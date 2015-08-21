@@ -10,7 +10,7 @@ internal abstract class SysFunction(public val sensitivities: List<SysWait>, pub
 
     abstract fun run(initialization: Boolean = false): SysWait
 
-    protected open fun wait(): SysWait = SysWait.reduce(sensitivities)
+    public open fun wait(): SysWait = SysWait.reduce(sensitivities)
 }
 
 internal abstract class SysTriggeredFunction(public val trigger: SysWait, sensitivities: List<SysWait>, initialize: Boolean = true):
@@ -22,5 +22,5 @@ internal abstract class SysTriggeredFunction(public val trigger: SysWait, sensit
     public constructor(port: SysBooleanInput, positive: Boolean, sensitivities: List<SysWait> = emptyList(), initialize: Boolean = true):
             this(if (positive) port.posEdgeEvent else port.negEdgeEvent, sensitivities, initialize)
 
-    protected final override fun wait(): SysWait = trigger
+    public final override fun wait(): SysWait = trigger
 }

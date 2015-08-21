@@ -18,6 +18,10 @@ internal open class SysPort<IF : SysInterface>(name: String, parent: SysObject? 
         sysInterface.register(this)
     }
 
+    public fun to(port: SysPort<IF>): Pair<SysPort<IF>, IF> = Pair(this, port())
+
+    public fun to(sysInterface: IF): Pair<SysPort<IF>, IF> = Pair(this, sysInterface)
+
     public fun invoke(): IF {
         assert(bound != null, "Port $name is not bound")
         return bound!!
@@ -25,6 +29,12 @@ internal open class SysPort<IF : SysInterface>(name: String, parent: SysObject? 
 
     public val defaultEvent: SysWait.Finder = object: SysWait.Finder {
         override fun invoke() = bound?.defaultEvent
+    }
+}
+
+public fun <IF: SysInterface> bind(vararg pairs: Pair<SysPort<IF>, IF>) {
+    for (pair in pairs) {
+        pair.first.bind(pair.second)
     }
 }
 

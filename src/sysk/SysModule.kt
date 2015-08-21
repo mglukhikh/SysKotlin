@@ -2,16 +2,39 @@ package sysk
 
 import java.util.*
 
-public open class SysModule(name: String, parent: SysObject? = null): SysObject(name, parent) {
+public open class SysModule(name: String, parent: SysModule? = null): SysObject(name, parent) {
 
     internal val functions: MutableList<SysFunction> = ArrayList()
 
     // A set of helper functions
 
-    protected fun function(run: (Boolean) -> SysWait, sensitivities: SysWait = SysWait.Never, initialize: Boolean = true) {
-        functions.add(object: SysFunction(sensitivities, initialize = initialize) {
+    protected fun function(run: (Boolean) -> SysWait,
+                           sensitivities: SysWait = SysWait.Never, initialize: Boolean = true): SysFunction {
+        val f = object: SysFunction(sensitivities, initialize = initialize) {
             override fun run(initialization: Boolean) = run(initialization)
-        })
+        }
+        functions.add(f)
+        return f
+    }
+
+    protected fun triggeredFunction(run: (Boolean) -> SysWait,
+                                    clock: SysClockedSignal, positive: Boolean = true,
+                                    sensitivities: SysWait = SysWait.Never, initialize: Boolean = true): SysTriggeredFunction {
+        val f = object: SysTriggeredFunction(clock, positive, listOf(sensitivities), initialize) {
+            override fun run(initialization: Boolean) = run(initialization)
+        }
+        functions.add(f)
+        return f
+    }
+
+    protected fun triggeredFunction(run: (Boolean) -> SysWait,
+                                    clock: SysBooleanInput, positive: Boolean = true,
+                                    sensitivities: SysWait = SysWait.Never, initialize: Boolean = true): SysTriggeredFunction {
+        val f = object: SysTriggeredFunction(clock, positive, listOf(sensitivities), initialize) {
+            override fun run(initialization: Boolean) = run(initialization)
+        }
+        functions.add(f)
+        return f
     }
 
     protected fun <IF: SysInterface> port(name: String, sysInterface: IF? = null): SysPort<IF> =
@@ -32,6 +55,9 @@ public open class SysModule(name: String, parent: SysObject? = null): SysObject(
 
     protected fun booleanSignal(name: String, startValue: Boolean): SysBooleanSignal =
             SysBooleanSignal(name, startValue, this)
+
+    protected fun clockedSignal(name: String, startValue: Boolean, period: SysWait.Time): SysClockedSignal =
+            SysClockedSignal(name, startValue, period)
 
     protected fun event(name: String): SysWait.Event = SysWait.Event(name, this)
 }

@@ -43,6 +43,7 @@ public object SysScheduler {
         for (s in sensitivities) {
             when (s) {
                 is SysWait.Event -> result.add(s)
+                is SysWait.Finder -> result.add(s)
                 is SysWait.Time -> if (time == null || time > s + currentTime) time = s + currentTime
                 is SysWait.OneOf -> {
                     val innerResult = convertToList(s.elements)
@@ -68,6 +69,7 @@ public object SysScheduler {
     private fun happened(wait: SysWait, events: Set<SysWait.Event>): Boolean =
         when (wait) {
             is SysWait.Event -> wait in events
+            is SysWait.Finder -> wait() in events
             is SysWait.Time -> wait <= currentTime
             is SysWait.OneOf -> wait.elements.any { happened(it, events) }
             else -> false
@@ -76,6 +78,7 @@ public object SysScheduler {
     private fun time(wait: SysWait): SysWait.Time =
         when (wait) {
             is SysWait.Event -> if (events[wait] ?: false) currentTime else SysWait.Time.INFINITY
+            is SysWait.Finder -> wait()?.let { if (events[it] ?: false) currentTime else null} ?: SysWait.Time.INFINITY
             is SysWait.Time -> wait
             is SysWait.OneOf -> wait.elements.last() as SysWait.Time
             else -> SysWait.Time.INFINITY
