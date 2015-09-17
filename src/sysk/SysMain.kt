@@ -3,15 +3,15 @@ package sysk
 // Very simple usage test
 fun main(arg: Array<String>) {
     // integers
-    val x: @width(4) SysInteger = SysInteger(5)
-    val y: @width(6) SysInteger = SysInteger(9).extend(6)
-    val z: @width(6) SysInteger = x + y
+    val x: @Width(4) SysInteger = SysInteger(5)
+    val y: @Width(6) SysInteger = SysInteger(9).extend(6)
+    val z: @Width(6) SysInteger = x + y
     println(x)
     println(y)
     println(z)
     println(z[2])
     println(z[4,1])
-    val v: @width(12) SysInteger = y * z
+    val v: @Width(12) SysInteger = y * z
     println(v)
 
     // signals

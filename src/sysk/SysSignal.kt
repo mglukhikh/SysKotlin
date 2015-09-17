@@ -4,14 +4,14 @@ internal open class SysSignal<T>(name: String, startValue: T, parent: SysObject?
         SysSignalRead<T>, SysSignalWrite<T>, SysObject(name, parent) {
 
     /** Current signal value */
-    override public var value: T = startValue
+    override var value: T = startValue
         set(value) = write(value)
 
     /** Signal value for the next delta-cycle */
     private var nextValue: T = startValue
 
     /** Is value going to change or not */
-    public var changed: Boolean = false
+    var changed: Boolean = false
         private set
 
     private val changeEvent: SysWait.Event = SysWait.Event("changeEvent", this)
@@ -20,14 +20,14 @@ internal open class SysSignal<T>(name: String, startValue: T, parent: SysObject?
         SysScheduler.register(this)
     }
 
-    override public fun read() = value
+    override fun read() = value
 
-    override public fun write(value: T) {
+    override fun write(value: T) {
         nextValue = value
         changed = (value != this.value)
     }
 
-    override public fun register(port: SysPort<*>) {
+    override fun register(port: SysPort<*>) {
 
     }
 
@@ -35,12 +35,12 @@ internal open class SysSignal<T>(name: String, startValue: T, parent: SysObject?
         get() = changeEvent
 
     /** Compare value with another signal (only current value is important here) */
-    override public fun equals(other: Any?): Boolean {
+    override fun equals(other: Any?): Boolean {
         if (this === other) return true
         return (other as? SysSignal<*>)?.let { value == it.value } ?: return false
     }
 
-    override public fun toString(): String {
+    override fun toString(): String {
         return if (changed) "$value($nextValue)" else "$value"
     }
 
@@ -70,7 +70,7 @@ internal open class SysBooleanSignal(name: String, startValue: Boolean, parent: 
                 posEdgeEvent.happens()
             }
         }
-        super<SysSignal>.update()
+        super.update()
     }
 }
 

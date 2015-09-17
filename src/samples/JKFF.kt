@@ -2,14 +2,14 @@ package samples
 
 import sysk.*
 
-public class JKFF(name: String, parent: SysModule? = null): SysModule(name, parent) {
+class JKFF(name: String, parent: SysModule? = null): SysModule(name, parent) {
 
-    public val j: SysBooleanInput = booleanInput("j")
-    public val k: SysBooleanInput = booleanInput("k")
-    public val clk: SysBooleanInput = booleanInput("clk")
+    val j   = booleanInput("j")
+    val k   = booleanInput("k")
+    val clk = booleanInput("clk")
 
     private var state = false
-    public val q: SysOutput<Boolean> = output("q")
+    val q = output<Boolean>("q")
 
     private val f: SysTriggeredFunction = triggeredFunction({
         println("${SysScheduler.currentTime}: j = ${j.value} k = ${k.value} state = $state")
@@ -22,11 +22,11 @@ public class JKFF(name: String, parent: SysModule? = null): SysModule(name, pare
 
 private class Testbench(name: String): SysModule(name) {
 
-    public val j: SysOutput<Boolean> = output("j")
-    public val k: SysOutput<Boolean> = output("k")
+    val j = output<Boolean>("j")
+    val k = output<Boolean>("k")
 
-    public val clk: SysBooleanInput = booleanInput("clk")
-    public val q: SysBooleanInput = booleanInput("q")
+    val clk = booleanInput("clk")
+    val q   = booleanInput("q")
 
     private var counter = 0
 
@@ -39,36 +39,36 @@ private class Testbench(name: String): SysModule(name) {
             println("${SysScheduler.currentTime}: q = ${q.value} counter = $counter")
             when (counter) {
                 0 -> {
-                    assert(!q.value, "q should be false at the beginning")
+                    assert(!q.value) { "q should be false at the beginning" }
                     println("ZERO")
                 }
                 1 -> {
-                    assert(!q.value, "q should be false after q = true and JK = 11")
+                    assert(!q.value) { "q should be false after q = true and JK = 11" }
                     // All changes at clock N are received at clock N+1 and processed at clock N+2
                     j.value = true
                     println("ONE")
                 }
                 2 -> {
-                    assert(!q.value, "q should be false after q = false and JK = 00")
+                    assert(!q.value) { "q should be false after q = false and JK = 00" }
                     j.value = false
                     println("TWO")
                 }
                 3 -> {
-                    assert(q.value, "q should be true after JK = 10")
+                    assert(q.value) { "q should be true after JK = 10" }
                     k.value = true
                     println("THREE")
                 }
                 4 -> {
-                    assert(q.value, "q should be true after q = true and JK = 00")
+                    assert(q.value) { "q should be true after q = true and JK = 00" }
                     j.value = true
                     println("FOUR")
                 }
                 5 -> {
-                    assert(!q.value, "q should be false after JK = 01")
+                    assert(!q.value) { "q should be false after JK = 01" }
                     println("FIVE")
                 }
                 6 -> {
-                    assert(q.value, "q should be true after q = false and JK = 11")
+                    assert(q.value) { "q should be true after q = false and JK = 11" }
                     j.value = false
                     k.value = false
                     println("SIX")
@@ -81,7 +81,7 @@ private class Testbench(name: String): SysModule(name) {
     }, clk)
 }
 
-public fun main(args: Array<String>) {
+fun main(args: Array<String>) {
     val j = SysBooleanSignal("j", false)
     val k = SysBooleanSignal("k", false)
     val clk = SysClockedSignal("clk", false, time(20, TimeUnit.NS))

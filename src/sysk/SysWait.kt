@@ -1,6 +1,6 @@
 package sysk
 
-public enum class TimeUnit(public val femtoSeconds: Long, public val name: String) {
+enum class TimeUnit(val femtoSeconds: Long, val name: String) {
     FS(1, "fs"),
     PS(1000, "ps"),
     NS(1000000, "ns"),
@@ -11,10 +11,10 @@ public enum class TimeUnit(public val femtoSeconds: Long, public val name: Strin
     override fun toString() = name
 }
 
-public interface SysWait {
+interface SysWait {
 
     /** Special: something that never happens */
-    public object Never: SysWait {
+    object Never: SysWait {
 
     }
 
@@ -34,30 +34,30 @@ public interface SysWait {
         fun invoke(): Event?
     }
 
-    public data class Time(public val femtoSeconds: Long): SysWait, Comparable<Time> {
+    data class Time(val femtoSeconds: Long): SysWait, Comparable<Time> {
         override fun compareTo(other: Time): Int =
                 if (femtoSeconds > other.femtoSeconds) 1
                 else if (femtoSeconds < other.femtoSeconds) -1
                 else 0
 
-        public constructor(num: Int, tu: TimeUnit): this(tu.femtoSeconds * num)
+        constructor(num: Int, tu: TimeUnit): this(tu.femtoSeconds * num)
 
-        public fun plus(other: Time): Time = Time(femtoSeconds + other.femtoSeconds)
+        fun plus(other: Time): Time = Time(femtoSeconds + other.femtoSeconds)
 
-        public fun numUnits(tu: TimeUnit): Double = femtoSeconds / tu.femtoSeconds.toDouble()
+        fun numUnits(tu: TimeUnit): Double = femtoSeconds / tu.femtoSeconds.toDouble()
 
         companion object {
-            public val INFINITY: Time = Time(Long.MAX_VALUE)
+            val INFINITY: Time = Time(Long.MAX_VALUE)
         }
     }
 
-    public data class OneOf(public val elements: List<SysWait>): SysWait {
-        public constructor(vararg elements: SysWait): this(elements.toList())
+    data class OneOf(public val elements: List<SysWait>): SysWait {
+        constructor(vararg elements: SysWait): this(elements.toList())
 
-        override public fun or(other: SysWait): OneOf = OneOf(elements + other)
+        override fun or(other: SysWait): OneOf = OneOf(elements + other)
     }
 
-    open public fun or(other: SysWait): SysWait = if (other is OneOf) other.or(this) else OneOf(this, other)
+    open fun or(other: SysWait): SysWait = if (other is OneOf) other.or(this) else OneOf(this, other)
 
     companion object {
         fun reduce(elements: List<SysWait>): SysWait {

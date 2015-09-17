@@ -2,7 +2,7 @@ package sysk
 
 import java.util.*
 
-public open class SysModule(name: String, parent: SysModule? = null): SysObject(name, parent) {
+open class SysModule(name: String, parent: SysModule? = null): SysObject(name, parent) {
 
     internal val functions: MutableList<SysFunction> = ArrayList()
 

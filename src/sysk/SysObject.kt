@@ -1,14 +1,14 @@
 package sysk
 
-public data class SysName(public val name: String)
+data class SysName(val name: String)
 
-public open class SysObject(public val sysName: SysName, public val parent: SysObject? = null) {
+open class SysObject(val sysName: SysName, val parent: SysObject? = null) {
 
     private val parentName: String
         get() = if (parent != null) parent.name + "." else ""
 
-    public val name: String
+    val name: String
         get() = parentName + sysName.name
 
-    public constructor(name: String, parent: SysObject? = null): this(SysName(name), parent)
+    constructor(name: String, parent: SysObject? = null): this(SysName(name), parent)
 }

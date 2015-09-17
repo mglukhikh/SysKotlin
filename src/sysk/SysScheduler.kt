@@ -2,9 +2,9 @@ package sysk
 
 import java.util.*
 
-public object SysScheduler {
+object SysScheduler {
 
-    public var currentTime: SysWait.Time = SysWait.Time(0)
+    var currentTime: SysWait.Time = SysWait.Time(0)
         private set
 
     private val events: MutableMap<SysWait.Event, Boolean> = LinkedHashMap()
@@ -58,7 +58,7 @@ public object SysScheduler {
                 }
             }
         }
-        time?.let { result.add(time) }
+        time?.let { result.add(it) }
         return result
     }
 
@@ -84,7 +84,7 @@ public object SysScheduler {
             else -> SysWait.Time.INFINITY
         }
 
-    public fun start(endTime: SysWait.Time = SysWait.Time.INFINITY) {
+    fun start(endTime: SysWait.Time = SysWait.Time.INFINITY) {
         if (currentTime >= endTime) return
         if (currentTime.femtoSeconds == 0L) {
             resetEvents()
