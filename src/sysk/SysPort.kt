@@ -53,6 +53,15 @@ internal class SysWireInput(name: String, parent: SysObject? = null, signalRead:
     val negEdgeEvent: SysWait.Finder = object: SysWait.Finder {
         override fun invoke() = (bound as? SysWireRead)?.negEdgeEvent
     }
+
+    val zero: Boolean
+        get() = value.zero
+
+    val one: Boolean
+        get() = value.one
+
+    val x: Boolean
+        get() = value.x
 }
 
 internal open class SysOutput<T>(name: String, parent: SysObject? = null, signalWrite: SysSignalWrite<T>? = null):

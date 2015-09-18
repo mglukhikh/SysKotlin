@@ -13,8 +13,8 @@ class JKFF(name: String, parent: SysModule? = null): SysModule(name, parent) {
 
     private val f: SysTriggeredFunction = triggeredFunction({
         println("${SysScheduler.currentTime}: j = ${j.value} k = ${k.value} state = $state")
-        if (j.value.one && state.zero) state = SysWireState.ONE
-        else if (k.value.one && state.one) state = SysWireState.ZERO
+        if (j.one && state.zero) state = SysWireState.ONE
+        else if (k.one && state.one) state = SysWireState.ZERO
         q.value = state
         f.wait()
     }, clk, initialize = false)
@@ -39,36 +39,36 @@ private class Testbench(name: String): SysModule(name) {
             println("${SysScheduler.currentTime}: q = ${q.value} counter = $counter")
             when (counter) {
                 0 -> {
-                    assert(q.value.zero) { "q should be false at the beginning" }
+                    assert(q.zero) { "q should be false at the beginning" }
                     println("ZERO")
                 }
                 1 -> {
-                    assert(q.value.zero) { "q should be false after q = true and JK = 11" }
+                    assert(q.zero) { "q should be false after q = true and JK = 11" }
                     // All changes at clock N are received at clock N+1 and processed at clock N+2
                     j.value = SysWireState.ONE
                     println("ONE")
                 }
                 2 -> {
-                    assert(q.value.zero) { "q should be false after q = false and JK = 00" }
+                    assert(q.zero) { "q should be false after q = false and JK = 00" }
                     j.value = SysWireState.ZERO
                     println("TWO")
                 }
                 3 -> {
-                    assert(q.value.one) { "q should be true after JK = 10" }
+                    assert(q.one) { "q should be true after JK = 10" }
                     k.value = SysWireState.ONE
                     println("THREE")
                 }
                 4 -> {
-                    assert(q.value.one) { "q should be true after q = true and JK = 00" }
+                    assert(q.one) { "q should be true after q = true and JK = 00" }
                     j.value = SysWireState.ONE
                     println("FOUR")
                 }
                 5 -> {
-                    assert(q.value.zero) { "q should be false after JK = 01" }
+                    assert(q.zero) { "q should be false after JK = 01" }
                     println("FIVE")
                 }
                 6 -> {
-                    assert(q.value.one) { "q should be true after q = false and JK = 11" }
+                    assert(q.one) { "q should be true after q = false and JK = 11" }
                     j.value = SysWireState.ZERO
                     k.value = SysWireState.ZERO
                     println("SIX")

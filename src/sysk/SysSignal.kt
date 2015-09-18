@@ -61,6 +61,15 @@ internal open class SysWireSignal(name: String, startValue: SysWireState = SysWi
 
     override val negEdgeEvent = SysWait.Event("negEdgeEvent", this)
 
+    val zero: Boolean
+        get() = value.zero
+
+    val one: Boolean
+        get() = value.one
+
+    val x: Boolean
+        get() = value.x
+
     override fun update() {
         if (changed) {
             if (value.one && nextValue.zero) {

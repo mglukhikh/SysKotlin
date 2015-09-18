@@ -23,11 +23,11 @@ class SysSignalTest {
     @Test
     fun wire() {
         val first = SysWireSignal("first", SysWireState.X)
-        assert(first.value.x)
+        assert(first.x)
         first.value = SysWireState.ONE
-        assert(first.value.x)
+        assert(first.x)
         first.update()
-        assert(first.value.one)
+        assert(first.one)
         val second = SysSignal("second", SysWireState.ONE)
         assert(first == second)
         second.value = SysWireState.ZERO
