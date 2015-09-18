@@ -8,7 +8,7 @@ internal open class SysSignal<T>(name: String, startValue: T, parent: SysObject?
         set(value) = write(value)
 
     /** Signal value for the next delta-cycle */
-    private var nextValue: T = startValue
+    protected var nextValue: T = startValue
 
     /** Is value going to change or not */
     var changed: Boolean = false
@@ -54,8 +54,8 @@ internal open class SysSignal<T>(name: String, startValue: T, parent: SysObject?
     }
 }
 
-internal open class SysBooleanSignal(name: String, startValue: Boolean, parent: SysObject? = null):
-        SysSignal<Boolean>(name, startValue, parent), SysBooleanRead {
+internal open class SysWireSignal(name: String, startValue: SysWireState = SysWireState.X, parent: SysObject? = null):
+        SysSignal<SysWireState>(name, startValue, parent), SysWireRead {
 
     override val posEdgeEvent = SysWait.Event("posEdgeEvent", this)
 
@@ -63,10 +63,10 @@ internal open class SysBooleanSignal(name: String, startValue: Boolean, parent: 
 
     override fun update() {
         if (changed) {
-            if (value) {
+            if (value.one && nextValue.zero) {
                 negEdgeEvent.happens()
             }
-            else {
+            else if (value.zero && nextValue.one){
                 posEdgeEvent.happens()
             }
         }
@@ -74,8 +74,8 @@ internal open class SysBooleanSignal(name: String, startValue: Boolean, parent: 
     }
 }
 
-internal class SysClockedSignal(name: String, startValue: Boolean, public val period: SysWait.Time, parent: SysObject? = null):
-        SysBooleanSignal(name, startValue, parent) {
+internal class SysClockedSignal(name: String, public val period: SysWait.Time, startValue: SysWireState = SysWireState.ZERO, parent: SysObject? = null):
+        SysWireSignal(name, startValue, parent) {
 
     init {
         object: SysFunction(SysWait.Time(period.femtoSeconds / 2), initialize = false) {

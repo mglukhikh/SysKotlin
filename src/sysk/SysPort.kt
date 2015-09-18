@@ -44,14 +44,14 @@ internal open class SysInput<T>(name: String, parent: SysObject? = null, signalR
         get() = bound?.value ?: throw IllegalStateException("Port $name is not bound")
 }
 
-internal class SysBooleanInput(name: String, parent: SysObject? = null, signalRead: SysBooleanRead? = null):
-        SysInput<Boolean>(name, parent, signalRead) {
+internal class SysWireInput(name: String, parent: SysObject? = null, signalRead: SysWireRead? = null):
+        SysInput<SysWireState>(name, parent, signalRead) {
     val posEdgeEvent: SysWait.Finder = object: SysWait.Finder {
-        override fun invoke() = (bound as? SysBooleanRead)?.posEdgeEvent
+        override fun invoke() = (bound as? SysWireRead)?.posEdgeEvent
     }
 
     val negEdgeEvent: SysWait.Finder = object: SysWait.Finder {
-        override fun invoke() = (bound as? SysBooleanRead)?.negEdgeEvent
+        override fun invoke() = (bound as? SysWireRead)?.negEdgeEvent
     }
 }
 

@@ -15,7 +15,7 @@ interface SysSignalRead<T>: SysInterface {
     fun read(): T
 }
 
-interface SysBooleanRead: SysSignalRead<Boolean> {
+interface SysWireRead : SysSignalRead<SysWireState> {
 
     val posEdgeEvent: SysWait.Event
 

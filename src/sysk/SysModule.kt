@@ -28,7 +28,7 @@ open class SysModule(name: String, parent: SysModule? = null): SysObject(name, p
     }
 
     protected fun triggeredFunction(run: (Boolean) -> SysWait,
-                                    clock: SysBooleanInput, positive: Boolean = true,
+                                    clock: SysWireInput, positive: Boolean = true,
                                     sensitivities: SysWait = SysWait.Never, initialize: Boolean = true): SysTriggeredFunction {
         val f = object: SysTriggeredFunction(clock, positive, listOf(sensitivities), initialize) {
             override fun run(initialization: Boolean) = run(initialization)
@@ -44,8 +44,8 @@ open class SysModule(name: String, parent: SysModule? = null): SysObject(name, p
             SysInput(name, this, signalRead)
 
 
-    protected fun booleanInput(name: String, signalRead: SysBooleanRead? = null): SysBooleanInput =
-            SysBooleanInput(name, this, signalRead)
+    protected fun wireInput(name: String, signalRead: SysWireRead? = null): SysWireInput =
+            SysWireInput(name, this, signalRead)
 
     protected fun <T> output(name: String, signalWrite: SysSignalWrite<T>? = null): SysOutput<T> =
             SysOutput(name, this, signalWrite)
@@ -53,11 +53,11 @@ open class SysModule(name: String, parent: SysModule? = null): SysObject(name, p
     protected fun <T> signal(name: String, startValue: T): SysSignal<T> =
             SysSignal(name, startValue, this)
 
-    protected fun booleanSignal(name: String, startValue: Boolean): SysBooleanSignal =
-            SysBooleanSignal(name, startValue, this)
+    protected fun booleanSignal(name: String, startValue: SysWireState = SysWireState.X) =
+            SysWireSignal(name, startValue, this)
 
-    protected fun clockedSignal(name: String, startValue: Boolean, period: SysWait.Time): SysClockedSignal =
-            SysClockedSignal(name, startValue, period)
+    protected fun clockedSignal(name: String, period: SysWait.Time, startValue: SysWireState = SysWireState.ZERO) =
+            SysClockedSignal(name, period, startValue)
 
     protected fun event(name: String): SysWait.Event = SysWait.Event(name, this)
 }

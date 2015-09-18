@@ -19,7 +19,7 @@ internal abstract class SysTriggeredFunction(val trigger: SysWait, sensitivities
     constructor(clock: SysClockedSignal, positive: Boolean, sensitivities: List<SysWait> = emptyList(), initialize: Boolean = true):
             this(if (positive) clock.posEdgeEvent else clock.negEdgeEvent, sensitivities, initialize)
 
-    constructor(port: SysBooleanInput, positive: Boolean, sensitivities: List<SysWait> = emptyList(), initialize: Boolean = true):
+    constructor(port: SysWireInput, positive: Boolean, sensitivities: List<SysWait> = emptyList(), initialize: Boolean = true):
             this(if (positive) port.posEdgeEvent else port.negEdgeEvent, sensitivities, initialize)
 
     final override fun wait(): SysWait = trigger

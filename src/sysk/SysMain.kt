@@ -38,7 +38,7 @@ fun main(arg: Array<String>) {
     println("${input.name} = ${input.value}")
 
     // clock
-    val clock: SysClockedSignal = SysClockedSignal("clock", false, time(20, TimeUnit.NS))
+    val clock = SysClockedSignal("clock", time(20, TimeUnit.NS))
     println("${SysScheduler.currentTime}: ${clock.name} = $clock")
     SysScheduler.start(time(55, TimeUnit.NS))
     println("${SysScheduler.currentTime}: ${clock.name} = $clock")
