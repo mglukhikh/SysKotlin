@@ -29,6 +29,7 @@ private class Testbench(name: String, parent: SysModule): SysModule(name, parent
     val q   = wireInput("q")
 
     private var counter = 0
+    private var phase = 0
 
     private val f: SysTriggeredFunction = triggeredFunction({
         if (it) {
@@ -75,7 +76,13 @@ private class Testbench(name: String, parent: SysModule): SysModule(name, parent
                 }
             }
             counter++
-            if (counter > 6) counter = 1
+            if (counter > 6) {
+                counter = 1
+                phase++
+                if (phase == 4) {
+                    scheduler.stop()
+                }
+            }
         }
         f.wait()
     }, clk)
@@ -93,10 +100,6 @@ internal class Top: SysTopModule("top", SysScheduler()) {
     init {
         bind(ff.j to j, ff.k to k, ff.clk to clk, tb.clk to clk, tb.q to q)
         bind(ff.q to q, tb.j to j, tb.k to k)
-    }
-
-    fun start() {
-        scheduler.start(time(1, TimeUnit.US))
     }
 }
 

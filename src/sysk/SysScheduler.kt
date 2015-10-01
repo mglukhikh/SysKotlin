@@ -84,7 +84,10 @@ class SysScheduler {
             else -> SysWait.Time.INFINITY
         }
 
+    private var stopRequested = false
+
     fun start(endTime: SysWait.Time = SysWait.Time.INFINITY) {
+        stopRequested = false
         if (currentTime >= endTime) return
         if (currentTime.femtoSeconds == 0L) {
             resetEvents()
@@ -99,7 +102,7 @@ class SysScheduler {
                 update()
             }
         }
-        while (currentTime < endTime) {
+        while (currentTime < endTime && !stopRequested) {
             var globalClosestTime = SysWait.Time.INFINITY
             val happenedEvents = events.entrySet().filter { it.value }.map { it.key }.toSet()
             var functionActivated = false
@@ -125,5 +128,9 @@ class SysScheduler {
                 // Proceed to next time moment
             }
         }
+    }
+
+    fun stop() {
+        stopRequested = true
     }
 }

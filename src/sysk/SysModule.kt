@@ -60,7 +60,7 @@ open class SysModule internal constructor(
     protected fun <T> signal(name: String, startValue: T): SysSignal<T> =
             SysSignal(name, startValue, scheduler, this)
 
-    protected fun booleanSignal(name: String, startValue: SysWireState = SysWireState.X) =
+    protected fun wireSignal(name: String, startValue: SysWireState = SysWireState.X) =
             SysWireSignal(name, scheduler, startValue, this)
 
     protected fun clockedSignal(name: String, period: SysWait.Time, startValue: SysWireState = SysWireState.ZERO) =
@@ -69,4 +69,11 @@ open class SysModule internal constructor(
     protected fun event(name: String): SysWait.Event = SysWait.Event(name, scheduler, this)
 }
 
-open class SysTopModule(name: String, scheduler: SysScheduler): SysModule(name, scheduler, null)
+open class SysTopModule(
+        name: String = "top", scheduler: SysScheduler = SysScheduler()
+): SysModule(name, scheduler, null) {
+
+    fun start(endTime: SysWait.Time = SysWait.Time.INFINITY) {
+        scheduler.start(endTime)
+    }
+}
