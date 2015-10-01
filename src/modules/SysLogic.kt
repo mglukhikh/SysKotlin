@@ -8,7 +8,9 @@ open class SysUnaryModule<Input, Output>(
         operation: (Input) -> Output, name: String, parent: SysModule
 ): SysModule(name, parent) {
 
-    open val x = input<Input>("x")
+    protected open fun createInput(name: String) = input<Input>("x")
+
+    val x = createInput("x")
 
     val y = output<Output>("y")
 
@@ -22,7 +24,7 @@ open class SysUnaryWireModule<Output>(
         operation: (SysWireState) -> Output, name: String, parent: SysModule
 ): SysUnaryModule<SysWireState, Output>(operation, name, parent) {
 
-    override val x = wireInput("x")
+    override fun createInput(name: String) = wireInput(name)
 }
 
 class SysNotModule(name: String, parent: SysModule): SysUnaryWireModule<SysWireState>({ it.not() }, name, parent)
