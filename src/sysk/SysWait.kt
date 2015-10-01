@@ -31,7 +31,7 @@ interface SysWait {
     }
 
     interface Finder: SysWait {
-        fun invoke(): Event?
+        operator fun invoke(): Event?
     }
 
     data class Time(val femtoSeconds: Long): SysWait, Comparable<Time> {
@@ -42,7 +42,7 @@ interface SysWait {
 
         constructor(num: Int, tu: TimeUnit): this(tu.femtoSeconds * num)
 
-        fun plus(other: Time): Time = Time(femtoSeconds + other.femtoSeconds)
+        operator fun plus(other: Time): Time = Time(femtoSeconds + other.femtoSeconds)
 
         fun numUnits(tu: TimeUnit): Double = femtoSeconds / tu.femtoSeconds.toDouble()
 

@@ -39,24 +39,24 @@ class SysInteger(val width: Int, val value: Long) {
     }
 
     /** Adds arg to this integer, with result width is maximum of argument's widths */
-    fun plus(arg: SysInteger): SysInteger {
+    operator fun plus(arg: SysInteger): SysInteger {
         val resWidth = Math.max(width, arg.width)
         return SysInteger(Math.max(resWidth + 1, MAX_WIDTH), value + arg.value).truncate(resWidth)
     }
 
     /** Multiplies arg to this integer, with result width is sum of argument's width */
-    fun times(arg: SysInteger): SysInteger {
+    operator fun times(arg: SysInteger): SysInteger {
         return SysInteger(width + arg.width, value * arg.value)
     }
 
     /** Extracts a single bit, accessible as [i] */
-    fun get(i: Int): Boolean {
+    operator fun get(i: Int): Boolean {
         if (i < 0 || i >= width) throw IndexOutOfBoundsException()
         return (value and (1L shl i)) != 0L
     }
 
     /** Extracts a range of bits, accessible as [j,i] */
-    fun get(j: Int, i: Int): SysInteger {
+    operator fun get(j: Int, i: Int): SysInteger {
         if (j < i) throw IllegalArgumentException()
         if (j >= width || i < 0) throw IndexOutOfBoundsException()
         var result = value shr i

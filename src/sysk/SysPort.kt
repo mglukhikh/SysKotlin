@@ -23,13 +23,13 @@ open class SysPort<IF : SysInterface> internal constructor(
 
     fun to(sysInterface: IF): Pair<SysPort<IF>, IF> = Pair(this, sysInterface)
 
-    fun invoke(): IF {
+    operator fun invoke(): IF {
         assert(bound != null) { "Port $name is not bound" }
         return bound!!
     }
 
     val defaultEvent: SysWait.Finder = object: SysWait.Finder {
-        override fun invoke() = bound?.defaultEvent
+        override operator fun invoke() = bound?.defaultEvent
     }
 }
 

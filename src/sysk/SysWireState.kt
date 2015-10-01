@@ -15,7 +15,7 @@ enum class SysWireState {
     open val zero = false
     open val x = false
 
-    fun not() = when (this) {
+    operator fun not() = when (this) {
         X    -> X
         ONE  -> ZERO
         ZERO -> ONE
