@@ -1,7 +1,7 @@
 package sysk
 
 open class SysSignal<T> internal constructor(
-        name: String, startValue: T, parent: SysObject? = null
+        name: String, startValue: T, scheduler: SysScheduler, parent: SysObject? = null
 ): SysSignalRead<T>, SysSignalWrite<T>, SysObject(name, parent) {
 
     /** Current signal value */
@@ -15,10 +15,10 @@ open class SysSignal<T> internal constructor(
     var changed: Boolean = false
         private set
 
-    private val changeEvent: SysWait.Event = SysWait.Event("changeEvent", this)
+    private val changeEvent: SysWait.Event = SysWait.Event("changeEvent", scheduler, this)
 
     init {
-        SysScheduler.register(this)
+        scheduler.register(this)
     }
 
     override fun read() = value
@@ -56,12 +56,12 @@ open class SysSignal<T> internal constructor(
 }
 
 open class SysWireSignal internal constructor(
-        name: String, startValue: SysWireState = SysWireState.X, parent: SysObject? = null
-): SysSignal<SysWireState>(name, startValue, parent), SysWireRead {
+        name: String, scheduler: SysScheduler, startValue: SysWireState = SysWireState.X, parent: SysObject? = null
+): SysSignal<SysWireState>(name, startValue, scheduler, parent), SysWireRead {
 
-    override val posEdgeEvent = SysWait.Event("posEdgeEvent", this)
+    override val posEdgeEvent = SysWait.Event("posEdgeEvent", scheduler, this)
 
-    override val negEdgeEvent = SysWait.Event("negEdgeEvent", this)
+    override val negEdgeEvent = SysWait.Event("negEdgeEvent", scheduler, this)
 
     val zero: Boolean
         get() = value.zero
@@ -88,12 +88,13 @@ open class SysWireSignal internal constructor(
 class SysClockedSignal internal constructor(
         name: String,
         public val period: SysWait.Time,
+        scheduler: SysScheduler,
         startValue: SysWireState = SysWireState.ZERO,
         parent: SysObject? = null
-): SysWireSignal(name, startValue, parent) {
+): SysWireSignal(name, scheduler, startValue, parent) {
 
     init {
-        object: SysFunction(SysWait.Time(period.femtoSeconds / 2), initialize = false) {
+        object: SysFunction(scheduler, SysWait.Time(period.femtoSeconds / 2), initialize = false) {
             override fun run(initialization: Boolean): SysWait {
                 value = !value
                 return wait()

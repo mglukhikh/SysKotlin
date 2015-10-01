@@ -12,7 +12,7 @@ public class SysWireStateTest {
     }
 
     @Test
-    fun not() {
+    fun notTest() {
         assert((!SysWireState.ZERO).one)
         assert((!SysWireState.ONE).zero)
         assert((!SysWireState.X).x)

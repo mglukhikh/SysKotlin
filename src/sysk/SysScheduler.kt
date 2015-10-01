@@ -2,7 +2,7 @@ package sysk
 
 import java.util.*
 
-object SysScheduler {
+class SysScheduler {
 
     var currentTime: SysWait.Time = SysWait.Time(0)
         private set

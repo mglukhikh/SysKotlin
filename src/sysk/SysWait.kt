@@ -18,15 +18,17 @@ interface SysWait {
 
     }
 
-    class Event internal constructor(name: String, parent: SysObject? = null): SysObject(name, parent), SysWait {
+    class Event internal constructor(
+            name: String, val scheduler: SysScheduler, parent: SysObject? = null
+    ): SysObject(name, parent), SysWait {
 
         init {
-            SysScheduler.register(this)
+            scheduler.register(this)
         }
 
         // Unfortunately notify() is in use in Java
         fun happens() {
-            SysScheduler.happens(this)
+            scheduler.happens(this)
         }
     }
 

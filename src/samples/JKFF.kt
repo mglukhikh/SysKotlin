@@ -2,7 +2,7 @@ package samples
 
 import sysk.*
 
-class JKFF(name: String, parent: SysModule? = null): SysModule(name, parent) {
+class JKFF(name: String, parent: SysModule): SysModule(name, parent) {
 
     val j   = wireInput("j")
     val k   = wireInput("k")
@@ -12,7 +12,7 @@ class JKFF(name: String, parent: SysModule? = null): SysModule(name, parent) {
     val q = output<SysWireState>("q")
 
     private val f: SysTriggeredFunction = triggeredFunction({
-        println("${SysScheduler.currentTime}: j = ${j.value} k = ${k.value} state = $state")
+        println("$currentTime: j = ${j.value} k = ${k.value} state = $state")
         if (j.one && state.zero) state = SysWireState.ONE
         else if (k.one && state.one) state = SysWireState.ZERO
         q.value = state
@@ -20,7 +20,7 @@ class JKFF(name: String, parent: SysModule? = null): SysModule(name, parent) {
     }, clk, initialize = false)
 }
 
-private class Testbench(name: String): SysModule(name) {
+private class Testbench(name: String, parent: SysModule): SysModule(name, parent) {
 
     val j = output<SysWireState>("j")
     val k = output<SysWireState>("k")
@@ -36,7 +36,7 @@ private class Testbench(name: String): SysModule(name) {
             k.value = SysWireState.ZERO
         }
         else {
-            println("${SysScheduler.currentTime}: q = ${q.value} counter = $counter")
+            println("$currentTime: q = ${q.value} counter = $counter")
             when (counter) {
                 0 -> {
                     assert(q.zero) { "q should be false at the beginning" }
@@ -81,17 +81,25 @@ private class Testbench(name: String): SysModule(name) {
     }, clk)
 }
 
+internal class Top: SysTopModule("top", SysScheduler()) {
+    val j = signal("j", SysWireState.ZERO)
+    val k = signal("k", SysWireState.ZERO)
+    val q = signal("q", SysWireState.ZERO)
+    val clk = clockedSignal("clk", time(20, TimeUnit.NS))
+
+    val ff = JKFF("my", this)
+    val tb = Testbench("your", this)
+
+    init {
+        bind(ff.j to j, ff.k to k, ff.clk to clk, tb.clk to clk, tb.q to q)
+        bind(ff.q to q, tb.j to j, tb.k to k)
+    }
+
+    fun start() {
+        scheduler.start(time(1, TimeUnit.US))
+    }
+}
+
 fun main(args: Array<String>) {
-    val j = SysWireSignal("j", SysWireState.ZERO)
-    val k = SysWireSignal("k", SysWireState.ZERO)
-    val clk = SysClockedSignal("clk", time(20, TimeUnit.NS))
-    val q = SysWireSignal("q", SysWireState.ZERO)
-
-    val ff = JKFF("my")
-    val tb = Testbench("your")
-
-    bind(ff.j to j, ff.k to k, ff.clk to clk, tb.clk to clk, tb.q to q)
-    bind(ff.q to q, tb.j to j, tb.k to k)
-
-    SysScheduler.start(time(1, TimeUnit.US))
+    Top().start()
 }

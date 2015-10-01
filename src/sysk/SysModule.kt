@@ -2,15 +2,22 @@ package sysk
 
 import java.util.*
 
-open class SysModule(name: String, parent: SysModule? = null): SysObject(name, parent) {
+open class SysModule internal constructor(
+        name: String, val scheduler: SysScheduler, parent: SysModule? = null
+): SysObject(name, parent) {
+
+    constructor(name: String, parent: SysModule): this(name, parent.scheduler, parent)
 
     private val functions: MutableList<SysFunction> = ArrayList()
 
     // A set of helper functions
 
+    protected val currentTime: SysWait.Time
+        get() = scheduler.currentTime
+
     protected fun function(run: (Boolean) -> SysWait,
                            sensitivities: SysWait = SysWait.Never, initialize: Boolean = true): SysFunction {
-        val f = object: SysFunction(sensitivities, initialize = initialize) {
+        val f = object: SysFunction(scheduler, sensitivities, initialize = initialize) {
             override fun run(initialization: Boolean) = run(initialization)
         }
         functions.add(f)
@@ -20,7 +27,7 @@ open class SysModule(name: String, parent: SysModule? = null): SysObject(name, p
     protected fun triggeredFunction(run: (Boolean) -> SysWait,
                                     clock: SysClockedSignal, positive: Boolean = true,
                                     sensitivities: SysWait = SysWait.Never, initialize: Boolean = true): SysTriggeredFunction {
-        val f = object: SysTriggeredFunction(clock, positive, listOf(sensitivities), initialize) {
+        val f = object: SysTriggeredFunction(clock, positive, scheduler, listOf(sensitivities), initialize) {
             override fun run(initialization: Boolean) = run(initialization)
         }
         functions.add(f)
@@ -30,7 +37,7 @@ open class SysModule(name: String, parent: SysModule? = null): SysObject(name, p
     protected fun triggeredFunction(run: (Boolean) -> SysWait,
                                     clock: SysWireInput, positive: Boolean = true,
                                     sensitivities: SysWait = SysWait.Never, initialize: Boolean = true): SysTriggeredFunction {
-        val f = object: SysTriggeredFunction(clock, positive, listOf(sensitivities), initialize) {
+        val f = object: SysTriggeredFunction(clock, positive, scheduler, listOf(sensitivities), initialize) {
             override fun run(initialization: Boolean) = run(initialization)
         }
         functions.add(f)
@@ -51,13 +58,15 @@ open class SysModule(name: String, parent: SysModule? = null): SysObject(name, p
             SysOutput(name, this, signalWrite)
 
     protected fun <T> signal(name: String, startValue: T): SysSignal<T> =
-            SysSignal(name, startValue, this)
+            SysSignal(name, startValue, scheduler, this)
 
     protected fun booleanSignal(name: String, startValue: SysWireState = SysWireState.X) =
-            SysWireSignal(name, startValue, this)
+            SysWireSignal(name, scheduler, startValue, this)
 
     protected fun clockedSignal(name: String, period: SysWait.Time, startValue: SysWireState = SysWireState.ZERO) =
-            SysClockedSignal(name, period, startValue)
+            SysClockedSignal(name, period, scheduler, startValue)
 
-    protected fun event(name: String): SysWait.Event = SysWait.Event(name, this)
+    protected fun event(name: String): SysWait.Event = SysWait.Event(name, scheduler, this)
 }
+
+open class SysTopModule(name: String, scheduler: SysScheduler): SysModule(name, scheduler, null)

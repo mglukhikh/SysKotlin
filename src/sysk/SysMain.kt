@@ -14,14 +14,15 @@ fun main(arg: Array<String>) {
     val v: @Width(12) SysInteger = y * z
     println(v)
 
+    val scheduler = SysScheduler()
     // signals
-    val first: SysSignal<Boolean> = SysSignal("first", false)
+    val first: SysSignal<Boolean> = SysSignal("first", false, scheduler)
     println("${first.name} = $first")
     first.value = true
     println("${first.name} = $first")
     first.update()
     println("${first.name} = $first")
-    val second: SysSignal<Boolean> = SysSignal("second", true)
+    val second: SysSignal<Boolean> = SysSignal("second", true, scheduler)
     println(first == second)
     second.value = false
     println("$first, $second, ${first == second}")
@@ -29,7 +30,7 @@ fun main(arg: Array<String>) {
     println("$first, $second, ${first == second}")
 
     // ports
-    val connector: SysSignal<Boolean> = SysSignal("connector", false)
+    val connector: SysSignal<Boolean> = SysSignal("connector", false, scheduler)
     val input: SysInput<Boolean> = SysInput("input", null, connector)
     val output: SysOutput<Boolean> = SysOutput("output", null, connector)
     println("${input.name} = ${input.value}")
@@ -38,12 +39,12 @@ fun main(arg: Array<String>) {
     println("${input.name} = ${input.value}")
 
     // clock
-    val clock = SysClockedSignal("clock", time(20, TimeUnit.NS))
-    println("${SysScheduler.currentTime}: ${clock.name} = $clock")
-    SysScheduler.start(time(55, TimeUnit.NS))
-    println("${SysScheduler.currentTime}: ${clock.name} = $clock")
-    SysScheduler.start(time(115, TimeUnit.NS))
-    println("${SysScheduler.currentTime}: ${clock.name} = $clock")
-    SysScheduler.start(time(145, TimeUnit.NS))
-    println("${SysScheduler.currentTime}: ${clock.name} = $clock")
+    val clock = SysClockedSignal("clock", time(20, TimeUnit.NS), scheduler)
+    println("${scheduler.currentTime}: ${clock.name} = $clock")
+    scheduler.start(time(55, TimeUnit.NS))
+    println("${scheduler.currentTime}: ${clock.name} = $clock")
+    scheduler.start(time(115, TimeUnit.NS))
+    println("${scheduler.currentTime}: ${clock.name} = $clock")
+    scheduler.start(time(145, TimeUnit.NS))
+    println("${scheduler.currentTime}: ${clock.name} = $clock")
 }
