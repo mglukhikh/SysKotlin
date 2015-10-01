@@ -30,12 +30,15 @@ class SysSignalTest {
         assert(first.x)
         first.update()
         assert(first.one)
-        val second = SysSignal("second", SysWireState.ONE, scheduler)
+        first.value = SysWireState.ZERO
+        assert(first.one)
+        first.update()
+        assert(first.zero)
+        val second = SysSignal("second", SysWireState.ZERO, scheduler)
         assert(first == second)
-        second.value = SysWireState.ZERO
+        second.value = SysWireState.ONE
         assert(first == second)
         second.update()
         assert(first != second)
-
     }
 }
