@@ -18,7 +18,7 @@ interface SysWait {
 
     }
 
-    internal class Event(name: String, parent: SysObject? = null): SysObject(name, parent), SysWait {
+    class Event internal constructor(name: String, parent: SysObject? = null): SysObject(name, parent), SysWait {
 
         init {
             SysScheduler.register(this)
@@ -30,7 +30,7 @@ interface SysWait {
         }
     }
 
-    internal interface Finder: SysWait {
+    interface Finder: SysWait {
         fun invoke(): Event?
     }
 

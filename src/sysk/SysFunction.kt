@@ -1,25 +1,25 @@
 package sysk
 
-internal abstract class SysFunction(val sensitivities: List<SysWait>, val initialize: Boolean = true) {
+abstract class SysFunction internal constructor(val sensitivities: List<SysWait>, val initialize: Boolean = true) {
 
     init {
         SysScheduler.register(this)
     }
 
-    constructor(vararg sensitivities: SysWait, initialize: Boolean = true): this(sensitivities.toList(), initialize)
+    internal constructor(vararg sensitivities: SysWait, initialize: Boolean = true): this(sensitivities.toList(), initialize)
 
     abstract fun run(initialization: Boolean = false): SysWait
 
     open fun wait(): SysWait = SysWait.reduce(sensitivities)
 }
 
-internal abstract class SysTriggeredFunction(val trigger: SysWait, sensitivities: List<SysWait>, initialize: Boolean = true):
+abstract class SysTriggeredFunction internal constructor(val trigger: SysWait, sensitivities: List<SysWait>, initialize: Boolean = true):
         SysFunction(sensitivities + trigger, initialize) {
 
-    constructor(clock: SysClockedSignal, positive: Boolean, sensitivities: List<SysWait> = emptyList(), initialize: Boolean = true):
+    internal constructor(clock: SysClockedSignal, positive: Boolean, sensitivities: List<SysWait> = emptyList(), initialize: Boolean = true):
             this(if (positive) clock.posEdgeEvent else clock.negEdgeEvent, sensitivities, initialize)
 
-    constructor(port: SysWireInput, positive: Boolean, sensitivities: List<SysWait> = emptyList(), initialize: Boolean = true):
+    internal constructor(port: SysWireInput, positive: Boolean, sensitivities: List<SysWait> = emptyList(), initialize: Boolean = true):
             this(if (positive) port.posEdgeEvent else port.negEdgeEvent, sensitivities, initialize)
 
     final override fun wait(): SysWait = trigger

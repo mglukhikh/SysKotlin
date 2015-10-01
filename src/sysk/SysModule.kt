@@ -4,7 +4,7 @@ import java.util.*
 
 open class SysModule(name: String, parent: SysModule? = null): SysObject(name, parent) {
 
-    internal val functions: MutableList<SysFunction> = ArrayList()
+    private val functions: MutableList<SysFunction> = ArrayList()
 
     // A set of helper functions
 

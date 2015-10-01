@@ -1,7 +1,8 @@
 package sysk
 
-internal open class SysSignal<T>(name: String, startValue: T, parent: SysObject? = null):
-        SysSignalRead<T>, SysSignalWrite<T>, SysObject(name, parent) {
+open class SysSignal<T> internal constructor(
+        name: String, startValue: T, parent: SysObject? = null
+): SysSignalRead<T>, SysSignalWrite<T>, SysObject(name, parent) {
 
     /** Current signal value */
     override var value: T = startValue
@@ -54,8 +55,9 @@ internal open class SysSignal<T>(name: String, startValue: T, parent: SysObject?
     }
 }
 
-internal open class SysWireSignal(name: String, startValue: SysWireState = SysWireState.X, parent: SysObject? = null):
-        SysSignal<SysWireState>(name, startValue, parent), SysWireRead {
+open class SysWireSignal internal constructor(
+        name: String, startValue: SysWireState = SysWireState.X, parent: SysObject? = null
+): SysSignal<SysWireState>(name, startValue, parent), SysWireRead {
 
     override val posEdgeEvent = SysWait.Event("posEdgeEvent", this)
 
@@ -83,8 +85,12 @@ internal open class SysWireSignal(name: String, startValue: SysWireState = SysWi
     }
 }
 
-internal class SysClockedSignal(name: String, public val period: SysWait.Time, startValue: SysWireState = SysWireState.ZERO, parent: SysObject? = null):
-        SysWireSignal(name, startValue, parent) {
+class SysClockedSignal internal constructor(
+        name: String,
+        public val period: SysWait.Time,
+        startValue: SysWireState = SysWireState.ZERO,
+        parent: SysObject? = null
+): SysWireSignal(name, startValue, parent) {
 
     init {
         object: SysFunction(SysWait.Time(period.femtoSeconds / 2), initialize = false) {
