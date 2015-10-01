@@ -4,12 +4,16 @@ open class SysSignal<T> internal constructor(
         name: String, startValue: T, scheduler: SysScheduler, parent: SysObject? = null
 ): SysSignalRead<T>, SysSignalWrite<T>, SysObject(name, parent) {
 
+    /** Current signal value (backing field) */
+    private var storedValue = startValue
+
     /** Current signal value */
-    override var value: T = startValue
+    override var value: T
+        get() = storedValue
         set(value) = write(value)
 
     /** Signal value for the next delta-cycle */
-    protected var nextValue: T = startValue
+    protected var nextValue = startValue
 
     /** Is value going to change or not */
     var changed: Boolean = false
@@ -50,7 +54,7 @@ open class SysSignal<T> internal constructor(
         if (changed) {
             changeEvent.happens()
         }
-        $value = nextValue
+        storedValue = nextValue
         changed = false
     }
 }
