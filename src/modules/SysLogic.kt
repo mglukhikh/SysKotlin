@@ -33,9 +33,13 @@ open class SysBinaryModule<Input1, Input2, Output>(
         operation: (Input1, Input2) -> Output, name: String, parent: SysModule
 ): SysModule(name, parent) {
 
-    open val x1 = input<Input1>("x1")
+    protected open fun createInput1(name: String) = input<Input1>(name)
 
-    open val x2 = input<Input2>("x2")
+    protected open fun createInput2(name: String) = input<Input2>(name)
+
+    val x1 = createInput1("x1")
+
+    val x2 = createInput2("x2")
 
     val y = output<Output>("y")
 
@@ -49,9 +53,9 @@ open class SysBinaryWireModule<Output>(
         operation: (SysWireState, SysWireState) -> Output, name: String, parent: SysModule
 ): SysBinaryModule<SysWireState, SysWireState, Output>(operation, name, parent) {
 
-    override val x1 = wireInput("x1")
+    override fun createInput1(name: String) = wireInput(name)
 
-    override val x2 = wireInput("x2")
+    override fun createInput2(name: String) = wireInput(name)
 }
 
 class SysOrModule(name: String, parent: SysModule):

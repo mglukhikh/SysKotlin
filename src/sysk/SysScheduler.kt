@@ -80,7 +80,7 @@ class SysScheduler {
             is SysWait.Event -> if (events[wait] ?: false) currentTime else SysWait.Time.INFINITY
             is SysWait.Finder -> wait()?.let { if (events[it] ?: false) currentTime else null} ?: SysWait.Time.INFINITY
             is SysWait.Time -> wait
-            is SysWait.OneOf -> wait.elements.last() as SysWait.Time
+            is SysWait.OneOf -> wait.elements.map { time(it) }.min() ?: SysWait.Time.INFINITY
             else -> SysWait.Time.INFINITY
         }
 
