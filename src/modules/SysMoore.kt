@@ -55,7 +55,7 @@ class CountTriggerMoore(name: String, parent: SysModule): SysUnaryWireMoore<SysW
             }
         },
         { it },
-        SysWireState.X,
+        SysWireState.ZERO,
         name,
         parent
 )
