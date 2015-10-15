@@ -92,17 +92,21 @@ open class SysWireSignal internal constructor(
 class SysClockedSignal internal constructor(
         name: String,
         public val period: SysWait.Time,
-        scheduler: SysScheduler,
+        private val scheduler: SysScheduler,
         startValue: SysWireState = SysWireState.ZERO,
         parent: SysObject? = null
 ): SysWireSignal(name, scheduler, startValue, parent) {
 
-    init {
-        object: SysFunction(scheduler, SysWait.Time(period.femtoSeconds / 2), initialize = false) {
-            override fun run(initialization: Boolean): SysWait {
-                value = !value
-                return wait()
-            }
+    protected inner class SysClockedSignalFunction :
+            SysFunction(scheduler, SysWait.Time(period.femtoSeconds / 2), initialize = false) {
+
+        override fun run(initialization: Boolean): SysWait {
+            value = !value
+            return wait()
         }
+    }
+
+    init {
+        SysClockedSignalFunction()
     }
 }

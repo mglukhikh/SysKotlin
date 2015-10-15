@@ -15,11 +15,18 @@ open class SysModule internal constructor(
     protected val currentTime: SysWait.Time
         get() = scheduler.currentTime
 
+    protected class SysModuleFunction(
+            private val f: (Boolean) -> SysWait,
+            scheduler: SysScheduler,
+            sensitivities: SysWait,
+            initialize: Boolean
+    ) : SysFunction(scheduler, sensitivities, initialize = initialize) {
+        override fun run(initialization: Boolean): SysWait = f(initialization)
+    }
+
     protected fun function(run: (Boolean) -> SysWait,
                            sensitivities: SysWait = SysWait.Never, initialize: Boolean = true): SysFunction {
-        val f = object: SysFunction(scheduler, sensitivities, initialize = initialize) {
-            override fun run(initialization: Boolean) = run(initialization)
-        }
+        val f = SysModuleFunction(run, scheduler, sensitivities, initialize)
         functions.add(f)
         return f
     }
