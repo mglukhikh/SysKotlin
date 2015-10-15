@@ -1,14 +1,14 @@
 package sysk
 
-enum class TimeUnit(val femtoSeconds: Long, val name: String) {
-    FS(1, "fs"),
-    PS(1000, "ps"),
-    NS(1000000, "ns"),
-    US(1000000000, "us"),
-    MS(1000000000000, "ms"),
-     S(1000000000000000, "s");
+enum class TimeUnit(val femtoSeconds: Long) {
+    FS(1),
+    PS(1000),
+    NS(1000000),
+    US(1000000000),
+    MS(1000000000000),
+     S(1000000000000000);
 
-    override fun toString() = name
+    override fun toString() = name.toLowerCase()
 }
 
 interface SysWait {
@@ -66,7 +66,7 @@ interface SysWait {
             if (elements.isEmpty()) {
                 return Never
             }
-            else if (elements.size() == 1) {
+            else if (elements.size == 1) {
                 return elements.first()
             }
             else {

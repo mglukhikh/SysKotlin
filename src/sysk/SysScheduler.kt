@@ -30,7 +30,7 @@ class SysScheduler {
     }
 
     private fun resetEvents() {
-        events.keySet().forEach { events[it] = false }
+        events.keys.forEach { events[it] = false }
     }
 
     private fun update() {
@@ -49,7 +49,7 @@ class SysScheduler {
                     val innerResult = convertToList(s.elements)
                     val last = innerResult.lastOrNull()
                     if (last is SysWait.Time) {
-                        result.addAll(innerResult.subList(0, innerResult.size() - 1))
+                        result.addAll(innerResult.subList(0, innerResult.size - 1))
                         if (time == null || time > last + currentTime) time = last + currentTime
                     }
                     else {
@@ -92,7 +92,7 @@ class SysScheduler {
         if (currentTime.femtoSeconds == 0L) {
             resetEvents()
             var functionActivated = false
-            for (function in functions.keySet()) {
+            for (function in functions.keys) {
                 if (function.initialize) {
                     functionActivated = true
                     functions[function] = convert(function.run(true))
@@ -104,7 +104,7 @@ class SysScheduler {
         }
         while (currentTime < endTime && !stopRequested) {
             var globalClosestTime = SysWait.Time.INFINITY
-            val happenedEvents = events.entrySet().filter { it.value }.map { it.key }.toSet()
+            val happenedEvents = events.entries.filter { it.value }.map { it.key }.toSet()
             var functionActivated = false
             resetEvents()
             for ((function, wait) in functions) {

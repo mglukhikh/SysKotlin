@@ -95,7 +95,7 @@ internal class Top: SysTopModule("top", SysScheduler()) {
     val clk = clockedSignal("clk", time(20, TimeUnit.NS))
 
     val ff = JKFF("my", this)
-    val tb = Testbench("your", this)
+    private val tb = Testbench("your", this)
 
     init {
         bind(ff.j to j, ff.k to k, ff.clk to clk, tb.clk to clk, tb.q to q)
