@@ -98,7 +98,7 @@ class SysClockedSignal internal constructor(
 ): SysWireSignal(name, scheduler, startValue, parent) {
 
     protected inner class SysClockedSignalFunction :
-            SysFunction(scheduler, SysWait.Time(period.femtoSeconds / 2), initialize = false) {
+            SysFunction(scheduler, period / 2, initialize = false) {
 
         override fun run(initialization: Boolean): SysWait {
             value = !value

@@ -44,7 +44,9 @@ interface SysWait {
 
         constructor(num: Int, tu: TimeUnit): this(tu.femtoSeconds * num)
 
-        operator fun plus(other: Time): Time = Time(femtoSeconds + other.femtoSeconds)
+        operator fun plus(other: Time) = Time(femtoSeconds + other.femtoSeconds)
+
+        operator fun div(arg: Int) = Time(femtoSeconds / 2)
 
         fun numUnits(tu: TimeUnit): Double = femtoSeconds / tu.femtoSeconds.toDouble()
 
