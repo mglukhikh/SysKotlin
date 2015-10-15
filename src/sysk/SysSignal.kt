@@ -98,7 +98,7 @@ class SysClockedSignal internal constructor(
 ): SysWireSignal(name, scheduler, startValue, parent) {
 
     protected inner class SysClockedSignalFunction :
-            SysFunction(scheduler, period / 2, initialize = false) {
+            SysFunction(period / 2, initialize = false) {
 
         override fun run(initialization: Boolean): SysWait {
             value = !value
@@ -107,6 +107,6 @@ class SysClockedSignal internal constructor(
     }
 
     init {
-        SysClockedSignalFunction()
+        scheduler.register(SysClockedSignalFunction())
     }
 }
