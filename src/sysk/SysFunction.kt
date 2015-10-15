@@ -32,3 +32,25 @@ abstract class SysTriggeredFunction internal constructor(
 
     final override fun wait(): SysWait = trigger
 }
+
+abstract class SysFunctionWithCounter internal constructor(
+        trigger: SysWait,
+        val init: () -> Unit,
+        vararg val stages: () -> Unit
+): SysTriggeredFunction(trigger, emptyList()) {
+
+    var counter = 0
+
+    override fun run(initialization: Boolean): SysWait {
+        if (initialization) {
+            init()
+        }
+        else {
+            if (counter < stages.size()) {
+                stages.get(counter)()
+            }
+            counter++
+        }
+        return wait()
+    }
+}
