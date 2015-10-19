@@ -8,7 +8,7 @@ class RSFF(name: String, parent: SysModule): SysModule(name, parent) {
     val s   = wireInput("s")
     val clk = wireInput("clk")
 
-    private var state = SysWireState.ZERO
+    private var state = SysWireState.X
     val q = output<SysWireState>("q")
 
     private val f: SysTriggeredFunction = triggeredFunction({

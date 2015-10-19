@@ -16,34 +16,42 @@ private class TestbenchRSTrigger(name: String, parent: SysModule): SysModule(nam
 
     private val f: SysTriggeredFunction = triggeredFunction({
         if (it) {
-            r.value = SysWireState.ZERO
-            s.value = SysWireState.ZERO
+            r.value = SysWireState.X
+            s.value = SysWireState.X
         }
         else {
             println("$currentTime: q = ${q.value} counter = $counter")
             when (counter) {
                 0 -> {
-                    assert(q.zero) { "q should be false at the beginning" }
+                    assert(q.x) { "q should be x at the beginning" }
                     println("ZERO")
                 }
                 1 -> {
-                    assert(q.zero) { "q should be false after q = false and RS = 00" }
+                    if (phase == 0)
+                        assert(q.x) { "q should be x after q = x and RS = XX" }
+                    else
+                        assert(q.zero) { "q should be false after q = false and RS = 00" }
+
                     // All changes at clock N are received at clock N+1 and processed at clock N+2
                     s.value = SysWireState.ONE
                     println("ONE")
                 }
                 2 -> {
-                    assert(q.zero) { "q should be false after q = false and RS = 00" }
+                    if (phase == 0)
+                        assert(q.x) { "q should be x after q = x and RS = XX" }
+                    else
+                        assert(q.zero) { "q should be false after q = false and RS = 00" }
+
                     s.value = SysWireState.ZERO
                     println("TWO")
                 }
                 3 -> {
-                    assert(q.one) { "q should be true after RS = 01" }
+                    assert(q.one) { "q should be true after RS = 01 or RS = X1" }
                     r.value = SysWireState.ONE
                     println("THREE")
                 }
                 4 -> {
-                    assert(q.one) { "q should be true after q = true and RS = 00" }
+                    assert(q.one) { "q should be true after q = true and RS = 00 or RS = X0" }
                     r.value = SysWireState.ZERO
                     println("FOUR")
                 }
@@ -66,9 +74,10 @@ private class TestbenchRSTrigger(name: String, parent: SysModule): SysModule(nam
 }
 
 internal class TopRSTrigger: SysTopModule("top", SysScheduler()) {
-    val r = signal("r", SysWireState.ZERO)
-    val s = signal("s", SysWireState.ZERO)
-    val q = signal("q", SysWireState.ZERO)
+    val r = signal("r", SysWireState.X)
+    val s = signal("s", SysWireState.X)
+
+    val q = signal("q", SysWireState.X)
     val clk = clockedSignal("clk", time(20, TimeUnit.NS))
 
     val ff = RSFF("my", this)
