@@ -15,23 +15,31 @@ private class TestbenchDTrigger(name: String, parent: SysModule): SysModule(name
 
     private val f: SysTriggeredFunction = triggeredFunction({
         if (it) {
-            d.value = SysWireState.ZERO
+            d.value = SysWireState.X
         }
         else {
             println("$currentTime: q = ${q.value} counter = $counter")
             when (counter) {
                 0 -> {
-                    assert(q.zero) { "q should be false at the beginning" }
+                    assert(q.x) { "q should be x at the beginning" }
                     println("ZERO")
                 }
                 1 -> {
-                    assert(q.zero) { "q should be false after q = false and D = 0" }
+                    if (phase == 0)
+                        assert(q.x) { "q should be x after q = x and D = X" }
+                    else
+                        assert(q.zero) { "q should be false after q = false and D = 0" }
+
                     // All changes at clock N are received at clock N+1 and processed at clock N+2
                     d.value = SysWireState.ONE
                     println("ONE")
                 }
                 2 -> {
-                    assert(q.zero) { "q should be false after q = false and D = 0" }
+                    if (phase == 0)
+                        assert(q.x) { "q should be x after q = x and D = X" }
+                    else
+                        assert(q.zero) { "q should be false after q = false and D = 0" }
+
                     d.value = SysWireState.ZERO
                     println("TWO")
                 }
@@ -58,10 +66,10 @@ private class TestbenchDTrigger(name: String, parent: SysModule): SysModule(name
 }
 
 internal class TopDTrigger: SysTopModule("top", SysScheduler()) {
-    val d = signal("d", SysWireState.ZERO)
+    val d = signal("d", SysWireState.X)
 
     val clk = clockedSignal("clk", time(20, TimeUnit.NS))
-    val q = signal("q", SysWireState.ZERO)
+    val q = signal("q", SysWireState.X)
 
     val ff = DFF("my", this)
     val tb = TestbenchDTrigger("your", this)
