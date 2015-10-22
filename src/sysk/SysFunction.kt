@@ -46,7 +46,7 @@ abstract class SysFunctionWithCounter internal constructor(
             init()
         }
         else {
-            if (counter < stages.size()) {
+            if (counter < stages.size) {
                 stages.get(counter)()
             }
             counter++

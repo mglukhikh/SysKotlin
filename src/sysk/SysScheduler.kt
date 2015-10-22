@@ -66,7 +66,7 @@ class SysScheduler {
 
     private fun convert(sensitivities: List<SysWait>): SysWait = SysWait.reduce(convertToList(sensitivities))
 
-    private fun happened(wait: SysWait, events: Set<SysWait.Event>): Boolean =
+    private fun happened(wait: SysWait, events: Set<SysWait.Event?>): Boolean =
         when (wait) {
             is SysWait.Event -> wait in events
             is SysWait.Finder -> wait() in events
