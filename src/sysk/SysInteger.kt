@@ -26,7 +26,7 @@ class SysInteger(
         }
 
 
-        if (bitsState.size() != width) {
+        if (bitsState.size != width) {
             throw IllegalArgumentException()
         }
     }
@@ -48,7 +48,7 @@ class SysInteger(
     constructor(width: Int, value: Int) : this(width, value.toLong(), bitsState = maskByValue(value.toLong(), width))
 
     /**Construct from given SysWireState Array*/
-    constructor (arr: Array<SysWireState>) : this(arr.size(), valueBySWSArray(arr), bitsState = maskBySWSArray(arr))
+    constructor (arr: Array<SysWireState>) : this(arr.size, valueBySWSArray(arr), bitsState = maskBySWSArray(arr))
 
     /** Increase width to the given */
     fun extend(width: Int): SysInteger {
@@ -82,65 +82,57 @@ class SysInteger(
 
     /** Integer division by divisor*/
     operator fun div(arg: SysInteger): SysInteger {
-        if (arg.value == 0L)
-            throw IllegalArgumentException("Division by zero");
-        if (arg.width > width)
-            arg.truncate(width);
+        if (arg.value == 0L) throw IllegalArgumentException("Division by zero")
+        if (arg.width > width) arg.truncate(width)
         return SysInteger(width, value / arg.value)
     }
 
     /** Remainder of integer division*/
     operator fun mod(arg: SysInteger): SysInteger {
-        if (arg.value == 0L)
-            throw IllegalArgumentException("Division by zero");
-        if (arg.width > width)
-            return this;
+        if (arg.value == 0L) throw IllegalArgumentException("Division by zero")
+        if (arg.width > width) return this
         return SysInteger(arg.width, value % arg.value)
     }
 
     /** Multiplies arg to this integer, with result width is sum of argument's width */
     operator fun times(arg: SysInteger): SysInteger {
-        val resWidth = Math.min(width + arg.width, MAX_WIDTH);
-        return SysInteger(resWidth, value * arg.value).truncate(resWidth);
+        val resWidth = Math.min(width + arg.width, MAX_WIDTH)
+        return SysInteger(resWidth, value * arg.value).truncate(resWidth)
     }
 
-//TODO Remake all shifts
+    //TODO Remake all shifts
     /** Bitwise logical shift right*/
     fun ushr(shift: Int): SysInteger {
-        if (shift == 0)
-            return this;
+        if (shift == 0) return this
 
-        return SysInteger(width, value ushr shift, bitsState = bitsState);
+        return SysInteger(width, value ushr shift, bitsState = bitsState)
     }
 
     /** Bitwise logical shift left*/
     fun ushl(shift: Int): SysInteger {
-        if (shift == 0)
-            return this;
-        val tempState = bitsState;
+        if (shift == 0) return this
+        val tempState = bitsState
         val start = tempState.lastIndexOf(false)
         for (i in 0..shift)
-            tempState[start - i] = true;
-        return SysInteger(width, value shl shift, bitsState = tempState);
+            tempState[start - i] = true
+        return SysInteger(width, value shl shift, bitsState = tempState)
     }
 
     /** Arithmetic shift right*/
     fun shr(shift: Int): SysInteger {
-        if (shift == 0)
-            return this;
-        return SysInteger(width, value shr shift, bitsState = bitsState);
+        if (shift == 0) return this
+        return SysInteger(width, value shr shift, bitsState = bitsState)
 
     }
 
     /** Arithmetic shift left*/
     fun shl(shift: Int): SysInteger {
-        if (shift == 0)
-            return this;
+        if (shift == 0) return this
         val tempState = bitsState;
         val start = tempState.lastIndexOf(false)
         for (i in 0..shift)
-            tempState[start - i] = true;
-        return SysInteger(width, value shl shift, bitsState = tempState);
+            tempState[start - i] = true
+        return SysInteger(width, value shl shift, bitsState = tempState)
     }
 
 
@@ -179,39 +171,39 @@ class SysInteger(
     }
 */
     /** Bitwise and*/
-    fun and(arg: SysInteger): SysInteger {
+    infix fun and(arg: SysInteger): SysInteger {
         var temp = arg.bitsState;
 
         for (i in 0..Math.min(temp.lastIndex, bitsState.lastIndex)) {
             temp[i] = temp[i] and bitsState[i];
         }
-        if (temp.size() < bitsState.size())
-            temp = temp.plus(bitsState.copyOfRange(temp.size(), bitsState.size()));
+        if (temp.size < bitsState.size)
+            temp = temp.plus(bitsState.copyOfRange(temp.size, bitsState.size));
         return SysInteger(Math.max(width, arg.width), value and arg.value, bitsState = temp)
     }
 
     /** Bitwise or*/
-    fun or(arg: SysInteger): SysInteger {
+    infix fun or(arg: SysInteger): SysInteger {
 
         var temp = arg.bitsState;
         for (i in 0..Math.min(temp.lastIndex, bitsState.lastIndex)) {
             temp[i] = temp[i] and bitsState[i];
         }
-        if (temp.size() < bitsState.size())
-            temp = temp.plus(bitsState.copyOfRange(temp.size(), bitsState.size()));
+        if (temp.size < bitsState.size)
+            temp = temp.plus(bitsState.copyOfRange(temp.size, bitsState.size));
         return SysInteger(Math.max(width, arg.width), value or arg.value, bitsState = temp)
 
     }
 
     /** Bitwise xor*/
-    fun xor(arg: SysInteger): SysInteger {
+    infix fun xor(arg: SysInteger): SysInteger {
 
         var temp = arg.bitsState;
         for (i in 0..Math.min(temp.lastIndex, bitsState.lastIndex)) {
             temp[i] = temp[i] and  bitsState[i];
         }
-        if (temp.size() < bitsState.size())
-            temp = temp.plus(bitsState.copyOfRange(temp.size(), bitsState.size()));
+        if (temp.size < bitsState.size)
+            temp = temp.plus(bitsState.copyOfRange(temp.size, bitsState.size));
         return SysInteger(Math.max(width, arg.width), value xor arg.value, bitsState = temp)
     }
 
@@ -285,16 +277,16 @@ class SysInteger(
 
         private fun valueBySWSArray(arr: Array<SysWireState>): Long {
             var value: Long = 0L
-            var counter: Int = 0;
+            var counter: Int = 0
             while (arr[counter] == SysWireState.X)
                 counter++;
 
-            while (counter < arr.size() && arr[counter] != SysWireState.X) {
+            while (counter < arr.size && arr[counter] != SysWireState.X) {
                 if (arr[counter] == SysWireState.ONE)
-                    value = (value shl 1) or (1L);
+                    value = (value shl 1) or (1L)
                 else
-                    value = value shl 1;
-                counter++;
+                    value = value shl 1
+                counter++
             }
 
             return value
@@ -303,13 +295,9 @@ class SysInteger(
 
         private fun maskBySWSArray(arr: Array<SysWireState>): Array<Boolean> {
 
-            // val mask: Array<Boolean> = Array<Boolean>(size, { false }) ; //Smth wrong with array constructing
+            val mask = BooleanArray(arr.size)
 
-            val mask = BooleanArray(arr.size())
-
-            //mask.fill(false);
-
-            for (i in 0..mask.size() - 1)
+            for (i in 0..mask.size - 1)
                 if (arr[i] != SysWireState.X)
                     mask[i] = true;
 
@@ -318,12 +306,9 @@ class SysInteger(
 
         private fun maskByValue(value: Long, width: Int): Array<Boolean> {
 
-            if(width==0)
-                return BooleanArray(0).toTypedArray();
+            if (width==0) return BooleanArray(0).toTypedArray();
 
             val widthByValue = widthByValue(value)
-
-            // val mask = Array<Boolean>(width) { false }; //smth with array
 
             val mask = BooleanArray(width);
 
@@ -338,13 +323,10 @@ class SysInteger(
 
         private fun widthByValue(value: Long): Int {
             var result = 0
-            var current = 0L;
+            var current: Long
             if (value == 0L)
-                return 1;
-            if (value > 0)
-                current = value;
-            else
-                current = -value;
+                return 1
+            current = Math.abs(value)
             while (current != 0L) {
                 result++
                 current = current shr 1
