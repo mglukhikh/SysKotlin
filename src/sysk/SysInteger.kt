@@ -72,8 +72,11 @@ class SysInteger(
         return SysInteger(Math.min(resWidth + 1, MAX_WIDTH), value + arg.value).truncate(resWidth)
     }
 
+    // TODO: add unaryMinus (-x)
+
     /** Subtract arg from this integer*/
     operator fun minus(arg: SysInteger): SysInteger {
+        // TODO: x - y and x + (-y) should always produce the same results
         if (arg.width < width)
             return SysInteger(width, value - arg.value);
         else
@@ -322,6 +325,7 @@ class SysInteger(
         }
 
         private fun widthByValue(value: Long): Int {
+            // TODO: result should be one at start! Sign also takes one bit!
             var result = 0
             var current: Long
             if (value == 0L)

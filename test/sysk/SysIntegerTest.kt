@@ -4,6 +4,7 @@ import org.junit.Test
 import sysk.SysWireState.ONE
 import sysk.SysWireState.X
 import sysk.SysWireState.ZERO
+import kotlin.test.assertEquals
 
 
 public class SysIntegerTest {
@@ -68,8 +69,8 @@ public class SysIntegerTest {
         z = SysInteger(arr);
 
         assert((x xor y).equals(z));
-
     }
+
 /*
     @Test
     fun testShifts() {
@@ -88,4 +89,21 @@ public class SysIntegerTest {
         assert((x ushr 2).equals(ushrTest))
 
     }*/
+
+    @Test
+    fun testPlusMinusBorder() {
+        val x = SysInteger(4, 7)
+        val y = SysInteger(3, 3)
+        val zero = SysInteger(0)
+        val mx = zero - x
+        // TODO: check widths and values in this test!
+        assertEquals(SysInteger(4, -7), mx)
+        val my = zero - y
+        assertEquals(SysInteger(3, -3), my)
+        assertEquals(SysInteger(5, 10), x + y)
+        assertEquals(SysInteger(5, 14), x + x)
+        assertEquals(SysInteger(5, 10), x - my)
+        assertEquals(SysInteger(5, 14), x - mx)
+    }
+
 }
