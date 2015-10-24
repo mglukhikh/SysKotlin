@@ -1,18 +1,26 @@
 package sysk
 
 import org.junit.Test
-import java.util.*
 
 class SysBusTest {
     @Test
-    fun SysBus() {
-//        var list: ArrayList<SysSignal<Any?>> = ArrayList()
-//        list.add(SysSignal("first", false, SysScheduler()))
-//        list.add(SysSignal("first", SysWireState.ZERO, SysScheduler()))
-//        var bus: SysBus = SysBus(list, "bus", SysScheduler())
-//        var input_1 = SysInput<Boolean>("input_1", null, bus[0])
-//        var output_1 = SysOutput<Boolean>("output_1", null, bus[0])
-//        var input_2 = SysInput<SysWireState>("input_2", null, bus[1])
-//        var output_2 = SysOutput<SysWireState>("output_2", null, bus[1])
+    fun SysWireBus() {
+        var bus = sysk.SysWireBus("bus", SysScheduler())
+        bus.addWire(SysWireState.ZERO)
+        bus.addWire(SysWireState.ZERO)
+        bus.addWire(SysWireState.ONE)
+        bus.addWire(SysWireState.ZERO)
+        assert(bus[0].zero)
+        assert(bus[1].zero)
+        assert(bus[2].one)
+        assert(bus[3].zero)
+        bus.set(SysWireState.ONE, 1)
+        assert(bus[1].zero)
+        bus.update()
+        assert(bus[1].one)
+        bus.set(SysWireState.ONE, 2)
+        bus.set(SysWireState.ZERO, 2)
+        bus.update()
+        assert(bus[2].x)
     }
 }

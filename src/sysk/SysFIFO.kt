@@ -49,7 +49,8 @@ open class SysFIFOInterface<T> constructor(
     override val defaultEvent: SysWait.Event
         get() = changeEvent
 
-    override fun register(port: SysPort<*>) { }
+    override fun register(port: SysPort<*>) {
+    }
 
     override fun toString() = fifo.toString()
 }
@@ -87,16 +88,18 @@ open class SysAsynchronousFIFO<T> constructor(
 ) : SysFIFOInterface<T>(capacity, name, startValue, scheduler, parent) {
 
     override var push: SysWireState = SysWireState.X
-        get() = throw UnsupportedOperationException()
+        get() = throw UnsupportedOperationException(
+                "SysAsynchronousFIFO $name: Read is not supported for push port.")
         set(value) {
-            if (field == SysWireState.ZERO && value == SysWireState.ONE) push()
+            if (field.zero && value.one) push()
             field = value;
         }
 
     override var pop: SysWireState = SysWireState.X
-        get() = throw UnsupportedOperationException()
+        get() = throw UnsupportedOperationException(
+                "SysAsynchronousFIFO $name: Read is not supported for pop port.")
         set(value) {
-            if (field == SysWireState.ZERO && value == SysWireState.ONE) pop()
+            if (field.zero && value.one) pop()
             field = value;
         }
 }

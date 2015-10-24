@@ -103,7 +103,8 @@ open class SysFIFOInput<T> constructor(
             return bound!!.empty
         }
     var pop: SysWireState
-        get() = throw UnsupportedOperationException("Read is not supported for output port")
+        get() = throw UnsupportedOperationException(
+                "SysFifoPort $name: Read is not supported for pop port")
         set(value) {
             if (bound == null) throw IllegalStateException("Port $name is not bound")
             bound!!.pop = value
@@ -114,16 +115,17 @@ open class SysFIFOOutput<T> constructor(
         name: String, parent: SysObject? = null, fifo: SysFIFOInterface<T>? = null
 ) : SysPort<SysFIFOInterface<T>>(name, parent, fifo) {
     var value: T
-        get() = throw UnsupportedOperationException("Read is not supported for output port")
+        get() = throw UnsupportedOperationException(
+                "SysFifoPort $name: Read is not supported for output port")
         set(value) {
             if (bound == null) throw IllegalStateException("Port $name is not bound")
             bound!!.input = value
         }
     val size: Int
-       get() {
-           if (bound == null) throw IllegalStateException("Port $name is not bound")
-           return bound!!.size
-       }
+        get() {
+            if (bound == null) throw IllegalStateException("Port $name is not bound")
+            return bound!!.size
+        }
     val full: Boolean
         get() {
             if (bound == null) throw IllegalStateException("Port $name is not bound")
@@ -135,9 +137,47 @@ open class SysFIFOOutput<T> constructor(
             return bound!!.empty
         }
     var push: SysWireState
-        get() = throw UnsupportedOperationException("Read is not supported for output port")
+        get() = throw UnsupportedOperationException(
+                "SysFifoPort $name: Read is not supported for push port")
         set(value) {
             if (bound == null) throw IllegalStateException("Port $name is not bound")
             bound!!.push = value
         }
+}
+
+
+open class SysBusPort<T> constructor(
+        name: String, parent: SysObject? = null, bus: SysBus<T>? = null
+) : SysPort<SysBus<T>>(name, parent, bus) {
+
+    operator fun get(index: Int): T {
+        if (bound == null) throw IllegalStateException("Port $name is not bound")
+        return bound!![index]
+    }
+
+    fun set(value: T, index: Int) {
+        if (bound == null) throw IllegalStateException("Port $name is not bound")
+        bound!!.set(value, index)
+    }
+}
+
+open class SysBusInput<T> constructor(
+        name: String, parent: SysObject? = null, bus: SysBus<T>? = null
+) : SysPort<SysBus<T>>(name, parent, bus) {
+
+    operator fun get(index: Int): T {
+        if (bound == null) throw IllegalStateException("Port $name is not bound")
+        return bound!![index]
+    }
+}
+
+
+open class SysBusOutput<T> constructor(
+        name: String, parent: SysObject? = null, bus: SysBus<T>? = null
+) : SysPort<SysBus<T>>(name, parent, bus) {
+
+    fun set(value: T, index: Int) {
+        if (bound == null) throw IllegalStateException("Port $name is not bound")
+        bound!!.set(value, index)
+    }
 }

@@ -11,6 +11,8 @@ class SysScheduler {
 
     private val signals: MutableSet<SysSignal<*>> = LinkedHashSet()
 
+    private val buses: MutableSet<SysBus<*>> = LinkedHashSet()
+
     private val functions: MutableMap<SysFunction, SysWait> = LinkedHashMap()
 
     internal fun register(event: SysWait.Event) {
@@ -19,6 +21,10 @@ class SysScheduler {
 
     internal fun register(signal: SysSignal<*>) {
         signals.add(signal)
+    }
+
+    internal fun register(bus: SysBus<*>) {
+        buses.add(bus)
     }
 
     internal fun register(function: SysFunction) {
@@ -35,6 +41,7 @@ class SysScheduler {
 
     private fun update() {
         signals.forEach { it.update() }
+        buses.forEach { it.update() }
     }
 
     private fun convertToList(sensitivities: List<SysWait>): List<SysWait> {
