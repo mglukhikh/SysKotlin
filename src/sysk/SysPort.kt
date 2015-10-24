@@ -2,7 +2,7 @@ package sysk
 
 open class SysPort<IF : SysInterface> internal constructor(
         name: String, parent: SysObject? = null, sysInterface: IF? = null
-): SysObject(name, parent) {
+) : SysObject(name, parent) {
 
     protected var bound: IF? = null
         private set
@@ -13,7 +13,7 @@ open class SysPort<IF : SysInterface> internal constructor(
 
     fun bind(port: SysPort<IF>): Unit = bind(port())
 
-    fun bind(sysInterface: IF) {
+    infix fun bind(sysInterface: IF) {
         assert(bound == null) { "Port $name is already bound to $bound" }
         bound = sysInterface
         sysInterface.register(this)
@@ -28,12 +28,12 @@ open class SysPort<IF : SysInterface> internal constructor(
         return bound!!
     }
 
-    val defaultEvent: SysWait.Finder = object: SysWait.Finder {
+    val defaultEvent: SysWait.Finder = object : SysWait.Finder {
         override operator fun invoke() = bound?.defaultEvent
     }
 }
 
-fun <IF: SysInterface> bind(vararg pairs: Pair<SysPort<IF>, IF>) {
+fun <IF : SysInterface> bind(vararg pairs: Pair<SysPort<IF>, IF>) {
     for (pair in pairs) {
         pair.first.bind(pair.second)
     }
@@ -41,19 +41,19 @@ fun <IF: SysInterface> bind(vararg pairs: Pair<SysPort<IF>, IF>) {
 
 open class SysInput<T> internal constructor(
         name: String, parent: SysObject? = null, signalRead: SysSignalRead<T>? = null
-): SysPort<SysSignalRead<T>>(name, parent, signalRead) {
+) : SysPort<SysSignalRead<T>>(name, parent, signalRead) {
     val value: T
         get() = bound?.value ?: throw IllegalStateException("Port $name is not bound")
 }
 
 class SysWireInput internal constructor(
         name: String, parent: SysObject? = null, signalRead: SysWireRead? = null
-): SysInput<SysWireState>(name, parent, signalRead) {
-    val posEdgeEvent: SysWait.Finder = object: SysWait.Finder {
+) : SysInput<SysWireState>(name, parent, signalRead) {
+    val posEdgeEvent: SysWait.Finder = object : SysWait.Finder {
         override fun invoke() = (bound as? SysWireRead)?.posEdgeEvent
     }
 
-    val negEdgeEvent: SysWait.Finder = object: SysWait.Finder {
+    val negEdgeEvent: SysWait.Finder = object : SysWait.Finder {
         override fun invoke() = (bound as? SysWireRead)?.negEdgeEvent
     }
 
@@ -69,11 +69,75 @@ class SysWireInput internal constructor(
 
 open class SysOutput<T> internal constructor(
         name: String, parent: SysObject? = null, signalWrite: SysSignalWrite<T>? = null
-): SysPort<SysSignalWrite<T>>(name, parent, signalWrite) {
+) : SysPort<SysSignalWrite<T>>(name, parent, signalWrite) {
     var value: T
         get() = throw UnsupportedOperationException("Signal read is not supported for output port")
         set(value) {
             if (bound == null) throw IllegalStateException("Port $name is not bound")
             bound!!.value = value
+        }
+}
+
+open class SysFIFOInput<T> constructor(
+        name: String, parent: SysObject? = null, fifo: SysFIFOInterface<T>? = null
+) : SysPort<SysFIFOInterface<T>>(name, parent, fifo) {
+    val value: T
+        get() {
+            if (bound == null) throw IllegalStateException("Port $name is not bound")
+            return bound!!.output
+        }
+
+    val size: Int
+        get() {
+            if (bound == null) throw IllegalStateException("Port $name is not bound")
+            return bound!!.size
+        }
+    val full: Boolean
+        get() {
+            if (bound == null) throw IllegalStateException("Port $name is not bound")
+            return bound!!.full
+        }
+    val empty: Boolean
+        get() {
+            if (bound == null) throw IllegalStateException("Port $name is not bound")
+            return bound!!.empty
+        }
+    var pop: SysWireState
+        get() = throw UnsupportedOperationException("Read is not supported for output port")
+        set(value) {
+            if (bound == null) throw IllegalStateException("Port $name is not bound")
+            bound!!.pop = value
+        }
+}
+
+open class SysFIFOOutput<T> constructor(
+        name: String, parent: SysObject? = null, fifo: SysFIFOInterface<T>? = null
+) : SysPort<SysFIFOInterface<T>>(name, parent, fifo) {
+    var value: T
+        get() = throw UnsupportedOperationException("Read is not supported for output port")
+        set(value) {
+            if (bound == null) throw IllegalStateException("Port $name is not bound")
+            bound!!.input = value
+        }
+    val size: Int
+       get() {
+           if (bound == null) throw IllegalStateException("Port $name is not bound")
+           return bound!!.size
+       }
+    val full: Boolean
+        get() {
+            if (bound == null) throw IllegalStateException("Port $name is not bound")
+            return bound!!.full
+        }
+    val empty: Boolean
+        get() {
+            if (bound == null) throw IllegalStateException("Port $name is not bound")
+            return bound!!.empty
+        }
+    var push: SysWireState
+        get() = throw UnsupportedOperationException("Read is not supported for output port")
+        set(value) {
+            if (bound == null) throw IllegalStateException("Port $name is not bound")
+            bound!!.push = value
         }
 }
