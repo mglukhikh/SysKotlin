@@ -14,8 +14,12 @@ class SysInteger(
         val width: Int,
         val value: Long,
         defaultBitState: Boolean = false,
-        private val bitsState: Array<Boolean> = Array(width, { i -> defaultBitState })
-) {
+        private val bitsState: Array<Boolean> = Array(width, { i -> defaultBitState }),
+        //This array is only for shifts and will be initialized when one of shift functions run
+        private val sysWireStateArray: Array<SysWireState> = Array(width, { SysWireState.X })) {
+    //This property answer a question: was sysWireStateArray initialized or not
+    private var sysWireStateArrayInit: Boolean = false
+
     init {
         if (!checkWidth()) {
             throw IllegalArgumentException()
@@ -48,7 +52,10 @@ class SysInteger(
     constructor(width: Int, value: Int) : this(width, value.toLong(), bitsState = maskByValue(value.toLong(), width))
 
     /**Construct from given SysWireState Array*/
-    constructor (arr: Array<SysWireState>) : this(arr.size, valueBySWSArray(arr), bitsState = maskBySWSArray(arr))
+    constructor (arr: Array<SysWireState>) : this(arr.size, valueBySWSArray(arr), bitsState = maskBySWSArray(arr),
+            sysWireStateArray = arr) {
+        sysWireStateArrayInit = true
+    }
 
     /** Increase width to the given */
     fun extend(width: Int): SysInteger {
@@ -68,19 +75,21 @@ class SysInteger(
 
     /** Adds arg to this integer, with result width is maximum of argument's widths */
     operator fun plus(arg: SysInteger): SysInteger {
-        val resWidth = Math.max(width, arg.width)
-        return SysInteger(Math.min(resWidth + 1, MAX_WIDTH), value + arg.value).truncate(resWidth)
+        val resWidth = Math.min(Math.max(width, arg.width), MAX_WIDTH);
+        return SysInteger(resWidth, value + arg.value).truncate(resWidth)
+    }
+
+
+    /**Unary minus*/
+    operator fun minus(): SysInteger {
+        return SysInteger(-value).truncate(this.width)
     }
 
     // TODO: add unaryMinus (-x)
 
     /** Subtract arg from this integer*/
     operator fun minus(arg: SysInteger): SysInteger {
-        // TODO: x - y and x + (-y) should always produce the same results
-        if (arg.width < width)
-            return SysInteger(width, value - arg.value);
-        else
-            return SysInteger(Math.max(width, arg.width), value - arg.value)
+        return SysInteger(Math.max(width, arg.width), value - arg.value)
     }
 
     /** Integer division by divisor*/
@@ -103,76 +112,145 @@ class SysInteger(
         return SysInteger(resWidth, value * arg.value).truncate(resWidth)
     }
 
-    //TODO Remake all shifts
     /** Bitwise logical shift right*/
-    fun ushr(shift: Int): SysInteger {
-        if (shift == 0) return this
+    infix fun ushr(shift: Int): SysInteger {
+        if (shift == 0)
+            return this;
+        if (shift > width || shift < 0)
+            throw IllegalArgumentException()
+        if (!sysWireStateArrayInit) {
+            sysWireStateArrayInit = true
+            makeSWSArray(value, width, bitsState.toBooleanArray(), sysWireStateArray)
+        }
 
-        return SysInteger(width, value ushr shift, bitsState = bitsState)
+        return SysInteger(sysWireStateArray.copyOfRange(0, sysWireStateArray.size - shift));
     }
 
     /** Bitwise logical shift left*/
-    fun ushl(shift: Int): SysInteger {
-        if (shift == 0) return this
-        val tempState = bitsState
-        val start = tempState.lastIndexOf(false)
-        for (i in 0..shift)
-            tempState[start - i] = true
-        return SysInteger(width, value shl shift, bitsState = tempState)
+    infix fun ushl(shift: Int): SysInteger {
+        if (shift == 0)
+            return this;
+        if (shift > width || shift < 0)
+            throw IllegalArgumentException()
+        if (!sysWireStateArrayInit) {
+            sysWireStateArrayInit = true
+            makeSWSArray(value, width, bitsState.toBooleanArray(), sysWireStateArray)
+        }
+        return SysInteger(sysWireStateArray.copyOfRange(shift, sysWireStateArray.size))
     }
 
     /** Arithmetic shift right*/
-    fun shr(shift: Int): SysInteger {
-        if (shift == 0) return this
-        return SysInteger(width, value shr shift, bitsState = bitsState)
-
+    infix fun shr(shift: Int): SysInteger {
+        if (shift == 0)
+            return this;
+        if (shift > width || shift < 0)
+            throw IllegalArgumentException()
+        if (!sysWireStateArrayInit) {
+            sysWireStateArrayInit = true
+            makeSWSArray(value, width, bitsState.toBooleanArray(), sysWireStateArray)
+        }
+        val sysWireStateArrayCopy = sysWireStateArray.copyOf()
+        // for (i in width-1..shift){
+        var i = width - 1
+        while (i >= shift) {
+            sysWireStateArrayCopy[i] = sysWireStateArrayCopy[i - shift]
+            i--
+        }
+        while (i >= 0) {
+            sysWireStateArrayCopy[i] = SysWireState.ZERO
+            i--
+        }
+        return SysInteger(sysWireStateArrayCopy)
     }
 
     /** Arithmetic shift left*/
-    fun shl(shift: Int): SysInteger {
-        if (shift == 0) return this
-        val tempState = bitsState;
-        val start = tempState.lastIndexOf(false)
-        for (i in 0..shift)
-            tempState[start - i] = true
-        return SysInteger(width, value shl shift, bitsState = tempState)
-    }
-
-
-    //TODO  Remake
-    /*
-    /** Cyclic shift right*/
-    fun cshr(shift: Int): SysInteger {
+    infix fun shl(shift: Int): SysInteger {
         if (shift == 0)
             return this;
-
-        val tempState = bitsState;
-        val bitShift = bitsState.copyOfRange(bitsState.size() - shift, bitsState.size());
-        for (i in tempState.size() - 1..shift) {
-            tempState[i] = tempState[i - shift];
+        if (shift > width || shift < 0)
+            throw IllegalArgumentException()
+        if (!sysWireStateArrayInit) {
+            sysWireStateArrayInit = true
+            makeSWSArray(value, width, bitsState.toBooleanArray(), sysWireStateArray)
         }
-        for (i in 0..shift - 1) {
-            tempState[i] = bitShift[i]
+        val sysWireStateArrayCopy = sysWireStateArray.copyOf()
+        var i = 0
+        while (i < sysWireStateArrayCopy.size - shift) {
+            sysWireStateArrayCopy[i] = sysWireStateArrayCopy[i + shift]
+            i++
         }
-
-        val mask = 1L;
-        var buff = value;
-        var temp = 0L;
-
-        for (i in 0..shift) {
-            if (mask and buff == mask)
-                temp = temp or (1L shl i);
-            buff = buff shr 1;
+        while (i < sysWireStateArrayCopy.size) {
+            sysWireStateArrayCopy[i] = SysWireState.ZERO
+            i++
         }
-
-        temp = temp shl (width - shift);
-
-        buff = buff or temp;
-
-        return SysInteger(width, buff, bitsState = tempState);
+        return SysInteger(sysWireStateArrayCopy)
 
     }
-*/
+
+    /** Cyclic shift right*/
+    infix fun cshr(shift: Int): SysInteger {
+
+        if (shift < 0)
+            return this cshl -shift
+
+        val realShift = shift % width
+
+        if (realShift == 0)
+            return this;
+        if (!sysWireStateArrayInit) {
+            sysWireStateArrayInit = true
+            makeSWSArray(value, width, bitsState.toBooleanArray(), sysWireStateArray)
+        }
+        val sysWireStateArrayCopy = sysWireStateArray.copyOf()
+        val tempArray = Array(realShift, { SysWireState.X })
+
+        for (i in 0..realShift - 1) {
+            tempArray[i] = sysWireStateArrayCopy[sysWireStateArrayCopy.size - realShift + i]
+        }
+        var i = sysWireStateArrayCopy.size - 1
+        while (i >= realShift) {
+            sysWireStateArrayCopy[i] = sysWireStateArrayCopy[i - realShift]
+            i--
+        }
+        while (i >= 0) {
+            sysWireStateArrayCopy[i] = tempArray[i]
+            i--
+        }
+        return SysInteger(sysWireStateArrayCopy)
+    }
+
+    /** Cyclic shift left*/
+    infix fun cshl(shift: Int): SysInteger {
+
+        if (shift < 0)
+            return this cshr -shift
+        val realShift = shift % width
+
+        if (realShift == 0)
+            return this;
+        if (!sysWireStateArrayInit) {
+            sysWireStateArrayInit = true
+            makeSWSArray(value, width, bitsState.toBooleanArray(), sysWireStateArray)
+        }
+        val sysWireStateArrayCopy = sysWireStateArray.copyOf()
+        val tempArray = Array(realShift, { SysWireState.X })
+
+        for (i in 0..realShift - 1) {
+            tempArray[i] = sysWireStateArrayCopy[i]
+        }
+
+        var i = 0
+        while (i < sysWireStateArrayCopy.size - shift) {
+            sysWireStateArrayCopy[i] = sysWireStateArrayCopy[i + shift]
+            i++
+        }
+        while (i < sysWireStateArrayCopy.size) {
+            sysWireStateArrayCopy[i] = tempArray[i - sysWireStateArrayCopy.size + realShift]
+            i++
+        }
+        return SysInteger(sysWireStateArrayCopy)
+    }
+
     /** Bitwise and*/
     infix fun and(arg: SysInteger): SysInteger {
         var temp = arg.bitsState;
@@ -280,8 +358,8 @@ class SysInteger(
 
         private fun valueBySWSArray(arr: Array<SysWireState>): Long {
             var value: Long = 0L
-            var counter: Int = 0
-            while (arr[counter] == SysWireState.X)
+            var counter: Int = 0;
+            while (counter < arr.size && arr[counter] == SysWireState.X )
                 counter++;
 
             while (counter < arr.size && arr[counter] != SysWireState.X) {
@@ -296,6 +374,32 @@ class SysInteger(
         }
 
 
+        private fun makeSWSArray(value: Long, width: Int, mask: BooleanArray, result: Array<SysWireState>) {
+            var valueCopy = value;
+            var temp: Long
+            //  for (i in width - 1..0) {
+
+            var leftUnassigned = 0;
+            while (mask[leftUnassigned] == false)
+                leftUnassigned++;
+            var rightUnussigned = width - 1
+            if (mask[rightUnussigned] == false) {
+                while (mask[rightUnussigned] == false)
+                    rightUnussigned--;
+                rightUnussigned++
+            }
+            var i = rightUnussigned;
+            while (i >= leftUnassigned) {
+                temp = (valueCopy and 1L)
+                if (temp == 0L)
+                    result[i] = SysWireState.ZERO
+                else
+                    result[i] = SysWireState.ONE
+                valueCopy = valueCopy shr 1
+                i--
+            }
+        }
+
         private fun maskBySWSArray(arr: Array<SysWireState>): Array<Boolean> {
 
             val mask = BooleanArray(arr.size)
@@ -309,7 +413,8 @@ class SysInteger(
 
         private fun maskByValue(value: Long, width: Int): Array<Boolean> {
 
-            if (width==0) return BooleanArray(0).toTypedArray();
+            if (width == 0)
+                return BooleanArray(0).toTypedArray();
 
             val widthByValue = widthByValue(value)
 

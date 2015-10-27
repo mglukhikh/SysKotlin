@@ -1,9 +1,7 @@
 package sysk
 
 import org.junit.Test
-import sysk.SysWireState.ONE
-import sysk.SysWireState.X
-import sysk.SysWireState.ZERO
+import sysk.SysWireState.*
 import kotlin.test.assertEquals
 
 
@@ -40,10 +38,12 @@ public class SysIntegerTest {
         assert((x / y).equals(SysInteger(64, 0)));
         //assert((y / x).equals(SysInteger(64, 2)));
         //assert((x % y).equals(x));
-
+        assert((x - y).equals(x + (-y)))
+        assert((x - y).equals((-y) + x))
         val z = SysInteger(32, 62000L);
         assert((y / z).equals(SysInteger(32, 2)));
         assert((z % y).equals(z));
+        assert((-y).equals(SysInteger(32, -128000)))
     }
 
     @Test
@@ -71,24 +71,25 @@ public class SysIntegerTest {
         assert((x xor y).equals(z));
     }
 
-/*
     @Test
     fun testShifts() {
 
         val x = SysInteger(arrayOf(X, X, ONE, ONE, ZERO, ZERO, ONE, ZERO, ONE));
-        val cshrTest = SysInteger(arrayOf(ZERO, ONE, X, X, ONE, ONE, ZERO, ZERO, ONE));
-        val shlTest = SysInteger(arrayOf( ONE, ONE, ZERO, ZERO, ONE, ZERO, ONE,ZERO,ZERO));
-        val shrTest = SysInteger(arrayOf(ZERO,ZERO,X, X, ONE, ONE, ZERO, ZERO, ONE));
-       // val ushlTest = SysInteger(arrayOf());
-        val ushrTest = SysInteger(arrayOf(X, X, ONE, ONE, ZERO, ZERO, ONE));
+        val cshrTest = SysInteger(arrayOf(ZERO, ONE, X, X, ONE, ONE, ZERO, ZERO, ONE));//OK
+        val cshlTest = SysInteger(arrayOf(ONE, ONE, ZERO, ZERO, ONE, ZERO, ONE, X, X));//OK
+        val shlTest = SysInteger(arrayOf(ONE, ONE, ZERO, ZERO, ONE, ZERO, ONE, ZERO, ZERO));//OK
+        val shrTest = SysInteger(arrayOf(ZERO, ZERO, X, X, ONE, ONE, ZERO, ZERO, ONE));//OK
+        val ushlTest = SysInteger(arrayOf(ONE, ONE, ZERO, ZERO, ONE, ZERO, ONE)); //OK
+        val ushrTest = SysInteger(arrayOf(X, X, ONE, ONE, ZERO, ZERO, ONE)); //OK
 
-      //  assert((x cshr 2).equals(cshrTest))
-        assert((x shr 2).equals(shrTest))
-        assert((x shl 2).equals(shlTest))
-       // assert((x ushl 2).equals(ushlTest))
-        assert((x ushr 2).equals(ushrTest))
+        assert((x cshr 2).equals(cshrTest))//OK
+        assert((x cshl 2).equals(cshlTest))//OK
+        assert((x shr 2).equals(shrTest))//OK
+        assert((x shl 2).equals(shlTest))//OK
+        assert((x ushl 2).equals(ushlTest)) //OK
+        assert((x ushr 2).equals(ushrTest)) //OK
 
-    }*/
+    }
 
     @Test
     fun testPlusMinusBorder() {
