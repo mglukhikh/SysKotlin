@@ -2,7 +2,6 @@ package sysk
 
 import org.junit.Test
 import sysk.SysWireState.*
-import kotlin.test.assertEquals
 
 
 public class SysIntegerTest {
@@ -90,22 +89,4 @@ public class SysIntegerTest {
         assert((x ushr 2).equals(ushrTest)) //OK
 
     }
-
-    @Test
-    fun testPlusMinusBorder() {
-        val x = SysInteger(4, 7)
-        val y = SysInteger(3, 3)
-        val zero = SysInteger(0)
-        val mx = zero - x
-        assertEquals(SysInteger(4, -7), mx)
-        val my = zero - y
-        assertEquals(SysInteger(3, -3), my)
-        assertEquals(SysInteger(4, 10), x + y)
-        // TODO: uncomment, 14[4] is not possible
-        //assertEquals(SysInteger(4, 6), x + x)
-        assertEquals(SysInteger(4, 10), x - my)
-        // TODO: uncommment, 14[4] is not possible
-        //assertEquals(SysInteger(4, 6), x - mx)
-    }
-
 }

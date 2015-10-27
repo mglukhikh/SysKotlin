@@ -404,6 +404,8 @@ class SysInteger(
 
             val mask = BooleanArray(arr.size)
 
+            //mask.fill(false);
+
             for (i in 0..mask.size - 1)
                 if (arr[i] != SysWireState.X)
                     mask[i] = true;
