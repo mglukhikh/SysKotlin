@@ -81,7 +81,7 @@ class SysInteger(
 
 
     /**Unary minus*/
-    operator fun minus(): SysInteger {
+    operator fun unaryMinus(): SysInteger {
         return SysInteger(-value).truncate(this.width)
     }
 
