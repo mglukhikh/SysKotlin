@@ -49,7 +49,7 @@ class LatchTriggerMoore(name: String, parent: SysModule): SysUnaryWireMoore<SysW
 class CountTriggerMoore(name: String, parent: SysModule): SysUnaryWireMoore<SysWireState, SysWireState>(
         { prev: SysWireState, curr: SysWireState ->
             when (curr) {
-                SysWireState.X -> curr
+                SysWireState.X, SysWireState.Z -> SysWireState.X
                 SysWireState.ZERO -> prev
                 SysWireState.ONE -> !prev
             }

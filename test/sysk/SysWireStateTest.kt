@@ -16,6 +16,7 @@ public class SysWireStateTest {
         assert((!SysWireState.ZERO).one)
         assert((!SysWireState.ONE).zero)
         assert((!SysWireState.X).x)
+        assert((!SysWireState.Z).z)
     }
 
     @Test
@@ -43,5 +44,15 @@ public class SysWireStateTest {
             }
         }
         assert(SysWireState.ONE.and(SysWireState.ONE).one)
+    }
+
+    @Test
+    fun wiredAnd() {
+        for (arg in SysWireState.values) {
+            assert(SysWireState.Z.wiredAnd(arg) == arg)
+            assert(arg.wiredAnd(SysWireState.Z) == arg)
+        }
+        assert(SysWireState.ONE.wiredAnd(SysWireState.ONE).one)
+        assert(SysWireState.ZERO.wiredAnd(SysWireState.ZERO).zero)
     }
 }
