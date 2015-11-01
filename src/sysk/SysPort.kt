@@ -78,9 +78,9 @@ open class SysOutput<T> internal constructor(
         }
 }
 
-open class SysFIFOInput<T> constructor(
-        name: String, parent: SysObject? = null, fifo: SysFIFOInterface<T>? = null
-) : SysPort<SysFIFOInterface<T>>(name, parent, fifo) {
+open class SysFifoInput<T> constructor(
+        name: String, parent: SysObject? = null, Fifo: SysFifo<T>? = null
+) : SysPort<SysFifo<T>>(name, parent, Fifo) {
     val value: T
         get() {
             if (bound == null) throw IllegalStateException("Port $name is not bound")
@@ -111,9 +111,9 @@ open class SysFIFOInput<T> constructor(
         }
 }
 
-open class SysFIFOOutput<T> constructor(
-        name: String, parent: SysObject? = null, fifo: SysFIFOInterface<T>? = null
-) : SysPort<SysFIFOInterface<T>>(name, parent, fifo) {
+open class SysFifoOutput<T> constructor(
+        name: String, parent: SysObject? = null, Fifo: SysFifo<T>? = null
+) : SysPort<SysFifo<T>>(name, parent, Fifo) {
     var value: T
         get() = throw UnsupportedOperationException(
                 "SysFifoPort $name: Read is not supported for output port")
@@ -170,7 +170,6 @@ open class SysBusInput<T> constructor(
         return bound!![index]
     }
 }
-
 
 open class SysBusOutput<T> constructor(
         name: String, parent: SysObject? = null, bus: SysBus<T>? = null

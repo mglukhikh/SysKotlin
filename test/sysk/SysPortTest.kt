@@ -46,10 +46,10 @@ class SysPortTest {
     }
 
     @Test
-    fun SysFIFOPort() {
-        var connector: SysAsynchronousFIFO<SysWireState> = SysAsynchronousFIFO(4, "fifo", SysWireState.ZERO, SysScheduler())
-        val input = SysFIFOInput("input", null, connector)
-        val output = SysFIFOOutput("output", null, connector)
+    fun SysFifoPort() {
+        var connector: SysAsynchronousFifo<SysWireState> = SysAsynchronousFifo(4, "Fifo", SysWireState.ZERO, SysScheduler())
+        val input = SysFifoInput("input", null, connector)
+        val output = SysFifoOutput("output", null, connector)
         output.push = SysWireState.ZERO;
         assert(input.value.zero)
         assert(0 == input.size)

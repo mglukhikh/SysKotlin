@@ -2,7 +2,7 @@ package sysk
 
 import java.util.*
 
-open class SysFIFOInterface<T> constructor(
+open class SysFifo<T> constructor(
         val capacity: Int, name: String, startValue: T, scheduler: SysScheduler, parent: SysObject? = null
 ) : SysInterface, SysObject(name, parent) {
 
@@ -55,9 +55,9 @@ open class SysFIFOInterface<T> constructor(
     override fun toString() = fifo.toString()
 }
 
-open class SysWireFIFO constructor(
+open class SysWireFifo constructor(
         capacity: Int, name: String, scheduler: SysScheduler, parent: SysObject? = null
-) : SysFIFOInterface<SysWireState>(capacity, name, SysWireState.X, scheduler, parent) {
+) : SysFifo<SysWireState>(capacity, name, SysWireState.X, scheduler, parent) {
 
     val posEdgeEvent = SysWait.Event("posEdgeEvent", scheduler, this)
 
@@ -83,13 +83,13 @@ open class SysWireFIFO constructor(
     }
 }
 
-open class SysAsynchronousFIFO<T> constructor(
+open class SysAsynchronousFifo<T> constructor(
         capacity: Int, name: String, startValue: T, scheduler: SysScheduler, parent: SysObject? = null
-) : SysFIFOInterface<T>(capacity, name, startValue, scheduler, parent) {
+) : SysFifo<T>(capacity, name, startValue, scheduler, parent) {
 
     override var push: SysWireState = SysWireState.X
         get() = throw UnsupportedOperationException(
-                "SysAsynchronousFIFO $name: Read is not supported for push port.")
+                "SysAsynchronousFifo $name: Read is not supported for push port.")
         set(value) {
             if (field.zero && value.one) push()
             field = value;
@@ -97,7 +97,7 @@ open class SysAsynchronousFIFO<T> constructor(
 
     override var pop: SysWireState = SysWireState.X
         get() = throw UnsupportedOperationException(
-                "SysAsynchronousFIFO $name: Read is not supported for pop port.")
+                "SysAsynchronousFifo $name: Read is not supported for pop port.")
         set(value) {
             if (field.zero && value.one) pop()
             field = value;
