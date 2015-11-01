@@ -157,26 +157,6 @@ open class SysBusPort<T> constructor(
 
     fun set(value: T, index: Int) {
         if (bound == null) throw IllegalStateException("Port $name is not bound")
-        bound!!.set(value, index)
-    }
-}
-
-open class SysBusInput<T> constructor(
-        name: String, parent: SysObject? = null, bus: SysBus<T>? = null
-) : SysPort<SysBus<T>>(name, parent, bus) {
-
-    operator fun get(index: Int): T {
-        if (bound == null) throw IllegalStateException("Port $name is not bound")
-        return bound!![index]
-    }
-}
-
-open class SysBusOutput<T> constructor(
-        name: String, parent: SysObject? = null, bus: SysBus<T>? = null
-) : SysPort<SysBus<T>>(name, parent, bus) {
-
-    fun set(value: T, index: Int) {
-        if (bound == null) throw IllegalStateException("Port $name is not bound")
-        bound!!.set(value, index)
+        bound!!.set(value, index, this)
     }
 }

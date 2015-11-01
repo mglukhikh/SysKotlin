@@ -2,8 +2,7 @@ package sysk
 
 import java.util.*
 
-/** ToDo: impossibility a create objects of this class. */
-open class SysBus<T> constructor(
+abstract class SysBus<T> constructor(
         name: String, private val scheduler: SysScheduler, parent: SysObject? = null
 ) : SysInterface, SysObject(name, parent) {
 
@@ -11,7 +10,7 @@ open class SysBus<T> constructor(
         scheduler.register(this)
     }
 
-    protected val signal: ArrayList<SysSignal<T>> = ArrayList()
+    protected val signals: MutableList<SysSignal<T>> = ArrayList()
 
     protected final val changeEvent = SysWait.Event("changeEvent", scheduler, this)
 
@@ -22,51 +21,55 @@ open class SysBus<T> constructor(
     }
 
     open fun addWire(startValue: T) {
-        signal.add(SysSignal<T>((signal.size).toString(), startValue, scheduler, this))
+        signals.add(SysSignal<T>((signals.size).toString(), startValue, scheduler, this))
     }
 
-    open fun set(value: T, index: Int) {
-        throw UnsupportedOperationException(
-                "SysBus $name: set(index: Int) is not supported for internal SysBus")
-    }
+    abstract fun set(value: T, index: Int, port: SysPort<*>)
 
     internal operator fun get(index: Int): T {
-        if (index >= signal.size || index < 0) {
+        if (index >= signals.size || index < 0) {
             throw IllegalArgumentException(
                     "SysBus $name: Wire with index $index is not found.")
         }
-        return signal[index].value
+        return signals[index].value
     }
 
-    internal open fun update() {
-        throw UnsupportedOperationException(
-                "SysBus $name: Update is not supported for internal SysBus")
-    }
+    internal abstract fun update()
 }
 
 open class SysWireBus constructor(
         name: String, scheduler: SysScheduler, parent: SysObject? = null
 ) : SysBus<SysWireState>(name, scheduler, parent) {
 
-    private val change: MutableList<Boolean> = ArrayList()
+    private val ports: MutableMap<SysPort<*>, MutableList<SysWireState>> = HashMap()
 
-    override fun addWire(startValue: SysWireState) {
-        super.addWire(startValue)
-        change.add(false)
+    override fun register(port: SysPort<*>) {
+        val list = ArrayList<SysWireState>()
+        for (i in signals.indices) list.add(SysWireState.Z)
+        ports.put(port, list)
+        for (i in signals.indices) update(i)
     }
 
-    override fun set(value: SysWireState, index: Int) {
-        if (!change[index]) {
-            signal[index].value = value
-            change[index] = true
-        } else if (value != signal[index].value) {
-            signal[index].value = SysWireState.X
-        }
+    // ToDo: private addWire(startValue: T)
+    fun addWire() {
+        super.addWire(SysWireState.X)
+        ports.forEach { it.value.add(SysWireState.Z) }
+        if (!ports.isEmpty()) update(signals.size - 1)
+    }
+
+    override fun set(value: SysWireState, index: Int, port: SysPort<*>) {
+        ports[port]!!.set(index, value)
+        update(index)
+    }
+
+    private fun update(index: Int) {
+        var value = SysWireState.Z
+        ports.forEach { value = value.wiredAnd(it.value[index]) }
+        signals[index].value = value;
     }
 
     override fun update() {
-        for (i in change.indices) change[i] = false
-        signal.forEach { it.update() }
+        signals.forEach { it.update() }
     }
 }
 
@@ -81,17 +84,17 @@ open class SysPriorityBus<T> constructor(
         priority.add(startValue.priority)
     }
 
-    override fun set(value: SysPriorityValue<T>, index: Int) {
+    override fun set(value: SysPriorityValue<T>, index: Int, port: SysPort<*>) {
         if (this.priority[index] < value.priority) {
             this.priority[index] = value.priority
-            signal[index].value = value
+            signals[index].value = value
         }
     }
 
     override fun update() {
         for (i in priority.indices) {
             priority[i] = 0
-            signal[i].update()
+            signals[i].update()
         }
     }
 }
@@ -109,16 +112,16 @@ open class SysFifoBus<T> constructor(
         fifo.add(LinkedList())
     }
 
-    override fun set(value: T, index: Int) {
+    override fun set(value: T, index: Int, port: SysPort<*>) {
         fifo[index].add(value);
     }
 
     override fun update() {
-        for (i in signal.indices)
+        for (i in signals.indices)
             if (!fifo[i].isEmpty()) {
-                signal[i].value = fifo[i].element()
+                signals[i].value = fifo[i].element()
                 fifo[i].remove()
             }
-        signal.forEach { it.update() }
+        signals.forEach { it.update() }
     }
 }
