@@ -6,6 +6,8 @@ open class SysFifo<T> constructor(
         val capacity: Int, name: String, startValue: T, scheduler: SysScheduler, parent: SysObject? = null
 ) : SysInterface, SysObject(name, parent) {
 
+    private var counterSysFifoInputs: Int = 0
+
     protected val changeEvent = SysWait.Event("changeEvent", scheduler, this)
 
     protected var fifo: Queue<T> = LinkedList()
@@ -50,6 +52,9 @@ open class SysFifo<T> constructor(
         get() = changeEvent
 
     override fun register(port: SysPort<*>) {
+        if (port is SysFifoOutput<*>) ++counterSysFifoInputs
+        if (counterSysFifoInputs > 1)
+            throw IllegalStateException("SysFifo ${name} may have only one output port.")
     }
 
     override fun toString() = fifo.toString()
