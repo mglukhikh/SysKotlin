@@ -28,6 +28,26 @@ public class SysIntegerTest {
     }
 
     @Test
+    fun testGet() {
+
+        val x = SysInteger(10, -128);
+        val y = SysInteger(10, 127);
+        val z = SysInteger(10, -1);
+
+        val arrx = arrayOf(X, X, X, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO);
+        val arry = arrayOf(X, X, X, ONE, ONE, ONE, ONE, ONE, ONE, ONE);
+        val arrz = arrayOf(X, X, ONE, ONE, ONE, ONE, ONE, ONE, ONE, ONE);
+
+        for (i in 0..9) {
+            assert(arrx[i].equals(x[i])) { "x" + i + " " + x[i] }
+            assert(arry[i].equals(y[i])) { "y" + i + " " + y[i] }
+            assert(arrz[i].equals(z[i])) { "z" + i + " " + z[i] }
+
+        }
+
+    }
+
+    @Test
     fun testMath() {
         val x: SysInteger = SysInteger(64, 62000L);
         val y: SysInteger = SysInteger(32, 128000);
@@ -48,23 +68,23 @@ public class SysIntegerTest {
     @Test
     fun testLogic() {
 
-        val x: SysInteger = SysInteger(10, 128)
+        val x: SysInteger = SysInteger(10, 127)
         val y: SysInteger = SysInteger(7, 64)
 
 
-        var arr = arrayOf (X, X, ONE, ONE, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO);
+        var arr = arrayOf (X, X, ZERO, ONE, ONE, ONE, ONE, ONE, ONE, ONE);
         var z = SysInteger(arr);
 
         assert((x or y).equals(z), { x or y });
 
-        arr = arrayOf(X, X, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO);
+        arr = arrayOf(X, X, ZERO, ONE, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO);
         z = SysInteger(arr);
 
         assert((x and y).equals(z));
 
-        assert((x.inv()).equals(SysInteger(10, -129)));  //Mb need equality to 127?
+        assert((x.inv()).equals(SysInteger(10, -128)));
 
-        arr = arrayOf(X, X, ONE, ONE, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO);
+        arr = arrayOf(X, X, ZERO, ZERO, ONE, ONE, ONE, ONE, ONE, ONE);
         z = SysInteger(arr);
 
         assert((x xor y).equals(z));

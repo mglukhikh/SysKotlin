@@ -336,7 +336,7 @@ class SysInteger(
     private fun minValue(): Long {
         if (width == 0) return 0
         if (width == MAX_WIDTH) return Long.MIN_VALUE;
-        return -(1L shl (width )) + 1
+        return -(1L shl (width ))
     }
 
     private fun maxValue(): Long {
@@ -431,6 +431,8 @@ class SysInteger(
             return mask.toTypedArray();
         }
 
+
+        //TODO Rework. wahat is -1 width???
         private fun widthByValue(value: Long): Int {
             // TODO: result should be one at start! Sign also takes one bit!
             var result = 0
