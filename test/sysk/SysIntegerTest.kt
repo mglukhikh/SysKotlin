@@ -15,7 +15,7 @@ public class SysIntegerTest {
         val z: @Width(6) SysInteger = x + y
         assert(z.width == 6)
         assert(z.equals(SysInteger(6, 14)), { z })
-        assert(z[2] == SysWireState.ONE)
+        assert(z[2] == SysWireState.ONE, { z[2] })
         assert(z[4, 1].equals(SysInteger(4, 7)));
         val v: @Width(12) SysInteger = y * z
         assert(v.width == 12)
@@ -34,14 +34,26 @@ public class SysIntegerTest {
         val y = SysInteger(10, 127);
         val z = SysInteger(10, -1);
 
-        val arrx = arrayOf(X, X, X, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO);
-        val arry = arrayOf(X, X, X, ONE, ONE, ONE, ONE, ONE, ONE, ONE);
-        val arrz = arrayOf(X, X, ONE, ONE, ONE, ONE, ONE, ONE, ONE, ONE);
+        val arrx = arrayOf(X, X, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ONE);
+        val arry = arrayOf(X, X, ONE, ONE, ONE, ONE, ONE, ONE, ONE, ZERO);
+        val arrz = arrayOf(X, X, X, X, X, X, X, X, X, ONE);
+
 
         for (i in 0..9) {
             assert(arrx[i].equals(x[i])) { "x" + i + " " + x[i] }
             assert(arry[i].equals(y[i])) { "y" + i + " " + y[i] }
             assert(arrz[i].equals(z[i])) { "z" + i + " " + z[i] }
+
+        }
+
+        val a = SysInteger(arrx);
+        val b = SysInteger(arry);
+        val c = SysInteger(arrz);
+
+        for (i in 0..9) {
+            assert(arrx[i].equals(a[i])) { "a" + i + " " + a[i] }
+            assert(arry[i].equals(b[i])) { "b" + i + " " + b[i] }
+            assert(arrz[i].equals(c[i])) { "c" + i + " " + c[i] }
 
         }
 
@@ -69,22 +81,22 @@ public class SysIntegerTest {
     fun testLogic() {
 
         val x: SysInteger = SysInteger(10, 127)
-        val y: SysInteger = SysInteger(7, 64)
+        val y: SysInteger = SysInteger(8, 64)
 
 
-        var arr = arrayOf (X, X, ZERO, ONE, ONE, ONE, ONE, ONE, ONE, ONE);
+        var arr = arrayOf (X, X, ONE, ONE, ONE, ONE, ONE, ONE, ONE, ZERO);
         var z = SysInteger(arr);
 
         assert((x or y).equals(z), { x or y });
 
-        arr = arrayOf(X, X, ZERO, ONE, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO);
+        arr = arrayOf(X, X, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ONE, ZERO);
         z = SysInteger(arr);
 
         assert((x and y).equals(z));
 
         assert((x.inv()).equals(SysInteger(10, -128)));
 
-        arr = arrayOf(X, X, ZERO, ZERO, ONE, ONE, ONE, ONE, ONE, ONE);
+        arr = arrayOf(X, X, ONE, ONE, ONE, ONE, ONE, ONE, ZERO, ZERO);
         z = SysInteger(arr);
 
         assert((x xor y).equals(z));
