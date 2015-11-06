@@ -2,7 +2,7 @@ package sysk
 
 import java.util.*
 
-open class SysFifo<T> constructor(
+open class SysFifo<T> internal constructor(
         val capacity: Int, name: String, startValue: T, scheduler: SysScheduler, parent: SysObject? = null
 ) : SysInterface, SysObject(name, parent) {
 
@@ -60,7 +60,7 @@ open class SysFifo<T> constructor(
     override fun toString() = fifo.toString()
 }
 
-open class SysWireFifo constructor(
+open class SysWireFifo internal constructor(
         capacity: Int, name: String, scheduler: SysScheduler, parent: SysObject? = null
 ) : SysFifo<SysWireState>(capacity, name, SysWireState.X, scheduler, parent) {
 
@@ -88,7 +88,7 @@ open class SysWireFifo constructor(
     }
 }
 
-open class SysAsynchronousFifo<T> constructor(
+open class SysAsynchronousFifo<T> internal constructor(
         capacity: Int, name: String, startValue: T, scheduler: SysScheduler, parent: SysObject? = null
 ) : SysFifo<T>(capacity, name, startValue, scheduler, parent) {
 
