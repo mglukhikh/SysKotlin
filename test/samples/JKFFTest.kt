@@ -17,7 +17,7 @@ class JKFFTest {
         private var phase = 0
 
         private val f: SysTriggeredFunction = triggeredFunction({
-            if (it) {
+            if (it is SysWait.Initialize) {
                 j.value = SysWireState.ZERO
                 k.value = SysWireState.ZERO
             }

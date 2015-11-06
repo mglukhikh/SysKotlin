@@ -18,6 +18,10 @@ interface SysWait {
 
     }
 
+    object Initialize: SysWait {
+
+    }
+
     class Event internal constructor(
             name: String, val scheduler: SysScheduler, parent: SysObject? = null
     ): SysObject(name, parent), SysWait {

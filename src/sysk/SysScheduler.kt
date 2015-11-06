@@ -103,8 +103,8 @@ class SysScheduler {
             for (function in functions.keys) {
                 if (function.initialize) {
                     functionActivated = true
-                    sensitivities = convert(function.run())
-                    if (sensitivities == SysWait.Never) functions.remove(function)
+                    sensitivities = convert(function.run(SysWait.Initialize))
+                    if (sensitivities is SysWait.Never) functions.remove(function)
                     else functions[function] = sensitivities
                 }
             }
@@ -121,7 +121,7 @@ class SysScheduler {
             for ((function, wait) in functions) {
                 if (happened(wait, happenedEvents)) {
                     functionActivated = true
-                    sensitivities = convert(function.run())
+                    sensitivities = convert(function.run(wait))
                     if (sensitivities == SysWait.Never) functions.remove(function)
                     else functions[function] = sensitivities
                 }

@@ -16,14 +16,14 @@ open class SysModule internal constructor(
         get() = scheduler.currentTime
 
     protected class SysModuleFunction(
-            private val f: (Boolean) -> SysWait,
+            private val f: (SysWait) -> SysWait,
             sensitivities: SysWait,
             initialize: Boolean
     ) : SysFunction(sensitivities, initialize = initialize) {
-        override fun run(initialization: Boolean): SysWait = f(initialization)
+        override fun run(event: SysWait): SysWait = f(event)
     }
 
-    protected fun function(run: (Boolean) -> SysWait,
+    protected fun function(run: (SysWait) -> SysWait,
                            sensitivities: SysWait = SysWait.Never, initialize: Boolean = true): SysFunction {
         val f = SysModuleFunction(run, sensitivities, initialize)
         scheduler.register(f)
@@ -32,14 +32,14 @@ open class SysModule internal constructor(
     }
 
     protected class SysModuleTriggeredFunction(
-            private val f: (Boolean) -> SysWait,
+            private val f: (SysWait) -> SysWait,
             trigger: SysWait,
             sensitivities: SysWait,
             initialize: Boolean
     ) : SysTriggeredFunction(trigger, listOf(sensitivities), initialize) {
 
         constructor(
-                f: (Boolean) -> SysWait,
+                f: (SysWait) -> SysWait,
                 clock: SysClockedSignal,
                 positive: Boolean,
                 sensitivities: SysWait,
@@ -47,17 +47,17 @@ open class SysModule internal constructor(
         ): this(f, if (positive) clock.posEdgeEvent else clock.negEdgeEvent, sensitivities, initialize)
 
         constructor(
-                f: (Boolean) -> SysWait,
+                f: (SysWait) -> SysWait,
                 clock: SysWireInput,
                 positive: Boolean,
                 sensitivities: SysWait,
                 initialize: Boolean
         ): this(f, if (positive) clock.posEdgeEvent else clock.negEdgeEvent, sensitivities, initialize)
 
-        override fun run(initialization: Boolean) = f(initialization)
+        override fun run(event: SysWait) = f(event)
     }
 
-    protected fun triggeredFunction(run: (Boolean) -> SysWait,
+    protected fun triggeredFunction(run: (SysWait) -> SysWait,
                                     clock: SysClockedSignal, positive: Boolean = true,
                                     sensitivities: SysWait = SysWait.Never, initialize: Boolean = true): SysTriggeredFunction {
         val f = SysModuleTriggeredFunction(run, clock, positive, sensitivities, initialize)
@@ -66,7 +66,7 @@ open class SysModule internal constructor(
         return f
     }
 
-    protected fun triggeredFunction(run: (Boolean) -> SysWait,
+    protected fun triggeredFunction(run: (SysWait) -> SysWait,
                                     clock: SysWireInput, positive: Boolean = true,
                                     sensitivities: SysWait = SysWait.Never, initialize: Boolean = true): SysTriggeredFunction {
         val f = SysModuleTriggeredFunction(run, clock, positive, sensitivities, initialize)

@@ -16,7 +16,7 @@ class DFFTest {
         private var phase = 0
 
         private val f: SysTriggeredFunction = triggeredFunction({
-            if (it) {
+            if (it is SysWait.Initialize) {
                 d.value = SysWireState.X
             }
             else {

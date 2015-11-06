@@ -100,7 +100,7 @@ class SysClockedSignal internal constructor(
     protected inner class SysClockedSignalFunction :
             SysFunction(period / 2, initialize = false) {
 
-        override fun run(initialization: Boolean): SysWait {
+        override fun run(event: SysWait): SysWait {
             value = !value
             return wait()
         }

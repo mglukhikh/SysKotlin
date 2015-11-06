@@ -7,7 +7,7 @@ abstract class SysFunction internal constructor(
     internal constructor(vararg sensitivities: SysWait, initialize: Boolean = true):
             this(sensitivities.toList(), initialize)
 
-    abstract fun run(initialization: Boolean = false): SysWait
+    abstract fun run(event: SysWait): SysWait
 
     open fun wait(): SysWait = SysWait.reduce(sensitivities)
 }
@@ -41,8 +41,8 @@ abstract class SysFunctionWithCounter internal constructor(
 
     var counter = 0
 
-    override fun run(initialization: Boolean): SysWait {
-        if (initialization) {
+    override fun run(event : SysWait): SysWait {
+        if (event is SysWait.Initialize) {
             init()
         }
         else {
