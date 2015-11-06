@@ -99,10 +99,13 @@ class SysScheduler {
         if (currentTime.femtoSeconds == 0L) {
             resetEvents()
             var functionActivated = false
+            var sensitivities: SysWait
             for (function in functions.keys) {
                 if (function.initialize) {
                     functionActivated = true
-                    functions[function] = convert(function.run(true))
+                    sensitivities = convert(function.run())
+                    if (sensitivities == SysWait.Never) functions.remove(function)
+                    else functions[function] = sensitivities
                 }
             }
             if (functionActivated) {
@@ -113,11 +116,14 @@ class SysScheduler {
             var globalClosestTime = SysWait.Time.INFINITY
             val happenedEvents = events.entries.filter { it.value }.map { it.key }.toSet()
             var functionActivated = false
+            var sensitivities: SysWait
             resetEvents()
             for ((function, wait) in functions) {
                 if (happened(wait, happenedEvents)) {
                     functionActivated = true
-                    functions[function] = convert(function.run())
+                    sensitivities = convert(function.run())
+                    if (sensitivities == SysWait.Never) functions.remove(function)
+                    else functions[function] = sensitivities
                 }
                 else if (!functionActivated) {
                     val closestTime = time(wait)
