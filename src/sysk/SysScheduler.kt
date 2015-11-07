@@ -100,15 +100,17 @@ class SysScheduler {
             resetEvents()
             var functionActivated = false
             var sensitivities: SysWait
+            var neverCalledFunctions: MutableList<SysFunction> = ArrayList()
             for (function in functions.keys) {
                 if (function.initialize) {
                     functionActivated = true
                     sensitivities = convert(function.run(SysWait.Initialize))
-                    if (sensitivities is SysWait.Never) functions.remove(function)
+                    if (sensitivities is SysWait.Never) neverCalledFunctions.add(function)
                     else functions[function] = sensitivities
                 }
             }
             if (functionActivated) {
+                for (function in neverCalledFunctions) functions.remove(function)
                 update()
             }
         }
@@ -117,12 +119,13 @@ class SysScheduler {
             val happenedEvents = events.entries.filter { it.value }.map { it.key }.toSet()
             var functionActivated = false
             var sensitivities: SysWait
+            var neverCalledFunctions: MutableList<SysFunction> = ArrayList()
             resetEvents()
             for ((function, wait) in functions) {
                 if (happened(wait, happenedEvents)) {
                     functionActivated = true
                     sensitivities = convert(function.run(wait))
-                    if (sensitivities == SysWait.Never) functions.remove(function)
+                    if (sensitivities is SysWait.Never) neverCalledFunctions.add(function)
                     else functions[function] = sensitivities
                 }
                 else if (!functionActivated) {
@@ -133,6 +136,7 @@ class SysScheduler {
                 }
             }
             if (functionActivated) {
+                for (function in neverCalledFunctions) functions.remove(function)
                 update()
                 // Proceed to next delta-cycle
             }
