@@ -96,7 +96,7 @@ class SysScheduler {
     fun start(endTime: SysWait.Time = SysWait.Time.INFINITY) {
         stopRequested = false
         if (currentTime >= endTime) return
-        var happenedEvents: Set<SysWait> = setOf(SysWait.Initialize)
+        var happenedEvents: Set<SysWait> = if (currentTime.femtoSeconds == 0L) setOf(SysWait.Initialize) else setOf()
         while (currentTime < endTime && !stopRequested) {
             var globalClosestTime = SysWait.Time.INFINITY
             var functionActivated = false
