@@ -96,28 +96,9 @@ class SysScheduler {
     fun start(endTime: SysWait.Time = SysWait.Time.INFINITY) {
         stopRequested = false
         if (currentTime >= endTime) return
-        if (currentTime.femtoSeconds == 0L) {
-            val happenedEvents = setOf(SysWait.Initialize)
-            var functionActivated = false
-            var sensitivities: SysWait
-            var neverCalledFunctions: MutableList<SysFunction> = ArrayList()
-            resetEvents()
-            for ((function, wait) in functions) {
-                if (happened(wait, happenedEvents)) {
-                    functionActivated = true
-                    sensitivities = convert(function.run(SysWait.Initialize))
-                    if (sensitivities == SysWait.Never) neverCalledFunctions.add(function)
-                    else functions[function] = sensitivities
-                }
-            }
-            if (functionActivated) {
-                functions -= neverCalledFunctions
-                update()
-            }
-        }
+        var happenedEvents: Set<SysWait> = setOf(SysWait.Initialize)
         while (currentTime < endTime && !stopRequested) {
             var globalClosestTime = SysWait.Time.INFINITY
-            val happenedEvents = events.entries.filter { it.value }.map { it.key }.toSet()
             var functionActivated = false
             var sensitivities: SysWait
             var neverCalledFunctions: MutableList<SysFunction> = ArrayList()
@@ -145,6 +126,7 @@ class SysScheduler {
                 currentTime = globalClosestTime
                 // Proceed to next time moment
             }
+            happenedEvents = events.entries.filter { it.value }.map { it.key }.toSet()
         }
     }
 
