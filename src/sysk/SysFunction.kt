@@ -1,8 +1,10 @@
 package sysk
 
 abstract class SysFunction internal constructor(
-        val sensitivities: List<SysWait>, val initialize: Boolean = true
+        sensitivities: List<SysWait>, initialize: Boolean = true
 ) {
+
+    val sensitivities = if (initialize) sensitivities + SysWait.Initialize else sensitivities
 
     internal constructor(vararg sensitivities: SysWait, initialize: Boolean = true):
             this(sensitivities.toList(), initialize)

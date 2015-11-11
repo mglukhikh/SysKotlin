@@ -73,7 +73,7 @@ class SysScheduler {
 
     private fun convert(sensitivities: List<SysWait>): SysWait = SysWait.reduce(convertToList(sensitivities))
 
-    private fun happened(wait: SysWait, events: Set<SysWait.Event?>): Boolean =
+    private fun happened(wait: SysWait, events: Set<SysWait?>): Boolean =
         when (wait) {
             is SysWait.Event -> wait in events
             is SysWait.Finder -> wait() in events
@@ -97,12 +97,13 @@ class SysScheduler {
         stopRequested = false
         if (currentTime >= endTime) return
         if (currentTime.femtoSeconds == 0L) {
-            resetEvents()
+            val happenedEvents = setOf(SysWait.Initialize)
             var functionActivated = false
             var sensitivities: SysWait
             var neverCalledFunctions: MutableList<SysFunction> = ArrayList()
-            for (function in functions.keys) {
-                if (function.initialize) {
+            resetEvents()
+            for ((function, wait) in functions) {
+                if (happened(wait, happenedEvents)) {
                     functionActivated = true
                     sensitivities = convert(function.run(SysWait.Initialize))
                     if (sensitivities == SysWait.Never) neverCalledFunctions.add(function)
@@ -110,7 +111,7 @@ class SysScheduler {
                 }
             }
             if (functionActivated) {
-                for (function in neverCalledFunctions) functions.remove(function)
+                functions -= neverCalledFunctions
                 update()
             }
         }
@@ -136,7 +137,7 @@ class SysScheduler {
                 }
             }
             if (functionActivated) {
-                for (function in neverCalledFunctions) functions.remove(function)
+                functions -= neverCalledFunctions
                 update()
                 // Proceed to next delta-cycle
             }
