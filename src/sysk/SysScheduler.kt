@@ -105,7 +105,7 @@ class SysScheduler {
                 if (function.initialize) {
                     functionActivated = true
                     sensitivities = convert(function.run(SysWait.Initialize))
-                    if (sensitivities is SysWait.Never) neverCalledFunctions.add(function)
+                    if (sensitivities == SysWait.Never) neverCalledFunctions.add(function)
                     else functions[function] = sensitivities
                 }
             }
@@ -125,7 +125,7 @@ class SysScheduler {
                 if (happened(wait, happenedEvents)) {
                     functionActivated = true
                     sensitivities = convert(function.run(wait))
-                    if (sensitivities is SysWait.Never) neverCalledFunctions.add(function)
+                    if (sensitivities == SysWait.Never) neverCalledFunctions.add(function)
                     else functions[function] = sensitivities
                 }
                 else if (!functionActivated) {

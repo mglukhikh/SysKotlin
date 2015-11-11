@@ -42,7 +42,7 @@ abstract class SysFunctionWithCounter internal constructor(
     var counter = 0
 
     override fun run(event : SysWait): SysWait {
-        if (event is SysWait.Initialize) {
+        if (event == SysWait.Initialize) {
             init()
         }
         else {

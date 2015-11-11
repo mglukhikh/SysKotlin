@@ -18,6 +18,7 @@ interface SysWait {
 
     }
 
+    /** Special: initialization event that happens on start */
     object Initialize: SysWait {
 
     }
