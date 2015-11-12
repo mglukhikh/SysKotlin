@@ -153,6 +153,7 @@ class SRegTest {
         init {
             bind(ff.d to d, ff.dir to dir, ff.clk to clk, tb.clk to clk, tb.q to q)
             bind(ff.q to q, tb.d to d, tb.dir to dir)
+            bindArrays(ff.)
         }
     }
 

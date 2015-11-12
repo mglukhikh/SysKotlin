@@ -14,7 +14,7 @@ public class SReg (name: String, digPerWord: Int, parent: SysModule): SysModule(
 
     private val f: SysTriggeredFunction = triggeredFunction({
 
-        println("$currentTime: d = ${d.value} q = ${q.value}")
+        println("$currentTime: d = ${d.value}")
         if (dir.zero) {
             state[0] = d.value
             trigQ[0].value = state[0]
