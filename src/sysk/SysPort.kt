@@ -39,6 +39,12 @@ fun <IF : SysInterface> bind(vararg pairs: Pair<SysPort<IF>, IF>) {
     }
 }
 
+fun <IF: SysInterface> bindArrays(vararg pairs: Pair<Array<out SysPort<IF>>, Array<out IF>>) {
+    for (pair in pairs) {
+        pair.first.forEachIndexed { i, sysPort -> sysPort.bind(pair.second[i]) }
+    }
+}
+
 open class SysInput<T> internal constructor(
         name: String, parent: SysObject? = null, signalRead: SysSignalRead<T>? = null
 ) : SysPort<SysSignalRead<T>>(name, parent, signalRead) {
