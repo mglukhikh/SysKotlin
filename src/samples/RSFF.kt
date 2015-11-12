@@ -12,7 +12,7 @@ class RSFF(name: String, parent: SysModule): SysModule(name, parent) {
     val q = output<SysWireState>("q")
 
     private val f: SysTriggeredFunction = triggeredFunction({
-        println("$currentTime: r = ${r.value} s = ${s.value} state = $state")
+
         if (s.one) state = SysWireState.ONE
         else if (r.one) state = SysWireState.ZERO
         q.value = state

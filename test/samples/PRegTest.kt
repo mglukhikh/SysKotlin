@@ -33,7 +33,6 @@ class PRegTest {
                             assert(q[i].x) { "q[$i] should be x at the beginning" }
                             i += 1
                         }
-                        println("ZERO")
                     }
                     1 -> {
                         if (phase == 0) {
@@ -58,7 +57,6 @@ class PRegTest {
                             else d[i].value = SysWireState.ZERO
                             i += 1
                         }
-                        println("ONE")
                     }
                     2 -> {
                         if (phase == 0) {
@@ -80,7 +78,6 @@ class PRegTest {
                             d[i].value = SysWireState.ZERO
                             i += 1
                         }
-                        println("TWO")
                     }
                     3 -> {
                         i = 0
@@ -89,7 +86,6 @@ class PRegTest {
                             else assert(q[i].zero) { "q[$i] should be false after D[$i] = 0" }
                             i += 1
                         }
-                        println("THREE")
                     }
                     4 -> {
                         i = 0
@@ -97,7 +93,6 @@ class PRegTest {
                             assert(q[i].zero) { "q[$i] should be false after D = 0" }
                             i += 1
                         }
-                        println("FOUR")
                     }
                 }
                 counter++

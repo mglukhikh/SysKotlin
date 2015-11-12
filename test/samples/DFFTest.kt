@@ -20,11 +20,9 @@ class DFFTest {
                 d.value = SysWireState.X
             }
             else {
-                println("$currentTime: q = ${q.value} counter = $counter")
                 when (counter) {
                     0 -> {
                         assert(q.x) { "q should be x at the beginning" }
-                        println("ZERO")
                     }
                     1 -> {
                         if (phase == 0)
@@ -34,7 +32,6 @@ class DFFTest {
 
                         // All changes at clock N are received at clock N+1 and processed at clock N+2
                         d.value = SysWireState.ONE
-                        println("ONE")
                     }
                     2 -> {
                         if (phase == 0)
@@ -43,15 +40,12 @@ class DFFTest {
                             assert(q.zero) { "q should be false after q = false and D = 0" }
 
                         d.value = SysWireState.ZERO
-                        println("TWO")
                     }
                     3 -> {
                         assert(q.one) { "q should be true after D = 1" }
-                        println("THREE")
                     }
                     4 -> {
                         assert(q.zero) { "q should be false after D = 0" }
-                        println("FOUR")
                     }
                 }
                 counter++

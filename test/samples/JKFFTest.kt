@@ -22,42 +22,34 @@ class JKFFTest {
                 k.value = SysWireState.ZERO
             }
             else {
-                println("$currentTime: q = ${q.value} counter = $counter")
                 when (counter) {
                     0 -> {
                         assert(q.zero) { "q should be false at the beginning" }
-                        println("ZERO")
                     }
                     1 -> {
                         assert(q.zero) { "q should be false after q = true and JK = 11" }
                         // All changes at clock N are received at clock N+1 and processed at clock N+2
                         j.value = SysWireState.ONE
-                        println("ONE")
                     }
                     2 -> {
                         assert(q.zero) { "q should be false after q = false and JK = 00" }
                         j.value = SysWireState.ZERO
-                        println("TWO")
                     }
                     3 -> {
                         assert(q.one) { "q should be true after JK = 10" }
                         k.value = SysWireState.ONE
-                        println("THREE")
                     }
                     4 -> {
                         assert(q.one) { "q should be true after q = true and JK = 00" }
                         j.value = SysWireState.ONE
-                        println("FOUR")
                     }
                     5 -> {
                         assert(q.zero) { "q should be false after JK = 01" }
-                        println("FIVE")
                     }
                     6 -> {
                         assert(q.one) { "q should be true after q = false and JK = 11" }
                         j.value = SysWireState.ZERO
                         k.value = SysWireState.ZERO
-                        println("SIX")
                     }
                 }
                 counter++

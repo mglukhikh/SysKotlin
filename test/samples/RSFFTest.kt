@@ -22,11 +22,9 @@ class RSFFTest {
                 s.value = SysWireState.X
             }
             else {
-                println("$currentTime: q = ${q.value} counter = $counter")
                 when (counter) {
                     0 -> {
                         assert(q.x) { "q should be x at the beginning" }
-                        println("ZERO")
                     }
                     1 -> {
                         if (phase == 0)
@@ -36,7 +34,6 @@ class RSFFTest {
 
                         // All changes at clock N are received at clock N+1 and processed at clock N+2
                         s.value = SysWireState.ONE
-                        println("ONE")
                     }
                     2 -> {
                         if (phase == 0)
@@ -45,21 +42,17 @@ class RSFFTest {
                             assert(q.zero) { "q should be false after q = false and RS = 00" }
 
                         s.value = SysWireState.ZERO
-                        println("TWO")
                     }
                     3 -> {
                         assert(q.one) { "q should be true after RS = 01 or RS = X1" }
                         r.value = SysWireState.ONE
-                        println("THREE")
                     }
                     4 -> {
                         assert(q.one) { "q should be true after q = true and RS = 00 or RS = X0" }
                         r.value = SysWireState.ZERO
-                        println("FOUR")
                     }
                     5 -> {
                         assert(q.zero) { "q should be false after RS = 10" }
-                        println("FIVE")
                     }
                 }
                 counter++
