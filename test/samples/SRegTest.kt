@@ -7,7 +7,7 @@ class SRegTest {
 
     private class Testbench(name: String, digPerWord: Int, parent: SysModule): SysModule(name, parent) {
 
-        val d = output<SysWireState>("d")
+        val d   = output<SysWireState>("d")
         val dir = output<SysWireState>("dir")
 
         val clk = wireInput("clk")
@@ -17,16 +17,15 @@ class SRegTest {
         private var phase = 0
 
         private val f: SysTriggeredFunction = triggeredFunction({
+
             if (it is SysWait.Initialize) {
                 d.value = SysWireState.X
                 dir.value = SysWireState.X
             }
             else {
-                println("$currentTime: q = $q counter = $counter")
                 when (counter) {
                     0 -> {
                         assert(q.x) { "q should be x at the beginning" }
-                        println("ZERO")
                     }
                     1 -> {
                         if (phase == 0)
@@ -37,7 +36,6 @@ class SRegTest {
                         // All changes at clock N are received at clock N+1 and processed at clock N+2
                         dir.value = SysWireState.ZERO
                         d.value = SysWireState.ONE
-                        println("ONE")
                     }
                     2 -> {
                         if (phase == 0)
@@ -47,7 +45,6 @@ class SRegTest {
 
                         dir.value = SysWireState.ZERO
                         d.value = SysWireState.ZERO
-                        println("TWO")
                     }
                     3 -> {
                         if (phase == 0)
@@ -57,7 +54,6 @@ class SRegTest {
 
                         dir.value = SysWireState.ZERO
                         d.value = SysWireState.ONE
-                        println("THREE")
                     }
                     4 -> {
                         if (phase == 0)
@@ -67,63 +63,51 @@ class SRegTest {
 
                         dir.value = SysWireState.ZERO
                         d.value = SysWireState.ZERO
-                        println("FOUR")
                     }
                     5 -> {
-                        assert(q.one) { "q should be true after q = x and D = 1" }
+                        assert(q.one) { "q should be true after D = 1" }
                         dir.value = SysWireState.ZERO
-                        println("FIVE")
                     }
                     6 -> {
-                        assert(q.zero) { "q should be false after q = 1 and D = 0" }
+                        assert(q.zero) { "q should be false after D = 0" }
                         dir.value = SysWireState.ZERO
-                        println("SIX")
                     }
                     7 -> {
-                        assert(q.one) { "q should be true after q = 0 and D = 1" }
-                        println("SEVEN")
+                        assert(q.one) { "q should be true after D = 1" }
                     }
                     8 -> {
-                        assert(q.zero) { "q should be false after q = 1 and D = 0" }
+                        assert(q.zero) { "q should be false after D = 0" }
                         dir.value = SysWireState.ONE
                         d.value = SysWireState.ONE
-                        println("EIGHT")
                     }
                     9 -> {
-                        assert(q.zero) { "q should be false after q = 1 and D = 0" }
+                        assert(q.zero) { "q should be false after D = 0" }
                         dir.value = SysWireState.ONE
                         d.value = SysWireState.ZERO
-                        println("NINE")
                     }
                     10 -> {
-                        assert(q.zero) { "q should be false after q = 1 and D = 0" }
+                        assert(q.zero) { "q should be false after D = 0" }
                         dir.value = SysWireState.ONE
                         d.value = SysWireState.ONE
-                        println("TEN")
                     }
                     11 -> {
-                        assert(q.zero) { "q should be false after q = 1 and D = 0" }
+                        assert(q.zero) { "q should be false after D = 0" }
                         dir.value = SysWireState.ONE
                         d.value = SysWireState.ZERO
-                        println("ELEVEN")
                     }
                     12 -> {
-                        assert(q.one) { "q should be true after q = 0 and D = 1" }
+                        assert(q.one) { "q should be true after D = 1" }
                         dir.value = SysWireState.ONE
-                        println("TWELVE")
                     }
                     13 -> {
-                        assert(q.zero) { "q should be false after q = 1 and D = 0" }
+                        assert(q.zero) { "q should be false after D = 0" }
                         dir.value = SysWireState.ONE
-                        println("THIRTEEN")
                     }
                     14 -> {
-                        assert(q.one) { "q should be true after q = 0 and D = 1" }
-                        println("FOURTEEN")
+                        assert(q.one) { "q should be true after D = 1" }
                     }
                     15 -> {
-                        assert(q.zero) { "q should be false after q = 1 and D = 0" }
-                        println("FIFTEEN")
+                        assert(q.zero) { "q should be false after D = 0" }
                     }
                 }
                 counter++
@@ -153,7 +137,6 @@ class SRegTest {
         init {
             bind(ff.d to d, ff.dir to dir, ff.clk to clk, tb.clk to clk, tb.q to q)
             bind(ff.q to q, tb.d to d, tb.dir to dir)
-            bindArrays(ff.)
         }
     }
 
