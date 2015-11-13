@@ -39,12 +39,6 @@ open class SysSignal<T> internal constructor(
     override val defaultEvent: SysWait.Event
         get() = changeEvent
 
-    /** Compare value with another signal (only current value is important here) */
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        return (other as? SysSignal<*>)?.let { value == it.value } ?: return false
-    }
-
     override fun toString(): String {
         return if (changed) "$value($nextValue)" else "$value"
     }
