@@ -37,15 +37,7 @@ open class SysModule internal constructor(
 
         constructor(
                 f: (SysWait) -> SysWait,
-                clock: SysClockedSignal,
-                positive: Boolean,
-                sensitivities: SysWait,
-                initialize: Boolean
-        ) : this(f, if (positive) clock.posEdgeEvent else clock.negEdgeEvent, sensitivities, initialize)
-
-        constructor(
-                f: (SysWait) -> SysWait,
-                clock: SysWireInput,
+                clock: SysEdged,
                 positive: Boolean,
                 sensitivities: SysWait,
                 initialize: Boolean
@@ -55,13 +47,7 @@ open class SysModule internal constructor(
     }
 
     protected fun triggeredFunction(run: (SysWait) -> SysWait,
-                                    clock: SysClockedSignal, positive: Boolean = true,
-                                    sensitivities: SysWait = SysWait.Never, initialize: Boolean = true): SysTriggeredFunction {
-        return SysModuleTriggeredFunction(run, clock, positive, sensitivities, initialize).register()
-    }
-
-    protected fun triggeredFunction(run: (SysWait) -> SysWait,
-                                    clock: SysWireInput, positive: Boolean = true,
+                                    clock: SysEdged, positive: Boolean = true,
                                     sensitivities: SysWait = SysWait.Never, initialize: Boolean = true): SysTriggeredFunction {
         return SysModuleTriggeredFunction(run, clock, positive, sensitivities, initialize).register()
     }

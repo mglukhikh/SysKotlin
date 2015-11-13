@@ -48,12 +48,12 @@ open class SysInput<T> internal constructor(
 
 class SysWireInput internal constructor(
         name: String, parent: SysObject? = null, signalRead: SysWireRead? = null
-) : SysInput<SysWireState>(name, parent, signalRead) {
-    val posEdgeEvent: SysWait.Finder = object : SysWait.Finder {
+) : SysInput<SysWireState>(name, parent, signalRead), SysEdged {
+    override val posEdgeEvent: SysWait.Finder = object : SysWait.Finder {
         override fun invoke() = (bound as? SysWireRead)?.posEdgeEvent
     }
 
-    val negEdgeEvent: SysWait.Finder = object : SysWait.Finder {
+    override val negEdgeEvent: SysWait.Finder = object : SysWait.Finder {
         override fun invoke() = (bound as? SysWireRead)?.negEdgeEvent
     }
 

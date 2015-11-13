@@ -15,11 +15,18 @@ interface SysSignalRead<T>: SysInterface {
     fun read(): T
 }
 
-interface SysWireRead : SysSignalRead<SysWireState> {
+interface SysEdged {
 
-    val posEdgeEvent: SysWait.Event
+    val posEdgeEvent: SysWait
 
-    val negEdgeEvent: SysWait.Event
+    val negEdgeEvent: SysWait
+}
+
+interface SysWireRead : SysSignalRead<SysWireState>, SysEdged {
+
+    override val posEdgeEvent: SysWait.Event
+
+    override val negEdgeEvent: SysWait.Event
 }
 
 interface SysSignalWrite<T>: SysInterface {
