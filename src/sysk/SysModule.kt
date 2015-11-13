@@ -25,10 +25,7 @@ open class SysModule internal constructor(
 
     protected fun function(run: (SysWait) -> SysWait,
                            sensitivities: SysWait = SysWait.Never, initialize: Boolean = true): SysFunction {
-        val f = SysModuleFunction(run, sensitivities, initialize)
-        scheduler.register(f)
-        functions.add(f)
-        return f
+        return SysModuleFunction(run, sensitivities, initialize).register()
     }
 
     protected class SysModuleTriggeredFunction(
@@ -60,19 +57,19 @@ open class SysModule internal constructor(
     protected fun triggeredFunction(run: (SysWait) -> SysWait,
                                     clock: SysClockedSignal, positive: Boolean = true,
                                     sensitivities: SysWait = SysWait.Never, initialize: Boolean = true): SysTriggeredFunction {
-        val f = SysModuleTriggeredFunction(run, clock, positive, sensitivities, initialize)
-        scheduler.register(f)
-        functions.add(f)
-        return f
+        return SysModuleTriggeredFunction(run, clock, positive, sensitivities, initialize).register()
     }
 
     protected fun triggeredFunction(run: (SysWait) -> SysWait,
                                     clock: SysWireInput, positive: Boolean = true,
                                     sensitivities: SysWait = SysWait.Never, initialize: Boolean = true): SysTriggeredFunction {
-        val f = SysModuleTriggeredFunction(run, clock, positive, sensitivities, initialize)
-        scheduler.register(f)
-        functions.add(f)
-        return f
+        return SysModuleTriggeredFunction(run, clock, positive, sensitivities, initialize).register()
+    }
+
+    private fun <T : SysFunction> T.register(): T {
+        scheduler.register(this)
+        functions.add(this)
+        return this
     }
 
     protected fun <IF : SysInterface> port(name: String, sysInterface: IF? = null): SysPort<IF> =
