@@ -16,41 +16,50 @@ open class SysModule internal constructor(
         get() = scheduler.currentTime
 
     protected class SysModuleFunction(
-            private val f: (SysWait) -> SysWait,
+            private val f: (SysWait) -> Any,
             sensitivities: SysWait,
             initialize: Boolean
     ) : SysFunction(sensitivities, initialize = initialize) {
-        override fun run(event: SysWait): SysWait = f(event)
+        override fun run(event: SysWait): SysWait = run(event, wait(), f)
     }
 
-    protected fun function(run: (SysWait) -> SysWait,
+    protected fun function(run: (SysWait) -> Any,
                            sensitivities: SysWait = SysWait.Never, initialize: Boolean = true): SysFunction {
         return SysModuleFunction(run, sensitivities, initialize).register()
     }
 
+    protected fun function(sensitivities: SysWait = SysWait.Never, initialize: Boolean = true,
+                           run: (SysWait) -> Unit = {}) =
+            function({ run(it) }, sensitivities, initialize)
+
     protected class SysModuleTriggeredFunction(
-            private val f: (SysWait) -> SysWait,
+            private val f: (SysWait) -> Any,
             trigger: SysWait,
             sensitivities: SysWait,
             initialize: Boolean
     ) : SysTriggeredFunction(trigger, listOf(sensitivities), initialize) {
 
         constructor(
-                f: (SysWait) -> SysWait,
+                f: (SysWait) -> Any,
                 clock: SysEdged,
                 positive: Boolean,
                 sensitivities: SysWait,
                 initialize: Boolean
         ) : this(f, if (positive) clock.posEdgeEvent else clock.negEdgeEvent, sensitivities, initialize)
 
-        override fun run(event: SysWait) = f(event)
+        override fun run(event: SysWait) = run(event, wait(), f)
     }
 
-    protected fun triggeredFunction(run: (SysWait) -> SysWait,
+    protected fun triggeredFunction(run: (SysWait) -> Any,
                                     clock: SysEdged, positive: Boolean = true,
                                     sensitivities: SysWait = SysWait.Never, initialize: Boolean = true): SysTriggeredFunction {
         return SysModuleTriggeredFunction(run, clock, positive, sensitivities, initialize).register()
     }
+
+    protected fun triggeredFunction(clock: SysEdged, positive: Boolean = true,
+                                    sensitivities: SysWait = SysWait.Never, initialize: Boolean = true,
+                                    run: (SysWait) -> Unit = {}) =
+            triggeredFunction({ run(it) }, clock, positive, sensitivities, initialize)
 
     private fun <T : SysFunction> T.register(): T {
         scheduler.register(this)
@@ -108,6 +117,13 @@ open class SysModule internal constructor(
     protected fun <T> fifoBus(name: String) = SysFifoBus<T>(name, scheduler, this)
 
     protected fun event(name: String): SysWait.Event = SysWait.Event(name, scheduler, this)
+
+    companion object {
+
+        private fun run(event: SysWait, default: SysWait, f: (SysWait) -> Any) =
+                (f(event) as? SysWait)?.let { it } ?: default
+
+    }
 }
 
 open class SysTopModule(

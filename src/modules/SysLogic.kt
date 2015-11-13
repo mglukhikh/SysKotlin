@@ -1,6 +1,5 @@
 package modules
 
-import sysk.SysFunction
 import sysk.SysModule
 import sysk.SysWireState
 
@@ -14,10 +13,11 @@ open class SysUnaryModule<Input, Output>(
 
     val y = output<Output>("y")
 
-    private val f: SysFunction = function({
-        y.value = operation(x.value)
-        f.wait()
-    }, sensitivities = x.defaultEvent, initialize = false)
+    init {
+        function(sensitivities = x.defaultEvent, initialize = false) {
+            y.value = operation(x.value)
+        }
+    }
 }
 
 open class SysUnaryWireModule<Output>(
@@ -43,10 +43,11 @@ open class SysBinaryModule<Input1, Input2, Output>(
 
     val y = output<Output>("y")
 
-    private val f: SysFunction = function({
-        y.value = operation(x1.value, x2.value)
-        f.wait()
-    }, sensitivities = x1.defaultEvent.or(x2.defaultEvent), initialize = false)
+    init {
+        function(sensitivities = x1.defaultEvent.or(x2.defaultEvent), initialize = false) {
+            y.value = operation(x1.value, x2.value)
+        }
+    }
 }
 
 open class SysBinaryWireModule<Output>(

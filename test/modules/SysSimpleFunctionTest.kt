@@ -1,7 +1,6 @@
 package modules
 
 import org.junit.Test
-import sysk.SysFunction
 import sysk.SysTopModule
 import sysk.SysWireState
 import sysk.bind
@@ -22,23 +21,24 @@ class SysSimpleFunctionTest {
 
         val counter = 0
 
-        private val f: SysFunction = function({
-            when (counter) {
-                0 -> {
-                    assert(y.x)
-                    x.value = SysWireState.ZERO
-                }
-                1 -> {
-                    assert(y.one)
-                    x.value = SysWireState.ONE
-                }
-                2 -> {
-                    assert(y.zero)
-                    scheduler.stop()
+        init {
+            function(sensitivities = y.defaultEvent, initialize = false) {
+                when (counter) {
+                    0 -> {
+                        assert(y.x)
+                        x.value = SysWireState.ZERO
+                    }
+                    1 -> {
+                        assert(y.one)
+                        x.value = SysWireState.ONE
+                    }
+                    2 -> {
+                        assert(y.zero)
+                        scheduler.stop()
+                    }
                 }
             }
-            f.wait()
-        }, sensitivities = y.defaultEvent, initialize = false)
+        }
     }
 
     @Test
@@ -60,36 +60,37 @@ class SysSimpleFunctionTest {
 
         val counter = 0
 
-        private val f: SysFunction = function({
-            when (counter) {
-                0 -> {
-                    assert(y.x)
-                    x1.value = SysWireState.ZERO
-                    x2.value = SysWireState.ZERO
-                }
-                1 -> {
-                    assert(y.zero)
-                    x1.value = SysWireState.ONE
-                }
-                2 -> {
-                    assert(y.one)
-                    x2.value = SysWireState.ONE
-                }
-                3 -> {
-                    assert(y.one)
-                    x1.value = SysWireState.ZERO
-                }
-                4 -> {
-                    assert(y.one)
-                    x2.value = SysWireState.ZERO
-                }
-                5 -> {
-                    assert(y.zero)
-                    scheduler.stop()
+        init {
+            function(sensitivities = y.defaultEvent, initialize = false) {
+                when (counter) {
+                    0 -> {
+                        assert(y.x)
+                        x1.value = SysWireState.ZERO
+                        x2.value = SysWireState.ZERO
+                    }
+                    1 -> {
+                        assert(y.zero)
+                        x1.value = SysWireState.ONE
+                    }
+                    2 -> {
+                        assert(y.one)
+                        x2.value = SysWireState.ONE
+                    }
+                    3 -> {
+                        assert(y.one)
+                        x1.value = SysWireState.ZERO
+                    }
+                    4 -> {
+                        assert(y.one)
+                        x2.value = SysWireState.ZERO
+                    }
+                    5 -> {
+                        assert(y.zero)
+                        scheduler.stop()
+                    }
                 }
             }
-            f.wait()
-        }, sensitivities = y.defaultEvent, initialize = false)
+        }
     }
 
     @Test
@@ -111,36 +112,37 @@ class SysSimpleFunctionTest {
 
         val counter = 0
 
-        private val f: SysFunction = function({
-            when (counter) {
-                0 -> {
-                    assert(y.x)
-                    x1.value = SysWireState.ZERO
-                    x2.value = SysWireState.ZERO
-                }
-                1 -> {
-                    assert(y.zero)
-                    x1.value = SysWireState.ONE
-                }
-                2 -> {
-                    assert(y.zero)
-                    x2.value = SysWireState.ONE
-                }
-                3 -> {
-                    assert(y.one)
-                    x1.value = SysWireState.ZERO
-                }
-                4 -> {
-                    assert(y.zero)
-                    x2.value = SysWireState.ZERO
-                }
-                5 -> {
-                    assert(y.zero)
-                    scheduler.stop()
+        init {
+            function(sensitivities = y.defaultEvent, initialize = false) {
+                when (counter) {
+                    0 -> {
+                        assert(y.x)
+                        x1.value = SysWireState.ZERO
+                        x2.value = SysWireState.ZERO
+                    }
+                    1 -> {
+                        assert(y.zero)
+                        x1.value = SysWireState.ONE
+                    }
+                    2 -> {
+                        assert(y.zero)
+                        x2.value = SysWireState.ONE
+                    }
+                    3 -> {
+                        assert(y.one)
+                        x1.value = SysWireState.ZERO
+                    }
+                    4 -> {
+                        assert(y.zero)
+                        x2.value = SysWireState.ZERO
+                    }
+                    5 -> {
+                        assert(y.zero)
+                        scheduler.stop()
+                    }
                 }
             }
-            f.wait()
-        }, sensitivities = y.defaultEvent, initialize = false)
+        }
     }
 
     @Test

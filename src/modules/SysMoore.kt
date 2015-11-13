@@ -1,7 +1,6 @@
 package modules
 
 import sysk.SysModule
-import sysk.SysTriggeredFunction
 import sysk.SysWireState
 
 open class SysUnaryMoore<Input, State, Output>(
@@ -20,11 +19,12 @@ open class SysUnaryMoore<Input, State, Output>(
 
     val y = output<Output>("y")
 
-    private val f: SysTriggeredFunction = triggeredFunction({
-        y.value = result(state)
-        state = transition(state, x.value)
-        f.wait()
-    }, clk, initialize = false)
+    init {
+        triggeredFunction(clk, initialize = false) {
+            y.value = result(state)
+            state = transition(state, x.value)
+        }
+    }
 }
 
 open class SysUnaryWireMoore<State, Output>(
@@ -80,11 +80,12 @@ open class SysBinaryMoore<Input1, Input2, State, Output>(
 
     val y = output<Output>("y")
 
-    private val f: SysTriggeredFunction = triggeredFunction({
-        y.value = result(state)
-        state = transition(state, x1.value, x2.value)
-        f.wait()
-    }, clk, initialize = false)
+    init {
+        triggeredFunction(clk, initialize = false) {
+            y.value = result(state)
+            state = transition(state, x1.value, x2.value)
+        }
+    }
 }
 
 open class SysBinaryWireMoore<State, Output>(
