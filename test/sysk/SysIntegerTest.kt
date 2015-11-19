@@ -57,6 +57,10 @@ public class SysIntegerTest {
 
         }
 
+        assert(a.equals(x))
+        assert(b.equals(y))
+        assert(c.equals(z))
+
     }
 
     @Test

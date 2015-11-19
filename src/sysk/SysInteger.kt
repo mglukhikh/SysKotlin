@@ -78,8 +78,6 @@ class SysInteger(
         return SysInteger(-value).truncate(this.width)
     }
 
-    // TODO: add unaryMinus (-x)
-
     /** Subtract arg from this integer*/
     operator fun minus(arg: SysInteger): SysInteger {
         return SysInteger(Math.max(width, arg.width), value - arg.value)
@@ -344,7 +342,10 @@ class SysInteger(
                 shift++;
                 counter++;
             }
-
+            if (arr[counter - 1] == SysWireState.ONE)
+                for (i in 0..64 - shift) {
+                    value = value or (1L shl (63 - i))
+                }
             return value
         }
 
