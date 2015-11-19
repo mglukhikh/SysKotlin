@@ -16,56 +16,56 @@ class RSFFTest {
         private var counter = 0
         private var phase = 0
 
-        private val f: SysTriggeredFunction = triggeredFunction({
-            if (it is SysWait.Initialize) {
-                r.value = SysWireState.X
-                s.value = SysWireState.X
-            }
-            else {
-                when (counter) {
-                    0 -> {
-                        assert(q.x) { "q should be x at the beginning" }
-                    }
-                    1 -> {
-                        if (phase == 0)
-                            assert(q.x) { "q should be x after q = x and RS = XX" }
-                        else
-                            assert(q.zero) { "q should be false after q = false and RS = 00" }
+        init {
+            triggeredFunction(clk) {
+                if (it is SysWait.Initialize) {
+                    r.value = SysWireState.X
+                    s.value = SysWireState.X
+                } else {
+                    when (counter) {
+                        0 -> {
+                            assert(q.x) { "q should be x at the beginning" }
+                        }
+                        1 -> {
+                            if (phase == 0)
+                                assert(q.x) { "q should be x after q = x and RS = XX" }
+                            else
+                                assert(q.zero) { "q should be false after q = false and RS = 00" }
 
-                        // All changes at clock N are received at clock N+1 and processed at clock N+2
-                        s.value = SysWireState.ONE
-                    }
-                    2 -> {
-                        if (phase == 0)
-                            assert(q.x) { "q should be x after q = x and RS = XX" }
-                        else
-                            assert(q.zero) { "q should be false after q = false and RS = 00" }
+                            // All changes at clock N are received at clock N+1 and processed at clock N+2
+                            s.value = SysWireState.ONE
+                        }
+                        2 -> {
+                            if (phase == 0)
+                                assert(q.x) { "q should be x after q = x and RS = XX" }
+                            else
+                                assert(q.zero) { "q should be false after q = false and RS = 00" }
 
-                        s.value = SysWireState.ZERO
+                            s.value = SysWireState.ZERO
+                        }
+                        3 -> {
+                            assert(q.one) { "q should be true after RS = 01 or RS = X1" }
+                            r.value = SysWireState.ONE
+                        }
+                        4 -> {
+                            assert(q.one) { "q should be true after q = true and RS = 00 or RS = X0" }
+                            r.value = SysWireState.ZERO
+                        }
+                        5 -> {
+                            assert(q.zero) { "q should be false after RS = 10" }
+                        }
                     }
-                    3 -> {
-                        assert(q.one) { "q should be true after RS = 01 or RS = X1" }
-                        r.value = SysWireState.ONE
-                    }
-                    4 -> {
-                        assert(q.one) { "q should be true after q = true and RS = 00 or RS = X0" }
-                        r.value = SysWireState.ZERO
-                    }
-                    5 -> {
-                        assert(q.zero) { "q should be false after RS = 10" }
+                    counter++
+                    if (counter > 5) {
+                        counter = 1
+                        phase++
+                        if (phase == 4) {
+                            scheduler.stop()
+                        }
                     }
                 }
-                counter++
-                if (counter > 5) {
-                    counter = 1
-                    phase++
-                    if (phase == 4) {
-                        scheduler.stop()
-                    }
-                }
             }
-            f.wait()
-        }, clk)
+        }
     }
 
     private class Top : SysTopModule("top", SysScheduler()) {

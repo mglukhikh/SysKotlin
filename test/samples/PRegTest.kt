@@ -18,94 +18,94 @@ class PRegTest {
         private var r = Random()
         private var arr = BooleanArray(digPerWord)
 
-        private val f: SysTriggeredFunction = triggeredFunction({
-            if (it is SysWait.Initialize) {
-                while (i < digPerWord) {
-                    d[i].value = SysWireState.X
-                    i += 1
+        init {
+            triggeredFunction(clk) {
+                if (it is SysWait.Initialize) {
+                    while (i < digPerWord) {
+                        d[i].value = SysWireState.X
+                        i += 1
+                    }
+                } else {
+                    when (counter) {
+                        0 -> {
+                            i = 0
+                            while (i < digPerWord) {
+                                assert(q[i].x) { "q[$i] should be x at the beginning" }
+                                i += 1
+                            }
+                        }
+                        1 -> {
+                            if (phase == 0) {
+                                i = 0
+                                while (i < digPerWord) {
+                                    assert(q[i].x) { "q[$i] should be x after q[$i] = x and D[$i] = X" }
+                                    i += 1
+                                }
+                            } else {
+                                i = 0
+                                while (i < digPerWord) {
+                                    assert(q[i].zero) { "q[$i] should be false after q[$i] = false and D[$i] = 0" }
+                                    i += 1
+                                }
+                            }
+                            // All changes at clock N are received at clock N+1 and processed at clock N+2
+
+                            i = 0
+                            while (i < digPerWord) {
+                                arr[i] = r.nextBoolean()
+                                if (arr[i]) d[i].value = SysWireState.ONE
+                                else d[i].value = SysWireState.ZERO
+                                i += 1
+                            }
+                        }
+                        2 -> {
+                            if (phase == 0) {
+                                i = 0
+                                while (i < digPerWord) {
+                                    assert(q[i].x) { "q[$i] should be x after q[$i] = x and D[$i] = X" }
+                                    i += 1
+                                }
+                            } else {
+                                i = 0
+                                while (i < digPerWord) {
+                                    assert(q[i].zero) { "q[$i] should be false after q[$i] = false and D[$i] = 0" }
+                                    i += 1
+                                }
+                            }
+
+                            i = 0
+                            while (i < digPerWord) {
+                                d[i].value = SysWireState.ZERO
+                                i += 1
+                            }
+                        }
+                        3 -> {
+                            i = 0
+                            while (i < digPerWord) {
+                                if (arr[i]) assert(q[i].one) { "q[$i] should be true after D[$i] = 1" }
+                                else assert(q[i].zero) { "q[$i] should be false after D[$i] = 0" }
+                                i += 1
+                            }
+                        }
+                        4 -> {
+                            i = 0
+                            while (i < digPerWord) {
+                                assert(q[i].zero) { "q[$i] should be false after D = 0" }
+                                i += 1
+                            }
+                        }
+                    }
+                    counter++
+                    if (counter > 4) {
+                        counter = 1
+                        phase++
+                        if (phase == 4) {
+                            scheduler.stop()
+                        }
+                    }
                 }
             }
-            else {
-                when (counter) {
-                    0 -> {
-                        i = 0
-                        while (i < digPerWord) {
-                            assert(q[i].x) { "q[$i] should be x at the beginning" }
-                            i += 1
-                        }
-                    }
-                    1 -> {
-                        if (phase == 0) {
-                            i = 0
-                            while (i < digPerWord) {
-                                assert(q[i].x) { "q[$i] should be x after q[$i] = x and D[$i] = X" }
-                                i += 1
-                            }
-                        } else {
-                            i = 0
-                            while (i < digPerWord) {
-                                assert(q[i].zero) { "q[$i] should be false after q[$i] = false and D[$i] = 0" }
-                                i += 1
-                            }
-                        }
-                        // All changes at clock N are received at clock N+1 and processed at clock N+2
-
-                        i = 0
-                        while (i < digPerWord) {
-                            arr[i] = r.nextBoolean()
-                            if (arr[i]) d[i].value = SysWireState.ONE
-                            else d[i].value = SysWireState.ZERO
-                            i += 1
-                        }
-                    }
-                    2 -> {
-                        if (phase == 0) {
-                            i = 0
-                            while (i < digPerWord) {
-                                assert(q[i].x) { "q[$i] should be x after q[$i] = x and D[$i] = X" }
-                                i += 1
-                            }
-                        } else {
-                            i = 0
-                            while (i < digPerWord) {
-                                assert(q[i].zero) { "q[$i] should be false after q[$i] = false and D[$i] = 0" }
-                                i += 1
-                            }
-                        }
-
-                        i = 0
-                        while (i < digPerWord) {
-                            d[i].value = SysWireState.ZERO
-                            i += 1
-                        }
-                    }
-                    3 -> {
-                        i = 0
-                        while (i < digPerWord) {
-                            if (arr[i]) assert(q[i].one) { "q[$i] should be true after D[$i] = 1" }
-                            else assert(q[i].zero) { "q[$i] should be false after D[$i] = 0" }
-                            i += 1
-                        }
-                    }
-                    4 -> {
-                        i = 0
-                        while (i < digPerWord) {
-                            assert(q[i].zero) { "q[$i] should be false after D = 0" }
-                            i += 1
-                        }
-                    }
-                }
-                counter++
-                if (counter > 4) {
-                    counter = 1
-                    phase++
-                    if (phase == 4) {
-                        scheduler.stop()
-                    }
-                }
-            }
-            f.wait()
-        }, clk)
+        }
     }
 
     private class Top : SysTopModule("top", SysScheduler()) {

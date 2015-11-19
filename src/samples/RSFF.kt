@@ -11,11 +11,12 @@ class RSFF(name: String, parent: SysModule): SysModule(name, parent) {
     private var state = SysWireState.X
     val q = output<SysWireState>("q")
 
-    private val f: SysTriggeredFunction = triggeredFunction({
+    init {
+        triggeredFunction(clk, initialize = false) {
 
-        if (s.one) state = SysWireState.ONE
-        else if (r.one) state = SysWireState.ZERO
-        q.value = state
-        f.wait()
-    }, clk, initialize = false)
+            if (s.one) state = SysWireState.ONE
+            else if (r.one) state = SysWireState.ZERO
+            q.value = state
+        }
+    }
 }

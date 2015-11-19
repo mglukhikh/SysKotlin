@@ -10,11 +10,11 @@ public class UReg <T> (name: String, defValue: T, parent: SysModule): SysModule(
     private var state: T = defValue
     val q = output<T>("q")
 
-    private val f: SysTriggeredFunction = triggeredFunction({
+    init {
+        triggeredFunction(clk, initialize = false) {
 
-        q.value = state
-        state = d.value
-
-        f.wait()
-    }, clk, initialize = false)
+            q.value = state
+            state = d.value
+        }
+    }
 }

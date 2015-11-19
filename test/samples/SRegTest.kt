@@ -16,111 +16,111 @@ class SRegTest {
         private var counter = 0
         private var phase = 0
 
-        private val f: SysTriggeredFunction = triggeredFunction({
+        init {
+            triggeredFunction(clk) {
 
-            if (it is SysWait.Initialize) {
-                d.value = SysWireState.X
-                dir.value = SysWireState.X
-            }
-            else {
-                when (counter) {
-                    0 -> {
-                        assert(q.x) { "q should be x at the beginning" }
-                    }
-                    1 -> {
-                        if (phase == 0)
-                            assert(q.x) { "q should be x after q = x and D = X" }
-                        else
-                            assert(q.zero) { "q should be false after q = false and D = 0" }
+                if (it is SysWait.Initialize) {
+                    d.value = SysWireState.X
+                    dir.value = SysWireState.X
+                } else {
+                    when (counter) {
+                        0 -> {
+                            assert(q.x) { "q should be x at the beginning" }
+                        }
+                        1 -> {
+                            if (phase == 0)
+                                assert(q.x) { "q should be x after q = x and D = X" }
+                            else
+                                assert(q.zero) { "q should be false after q = false and D = 0" }
 
-                        // All changes at clock N are received at clock N+1 and processed at clock N+2
-                        dir.value = SysWireState.ZERO
-                        d.value = SysWireState.ONE
-                    }
-                    2 -> {
-                        if (phase == 0)
-                            assert(q.x) { "q should be x after q = x and D = X" }
-                        else
-                            assert(q.zero) { "q should be false after q = false and D = 0" }
+                            // All changes at clock N are received at clock N+1 and processed at clock N+2
+                            dir.value = SysWireState.ZERO
+                            d.value = SysWireState.ONE
+                        }
+                        2 -> {
+                            if (phase == 0)
+                                assert(q.x) { "q should be x after q = x and D = X" }
+                            else
+                                assert(q.zero) { "q should be false after q = false and D = 0" }
 
-                        dir.value = SysWireState.ZERO
-                        d.value = SysWireState.ZERO
-                    }
-                    3 -> {
-                        if (phase == 0)
-                            assert(q.x) { "q should be x after q = x and D = X" }
-                        else
-                            assert(q.zero) { "q should be false after q = false and D = 0" }
+                            dir.value = SysWireState.ZERO
+                            d.value = SysWireState.ZERO
+                        }
+                        3 -> {
+                            if (phase == 0)
+                                assert(q.x) { "q should be x after q = x and D = X" }
+                            else
+                                assert(q.zero) { "q should be false after q = false and D = 0" }
 
-                        dir.value = SysWireState.ZERO
-                        d.value = SysWireState.ONE
-                    }
-                    4 -> {
-                        if (phase == 0)
-                            assert(q.x) { "q should be x after q = x and D = X" }
-                        else
-                            assert(q.zero) { "q should be false after q = false and D = 0" }
+                            dir.value = SysWireState.ZERO
+                            d.value = SysWireState.ONE
+                        }
+                        4 -> {
+                            if (phase == 0)
+                                assert(q.x) { "q should be x after q = x and D = X" }
+                            else
+                                assert(q.zero) { "q should be false after q = false and D = 0" }
 
-                        dir.value = SysWireState.ZERO
-                        d.value = SysWireState.ZERO
+                            dir.value = SysWireState.ZERO
+                            d.value = SysWireState.ZERO
+                        }
+                        5 -> {
+                            assert(q.one) { "q should be true after D = 1" }
+                            dir.value = SysWireState.ZERO
+                        }
+                        6 -> {
+                            assert(q.zero) { "q should be false after D = 0" }
+                            dir.value = SysWireState.ZERO
+                        }
+                        7 -> {
+                            assert(q.one) { "q should be true after D = 1" }
+                        }
+                        8 -> {
+                            assert(q.zero) { "q should be false after D = 0" }
+                            dir.value = SysWireState.ONE
+                            d.value = SysWireState.ONE
+                        }
+                        9 -> {
+                            assert(q.zero) { "q should be false after D = 0" }
+                            dir.value = SysWireState.ONE
+                            d.value = SysWireState.ZERO
+                        }
+                        10 -> {
+                            assert(q.zero) { "q should be false after D = 0" }
+                            dir.value = SysWireState.ONE
+                            d.value = SysWireState.ONE
+                        }
+                        11 -> {
+                            assert(q.zero) { "q should be false after D = 0" }
+                            dir.value = SysWireState.ONE
+                            d.value = SysWireState.ZERO
+                        }
+                        12 -> {
+                            assert(q.one) { "q should be true after D = 1" }
+                            dir.value = SysWireState.ONE
+                        }
+                        13 -> {
+                            assert(q.zero) { "q should be false after D = 0" }
+                            dir.value = SysWireState.ONE
+                        }
+                        14 -> {
+                            assert(q.one) { "q should be true after D = 1" }
+                        }
+                        15 -> {
+                            assert(q.zero) { "q should be false after D = 0" }
+                        }
                     }
-                    5 -> {
-                        assert(q.one) { "q should be true after D = 1" }
-                        dir.value = SysWireState.ZERO
-                    }
-                    6 -> {
-                        assert(q.zero) { "q should be false after D = 0" }
-                        dir.value = SysWireState.ZERO
-                    }
-                    7 -> {
-                        assert(q.one) { "q should be true after D = 1" }
-                    }
-                    8 -> {
-                        assert(q.zero) { "q should be false after D = 0" }
-                        dir.value = SysWireState.ONE
-                        d.value = SysWireState.ONE
-                    }
-                    9 -> {
-                        assert(q.zero) { "q should be false after D = 0" }
-                        dir.value = SysWireState.ONE
-                        d.value = SysWireState.ZERO
-                    }
-                    10 -> {
-                        assert(q.zero) { "q should be false after D = 0" }
-                        dir.value = SysWireState.ONE
-                        d.value = SysWireState.ONE
-                    }
-                    11 -> {
-                        assert(q.zero) { "q should be false after D = 0" }
-                        dir.value = SysWireState.ONE
-                        d.value = SysWireState.ZERO
-                    }
-                    12 -> {
-                        assert(q.one) { "q should be true after D = 1" }
-                        dir.value = SysWireState.ONE
-                    }
-                    13 -> {
-                        assert(q.zero) { "q should be false after D = 0" }
-                        dir.value = SysWireState.ONE
-                    }
-                    14 -> {
-                        assert(q.one) { "q should be true after D = 1" }
-                    }
-                    15 -> {
-                        assert(q.zero) { "q should be false after D = 0" }
+                    counter++
+                    if (counter > 15) {
+                        counter = 1
+                        phase++
+                        if (phase == 4) {
+                            scheduler.stop()
+                        }
                     }
                 }
-                counter++
-                if (counter > 15) {
-                    counter = 1
-                    phase++
-                    if (phase == 4) {
-                        scheduler.stop()
-                    }
-                }
             }
-            f.wait()
-        }, clk)
+        }
     }
 
     private class Top : SysTopModule("top", SysScheduler()) {

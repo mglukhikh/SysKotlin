@@ -11,11 +11,11 @@ class JKFF(name: String, parent: SysModule): SysModule(name, parent) {
     private var state = SysWireState.ZERO
     val q = output<SysWireState>("q")
 
-    private val f: SysTriggeredFunction = triggeredFunction({
-
-        if (j.one && state.zero) state = SysWireState.ONE
-        else if (k.one && state.one) state = SysWireState.ZERO
-        q.value = state
-        f.wait()
-    }, clk, initialize = false)
+    init {
+        triggeredFunction(clk, initialize = false) {
+            if (j.one && state.zero) state = SysWireState.ONE
+            else if (k.one && state.one) state = SysWireState.ZERO
+            q.value = state
+        }
+    }
 }

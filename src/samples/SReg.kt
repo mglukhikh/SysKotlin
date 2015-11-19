@@ -12,47 +12,47 @@ public class SReg (name: String, digPerWord: Int, parent: SysModule): SysModule(
     val trigQ = Array(digPerWord, {i -> SysWireState.X})
     private val state = Array(digPerWord, {i -> SysWireState.X})
 
-    private val f: SysTriggeredFunction = triggeredFunction({
+    init {
+        triggeredFunction(clk, initialize = false) {
 
-        if (dir.zero) {
-            state[0] = d.value
-            trigQ[0] = state[0]
+            if (dir.zero) {
+                state[0] = d.value
+                trigQ[0] = state[0]
 
-            var i = 1
-            while (i < digPerWord) {
-                state[i] = trigQ[i - 1]
-                i += 1
+                var i = 1
+                while (i < digPerWord) {
+                    state[i] = trigQ[i - 1]
+                    i += 1
+                }
+
+                i = 1
+                while (i < digPerWord) {
+                    trigQ[i] = state[i]
+                    i += 1
+                }
+
+                q.value = trigQ[digPerWord - 1]
             }
 
-            i = 1
-            while (i < digPerWord) {
-                trigQ[i] = state[i]
-                i += 1
-            }
+            if (dir.one) {
+                state[digPerWord - 1] = d.value
+                trigQ[digPerWord - 1] = state[digPerWord - 1]
 
-            q.value = trigQ[digPerWord - 1]
+                var i = digPerWord - 2
+                while (i >= 0) {
+                    state[i] = trigQ[i + 1]
+                    i -= 1
+                }
+
+                i = 0
+                while (i < digPerWord - 1) {
+                    trigQ[i] = state[i]
+                    i += 1
+                }
+
+                q.value = trigQ[0]
+            }
         }
-
-        if (dir.one) {
-            state[digPerWord - 1] = d.value
-            trigQ[digPerWord - 1] = state[digPerWord - 1]
-
-            var i = digPerWord - 2
-            while (i >= 0) {
-                state[i] = trigQ[i + 1]
-                i -= 1
-            }
-
-            i = 0
-            while (i < digPerWord - 1) {
-                trigQ[i] = state[i]
-                i += 1
-            }
-
-            q.value = trigQ[0]
-        }
-
-        f.wait()
-    }, clk, initialize = false)
+    }
 }
 

@@ -15,50 +15,50 @@ class DFFTest {
         private var counter = 0
         private var phase = 0
 
-        private val f: SysTriggeredFunction = triggeredFunction({
-            if (it is SysWait.Initialize) {
-                d.value = SysWireState.X
-            }
-            else {
-                when (counter) {
-                    0 -> {
-                        assert(q.x) { "q should be x at the beginning" }
-                    }
-                    1 -> {
-                        if (phase == 0)
-                            assert(q.x) { "q should be x after q = x and D = X" }
-                        else
-                            assert(q.zero) { "q should be false after q = false and D = 0" }
+        init {
+            triggeredFunction(clk) {
+                if (it is SysWait.Initialize) {
+                    d.value = SysWireState.X
+                } else {
+                    when (counter) {
+                        0 -> {
+                            assert(q.x) { "q should be x at the beginning" }
+                        }
+                        1 -> {
+                            if (phase == 0)
+                                assert(q.x) { "q should be x after q = x and D = X" }
+                            else
+                                assert(q.zero) { "q should be false after q = false and D = 0" }
 
-                        // All changes at clock N are received at clock N+1 and processed at clock N+2
-                        d.value = SysWireState.ONE
-                    }
-                    2 -> {
-                        if (phase == 0)
-                            assert(q.x) { "q should be x after q = x and D = X" }
-                        else
-                            assert(q.zero) { "q should be false after q = false and D = 0" }
+                            // All changes at clock N are received at clock N+1 and processed at clock N+2
+                            d.value = SysWireState.ONE
+                        }
+                        2 -> {
+                            if (phase == 0)
+                                assert(q.x) { "q should be x after q = x and D = X" }
+                            else
+                                assert(q.zero) { "q should be false after q = false and D = 0" }
 
-                        d.value = SysWireState.ZERO
+                            d.value = SysWireState.ZERO
+                        }
+                        3 -> {
+                            assert(q.one) { "q should be true after D = 1" }
+                        }
+                        4 -> {
+                            assert(q.zero) { "q should be false after D = 0" }
+                        }
                     }
-                    3 -> {
-                        assert(q.one) { "q should be true after D = 1" }
-                    }
-                    4 -> {
-                        assert(q.zero) { "q should be false after D = 0" }
+                    counter++
+                    if (counter > 4) {
+                        counter = 1
+                        phase++
+                        if (phase == 4) {
+                            scheduler.stop()
+                        }
                     }
                 }
-                counter++
-                if (counter > 4) {
-                    counter = 1
-                    phase++
-                    if (phase == 4) {
-                        scheduler.stop()
-                    }
-                }
             }
-            f.wait()
-        }, clk)
+        }
     }
 
     private class Top : SysTopModule("top", SysScheduler()) {

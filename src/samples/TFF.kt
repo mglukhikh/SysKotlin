@@ -10,16 +10,17 @@ public class TFF (name: String, parent: SysModule): SysModule(name, parent) {
     private var state = SysWireState.ZERO
     val q = output<SysWireState>("q")
 
-    private val f: SysTriggeredFunction = triggeredFunction({
+    init {
+        triggeredFunction(clk, initialize = false) {
 
-        if (t.one) {
-            if (state.one)
-                state = SysWireState.ZERO
-            else
-                state = SysWireState.ONE
+            if (t.one) {
+                if (state.one)
+                    state = SysWireState.ZERO
+                else
+                    state = SysWireState.ONE
+            }
+            q.value = state
         }
-        q.value = state
-        f.wait()
-    }, clk, initialize = false)
+    }
 }
 

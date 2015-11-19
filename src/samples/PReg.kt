@@ -10,14 +10,15 @@ public class PReg (name: String, digPerWord: Int, parent: SysModule): SysModule(
     private val state = Array(digPerWord, {i -> SysWireState.X})
     val q = Array(digPerWord, {i -> output<SysWireState>("q" + i.toString())})
 
-    private val f: SysTriggeredFunction = triggeredFunction({
+    init {
+        triggeredFunction(clk, initialize = false) {
 
-        var i = 0
-        while (i < digPerWord) {
-            state[i] = d[i].value
-            q[i].value = state[i]
-            i += 1
+            var i = 0
+            while (i < digPerWord) {
+                state[i] = d[i].value
+                q[i].value = state[i]
+                i += 1
+            }
         }
-        f.wait()
-    }, clk, initialize = false)
+    }
 }
