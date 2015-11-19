@@ -43,6 +43,9 @@ open class SysWireBus internal constructor(
 
     private val ports: MutableMap<SysPort<*>, MutableList<SysWireState>> = HashMap()
 
+    var changed = false
+        private set
+
     override fun register(port: SysPort<*>) {
         val list = ArrayList<SysWireState>()
         for (i in signals.indices) list.add(SysWireState.Z)
@@ -66,10 +69,13 @@ open class SysWireBus internal constructor(
         var value = SysWireState.Z
         ports.forEach { value = value.wiredAnd(it.value[index]) }
         signals[index].value = value;
+        if (signals[index].changed) changed = true
     }
 
     override fun update() {
         signals.forEach { it.update() }
+        if (changed) changeEvent.happens()
+        changed = false
     }
 }
 
@@ -78,6 +84,9 @@ open class SysPriorityBus<T> internal constructor(
 ) : SysBus<SysPriorityValue<T>>(name, scheduler, parent) {
 
     private val priority: MutableList<Int> = ArrayList()
+
+    var changed = false
+        private set
 
     override fun addWire(startValue: SysPriorityValue<T>) {
         super.addWire(startValue)
@@ -88,6 +97,7 @@ open class SysPriorityBus<T> internal constructor(
         if (this.priority[index] < value.priority) {
             this.priority[index] = value.priority
             signals[index].value = value
+            if (signals[index].changed) changed = true
         }
     }
 
@@ -96,6 +106,8 @@ open class SysPriorityBus<T> internal constructor(
             priority[i] = 0
             signals[i].update()
         }
+        if (changed) changeEvent.happens()
+        changed = false
     }
 }
 
@@ -121,6 +133,7 @@ open class SysFifoBus<T> internal constructor(
             if (!fifo[i].isEmpty()) {
                 signals[i].value = fifo[i].element()
                 fifo[i].remove()
+                changeEvent.happens()
             }
         signals.forEach { it.update() }
     }
