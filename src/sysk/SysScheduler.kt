@@ -15,6 +15,8 @@ class SysScheduler {
 
     private val functions: MutableMap<SysFunction, SysWait> = LinkedHashMap()
 
+    private val newFunctions: MutableMap<SysFunction, SysWait> = LinkedHashMap()
+
     internal fun register(event: SysWait.Event) {
         events.put(event, false)
     }
@@ -28,7 +30,7 @@ class SysScheduler {
     }
 
     internal fun register(function: SysFunction) {
-        functions[function] = convert(function.sensitivities)
+        newFunctions[function] = convert(function.sensitivities)
     }
 
     internal fun happens(event: SysWait.Event) {
@@ -49,6 +51,7 @@ class SysScheduler {
         var time: SysWait.Time? = null
         for (s in sensitivities) {
             when (s) {
+                is SysWait.Initialize -> result.add(s)
                 is SysWait.Event -> result.add(s)
                 is SysWait.Finder -> result.add(s)
                 is SysWait.Time -> if (time == null || time > s + currentTime) time = s + currentTime
@@ -75,6 +78,7 @@ class SysScheduler {
 
     private fun happened(wait: SysWait, events: Set<SysWait?>): Boolean =
         when (wait) {
+            is SysWait.Initialize -> wait in events
             is SysWait.Event -> wait in events
             is SysWait.Finder -> wait() in events
             is SysWait.Time -> wait <= currentTime
@@ -97,12 +101,16 @@ class SysScheduler {
         stopRequested = false
         if (currentTime >= endTime) return
         var happenedEvents: Set<SysWait> = if (currentTime.femtoSeconds == 0L) setOf(SysWait.Initialize) else setOf()
+        var initialize = true
         while (currentTime < endTime && !stopRequested) {
             var globalClosestTime = SysWait.Time.INFINITY
             var functionActivated = false
             var sensitivities: SysWait
             var neverCalledFunctions: MutableList<SysFunction> = ArrayList()
-            resetEvents()
+            if (!initialize) resetEvents()
+            else initialize = false
+            functions += newFunctions
+            newFunctions.clear()
             for ((function, wait) in functions) {
                 if (happened(wait, happenedEvents)) {
                     functionActivated = true
