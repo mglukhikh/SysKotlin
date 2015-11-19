@@ -32,6 +32,58 @@ open class SysModule internal constructor(
                            run: (SysWait) -> Unit = {}) =
             function({ run(it) }, sensitivities, initialize)
 
+    // TODO: both Stage && StagedFunction should be protected (IllegalAccessError bug)
+    data class Stage(val run: () -> SysWait)
+
+    class StagedFunction private constructor(
+            private val stages: MutableList<Stage>,
+            private var initStage: Stage? = null,
+            sensitivities: SysWait = SysWait.Never
+    ): SysFunction(sensitivities, initialize = true) {
+        constructor(sensitivities: SysWait = SysWait.Never):
+                this(linkedListOf(), null, sensitivities)
+
+        fun stage(f: () -> Unit): Stage {
+            val result = Stage {
+                f()
+                wait()
+            }
+            stages.add(result)
+            return result
+        }
+
+        fun initStage(f: () -> Unit): Stage {
+            initStage = Stage {
+                f()
+                wait()
+            }
+            return initStage!!
+        }
+
+        private fun init(): SysWait {
+            return initStage?.run() ?: wait()
+        }
+
+        var stageNumber = 0
+
+        override fun run(event: SysWait): SysWait {
+            if (event == SysWait.Initialize) {
+                return init()
+            }
+            else {
+                if (stageNumber < stages.size) return stages[stageNumber++].run()
+                return SysWait.Never
+            }
+        }
+    }
+
+    protected fun stagedFunction(sensitivities: SysWait = SysWait.Never,
+                                 init: StagedFunction.() -> Unit): StagedFunction {
+        val result = StagedFunction(sensitivities)
+        result.init()
+        return result
+    }
+
     protected class SysModuleTriggeredFunction(
             private val f: (SysWait) -> Any,
             trigger: SysWait,

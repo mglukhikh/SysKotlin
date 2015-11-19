@@ -6,6 +6,47 @@ import sysk.SysWireState
 import sysk.bind
 
 class SysSimpleAutomataTest {
+
+    class SysLatchStagedTester : SysTopModule() {
+        val dut = LatchTriggerMoore("not", this)
+
+        val x = wireSignal("x")
+        val y = wireSignal("y")
+
+        init {
+            bind(dut.x to x)
+            bind(dut.y to y)
+        }
+
+        init {
+            stagedFunction(sensitivities = y.defaultEvent) {
+                stage {
+                    assert(y.x)
+                    x.value = SysWireState.ZERO
+                }
+                stage {
+                    assert(y.x)
+                    x.value = SysWireState.ONE
+                }
+                stage {
+                    assert(y.zero)
+                    x.value = SysWireState.ZERO
+                }
+                stage {
+                    assert(y.one)
+                    x.value = SysWireState.ONE
+                }
+                stage {
+                    assert(y.zero)
+                }
+                stage {
+                    assert(y.one)
+                    scheduler.stop()
+                }
+            }
+        }
+    }
+
     class SysLatchTester : SysTopModule() {
 
         val dut = LatchTriggerMoore("not", this)
@@ -49,6 +90,11 @@ class SysSimpleAutomataTest {
                 }
             }
         }
+    }
+
+    @Test
+    fun latchStagedTest() {
+        SysLatchStagedTester().start()
     }
 
     @Test
