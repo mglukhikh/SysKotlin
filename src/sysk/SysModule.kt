@@ -81,7 +81,7 @@ open class SysModule internal constructor(
                                  init: StagedFunction.() -> Unit): StagedFunction {
         val result = StagedFunction(sensitivities)
         result.init()
-        return result
+        return result.register()
     }
 
     protected class SysModuleTriggeredFunction(
