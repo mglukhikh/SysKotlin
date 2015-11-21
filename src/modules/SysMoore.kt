@@ -1,6 +1,7 @@
 package modules
 
 import sysk.SysModule
+import sysk.SysWait
 import sysk.SysWireState
 
 open class SysUnaryMoore<Input, State, Output>(
@@ -20,9 +21,12 @@ open class SysUnaryMoore<Input, State, Output>(
     val y = output<Output>("y")
 
     init {
-        triggeredFunction(clk, initialize = false) {
+        triggeredFunction(clk, initialize = true) {
+            // First calculate state, then output, one tick delay is provided by clock sensitivity
+            if (it != SysWait.Initialize) {
+                state = transition(state, x.value)
+            }
             y.value = result(state)
-            state = transition(state, x.value)
         }
     }
 }
@@ -39,7 +43,7 @@ open class SysUnaryWireMoore<State, Output>(
 }
 
 class LatchTriggerMoore(name: String, parent: SysModule): SysUnaryWireMoore<SysWireState, SysWireState>(
-        { prev: SysWireState, curr: SysWireState -> curr },
+        { prev: SysWireState, data: SysWireState -> data },
         { it },
         SysWireState.X,
         name,
@@ -47,11 +51,10 @@ class LatchTriggerMoore(name: String, parent: SysModule): SysUnaryWireMoore<SysW
 )
 
 class CountTriggerMoore(name: String, parent: SysModule): SysUnaryWireMoore<SysWireState, SysWireState>(
-        { prev: SysWireState, curr: SysWireState ->
-            when (curr) {
-                SysWireState.X, SysWireState.Z -> SysWireState.X
-                SysWireState.ZERO -> prev
+        { prev: SysWireState, data: SysWireState ->
+            when (data) {
                 SysWireState.ONE -> !prev
+                else -> prev
             }
         },
         { it },
@@ -82,8 +85,9 @@ open class SysBinaryMoore<Input1, Input2, State, Output>(
 
     init {
         triggeredFunction(clk, initialize = false) {
-            y.value = result(state)
+            // First calculate state, then output, one tick delay is provided by clock sensitivity
             state = transition(state, x1.value, x2.value)
+            y.value = result(state)
         }
     }
 }

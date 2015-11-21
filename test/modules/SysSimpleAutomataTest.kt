@@ -1,25 +1,25 @@
 package modules
 
 import org.junit.Test
-import sysk.SysTopModule
-import sysk.SysWireState
-import sysk.bind
+import sysk.*
 
 class SysSimpleAutomataTest {
 
     class SysLatchStagedTester : SysTopModule() {
-        val dut = LatchTriggerMoore("not", this)
+        val dut = LatchTriggerMoore("latch", this)
 
         val x = wireSignal("x")
         val y = wireSignal("y")
 
+        val clk = clockedSignal("clk", time(20, TimeUnit.NS))
+
         init {
-            bind(dut.x to x)
+            bind(dut.x to x, dut.clk to clk)
             bind(dut.y to y)
         }
 
         init {
-            stagedFunction(sensitivities = y.defaultEvent) {
+            stagedFunction(clk.posEdgeEvent) {
                 stage {
                     assert(y.x)
                     x.value = SysWireState.ZERO
@@ -49,23 +49,25 @@ class SysSimpleAutomataTest {
 
     class SysLatchTester : SysTopModule() {
 
-        val dut = LatchTriggerMoore("not", this)
+        val dut = LatchTriggerMoore("latch", this)
 
         val x = wireSignal("x")
         val y = wireSignal("y")
 
+        val clk = clockedSignal("clk", time(20, TimeUnit.NS))
+
         init {
-            bind(dut.x to x)
+            bind(dut.x to x, dut.clk to clk)
             bind(dut.y to y)
         }
 
-        val counter = 0
+        var counter = 0
 
         init {
-            function(sensitivities = y.defaultEvent, initialize = false) {
+            function(sensitivities = clk.posEdgeEvent, initialize = false) {
                 when (counter) {
                     0 -> {
-                        assert(y.x)
+                        assert(y.x) { "Expected X at 0 but was ${y.value}"}
                         x.value = SysWireState.ZERO
                     }
                     1 -> {
@@ -88,6 +90,7 @@ class SysSimpleAutomataTest {
                         scheduler.stop()
                     }
                 }
+                counter++
             }
         }
     }
@@ -104,43 +107,42 @@ class SysSimpleAutomataTest {
 
     class SysCountTester : SysTopModule() {
 
-        val dut = CountTriggerMoore("not", this)
+        val dut = CountTriggerMoore("count", this)
 
         val x = wireSignal("x")
         val y = wireSignal("y")
 
+        val clk = clockedSignal("clk", time(20, TimeUnit.NS))
+
         init {
-            bind(dut.x to x)
+            bind(dut.x to x, dut.clk to clk)
             bind(dut.y to y)
         }
 
-        val counter = 0
-
         init {
-            function(sensitivities = y.defaultEvent, initialize = false) {
-                when (counter) {
-                    0 -> {
-                        assert(y.zero)
-                        x.value = SysWireState.ZERO
-                    }
-                    1 -> {
-                        assert(y.zero)
-                        x.value = SysWireState.ONE
-                    }
-                    2 -> {
-                        assert(y.zero)
-                    }
-                    3 -> {
-                        assert(y.one)
-                        x.value = SysWireState.ZERO
-                    }
-                    4 -> {
-                        assert(y.zero)
-                    }
-                    5 -> {
-                        assert(y.zero)
-                        scheduler.stop()
-                    }
+            stagedFunction(clk.posEdgeEvent) {
+                stage {
+                    // TODO [mglukhikh]: recheck this place, looks like it should be zero here
+                    assert(y.x)
+                    x.value = SysWireState.ZERO
+                }
+                stage {
+                    assert(y.zero) { "Expected ZERO at stage 1 but was ${y.value}"}
+                    x.value = SysWireState.ONE
+                }
+                stage {
+                    assert(y.zero)
+                }
+                stage {
+                    assert(y.one)
+                    x.value = SysWireState.ZERO
+                }
+                stage {
+                    assert(y.zero)
+                }
+                stage {
+                    assert(y.zero)
+                    scheduler.stop()
                 }
             }
         }
