@@ -60,7 +60,10 @@ open class SysBinaryWireModule<Output>(
 }
 
 class SysOrModule(name: String, parent: SysModule):
-        SysBinaryWireModule<SysWireState>({ x1, x2 -> x1.or(x2)}, name, parent)
+        SysBinaryWireModule<SysWireState>({ x1, x2 -> x1.or(x2) }, name, parent)
 
 class SysAndModule(name: String, parent: SysModule):
-        SysBinaryWireModule<SysWireState>({ x1, x2 -> x1.and(x2)}, name, parent)
+        SysBinaryWireModule<SysWireState>({ x1, x2 -> x1.and(x2) }, name, parent)
+
+class SysAndNotModule(name: String, parent: SysModule):
+        SysBinaryWireModule<SysWireState>({ x1, x2 -> x1.and(x2).not() }, name, parent)

@@ -1,5 +1,6 @@
 package samples
 
+import modules.SysAndNotModule
 import org.junit.Test
 import sysk.*
 
@@ -61,13 +62,14 @@ class DFFTest {
         }
     }
 
-    private class Top : SysTopModule("top", SysScheduler()) {
+    private class Top : SysTopModule("top") {
         val d = signal("d", SysWireState.X)
 
         val clk = clockedSignal("clk", time(20, TimeUnit.NS))
         val q = signal("q", SysWireState.X)
 
         val ff = DFF("my", this)
+
         private val tb = Testbench("your", this)
 
         init {
@@ -79,5 +81,51 @@ class DFFTest {
     @Test
     fun test() {
         Top().start()
+    }
+
+    private class NotTestbench : SysTopModule("top") {
+        val d = signal("d", SysWireState.X)
+
+        val clk = clockedSignal("clk", time(20, TimeUnit.NS))
+        val q = wireSignal("q", SysWireState.X)
+
+        val swapOrOne = signal("en", SysWireState.X)
+
+        val ff = DFF("my", this)
+        val andNot = SysAndNotModule("andNot", this)
+
+        init {
+            bind(ff.d to d, ff.clk to clk, andNot.x1 to q, andNot.x2 to swapOrOne)
+            bind(ff.q to q, andNot.y to d)
+
+            stagedFunction(clk.posEdgeEvent) {
+                stage {
+                    assert(q.x)
+                    swapOrOne.value = SysWireState.ZERO
+                }
+                stage {
+                    assert(q.x)
+                    swapOrOne.value = SysWireState.ONE
+                }
+                stage {
+                    assert(q.one)
+                }
+                stage {
+                    assert(q.zero)
+                }
+                stage {
+                    assert(q.one)
+                }
+                stage {
+                    assert(q.zero)
+                    scheduler.stop()
+                }
+            }
+        }
+    }
+
+    @Test
+    fun notTest() {
+        NotTestbench().start()
     }
 }
