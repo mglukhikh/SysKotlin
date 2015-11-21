@@ -38,10 +38,11 @@ open class SysModule internal constructor(
     class StagedFunction private constructor(
             private val stages: MutableList<Stage>,
             private var initStage: Stage? = null,
+            private var infiniteStage: Stage? = null,
             sensitivities: SysWait = SysWait.Never
     ): SysFunction(sensitivities, initialize = true) {
         constructor(sensitivities: SysWait = SysWait.Never):
-                this(linkedListOf(), null, sensitivities)
+                this(linkedListOf(), null, null, sensitivities)
 
         fun stage(f: () -> Unit): Stage {
             val result = Stage {
@@ -60,8 +61,22 @@ open class SysModule internal constructor(
             return initStage!!
         }
 
+        fun infiniteStage(f: () -> Unit): Stage {
+            infiniteStage = Stage {
+                f()
+                wait()
+            }
+            return infiniteStage!!
+        }
+
         private fun init(): SysWait {
             return initStage?.run() ?: wait()
+        }
+
+        private fun infinite(): SysWait {
+            // BUG: return infiniteStage?.run() ?: wait()
+            if (infiniteStage == null) return SysWait.Never
+            return infiniteStage!!.run()
         }
 
         var stageNumber = 0
@@ -70,9 +85,11 @@ open class SysModule internal constructor(
             if (event == SysWait.Initialize) {
                 return init()
             }
+            else if (stageNumber < stages.size){
+                return stages[stageNumber++].run()
+            }
             else {
-                if (stageNumber < stages.size) return stages[stageNumber++].run()
-                return SysWait.Never
+                return infinite()
             }
         }
     }

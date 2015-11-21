@@ -21,12 +21,15 @@ open class SysUnaryMoore<Input, State, Output>(
     val y = output<Output>("y")
 
     init {
-        triggeredFunction(clk, initialize = true) {
-            // First calculate state, then output, one tick delay is provided by clock sensitivity
-            if (it != SysWait.Initialize) {
-                state = transition(state, x.value)
+        stagedFunction(clk.posEdgeEvent) {
+            initStage {
+                y.value = result(state)
             }
-            y.value = result(state)
+            infiniteStage {
+                // First calculate state, then output, one tick delay is provided by clock sensitivity
+                state = transition(state, x.value)
+                y.value = result(state)
+            }
         }
     }
 }
