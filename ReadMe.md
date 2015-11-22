@@ -16,6 +16,30 @@
 * Interoperable
 * Easy to read
 
+# Version 0.0.1
+
+Planned at ~ 25 Dec 2015.
+
+TODO
+
+* Features
+** function builder (mikhail)
+** memory module (veronika)
+** SysBigInteger (valentin)
+** SysFloat (?) (valentin)
+** delayed happens (?) (sergey)
+** ports with default value (?)
+* Tests
+** FIFO / buses (sergey)
+** memory module (veronika)
+** register + integer (veronika or valentin)
+** port bindings check (?) (mikhail)
+** Some large sample (?) (mikhail or sergey)
+* Refactorings (mikhail)
+** wireInput/ input etc. (make more or less the same)
+** remove triggeredFunction (?)
+** function / stagedFunction together (?)
+
 # Design Notes
 
 ## Arithmetics
