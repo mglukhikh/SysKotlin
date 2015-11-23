@@ -74,7 +74,7 @@ open class SysModule internal constructor(
         }
 
         private fun infinite(): SysWait {
-            // BUG: return infiniteStage?.run() ?: wait()
+            // BUG: return infiniteStage?.run() ?: SysWait.Never, see KT-10142
             if (infiniteStage == null) return SysWait.Never
             return infiniteStage!!.run()
         }
