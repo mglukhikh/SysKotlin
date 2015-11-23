@@ -32,7 +32,7 @@ open class SysModule internal constructor(
                            run: (SysWait) -> Unit = {}) =
             function({ run(it) }, sensitivities, initialize)
 
-    // TODO: both Stage && StagedFunction should be protected (IllegalAccessError bug)
+    // TODO: both Stage && StagedFunction should be protected (IllegalAccessError BUG): see KT-10143
     data class Stage(val run: () -> SysWait)
 
     class StagedFunction private constructor(
