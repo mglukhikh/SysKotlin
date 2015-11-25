@@ -37,17 +37,30 @@ class Connectors {
         val firstAddress: Int
         private val memory: Array<SysInteger>
 
-        public val waitWrite = SysWait.Time(4)
-        public val waitRead = SysWait.Time(3)
-        public val waitPrint = SysWait.Time(2)
-        public val waitEmit = SysWait.Time(1)
-        public val waitDisable = SysWait.Time(1)
+        public val waitWrite: Long = 4
+        public val waitRead: Long = 3
+        public val waitPrint: Long = 2
+        public val waitEmitUpdate: Long = 1
+        public val waitDisable: Long = 1
+
+        public val startWrite = event("write")
+        public val startRead = event("read")
+        public val startPrint = event("print")
+        public val startEmitUpdate = event("emit")
+        public val startDisable = event("disable")
+        public val startUpdate = event("update")
 
         constructor(capacity: Int, firstAddress: Int, name: String, parent: SysModule) : super(name, parent) {
             this.capacity = capacity
             this.firstAddress = firstAddress
             this.memory = Array(capacity, { SysInteger(CAPACITY_DATA, 0) })
+
             function(emitUpdate, SysWait.Initialize, true)
+            function(update, startUpdate, false)
+            function(disable, startDisable, false)
+            function(write, startWrite, false)
+            function(read, startRead, false)
+            function(print, startPrint, false)
         }
 
         constructor(ignored: Empty) : super("Empty", SysTopModule("Empty")) {
@@ -60,7 +73,7 @@ class Connectors {
             for (i in 0..(CAPACITY_DATA - 1)) dataPort.set(SysWireState.Z, i)
             for (i in 0..(CAPACITY_ADDRESS - 1)) addressPort.set(SysWireState.Z, i)
             for (i in 0..(CAPACITY_COMMAND - 1)) commandPort.set(SysWireState.Z, i)
-            SysWait.Never
+            startDisable
         }
 
         private val write: (SysWait) -> SysWait = {
@@ -69,7 +82,7 @@ class Connectors {
             if ((address.value > firstAddress) && (address.value < (firstAddress + capacity))) {
                 memory[address.value.toInt() - firstAddress] = data
             }
-            SysWait.Never
+            startWrite
         }
 
         private val read: (SysWait) -> SysWait = {
@@ -78,7 +91,7 @@ class Connectors {
                 for (i in 0..(CAPACITY_DATA - 1))
                     dataPort.set(memory[address.value.toInt() - firstAddress][i], i)
             }
-            SysWait.Never
+            startRead
         }
 
         private val print: (SysWait) -> SysWait = {
@@ -86,34 +99,37 @@ class Connectors {
             if ((address.value >= firstAddress) && (address.value < (firstAddress + capacity))) {
                 println("$name value: ${memory[address.value.toInt() - firstAddress]}{${address.value}}")
             }
-            SysWait.Never
+            startPrint
         }
 
         private val emitUpdate: (SysWait) -> SysWait = {
-            function(update, commandPort.defaultEvent, false)
-            SysWait.Never
+            startUpdate.happens()
+            startEmitUpdate
         }
 
         private val update: (SysWait) -> SysWait = {
             val command = SysInteger(Array(CAPACITY_COMMAND, { commandPort[it] }))
+//            println("$name command $command")
             when (command) {
                 PUSH -> {
-                    function(write, waitWrite, false)
-                    function(emitUpdate, waitEmit + waitWrite, false)
+                    startWrite.happens(waitWrite)
+                    startEmitUpdate.happens(waitEmitUpdate + waitWrite)
+                    startUpdate
                 }
                 PULL -> {
-                    function(read, waitRead, false)
+                    startRead.happens(waitRead)
                     /** Todo: without CPU(Empty) */
-                    function(disable, waitRead + CPU(Empty).waitSave + waitDisable, false)
-                    function(emitUpdate, waitRead + CPU(Empty).waitSave + waitDisable + waitEmit, false)
+                    startDisable.happens(waitRead + CPU(Empty).waitSave + waitDisable)
+                    startEmitUpdate.happens(waitRead + CPU(Empty).waitSave + waitDisable + waitEmitUpdate)
+                    startUpdate
                 }
                 RESPONSE -> {
-                    function(print, waitPrint, false)
-                    function(emitUpdate, waitEmit + waitPrint, false)
+                    startPrint.happens(waitPrint)
+                    startEmitUpdate.happens(waitEmitUpdate + waitPrint)
+                    startUpdate
                 }
-                else -> function(update, commandPort.defaultEvent, false)
+                else -> commandPort.defaultEvent
             }
-            SysWait.Never
         }
     }
 
@@ -131,25 +147,52 @@ class Connectors {
         private var currentRegister = 0
         private var command = Command(NULL)
 
-        public val waitRem = SysWait.Time(5)
-        public val waitDiv = SysWait.Time(5)
-        public val waitMul = SysWait.Time(5)
-        public val waitSub = SysWait.Time(5)
-        public val waitAdd = SysWait.Time(5)
-        public val waitPush = SysWait.Time(4)
-        public val waitPull = SysWait.Time(3)
-        public val waitResponse = SysWait.Time(3)
-        public val waitPrint = SysWait.Time(2)
-        public val waitNext = SysWait.Time(2)
-        public val waitSave = SysWait.Time(2)
-        public val waitUpdate = SysWait.Time(1)
-        public val waitDisable = SysWait.Time(1)
+        public val waitRem: Long = 5
+        public val waitDiv: Long = 5
+        public val waitMul: Long = 5
+        public val waitSub: Long = 5
+        public val waitAdd: Long = 5
+        public val waitPush: Long = 4
+        public val waitPull: Long = 3
+        public val waitResponse: Long = 3
+        public val waitPrint: Long = 2
+        public val waitNext: Long = 2
+        public val waitSave: Long = 2
+        public val waitUpdate: Long = 1
+        public val waitDisable: Long = 1
+
+        public val startRem = event("rem")
+        public val startDiv = event("div")
+        public val startMul = event("mul")
+        public val startSub = event("sub")
+        public val startAdd = event("add")
+        public val startPush = event("push")
+        public val startPull = event("pull")
+        public val startResponse = event("response")
+        public val startPrint = event("print")
+        public val startNext = event("next")
+        public val startSave = event("save")
+        public val startDisable = event("disable")
+        public val startUpdate = event("update")
 
         constructor(commands: Queue<CPU.Command> = LinkedList(), A: Long, B: Long, name: String, parent: SysModule
         ) : super(name, parent) {
             this.commands = commands
             this.register = arrayOf(SysInteger(CAPACITY_DATA, A), SysInteger(CAPACITY_DATA, B))
+
             function(update, SysWait.Initialize, true)
+            function(add, startAdd, false)
+            function(sub, startSub, false)
+            function(mul, startMul, false)
+            function(div, startDiv, false)
+            function(rem, startRem, false)
+            function(push, startPush, false)
+            function(disable, startDisable, false)
+            function(pull, startPull, false)
+            function(save, startSave, false)
+            function(next, startNext, false)
+            function(print, startPrint, false)
+            function(response, startResponse, false)
         }
 
         constructor(ignored: Empty) : super("Empty", SysTopModule("Empty")) {
@@ -161,32 +204,32 @@ class Connectors {
             for (i in 0..(CAPACITY_DATA - 1)) dataPort.set(SysWireState.Z, i)
             for (i in 0..(CAPACITY_ADDRESS - 1)) addressPort.set(SysWireState.Z, i)
             for (i in 0..(CAPACITY_COMMAND - 1)) commandPort.set(SysWireState.Z, i)
-            SysWait.Never
+            startDisable
         }
 
         private val add: (SysWait) -> SysWait = {
             register[currentRegister] = register[0] + register[1]
-            SysWait.Never
+            startAdd
         }
 
         private val sub: (SysWait) -> SysWait = {
             register[currentRegister] = register[0] - register[1]
-            SysWait.Never
+            startSub
         }
 
         private val mul: (SysWait) -> SysWait = {
             register[currentRegister] = register[0] * register[1]
-            SysWait.Never
+            startMul
         }
 
         private val div: (SysWait) -> SysWait = {
             register[currentRegister] = register[0] / register[1]
-            SysWait.Never
+            startDiv
         }
 
         private val rem: (SysWait) -> SysWait = {
             register[currentRegister] = register[0] % register[1]
-            SysWait.Never
+            startRem
         }
 
         private val push: (SysWait) -> SysWait = {
@@ -194,39 +237,39 @@ class Connectors {
             for (i in 0..(CAPACITY_DATA - 1)) dataPort.set(register[currentRegister][i], i)
             for (i in 0..(CAPACITY_ADDRESS - 1)) addressPort.set(address[i], i)
             for (i in 0..(CAPACITY_COMMAND - 1)) commandPort.set(PUSH[i], i)
-            SysWait.Never
+            startPush
         }
 
         private val pull: (SysWait) -> SysWait = {
             val address = command.arg!!
             for (i in 0..(CAPACITY_ADDRESS - 1)) addressPort.set(address[i], i)
             for (i in 0..(CAPACITY_COMMAND - 1)) commandPort.set(PULL[i], i)
-            SysWait.Never
+            startPull
         }
 
         private val save: (SysWait) -> SysWait = {
             register[currentRegister] = SysInteger(Array(CAPACITY_DATA, { dataPort[it] }))
-            SysWait.Never
+            startSave
         }
 
         private val next: (SysWait) -> SysWait = {
             ++currentRegister
             currentRegister %= CAPACITY_REGISTER
-            SysWait.Never
+            startNext
         }
 
         private val print: (SysWait) -> SysWait = {
             var message = StringBuilder("$name register: ")
             register.forEach { message = message.append("$it ") }
             println(message)
-            SysWait.Never
+            startPrint
         }
 
         private val response: (SysWait) -> SysWait = {
             val address = command.arg!!
             for (i in 0..(CAPACITY_ADDRESS - 1)) addressPort.set(address[i], i)
             for (i in 0..(CAPACITY_COMMAND - 1)) commandPort.set(RESPONSE[i], i)
-            SysWait.Never
+            startResponse
         }
 
         private val update: (SysWait) -> SysWait = {
@@ -234,59 +277,57 @@ class Connectors {
             commands.remove()
             when (command.name) {
                 ADD -> {
-                    function(add, waitAdd, false)
-                    function(update, waitAdd + waitUpdate, false)
+                    startAdd.happens(waitAdd)
+                    startUpdate.happens(waitAdd + waitUpdate)
                 }
                 SUB -> {
-                    function(sub, waitSub, false)
-                    function(update, waitSub + waitUpdate, false)
+                    startSub.happens(waitSub)
+                    startUpdate.happens(waitSub + waitUpdate)
                 }
                 MUL -> {
-                    function(mul, waitMul, false)
-                    function(update, waitMul + waitUpdate, false)
+                    startMul.happens(waitMul)
+                    startUpdate.happens(waitMul + waitUpdate)
                 }
                 DIV -> {
-                    function(div, waitDiv, false)
-                    function(update, waitDiv + waitUpdate, false)
+                    startDiv.happens(waitDiv)
+                    startUpdate.happens(waitDiv + waitUpdate)
                 }
                 REM -> {
-                    function(rem, waitRem, false)
-                    function(update, waitRem + waitUpdate, false)
+                    startRem.happens(waitRem)
+                    startUpdate.happens(waitRem + waitUpdate)
                 }
                 PUSH -> {
-                    function(push, waitPush, false)
+                    startPush.happens(waitPush)
                     /** Todo: without RAM(Empty) */
-                    function(disable, waitPush + RAM(Empty).waitWrite + waitDisable, false)
-                    function(update, waitPush + RAM(Empty).waitWrite + waitDisable + waitUpdate, false)
+                    startDisable.happens(waitPush + RAM(Empty).waitWrite + waitDisable)
+                    startUpdate.happens(waitPush + RAM(Empty).waitWrite + waitDisable + waitUpdate)
                 }
                 PULL -> {
-                    function(pull, waitPull, false)
+                    startPull.happens(waitPull)
                     /** Todo: without RAM(Empty) */
-                    function(disable, waitPull + RAM(Empty).waitRead + waitDisable, false)
-                    function(save, waitPull + RAM(Empty).waitRead + waitSave, false)
-                    function(update, waitPull + RAM(Empty).waitRead
-                            + if (waitSave > waitDisable) waitSave else waitDisable
-                            + waitUpdate, false)
+                    startDisable.happens(waitPull + RAM(Empty).waitRead + waitDisable)
+                    startSave.happens(waitPull + RAM(Empty).waitRead + waitSave)
+                    startUpdate.happens(waitPull + RAM(Empty).waitRead + if (waitSave > waitDisable) waitSave else waitDisable + waitUpdate)
                 }
                 NEXT -> {
-                    function(next, waitNext, false)
-                    function(update, waitNext + waitUpdate, false)
+                    startNext.happens(waitNext)
+                    startUpdate.happens(waitNext + waitUpdate)
                 }
                 PRINT -> {
-                    function(print, waitPrint, false)
-                    function(update, waitPrint + waitUpdate, false)
+                    startPrint.happens(waitPrint)
+                    startUpdate.happens(waitPrint + waitUpdate)
                 }
                 RESPONSE -> {
-                    function(response, waitResponse, false)
+                    startResponse.happens(waitResponse)
                     /** Todo: without RAM(Empty) */
-                    function(update, waitResponse + RAM(Empty).waitPrint + waitDisable + waitUpdate, false)
-                    function(disable, waitResponse + RAM(Empty).waitPrint + waitDisable, false)
+                    startDisable.happens(waitResponse + RAM(Empty).waitPrint + waitDisable)
+                    startUpdate.happens(waitResponse + RAM(Empty).waitPrint + waitDisable + waitUpdate)
                 }
                 STOP -> {
                     scheduler.stop()
                 }
             }
-            SysWait.Never
+            startUpdate
         }
     }
 
