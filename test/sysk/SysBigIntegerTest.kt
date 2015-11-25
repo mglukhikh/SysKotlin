@@ -8,9 +8,9 @@ class SysBigIntegerTest {
     fun testGet() {
 
 
-        val x = SysBigInteger(SysInteger(10, -128));
-        val y = SysBigInteger(SysInteger(10, 127));
-        val z = SysBigInteger(SysInteger(10, -1));
+        val x = SysBigInteger.valueOf(SysInteger(10, -128));
+        val y = SysBigInteger.valueOf(SysInteger(10, 127));
+        val z = SysBigInteger.valueOf(SysInteger(10, -1));
 
         val arrx = arrayOf(X, X, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ONE);
         val arry = arrayOf(X, X, ONE, ONE, ONE, ONE, ONE, ONE, ONE, ZERO);
@@ -24,9 +24,9 @@ class SysBigIntegerTest {
 
         }
 
-        val xx = SysBigInteger(SysInteger(8, -128));
-        val yy = SysBigInteger(SysInteger(8, 127));
-        val zz = SysBigInteger(SysInteger(1, -1));
+        val xx = SysBigInteger.valueOf(SysInteger(8, -128));
+        val yy = SysBigInteger.valueOf(SysInteger(8, 127));
+        val zz = SysBigInteger.valueOf(SysInteger(1, -1));
 
         val arrxx = arrayOf(ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ONE);
         val arryy = arrayOf(ONE, ONE, ONE, ONE, ONE, ONE, ONE, ZERO);

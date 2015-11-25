@@ -8,8 +8,8 @@ public class SysIntegerTest {
 
     @Test
     fun first() {
-        val x: @Width(4) SysInteger = SysInteger(5)
-        val yy: @Width(6) SysInteger = SysInteger(9)
+        val x: @Width(4) SysInteger = SysInteger.valueOf(5)
+        val yy: @Width(6) SysInteger = SysInteger.valueOf(9)
         val y = yy.extend(6)
         assert(y.width == 6, { y })
         val z: @Width(6) SysInteger = x + y

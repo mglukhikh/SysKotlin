@@ -20,9 +20,10 @@ class SysBigInteger(
 
     constructor(width: Int, value: BigInteger) : this(width, value, bitsState = maskByValue(value, width))
 
-    constructor(sysInteger: SysInteger) : this(sysInteger.width, BigInteger.valueOf(sysInteger.value),
-            bitsState = maskByValue(BigInteger.valueOf(sysInteger.value), sysInteger.width))
-
+    /*
+        private constructor(sysInteger: SysInteger) : this(sysInteger.width, BigInteger.valueOf(sysInteger.value),
+                bitsState = maskByValue(BigInteger.valueOf(sysInteger.value), sysInteger.width))
+    */
     constructor(width: Int, value: Long) : this(width, BigInteger.valueOf(value),
             bitsState = maskByValue(BigInteger.valueOf(value), width))
 
@@ -30,13 +31,14 @@ class SysBigInteger(
             bitsState = maskByValue(BigInteger.valueOf(value.toLong()), width))
 
 
-    constructor(value: BigInteger) : this(value.bitLength() + 1, value,
+    private constructor(value: BigInteger) : this(value.bitLength() + 1, value,
             bitsState = maskByValue(value, value.bitLength() + 1))
 
-    constructor(value: Long) : this(SysInteger(value))
+    /*
+        constructor(value: Long) : this(SysInteger(value))
 
-    constructor(value: Int) : this(SysInteger(value))
-
+        constructor(value: Int) : this(SysInteger(value))
+    */
     constructor(arr: Array<SysWireState>) : this(arr.size, valueBySWSArray(arr),
             bitsState = maskBySWSArray(arr))
 
@@ -316,6 +318,22 @@ class SysBigInteger(
 
         fun uninitialized(width: Int) = SysBigInteger(width.toShort())
 
+        fun valueOf(value: Int): SysBigInteger {
+            val bigValue = BigInteger.valueOf(value.toLong())
+            return SysBigInteger(bigValue)
+        }
+
+        fun valueOf(value: Long): SysBigInteger {
+            return SysBigInteger(BigInteger.valueOf(value))
+        }
+
+        fun valueOf(value: BigInteger): SysBigInteger {
+            return SysBigInteger(value)
+        }
+
+        fun valueOf(value: SysInteger): SysBigInteger {
+            return value.toSysBigInteger()
+        }
 
         private fun maskByValue(value: BigInteger, width: Int): Array<Boolean> {
 
@@ -336,23 +354,6 @@ class SysBigInteger(
 
 
         private fun valueBySWSArray(arr: Array<SysWireState>): BigInteger {
-            /*
-                var counter: Int = 0;
-                while (counter < arr.size && arr[counter] == SysWireState.X )
-                    counter++;
-                var shift = 0
-                if (arr.size - counter == 0)
-                    return BigInteger.ZERO
-                var result = BigInteger.ZERO
-                while (counter < arr.size && arr[counter] != SysWireState.X) {
-                    if (arr[counter] == SysWireState.ONE)
-                        result = result.setBit(shift)
-                    shift++;
-                    counter++;
-                }
-
-                return result
-            */
 
             var leftShift = 0;
             var rightShift = 0;
@@ -391,51 +392,6 @@ class SysBigInteger(
                 return result
             }
 
-
-
-            /*
-            var counter = tempArray.size / SIZE_OF_LONG
-
-            var lastBlockSize = tempArray.size % SIZE_OF_LONG
-
-            if (lastBlockSize != 0) {
-                counter++
-            } else {
-                counter--
-                lastBlockSize = SIZE_OF_LONG
-            }*/
-            /*
-            var tempInteger: SysBigInteger
-
-            for (i in 0..counter - 1) {
-                tempInteger = SysBigInteger(SysInteger(tempArray.copyOfRange(i * SysInteger.MAX_WIDTH,
-                        (i + 1) * SysInteger.MAX_WIDTH)))
-
-                result = result.shiftLeft(SysInteger.MAX_WIDTH)
-                result=result.add(tempInteger)
-            }
-            */
-            /*
-            var tempValue: BigInteger
-            var i = 0
-            while (i < (counter - 1)) {
-                result.shiftLeft(SIZE_OF_LONG)
-                tempValue = BigInteger.valueOf(longValueBySWSArray(tempArray.copyOfRange(i * SIZE_OF_LONG,
-                        (i + 1) * SIZE_OF_LONG)))
-
-                result = result.add(tempValue)
-                i++
-            }
-
-            result.shiftLeft(lastBlockSize)
-            tempValue = BigInteger.valueOf(longValueBySWSArray(tempArray.copyOfRange((counter - 1) * SIZE_OF_LONG,
-                    (counter - 1) * SIZE_OF_LONG + lastBlockSize)))
-
-            result = result.add(tempValue)
-
-            return result
-        */
-
         }
 
         private fun inverseSWSArray(arr: Array<SysWireState>): Array<SysWireState> {
@@ -466,25 +422,7 @@ class SysBigInteger(
             return result
         }
 
-        /*
-       private fun longValueBySWSArray(arr: Array<SysWireState>): Long {
-           var value: Long = 0L
-           var counter: Int = 0;
-           /*
-           while (counter < arr.size && arr[counter] == SysWireState.X )
-               counter++;
-           */
-           var shift = 0
-           while (counter < arr.size && arr[counter] != SysWireState.X) {
-               if (arr[counter] == SysWireState.ONE)
-                   value = value  or (1L shl shift );
-               shift++;
-               counter++;
-           }
 
-           return value
-       }
-    */
         private fun maskBySWSArray(arr: Array<SysWireState>): Array<Boolean> {
 
 

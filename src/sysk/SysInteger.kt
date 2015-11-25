@@ -1,5 +1,7 @@
 package sysk
 
+import java.math.BigInteger
+
 /** Width of integer / unsigned / ... */
 @Target(AnnotationTarget.EXPRESSION, AnnotationTarget.TYPE)
 @Retention(AnnotationRetention.SOURCE)
@@ -30,11 +32,12 @@ class SysInteger(
             throw IllegalArgumentException()
         }
     }
-
     /** Construct from given long value setting minimal possible width */
+    @Deprecated("Use valueOf")
     constructor(value: Long) : this(widthByValue(value), value, true)
 
     /** Construct from given int value setting maximal possible width */
+    @Deprecated("Use valueOf")
     constructor(value: Int) : this(widthByValue(value.toLong()), value.toLong(), true)
 
     /**Construct uninitialized sys integer with given width.
@@ -286,6 +289,10 @@ class SysInteger(
         return SysInteger(result).truncate(j - i + 1)
     }
 
+    fun toSysBigInteger(): SysBigInteger {
+        return SysBigInteger(this.width, BigInteger.valueOf(this.value), bitsState = this.bitsState)
+    }
+
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -327,6 +334,12 @@ class SysInteger(
     companion object {
 
         val MAX_WIDTH: Int = 64
+
+        fun valueOf(value: Int): SysInteger {
+            return SysInteger(value.toLong());
+        }
+
+        fun valueOf(value: Long) = SysInteger(value);
 
         fun uninitialized(width: Int) = SysInteger(width.toShort())
 
