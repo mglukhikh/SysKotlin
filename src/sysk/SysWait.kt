@@ -32,8 +32,8 @@ interface SysWait {
         }
 
         // Unfortunately notify() is in use in Java
-        fun happens() {
-            scheduler.happens(this)
+        fun happens(delay: Long = 0) {
+            scheduler.happens(this, delay)
         }
     }
 

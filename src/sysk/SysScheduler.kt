@@ -7,7 +7,7 @@ class SysScheduler {
     var currentTime: SysWait.Time = SysWait.Time(0)
         private set
 
-    private val events: MutableMap<SysWait.Event, Boolean> = LinkedHashMap()
+    private val events: MutableMap<SysWait.Event, SysWait.Time> = LinkedHashMap()
 
     private val signals: MutableSet<SysSignal<*>> = LinkedHashSet()
 
@@ -18,7 +18,7 @@ class SysScheduler {
     private val newFunctions: MutableMap<SysFunction, SysWait> = LinkedHashMap()
 
     internal fun register(event: SysWait.Event) {
-        events.put(event, false)
+        events.put(event, SysWait.Time.INFINITY)
     }
 
     internal fun register(signal: SysSignal<*>) {
@@ -33,12 +33,15 @@ class SysScheduler {
         newFunctions[function] = convert(function.sensitivities)
     }
 
-    internal fun happens(event: SysWait.Event) {
-        events[event] = true
+    internal fun happens(event: SysWait.Event, delay: Long) {
+        events[event] = SysWait.Time(delay)
     }
 
     private fun resetEvents() {
-        events.keys.forEach { events[it] = false }
+        events.keys.forEach {
+            if (events[it]!! <= currentTime)
+                events[it] = SysWait.Time.INFINITY
+        }
     }
 
     private fun update() {
@@ -88,8 +91,8 @@ class SysScheduler {
 
     private fun time(wait: SysWait): SysWait.Time =
         when (wait) {
-            is SysWait.Event -> if (events[wait] ?: false) currentTime else SysWait.Time.INFINITY
-            is SysWait.Finder -> wait()?.let { if (events[it] ?: false) currentTime else null} ?: SysWait.Time.INFINITY
+            is SysWait.Event -> if (events[wait]!! <= currentTime) currentTime else SysWait.Time.INFINITY
+            is SysWait.Finder -> wait()?.let { if (events[it]!! <= currentTime) currentTime else null} ?: SysWait.Time.INFINITY
             is SysWait.Time -> wait
             is SysWait.OneOf -> wait.elements.map { time(it) }.min() ?: SysWait.Time.INFINITY
             else -> SysWait.Time.INFINITY
@@ -134,7 +137,7 @@ class SysScheduler {
                 currentTime = globalClosestTime
                 // Proceed to next time moment
             }
-            happenedEvents = events.entries.filter { it.value }.map { it.key }.toSet()
+            happenedEvents = events.entries.filter { it.value <= currentTime }.map { it.key }.toSet()
         }
     }
 
