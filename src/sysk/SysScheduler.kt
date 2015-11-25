@@ -34,7 +34,7 @@ class SysScheduler {
     }
 
     internal fun happens(event: SysWait.Event, delay: Long) {
-        events[event] = SysWait.Time(delay)
+        events[event] = SysWait.Time(if (delay < 0) 0 else delay) + currentTime
     }
 
     private fun resetEvents() {
@@ -91,7 +91,7 @@ class SysScheduler {
 
     private fun time(wait: SysWait): SysWait.Time =
         when (wait) {
-            is SysWait.Event -> if (events[wait]!! <= currentTime) currentTime else SysWait.Time.INFINITY
+            is SysWait.Event -> if (events[wait]!! <= currentTime) currentTime else events[wait]!!
             is SysWait.Finder -> wait()?.let { if (events[it]!! <= currentTime) currentTime else null} ?: SysWait.Time.INFINITY
             is SysWait.Time -> wait
             is SysWait.OneOf -> wait.elements.map { time(it) }.min() ?: SysWait.Time.INFINITY
