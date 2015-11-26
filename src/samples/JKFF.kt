@@ -12,7 +12,7 @@ class JKFF(name: String, parent: SysModule): SysModule(name, parent) {
     val q = output<SysWireState>("q")
 
     init {
-        triggeredFunction(clk, initialize = false) {
+        function(clk, initialize = false) {
             if (j.one && state.zero) state = SysWireState.ONE
             else if (k.one && state.one) state = SysWireState.ZERO
             q.value = state

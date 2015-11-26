@@ -32,6 +32,12 @@ open class SysModule internal constructor(
                            run: (SysWait) -> Unit = {}) =
             function({ run(it) }, sensitivities, initialize)
 
+    protected fun function(clock: SysEdged, positive: Boolean = true,
+                           initialize: Boolean = true,
+                           run: (SysWait) -> Unit = {}) =
+            function(if (positive) clock.posEdgeEvent else clock.negEdgeEvent,
+                     initialize, run)
+
     // TODO: both Stage && StagedFunction should be protected (IllegalAccessError BUG): see KT-10143
     data class Stage(val run: () -> SysWait)
 
@@ -100,35 +106,6 @@ open class SysModule internal constructor(
         result.init()
         return result.register()
     }
-
-    protected class SysModuleTriggeredFunction(
-            private val f: (SysWait) -> Any,
-            trigger: SysWait,
-            sensitivities: SysWait,
-            initialize: Boolean
-    ) : SysTriggeredFunction(trigger, listOf(sensitivities), initialize) {
-
-        constructor(
-                f: (SysWait) -> Any,
-                clock: SysEdged,
-                positive: Boolean,
-                sensitivities: SysWait,
-                initialize: Boolean
-        ) : this(f, if (positive) clock.posEdgeEvent else clock.negEdgeEvent, sensitivities, initialize)
-
-        override fun run(event: SysWait) = run(event, wait(), f)
-    }
-
-    protected fun triggeredFunction(run: (SysWait) -> Any,
-                                    clock: SysEdged, positive: Boolean = true,
-                                    sensitivities: SysWait = SysWait.Never, initialize: Boolean = true): SysTriggeredFunction {
-        return SysModuleTriggeredFunction(run, clock, positive, sensitivities, initialize).register()
-    }
-
-    protected fun triggeredFunction(clock: SysEdged, positive: Boolean = true,
-                                    sensitivities: SysWait = SysWait.Never, initialize: Boolean = true,
-                                    run: (SysWait) -> Unit = {}) =
-            triggeredFunction({ run(it) }, clock, positive, sensitivities, initialize)
 
     private fun <T : SysFunction> T.register(): T {
         scheduler.register(this)

@@ -13,7 +13,7 @@ public class SReg (name: String, digPerWord: Int, parent: SysModule): SysModule(
     private val state = Array(digPerWord, {i -> SysWireState.X})
 
     init {
-        triggeredFunction(clk, initialize = false) {
+        function(clk, initialize = false) {
 
             if (dir.zero) {
                 state[0] = d.value

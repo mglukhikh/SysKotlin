@@ -11,7 +11,7 @@ public class PReg (name: String, digPerWord: Int, parent: SysModule): SysModule(
     val q = Array(digPerWord, {i -> output<SysWireState>("q" + i.toString())})
 
     init {
-        triggeredFunction(clk, initialize = false) {
+        function(clk, initialize = false) {
 
             var i = 0
             while (i < digPerWord) {

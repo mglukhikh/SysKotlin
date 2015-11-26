@@ -1,7 +1,6 @@
 package modules
 
 import sysk.SysModule
-import sysk.SysWait
 import sysk.SysWireState
 
 open class SysUnaryMoore<Input, State, Output>(
@@ -87,7 +86,7 @@ open class SysBinaryMoore<Input1, Input2, State, Output>(
     val y = output<Output>("y")
 
     init {
-        triggeredFunction(clk, initialize = false) {
+        function(clk, initialize = false) {
             // First calculate state, then output, one tick delay is provided by clock sensitivity
             state = transition(state, x1.value, x2.value)
             y.value = result(state)

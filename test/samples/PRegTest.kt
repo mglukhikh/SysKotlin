@@ -19,7 +19,7 @@ class PRegTest {
         private var arr = BooleanArray(digPerWord)
 
         init {
-            triggeredFunction(clk) {
+            function(clk) {
                 if (it is SysWait.Initialize) {
                     while (i < digPerWord) {
                         d[i].value = SysWireState.X

@@ -17,7 +17,7 @@ class DFFTest {
         private var phase = 0
 
         init {
-            triggeredFunction(clk) {
+            function(clk) {
                 if (it is SysWait.Initialize) {
                     d.value = SysWireState.X
                 } else {

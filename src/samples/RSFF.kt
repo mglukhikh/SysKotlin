@@ -12,7 +12,7 @@ class RSFF(name: String, parent: SysModule): SysModule(name, parent) {
     val q = output<SysWireState>("q")
 
     init {
-        triggeredFunction(clk, initialize = false) {
+        function(clk, initialize = false) {
 
             if (s.one) state = SysWireState.ONE
             else if (r.one) state = SysWireState.ZERO

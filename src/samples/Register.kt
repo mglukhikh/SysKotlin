@@ -15,7 +15,7 @@ public class Register <T> (name: String, defValue: T, parent: SysModule): SysMod
     val q = output<T>("q")     // data output
 
     init {
-        triggeredFunction(clk, initialize = false) {
+        function(clk, initialize = false) {
             // TODO [veronika]: tests
             if (en.one) {
                 q.value = d.value
