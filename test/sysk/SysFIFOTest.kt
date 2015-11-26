@@ -6,9 +6,10 @@ class SysFifoTest {
     @Test
     fun SysFifo() {
         var Fifo = SysFifo(4, "Fifo", false, SysScheduler())
-        var _1 = SysFifoOutput("_1", null, Fifo)
         var check: Boolean = false
-        try { var _2 = SysFifoOutput("_2", null, Fifo) } catch(exc: IllegalStateException) { check = true }
+        try { SysFifoOutput("_1", null, Fifo) } catch(exc: IllegalStateException) { check = true }
+        assert(check == false)
+        try { SysFifoOutput("_2", null, Fifo) } catch(exc: IllegalStateException) { check = true }
         assert(check == true)
         assert("Fifo" == Fifo.name)
         assert(false == Fifo.output)
