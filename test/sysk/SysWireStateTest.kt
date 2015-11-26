@@ -21,7 +21,7 @@ public class SysWireStateTest {
 
     @Test
     fun or() {
-        for (arg in SysWireState.values) {
+        for (arg in SysWireState.values()) {
             assert(SysWireState.ONE.or(arg).one)
             assert(arg.or(SysWireState.ONE).one)
             if (!arg.one) {
@@ -35,7 +35,7 @@ public class SysWireStateTest {
 
     @Test
     fun and() {
-        for (arg in SysWireState.values) {
+        for (arg in SysWireState.values()) {
             assert(SysWireState.ZERO.and(arg).zero)
             assert(arg.and(SysWireState.ZERO).zero)
             if (!arg.zero) {
@@ -48,7 +48,7 @@ public class SysWireStateTest {
 
     @Test
     fun wiredAnd() {
-        for (arg in SysWireState.values) {
+        for (arg in SysWireState.values()) {
             assert(SysWireState.Z.wiredAnd(arg) == arg)
             assert(arg.wiredAnd(SysWireState.Z) == arg)
         }
