@@ -38,14 +38,17 @@ open class SysFifo<T> internal constructor(
     internal open fun pop() {
         if (!fifo.isEmpty()) fifo.remove()
         if (!fifo.isEmpty() && output != fifo.element()) {
-            output = fifo.element()
+            this.output = fifo.element()
             changeEvent.happens()
         }
     }
 
     internal open fun push() {
         if (!full) fifo.add(input)
-        this.output = fifo.element()
+        if ((size - 1) == 0) {
+            this.output = fifo.element()
+            changeEvent.happens()
+        }
     }
 
     override val defaultEvent: SysWait.Event
@@ -54,7 +57,7 @@ open class SysFifo<T> internal constructor(
     override fun register(port: SysPort<*>) {
         if (port is SysFifoOutput<*>) ++counterSysFifoInputs
         if (counterSysFifoInputs > 1)
-            throw IllegalStateException("SysFifo ${name} may have only one output port.")
+            throw IllegalStateException("SysFifo $name may have only one output port.")
     }
 
     override fun toString() = fifo.toString()
