@@ -38,10 +38,11 @@ class SysScheduler {
     }
 
     private fun resetEvents() {
-        events.keys.forEach {
-            if (events[it]!! <= currentTime)
-                events[it] = SysWait.Time.INFINITY
+        val reset = hashMapOf<SysWait.Event, SysWait.Time>()
+        for ((event, time) in events) {
+            if (time <= currentTime) reset[event] = SysWait.Time.INFINITY
         }
+        events += reset
     }
 
     private fun update() {
@@ -89,10 +90,12 @@ class SysScheduler {
             else -> false
         }
 
+    private fun happenTime(event: SysWait.Event) = events[event] ?: SysWait.Time.INFINITY
+
     private fun time(wait: SysWait): SysWait.Time =
         when (wait) {
-            is SysWait.Event -> if (events[wait]!! <= currentTime) currentTime else events[wait]!!
-            is SysWait.Finder -> wait()?.let { if (events[it]!! <= currentTime) currentTime else null} ?: SysWait.Time.INFINITY
+            is SysWait.Event -> happenTime(wait).let { if (it <= currentTime) currentTime else it }
+            is SysWait.Finder -> wait()?.let { if (happenTime(it) <= currentTime) currentTime else null} ?: SysWait.Time.INFINITY
             is SysWait.Time -> wait
             is SysWait.OneOf -> wait.elements.map { time(it) }.min() ?: SysWait.Time.INFINITY
             else -> SysWait.Time.INFINITY
