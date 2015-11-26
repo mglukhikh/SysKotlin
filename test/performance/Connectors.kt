@@ -27,15 +27,15 @@ class Connectors {
     internal object Empty {}
 
     /** This class not describes the operation of the real RAM. He only needed for the test. */
-    internal class RAM : SysModule {
+    internal class RAM(val capacity: Int, val firstAddress: Int,
+                       name: String, parent: SysModule,
+                       val ignore: Boolean = false) : SysModule(name, parent) {
 
         public val dataPort = busPort<SysWireState>("data")
         public val addressPort = busPort<SysWireState>("address")
         public val commandPort = busPort<SysWireState>("command")
 
-        val capacity: Int
-        val firstAddress: Int
-        private val memory: Array<SysInteger>
+        private val memory: Array<SysInteger> = Array(capacity, { SysInteger(CAPACITY_DATA, 0) })
 
         public val waitWrite: Long = 4
         public val waitRead: Long = 3
@@ -50,24 +50,7 @@ class Connectors {
         public val startDisable = event("disable")
         public val startUpdate = event("update")
 
-        constructor(capacity: Int, firstAddress: Int, name: String, parent: SysModule) : super(name, parent) {
-            this.capacity = capacity
-            this.firstAddress = firstAddress
-            this.memory = Array(capacity, { SysInteger(CAPACITY_DATA, 0) })
-
-            function(emitUpdate, SysWait.Initialize, true)
-            function(update, startUpdate, false)
-            function(disable, startDisable, false)
-            function(write, startWrite, false)
-            function(read, startRead, false)
-            function(print, startPrint, false)
-        }
-
-        constructor(ignored: Empty) : super("Empty", SysTopModule("Empty")) {
-            capacity = 0
-            firstAddress = 0
-            memory = Array(capacity, { SysInteger(CAPACITY_DATA, 0) })
-        }
+        constructor(ignored: Empty) : this(0, 0, "Empty", SysTopModule("Empty"), true)
 
         private val disable: (SysWait) -> SysWait = {
             for (i in 0..(CAPACITY_DATA - 1)) dataPort.set(SysWireState.Z, i)
@@ -131,10 +114,23 @@ class Connectors {
                 else -> commandPort.defaultEvent
             }
         }
+        init {
+            if (!ignore) {
+                function(emitUpdate, SysWait.Initialize, true)
+                function(update, startUpdate, false)
+                function(disable, startDisable, false)
+                function(write, startWrite, false)
+                function(read, startRead, false)
+                function(print, startPrint, false)
+            }
+        }
     }
 
     /** This class not describes the operation of the real CPU. He only needed for the test. */
-    internal class CPU : SysModule {
+    internal class CPU(protected val commands: Queue<CPU.Command> = linkedListOf(),
+                       private val A: Long, private val B: Long, name: String, parent: SysModule,
+                       val ignore: Boolean = false
+    ) : SysModule(name, parent) {
 
         internal class Command constructor(public val name: SysInteger, public val arg: SysInteger? = null) {}
 
@@ -142,8 +138,9 @@ class Connectors {
         public val addressPort = busPort<SysWireState>("address")
         public val commandPort = busPort<SysWireState>("command")
 
-        protected val commands: Queue<CPU.Command>
-        private var register: Array<SysInteger>
+        private var register: Array<SysInteger> =
+                if (ignore) arrayOf()
+                else arrayOf(SysInteger(CAPACITY_DATA, A), SysInteger(CAPACITY_DATA, B))
         private var currentRegister = 0
         private var command = Command(NULL)
 
@@ -175,30 +172,7 @@ class Connectors {
         public val startDisable = event("disable")
         public val startUpdate = event("update")
 
-        constructor(commands: Queue<CPU.Command> = LinkedList(), A: Long, B: Long, name: String, parent: SysModule
-        ) : super(name, parent) {
-            this.commands = commands
-            this.register = arrayOf(SysInteger(CAPACITY_DATA, A), SysInteger(CAPACITY_DATA, B))
-
-            function(update, SysWait.Initialize, true)
-            function(add, startAdd, false)
-            function(sub, startSub, false)
-            function(mul, startMul, false)
-            function(div, startDiv, false)
-            function(rem, startRem, false)
-            function(push, startPush, false)
-            function(disable, startDisable, false)
-            function(pull, startPull, false)
-            function(save, startSave, false)
-            function(next, startNext, false)
-            function(print, startPrint, false)
-            function(response, startResponse, false)
-        }
-
-        constructor(ignored: Empty) : super("Empty", SysTopModule("Empty")) {
-            this.commands = LinkedList<Command>()
-            this.register = arrayOf()
-        }
+        constructor(ignored: Empty) : this(linkedListOf(), 0, 0, "Empty", SysTopModule("Empty"), true)
 
         private val disable: (SysWait) -> SysWait = {
             for (i in 0..(CAPACITY_DATA - 1)) dataPort.set(SysWireState.Z, i)
@@ -328,6 +302,23 @@ class Connectors {
                 }
             }
             startUpdate
+        }
+        init {
+            if (!ignore) {
+                function(update, SysWait.Initialize, true)
+                function(add, startAdd, false)
+                function(sub, startSub, false)
+                function(mul, startMul, false)
+                function(div, startDiv, false)
+                function(rem, startRem, false)
+                function(push, startPush, false)
+                function(disable, startDisable, false)
+                function(pull, startPull, false)
+                function(save, startSave, false)
+                function(next, startNext, false)
+                function(print, startPrint, false)
+                function(response, startResponse, false)
+            }
         }
     }
 
