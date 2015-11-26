@@ -233,7 +233,7 @@ open class SysModule internal constructor(
 
     protected fun <T> priorityBus(name: String) = SysPriorityBus<T>(name, scheduler, this)
 
-    protected fun <T> prioriteValue(priority: Int, value: T) = SysPriorityValue<T>(priority, value)
+    protected fun <T> priorityValue(priority: Int, value: T) = SysPriorityValue<T>(priority, value)
 
     protected fun <T> fifoBus(name: String) = SysFifoBus<T>(name, scheduler, this)
 
