@@ -44,6 +44,7 @@ open class SysModule internal constructor(
 
         class Atomic(val run: () -> SysWait) : Stage()
 
+        // TODO [mglukhikh]: duplicating code with StagedFunction, think about it
         class Complex(
                 private val sensitivities: SysWait,
                 private val stages: MutableList<Stage>
@@ -52,6 +53,7 @@ open class SysModule internal constructor(
             fun complexStage(init: Stage.Complex.() -> Unit): Stage.Complex {
                 val result = Stage.Complex(sensitivities, linkedListOf())
                 result.init()
+                stages.add(result)
                 return result
             }
 
@@ -70,10 +72,19 @@ open class SysModule internal constructor(
 
             fun run(): SysWait {
                 if (!complete()) {
-                    stages[stageNumber++].let {
+                    stages[stageNumber].let {
                         when (it) {
-                            is Stage.Atomic -> return it.run()
-                            is Stage.Complex -> return it.run()
+                            is Stage.Atomic -> {
+                                stageNumber++
+                                return it.run()
+                            }
+                            is Stage.Complex -> {
+                                val result = it.run()
+                                if (it.complete()) {
+                                    stageNumber++
+                                }
+                                return result
+                            }
                         }
                     }
                 }

@@ -35,26 +35,25 @@ class SysSimpleAutomataTest {
                         x.value = SysWireState.ONE
                         assertTime(time(30, TimeUnit.NS))
                     }
-                    stage {
-                        assert(y.zero)
-                        x.value = SysWireState.ZERO
-                        assertTime(time(50, TimeUnit.NS))
-                    }
-                    stage {
-                        println("4")
-                        assert(y.one)
-                        x.value = SysWireState.ONE
-                        assertTime(time(70, TimeUnit.NS))
+                    complexStage {
+                        stage {
+                            assert(y.zero)
+                            x.value = SysWireState.ZERO
+                            assertTime(time(50, TimeUnit.NS))
+                        }
+                        stage {
+                            assert(y.one)
+                            x.value = SysWireState.ONE
+                            assertTime(time(70, TimeUnit.NS))
+                        }
                     }
                 }
                 stage {
-                    println("5")
                     assert(y.zero)
                     assert(currentTime == time(90, TimeUnit.NS)) { "Expected 90 ns but was $currentTime"}
                     assertTime(time(90, TimeUnit.NS))
                 }
                 stage {
-                    println("6")
                     assert(y.one)
                     assertTime(time(110, TimeUnit.NS))
                     scheduler.stop()
