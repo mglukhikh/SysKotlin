@@ -39,19 +39,64 @@ open class SysModule internal constructor(
                      initialize, run)
 
     // TODO: both Stage && StagedFunction should be protected (IllegalAccessError BUG): see KT-10143
-    data class Stage(val run: () -> SysWait)
+
+    sealed class Stage {
+
+        class Atomic(val run: () -> SysWait) : Stage()
+
+        class Complex(
+                private val sensitivities: SysWait,
+                private val stages: MutableList<Stage>
+        ) : Stage() {
+
+            fun complexStage(init: Stage.Complex.() -> Unit): Stage.Complex {
+                val result = Stage.Complex(sensitivities, linkedListOf())
+                result.init()
+                return result
+            }
+
+            fun stage(f: () -> Unit): Stage.Atomic {
+                val result = Stage.Atomic {
+                    f()
+                    sensitivities
+                }
+                stages.add(result)
+                return result
+            }
+
+            var stageNumber = 0
+
+            fun run(): SysWait {
+                if (stageNumber < stages.size) {
+                    stages[stageNumber++].let {
+                        when (it) {
+                            is Stage.Atomic -> return it.run()
+                            is Stage.Complex -> return it.run()
+                        }
+                    }
+                }
+                else return SysWait.Never
+            }
+        }
+    }
 
     class StagedFunction private constructor(
             private val stages: MutableList<Stage>,
-            private var initStage: Stage? = null,
-            private var infiniteStage: Stage? = null,
+            private var initStage: Stage.Atomic? = null,
+            private var infiniteStage: Stage.Atomic? = null,
             sensitivities: SysWait = SysWait.Never
     ): SysFunction(sensitivities, initialize = true) {
         constructor(sensitivities: SysWait = SysWait.Never):
                 this(linkedListOf(), null, null, sensitivities)
 
-        fun stage(f: () -> Unit): Stage {
-            val result = Stage {
+        fun complexStage(init: Stage.Complex.() -> Unit): Stage.Complex {
+            val result = Stage.Complex(wait(), linkedListOf())
+            result.init()
+            return result
+        }
+
+        fun stage(f: () -> Unit): Stage.Atomic {
+            val result = Stage.Atomic {
                 f()
                 wait()
             }
@@ -59,16 +104,16 @@ open class SysModule internal constructor(
             return result
         }
 
-        fun initStage(f: () -> Unit): Stage {
-            initStage = Stage {
+        fun initStage(f: () -> Unit): Stage.Atomic {
+            initStage = Stage.Atomic {
                 f()
                 wait()
             }
             return initStage!!
         }
 
-        fun infiniteStage(f: () -> Unit): Stage {
-            infiniteStage = Stage {
+        fun infiniteStage(f: () -> Unit): Stage.Atomic {
+            infiniteStage = Stage.Atomic {
                 f()
                 wait()
             }
@@ -91,8 +136,13 @@ open class SysModule internal constructor(
             if (event == SysWait.Initialize) {
                 return init()
             }
-            else if (stageNumber < stages.size){
-                return stages[stageNumber++].run()
+            else if (stageNumber < stages.size) {
+                stages[stageNumber++].let {
+                    when (it) {
+                        is Stage.Atomic -> return it.run()
+                        is Stage.Complex -> return it.run()
+                    }
+                }
             }
             else {
                 return infinite()
