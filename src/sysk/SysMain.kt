@@ -3,8 +3,8 @@ package sysk
 // Very simple usage test
 fun main(arg: Array<String>) {
     // integers
-    val x: @Width(4) SysInteger = SysInteger(5)
-    val y: @Width(6) SysInteger = SysInteger(9).extend(6)
+    val x: @Width(4) SysInteger = SysInteger.valueOf(5)
+    val y: @Width(6) SysInteger = SysInteger.valueOf(9).extend(6)
     val z: @Width(6) SysInteger = x + y
     println(x)
     println(y)
