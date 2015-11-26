@@ -12,7 +12,7 @@ abstract class SysBus<T> internal constructor(
 
     protected val signals: MutableList<SysSignal<T>> = ArrayList()
 
-    protected final val changeEvent = SysWait.Event("changeEvent", scheduler, this)
+    protected final val changeEvent = SysWait.Event("changeEvent", scheduler)
 
     override val defaultEvent: SysWait.Event
         get() = changeEvent
@@ -21,7 +21,7 @@ abstract class SysBus<T> internal constructor(
     }
 
     open fun addWire(startValue: T) {
-        signals.add(SysSignal<T>((signals.size).toString(), startValue, scheduler, this))
+        signals.add(SysSignal<T>((signals.size).toString(), startValue, scheduler))
     }
 
     abstract fun set(value: T, index: Int, port: SysPort<*>)

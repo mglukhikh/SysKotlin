@@ -19,7 +19,7 @@ open class SysSignal<T> internal constructor(
     var changed: Boolean = false
         private set
 
-    private val changeEvent: SysWait.Event = SysWait.Event("changeEvent", scheduler, this)
+    private val changeEvent: SysWait.Event = SysWait.Event("changeEvent", scheduler)
 
     init {
         scheduler.register(this)
@@ -57,9 +57,9 @@ open class SysWireSignal internal constructor(
         name: String, scheduler: SysScheduler, startValue: SysWireState = SysWireState.X, parent: SysObject? = null
 ): SysSignal<SysWireState>(name, startValue, scheduler, parent), SysWireRead {
 
-    override val posEdgeEvent = SysWait.Event("posEdgeEvent", scheduler, this)
+    override val posEdgeEvent = SysWait.Event("posEdgeEvent", scheduler)
 
-    override val negEdgeEvent = SysWait.Event("negEdgeEvent", scheduler, this)
+    override val negEdgeEvent = SysWait.Event("negEdgeEvent", scheduler)
 
     val zero: Boolean
         get() = value.zero

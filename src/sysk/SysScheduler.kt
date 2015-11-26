@@ -80,14 +80,19 @@ class SysScheduler {
 
     private fun convert(sensitivities: List<SysWait>): SysWait = SysWait.reduce(convertToList(sensitivities))
 
-    private fun happened(wait: SysWait, events: Set<SysWait?>): Boolean =
+    private fun triggeredEvent(wait: SysWait, events: Set<SysWait?>): SysWait? =
         when (wait) {
-            is SysWait.Initialize -> wait in events
-            is SysWait.Event -> wait in events
-            is SysWait.Finder -> wait() in events
-            is SysWait.Time -> wait <= currentTime
-            is SysWait.OneOf -> wait.elements.any { happened(it, events) }
-            else -> false
+            is SysWait.Initialize, is SysWait.Event ->
+                if (wait in events) wait else null
+            is SysWait.Finder -> wait().let { if (it in events) it else null }
+            is SysWait.Time -> if (wait <= currentTime) wait else null
+            is SysWait.OneOf -> {
+                for (element in wait.elements) {
+                    triggeredEvent(element, events)?.let { return it }
+                }
+                null
+            }
+            is SysWait.Never -> null
         }
 
     private fun happenTime(event: SysWait.Event) = events[event] ?: SysWait.Time.INFINITY
@@ -118,9 +123,10 @@ class SysScheduler {
             functions += newFunctions
             newFunctions.clear()
             for ((function, wait) in functions) {
-                if (happened(wait, happenedEvents)) {
+                val triggered = triggeredEvent(wait, happenedEvents)
+                if (triggered != null) {
                     functionActivated = true
-                    sensitivities = convert(function.run(wait))
+                    sensitivities = convert(function.run(triggered))
                     if (sensitivities == SysWait.Never) neverCalledFunctions.add(function)
                     else functions[function] = sensitivities
                 }

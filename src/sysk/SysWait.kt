@@ -11,21 +11,21 @@ enum class TimeUnit(val femtoSeconds: Long) {
     override fun toString() = name.toLowerCase()
 }
 
-interface SysWait {
+sealed class SysWait {
 
     /** Special: something that never happens */
-    object Never: SysWait {
+    object Never: SysWait() {
 
     }
 
     /** Special: initialization event that happens on start */
-    object Initialize: SysWait {
+    object Initialize: SysWait() {
 
     }
 
     class Event internal constructor(
-            name: String, val scheduler: SysScheduler, parent: SysObject? = null
-    ): SysObject(name, parent), SysWait {
+            val name: String, val scheduler: SysScheduler
+    ): SysWait() {
 
         init {
             scheduler.register(this)
@@ -37,11 +37,11 @@ interface SysWait {
         }
     }
 
-    interface Finder: SysWait {
-        operator fun invoke(): Event?
+    abstract class Finder: SysWait() {
+        abstract operator fun invoke(): Event?
     }
 
-    data class Time(val femtoSeconds: Long): SysWait, Comparable<Time> {
+    class Time(val femtoSeconds: Long): SysWait(), Comparable<Time> {
         override fun compareTo(other: Time): Int =
                 if (femtoSeconds > other.femtoSeconds) 1
                 else if (femtoSeconds < other.femtoSeconds) -1
@@ -53,17 +53,25 @@ interface SysWait {
 
         operator fun div(arg: Int) = Time(femtoSeconds / arg)
 
-        fun numUnits(tu: TimeUnit): Double = femtoSeconds / tu.femtoSeconds.toDouble()
+        override fun equals(other: Any?) = femtoSeconds == (other as? Time)?.femtoSeconds
+
+        override fun hashCode() = femtoSeconds.toInt()
+
+        override fun toString() = "'$femtoSeconds FS'"
 
         companion object {
             val INFINITY: Time = Time(Long.MAX_VALUE)
         }
     }
 
-    data class OneOf(public val elements: List<SysWait>): SysWait {
+    class OneOf(public val elements: List<SysWait>): SysWait() {
         constructor(vararg elements: SysWait): this(elements.toList())
 
         override fun or(other: SysWait): OneOf = OneOf(elements + other)
+
+        override fun equals(other: Any?) = elements == (other as? OneOf)?.elements
+
+        override fun hashCode() = elements.hashCode()
     }
 
     open fun or(other: SysWait): SysWait = if (other is OneOf) other.or(this) else OneOf(this, other)

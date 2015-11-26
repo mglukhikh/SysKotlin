@@ -66,8 +66,10 @@ open class SysModule internal constructor(
 
             var stageNumber = 0
 
+            fun complete() = stageNumber >= stages.size
+
             fun run(): SysWait {
-                if (stageNumber < stages.size) {
+                if (!complete()) {
                     stages[stageNumber++].let {
                         when (it) {
                             is Stage.Atomic -> return it.run()
@@ -92,6 +94,7 @@ open class SysModule internal constructor(
         fun complexStage(init: Stage.Complex.() -> Unit): Stage.Complex {
             val result = Stage.Complex(wait(), linkedListOf())
             result.init()
+            stages.add(result)
             return result
         }
 
@@ -121,7 +124,9 @@ open class SysModule internal constructor(
         }
 
         private fun init(): SysWait {
-            return initStage?.run() ?: wait()
+            // BUG: return infiniteStage?.run() ?: SysWait.Never, see KT-10142
+            if (initStage == null) return wait()
+            return initStage!!.run()
         }
 
         private fun infinite(): SysWait {
@@ -137,10 +142,19 @@ open class SysModule internal constructor(
                 return init()
             }
             else if (stageNumber < stages.size) {
-                stages[stageNumber++].let {
-                    when (it) {
-                        is Stage.Atomic -> return it.run()
-                        is Stage.Complex -> return it.run()
+                stages[stageNumber].let {
+                    return when (it) {
+                        is Stage.Atomic -> {
+                            stageNumber++
+                            it.run()
+                        }
+                        is Stage.Complex -> {
+                            val result = it.run()
+                            if (it.complete()) {
+                                stageNumber++
+                            }
+                            result
+                        }
                     }
                 }
             }
@@ -212,7 +226,7 @@ open class SysModule internal constructor(
 
     protected fun <T> fifoBus(name: String) = SysFifoBus<T>(name, scheduler, this)
 
-    protected fun event(name: String): SysWait.Event = SysWait.Event(name, scheduler, this)
+    protected fun event(name: String): SysWait.Event = SysWait.Event(name, scheduler)
 
     companion object {
 

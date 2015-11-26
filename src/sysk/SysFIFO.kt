@@ -8,7 +8,7 @@ open class SysFifo<T> internal constructor(
 
     private var counterSysFifoInputs: Int = 0
 
-    protected val changeEvent = SysWait.Event("changeEvent", scheduler, this)
+    protected val changeEvent = SysWait.Event("changeEvent", scheduler)
 
     protected var fifo: Queue<T> = LinkedList()
 
@@ -64,9 +64,9 @@ open class SysWireFifo internal constructor(
         capacity: Int, name: String, scheduler: SysScheduler, parent: SysObject? = null
 ) : SysFifo<SysWireState>(capacity, name, SysWireState.X, scheduler, parent) {
 
-    val posEdgeEvent = SysWait.Event("posEdgeEvent", scheduler, this)
+    val posEdgeEvent = SysWait.Event("posEdgeEvent", scheduler)
 
-    val negEdgeEvent = SysWait.Event("negEdgeEvent", scheduler, this)
+    val negEdgeEvent = SysWait.Event("negEdgeEvent", scheduler)
 
     val zero: Boolean
         get() = output.zero
