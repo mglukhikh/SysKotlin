@@ -42,6 +42,10 @@ TODO
 
 # Design Notes
 
+## Tracing
+
+Signals, ports, possibly also local variables...
+
 ## Arithmetics
 
 SysInteger = fixed width integer. Width is known at runtime and (possibly) can be annotated at compile time. 
