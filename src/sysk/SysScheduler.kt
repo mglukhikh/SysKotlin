@@ -33,8 +33,8 @@ class SysScheduler {
         newFunctions[function] = convert(function.sensitivities)
     }
 
-    internal fun happens(event: SysWait.Event, delay: Long) {
-        events[event] = SysWait.Time(if (delay < 0) 0 else delay) + currentTime
+    internal fun happens(event: SysWait.Event, delay: SysWait.Time) {
+        events[event] = if (delay.femtoSeconds < 0) SysWait.Time(0) else delay + currentTime
     }
 
     private fun resetEvents() {

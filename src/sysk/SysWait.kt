@@ -32,7 +32,7 @@ sealed class SysWait {
         }
 
         // Unfortunately notify() is in use in Java
-        fun happens(delay: Long = 0) {
+        fun happens(delay: SysWait.Time = SysWait.Time(0)) {
             scheduler.happens(this, delay)
         }
     }
