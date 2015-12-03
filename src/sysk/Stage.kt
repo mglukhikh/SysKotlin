@@ -28,19 +28,14 @@ interface StageContainer {
     fun run(event: SysWait): SysWait {
         if (!complete()) {
             stages[stageNumber].let {
+                val result = it.run(event)
                 when (it) {
-                    is Stage.Atomic -> {
+                    is Stage.Atomic -> stageNumber++
+                    is Stage.Complex -> if (it.complete()) {
                         stageNumber++
-                        return it.run()
-                    }
-                    is Stage.Complex -> {
-                        val result = it.run(event)
-                        if (it.complete()) {
-                            stageNumber++
-                        }
-                        return result
                     }
                 }
+                return result
             }
         }
         else return SysWait.Never
@@ -49,7 +44,11 @@ interface StageContainer {
 
 sealed class Stage {
 
-    class Atomic internal constructor(val run: () -> SysWait) : Stage()
+    abstract fun run(event: SysWait): SysWait
+
+    class Atomic internal constructor(private val f: () -> SysWait) : Stage() {
+        override fun run(event: SysWait) = f()
+    }
 
     class Complex internal constructor(
             private val sensitivities: SysWait,
@@ -60,6 +59,7 @@ sealed class Stage {
 
         override var stageNumber = 0
 
+        override fun run(event: SysWait) = super.run(event)
     }
 }
 
@@ -88,29 +88,29 @@ class StagedFunction private constructor(
         return infiniteStage!!
     }
 
-    private fun init(): SysWait {
+    private fun init(event: SysWait): SysWait {
         // BUG: return infiniteStage?.run() ?: SysWait.Never, see KT-10142
         if (initStage == null) return wait()
-        return initStage!!.run()
+        return initStage!!.run(event)
     }
 
-    private fun infinite(): SysWait {
+    private fun infinite(event: SysWait): SysWait {
         // BUG: return infiniteStage?.run() ?: SysWait.Never, see KT-10142
         if (infiniteStage == null) return SysWait.Never
-        return infiniteStage!!.run()
+        return infiniteStage!!.run(event)
     }
 
     override var stageNumber = 0
 
     override fun run(event: SysWait): SysWait {
         if (event == SysWait.Initialize) {
-            return init()
+            return init(event)
         }
         else if (!complete()) {
             return super.run(event)
         }
         else {
-            return infinite()
+            return infinite(event)
         }
     }
 }
