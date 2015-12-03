@@ -38,76 +38,14 @@ open class SysModule internal constructor(
             function(if (positive) clock.posEdgeEvent else clock.negEdgeEvent,
                      initialize, run)
 
-    // TODO: both Stage && StagedFunction should be protected (IllegalAccessError BUG): see KT-10143
+    interface StageContainer {
+        val stages: MutableList<Stage>
 
-    sealed class Stage {
+        var stageNumber: Int
 
-        class Atomic(val run: () -> SysWait) : Stage()
+        fun complete() = stageNumber >= stages.size
 
-        // TODO [mglukhikh]: duplicating code with StagedFunction, think about it
-        class Complex(
-                private val sensitivities: SysWait,
-                private val stages: MutableList<Stage>
-        ) : Stage() {
-
-            fun complexStage(init: Stage.Complex.() -> Unit): Stage.Complex {
-                val result = Stage.Complex(sensitivities, linkedListOf())
-                result.init()
-                stages.add(result)
-                return result
-            }
-
-            fun stage(f: () -> Unit): Stage.Atomic {
-                val result = Stage.Atomic {
-                    f()
-                    sensitivities
-                }
-                stages.add(result)
-                return result
-            }
-
-            var stageNumber = 0
-
-            fun complete() = stageNumber >= stages.size
-
-            fun run(): SysWait {
-                if (!complete()) {
-                    stages[stageNumber].let {
-                        when (it) {
-                            is Stage.Atomic -> {
-                                stageNumber++
-                                return it.run()
-                            }
-                            is Stage.Complex -> {
-                                val result = it.run()
-                                if (it.complete()) {
-                                    stageNumber++
-                                }
-                                return result
-                            }
-                        }
-                    }
-                }
-                else return SysWait.Never
-            }
-        }
-    }
-
-    class StagedFunction private constructor(
-            private val stages: MutableList<Stage>,
-            private var initStage: Stage.Atomic? = null,
-            private var infiniteStage: Stage.Atomic? = null,
-            sensitivities: SysWait = SysWait.Never
-    ): SysFunction(sensitivities, initialize = true) {
-        constructor(sensitivities: SysWait = SysWait.Never):
-                this(linkedListOf(), null, null, sensitivities)
-
-        fun complexStage(init: Stage.Complex.() -> Unit): Stage.Complex {
-            val result = Stage.Complex(wait(), linkedListOf())
-            result.init()
-            stages.add(result)
-            return result
-        }
+        fun wait(): SysWait
 
         fun stage(f: () -> Unit): Stage.Atomic {
             val result = Stage.Atomic {
@@ -117,6 +55,61 @@ open class SysModule internal constructor(
             stages.add(result)
             return result
         }
+
+        fun complexStage(init: Stage.Complex.() -> Unit): Stage.Complex {
+            val result = Stage.Complex(wait(), linkedListOf())
+            result.init()
+            stages.add(result)
+            return result
+        }
+
+        fun run(event: SysWait): SysWait {
+            if (!complete()) {
+                stages[stageNumber].let {
+                    when (it) {
+                        is Stage.Atomic -> {
+                            stageNumber++
+                            return it.run()
+                        }
+                        is Stage.Complex -> {
+                            val result = it.run(event)
+                            if (it.complete()) {
+                                stageNumber++
+                            }
+                            return result
+                        }
+                    }
+                }
+            }
+            else return SysWait.Never
+        }
+    }
+
+    sealed class Stage {
+
+        class Atomic(val run: () -> SysWait) : Stage()
+
+        // TODO [mglukhikh]: duplicating code with StagedFunction, think about it
+        class Complex(
+                private val sensitivities: SysWait,
+                override val stages: MutableList<Stage>
+        ) : Stage(), StageContainer {
+
+            override fun wait() = sensitivities
+
+            override var stageNumber = 0
+
+        }
+    }
+
+    class StagedFunction private constructor(
+            override val stages: MutableList<Stage>,
+            private var initStage: Stage.Atomic? = null,
+            private var infiniteStage: Stage.Atomic? = null,
+            sensitivities: SysWait = SysWait.Never
+    ): SysFunction(sensitivities, initialize = true), StageContainer {
+        constructor(sensitivities: SysWait = SysWait.Never):
+                this(linkedListOf(), null, null, sensitivities)
 
         fun initStage(f: () -> Unit): Stage.Atomic {
             initStage = Stage.Atomic {
@@ -146,28 +139,14 @@ open class SysModule internal constructor(
             return infiniteStage!!.run()
         }
 
-        var stageNumber = 0
+        override var stageNumber = 0
 
         override fun run(event: SysWait): SysWait {
             if (event == SysWait.Initialize) {
                 return init()
             }
-            else if (stageNumber < stages.size) {
-                stages[stageNumber].let {
-                    return when (it) {
-                        is Stage.Atomic -> {
-                            stageNumber++
-                            it.run()
-                        }
-                        is Stage.Complex -> {
-                            val result = it.run()
-                            if (it.complete()) {
-                                stageNumber++
-                            }
-                            result
-                        }
-                    }
-                }
+            else if (!complete()) {
+                return super.run(event)
             }
             else {
                 return infinite()
