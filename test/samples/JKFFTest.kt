@@ -13,53 +13,44 @@ class JKFFTest {
         val clk = wireInput("clk")
         val q   = wireInput("q")
 
-        private var counter = 0
-        private var phase = 0
-
         init {
-            function(clk) {
-                if (it is SysWait.Initialize) {
+            stagedFunction(clk.posEdgeEvent) {
+                initStage {
                     j.value = SysWireState.ZERO
                     k.value = SysWireState.ZERO
-                } else {
-                    when (counter) {
-                        0 -> {
-                            assert(q.zero) { "q should be false at the beginning" }
-                        }
-                        1 -> {
-                            assert(q.zero) { "q should be false after q = true and JK = 11" }
-                            // All changes at clock N are received at clock N+1 and processed at clock N+2
-                            j.value = SysWireState.ONE
-                        }
-                        2 -> {
-                            assert(q.zero) { "q should be false after q = false and JK = 00" }
-                            j.value = SysWireState.ZERO
-                        }
-                        3 -> {
-                            assert(q.one) { "q should be true after JK = 10" }
-                            k.value = SysWireState.ONE
-                        }
-                        4 -> {
-                            assert(q.one) { "q should be true after q = true and JK = 00" }
-                            j.value = SysWireState.ONE
-                        }
-                        5 -> {
-                            assert(q.zero) { "q should be false after JK = 01" }
-                        }
-                        6 -> {
-                            assert(q.one) { "q should be true after q = false and JK = 11" }
-                            j.value = SysWireState.ZERO
-                            k.value = SysWireState.ZERO
-                        }
+                }
+                stage {
+                    assert(q.zero) { "q should be false at the beginning" }
+                }
+                iterativeStage(0, 4) {
+                    stage {
+                        assert(q.zero) { "q should be false after q = true and JK = 11" }
+                        // All changes at clock N are received at clock N+1 and processed at clock N+2
+                        j.value = SysWireState.ONE
                     }
-                    counter++
-                    if (counter > 6) {
-                        counter = 1
-                        phase++
-                        if (phase == 4) {
-                            scheduler.stop()
-                        }
+                    stage {
+                        assert(q.zero) { "q should be false after q = false and JK = 00" }
+                        j.value = SysWireState.ZERO
                     }
+                    stage {
+                        assert(q.one) { "q should be true after JK = 10" }
+                        k.value = SysWireState.ONE
+                    }
+                    stage {
+                        assert(q.one) { "q should be true after q = true and JK = 00" }
+                        j.value = SysWireState.ONE
+                    }
+                    stage {
+                        assert(q.zero) { "q should be false after JK = 01" }
+                    }
+                    stage {
+                        assert(q.one) { "q should be true after q = false and JK = 11" }
+                        j.value = SysWireState.ZERO
+                        k.value = SysWireState.ZERO
+                    }
+                }
+                stage {
+                    scheduler.stop()
                 }
             }
         }
