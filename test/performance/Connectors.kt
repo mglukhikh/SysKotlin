@@ -71,12 +71,15 @@ class Connectors {
             public val description: Array<SysInteger>
             public val parent: SysModule?
 
-            constructor(description: Array<SysInteger>, parent: SysModule) : super(false) {
+            override val undefined: Boolean
+                get() = (parent != null)
+
+            constructor(description: Array<SysInteger>, parent: SysModule) {
                 this.description = description
                 this.parent = parent
             }
 
-            constructor(undefined: SysPackable.Undefined) : super(undefined) {
+            constructor() {
                 description = arrayOf()
                 parent = null
             }
@@ -462,30 +465,20 @@ class Connectors {
             val addressBus = wireBus("addressBus")
             val commandBus = wireBus("commandBus")
             val assertModule = AssertModule("AM", this)
-            val logFifoRam_1 = asynchronousFifo(10, "logFifo", AssertModule.Status(SysPackable.Undefined))
-            val logFifoRam_2 = asynchronousFifo(10, "logFifo", AssertModule.Status(SysPackable.Undefined))
-            val logFifoCpu = asynchronousFifo(10, "logFifo", AssertModule.Status(SysPackable.Undefined))
-            val logFifoHub = asynchronousFifo(10, "logFifo", AssertModule.Status(SysPackable.Undefined))
+            val logFifoRam_1 = asynchronousFifo(10, "logFifo", AssertModule.Status())
+            val logFifoRam_2 = asynchronousFifo(10, "logFifo", AssertModule.Status())
+            val logFifoCpu = asynchronousFifo(10, "logFifo", AssertModule.Status())
+            val logFifoHub = asynchronousFifo(10, "logFifo", AssertModule.Status())
             for (i in 0..(CAPACITY_DATA - 1)) dataBus.addWire()
             for (i in 0..(CAPACITY_ADDRESS - 1)) addressBus.addWire()
             for (i in 0..(CAPACITY_COMMAND - 1)) commandBus.addWire()
-            cpu.dataPort.bind(dataBus)
-            cpu.addressPort.bind(addressBus)
-            cpu.commandPort.bind(commandBus)
-            cpu.logPort.bind(logFifoCpu)
-            ram_1.dataPort.bind(dataBus)
-            ram_1.addressPort.bind(addressBus)
-            ram_1.commandPort.bind(commandBus)
-            ram_1.logPort.bind(logFifoRam_1)
-            ram_2.dataPort.bind(dataBus)
-            ram_2.addressPort.bind(addressBus)
-            ram_2.commandPort.bind(commandBus)
-            ram_2.logPort.bind(logFifoRam_2)
-            assertModule.logPort.bind(logFifoHub)
-            hub.inputs[0].bind(logFifoCpu)
-            hub.inputs[1].bind(logFifoRam_1)
-            hub.inputs[2].bind(logFifoRam_2)
-            hub.output.bind(logFifoHub)
+            bind(cpu.dataPort to dataBus, cpu.addressPort to addressBus, cpu.commandPort to commandBus,
+                 ram_1.dataPort to dataBus, ram_1.addressPort to addressBus, ram_1.commandPort to commandBus,
+                 ram_2.dataPort to dataBus, ram_2.addressPort to addressBus, ram_2.commandPort to commandBus)
+            bind(cpu.logPort to logFifoCpu, ram_1.logPort to logFifoRam_1, ram_2.logPort to logFifoRam_2,
+                 assertModule.logPort to logFifoHub,
+                 hub.inputs[0] to logFifoCpu, hub.inputs[1] to logFifoRam_1, hub.inputs[2] to logFifoRam_2,
+                 hub.output to logFifoHub)
         }
     }
 

@@ -1,20 +1,16 @@
 package sysk
 
-abstract class SysPackable {
+interface SysPackable {
 
-    public val undefined: Boolean
+    val undefined: Boolean
+        get() = false
 
-    constructor(undefined: Boolean) {
-        this.undefined = undefined
-    }
+    override fun toString(): String
 
-    constructor(undefined: SysPackable.Undefined) {
-        this.undefined = undefined.undefined
-    }
+    companion object Undefined : SysPackable {
+        override val undefined: Boolean
+            get() = true
 
-    override public abstract fun toString(): String
-
-    companion object Undefined : SysPackable(true) {
         override public fun toString() = "Undefined"
     }
 }
