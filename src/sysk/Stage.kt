@@ -38,12 +38,8 @@ interface StageContainer {
         if (!complete()) {
             stages[stageNumber].let {
                 val result = it.run(event)
-                when (it) {
-                    is Stage.Atomic -> stageNumber++
-                    is Stage.Complex -> if (it.complete()) {
-                        stageNumber++
-                    }
-                    is Stage.Infinite -> {}
+                if (it.complete()) {
+                    stageNumber++
                 }
                 return result
             }
@@ -56,8 +52,12 @@ sealed class Stage {
 
     abstract fun run(event: SysWait): SysWait
 
+    abstract fun complete(): Boolean
+
     class Atomic internal constructor(private val f: () -> SysWait) : Stage() {
         override fun run(event: SysWait) = f()
+
+        override fun complete() = true
     }
 
     class Complex internal constructor(
@@ -70,10 +70,14 @@ sealed class Stage {
         override var stageNumber = 0
 
         override fun run(event: SysWait) = super.run(event)
+
+        override fun complete() = super.complete()
     }
 
     class Infinite internal constructor(private val f: () -> SysWait) : Stage() {
         override fun run(event: SysWait): SysWait = f()
+
+        override fun complete() = false
     }
 }
 
