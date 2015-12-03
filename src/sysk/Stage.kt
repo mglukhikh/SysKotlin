@@ -51,7 +51,6 @@ sealed class Stage {
 
     class Atomic internal constructor(val run: () -> SysWait) : Stage()
 
-    // TODO [mglukhikh]: duplicating code with StagedFunction, think about it
     class Complex internal constructor(
             private val sensitivities: SysWait,
             override val stages: MutableList<Stage>
