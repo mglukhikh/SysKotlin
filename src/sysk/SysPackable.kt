@@ -1,14 +1,8 @@
 package sysk
 
-interface SysPackable {
+open class SysPackable constructor() {
 
-    val undefined: Boolean
-        get() = false
+    protected open val undefined: Boolean
+        get() = true
 
-    companion object Undefined : SysPackable {
-        override val undefined: Boolean
-            get() = true
-
-        override public fun toString() = "Undefined"
-    }
 }

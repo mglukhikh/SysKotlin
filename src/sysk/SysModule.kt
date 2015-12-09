@@ -51,9 +51,6 @@ open class SysModule internal constructor(
         return this
     }
 
-    protected fun <IF : SysInterface> port(name: String, sysInterface: IF? = null): SysPort<IF> =
-            SysPort(name, this, sysInterface)
-
     protected fun <T> input(name: String, signalRead: SysSignalRead<T>? = null): SysInput<T> =
             SysInput(name, this, signalRead)
 
