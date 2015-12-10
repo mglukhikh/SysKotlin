@@ -20,7 +20,7 @@ open class SysUnaryMoore<Input, State, Output>(
     val y = output<Output>("y")
 
     init {
-        stagedFunction(clk.posEdgeEvent) {
+        stagedFunction(clk) {
             initStage {
                 y.value = result(state)
             }

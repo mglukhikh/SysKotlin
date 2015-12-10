@@ -98,7 +98,7 @@ class DFFTest {
             bind(ff.d to d, ff.clk to clk, andNot.x1 to q, andNot.x2 to swapOrOne)
             bind(ff.q to q, andNot.y to d)
 
-            stagedFunction(clk.posEdgeEvent) {
+            stagedFunction(clk) {
                 stage {
                     assert(q.x)
                     swapOrOne.value = SysWireState.ZERO

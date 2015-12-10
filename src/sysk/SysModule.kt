@@ -45,6 +45,10 @@ open class SysModule internal constructor(
         return result.register()
     }
 
+    protected fun stagedFunction(clock: SysEdged, positive: Boolean = true,
+                                 init: StagedFunction.() -> Unit) =
+            stagedFunction(if (positive) clock.posEdgeEvent else clock.negEdgeEvent, init)
+
     private fun <T : SysFunction> T.register(): T {
         scheduler.register(this)
         functions.add(this)

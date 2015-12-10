@@ -23,7 +23,7 @@ class SysSimpleAutomataTest {
         }
 
         init {
-            stagedFunction(clk.posEdgeEvent) {
+            stagedFunction(clk) {
                 stage {
                     assert(y.x)
                     x.value = SysWireState.ZERO
@@ -135,7 +135,7 @@ class SysSimpleAutomataTest {
         }
 
         init {
-            stagedFunction(clk.posEdgeEvent) {
+            stagedFunction(clk) {
                 stage {
                     assert(y.zero)
                     x.value = SysWireState.ZERO

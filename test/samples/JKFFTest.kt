@@ -14,7 +14,7 @@ class JKFFTest {
         val q   = wireInput("q")
 
         init {
-            stagedFunction(clk.posEdgeEvent) {
+            stagedFunction(clk) {
                 initStage {
                     j.value = SysWireState.ZERO
                     k.value = SysWireState.ZERO
