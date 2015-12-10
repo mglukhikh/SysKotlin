@@ -25,8 +25,8 @@ interface StageContainer {
         return result
     }
 
-    fun iterativeStage(first: Int, last: Int, init: Stage.Iterative.() -> Unit): Stage.Iterative {
-        val result = Stage.Iterative(first, last, wait(), linkedListOf())
+    fun <T> iterativeStage(progression: Iterable<T>, init: Stage.Iterative<T>.() -> Unit): Stage.Iterative<T> {
+        val result = Stage.Iterative(progression, wait(), linkedListOf())
         result.init()
         stages.add(result)
         return result
@@ -81,9 +81,8 @@ sealed class Stage {
         override fun complete() = super.complete()
     }
 
-    class Iterative internal constructor(
-            val firstIteration: Int,
-            val lastIteration: Int,
+    class Iterative<T> internal constructor(
+            val progression: Iterable<T>,
             private val sensitivities: SysWait,
             override val stages: MutableList<Stage>
     ) : Stage(), StageContainer {
@@ -91,19 +90,30 @@ sealed class Stage {
 
         override var stage = 0
 
-        var iteration = firstIteration
+        val iterator = progression.iterator()
+
+        var it: T? = next()
             private set
+
+        private fun next(): T? {
+            if (iterator.hasNext()) {
+                return iterator.next()
+            }
+            else {
+                return null
+            }
+        }
 
         override fun run(event: SysWait): SysWait {
             val result = super.run(event)
             if (super.complete()) {
-                iteration++
+                it = next()
                 stage = 0
             }
             return result
         }
 
-        override fun complete() = iteration >= lastIteration
+        override fun complete() = !iterator.hasNext()
     }
 
     class Infinite internal constructor(private val f: () -> SysWait) : Stage() {

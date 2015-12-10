@@ -22,7 +22,7 @@ class JKFFTest {
                 stage {
                     assert(q.zero) { "q should be false at the beginning" }
                 }
-                iterativeStage(0, 4) {
+                iterativeStage(0..4) {
                     stage {
                         assert(q.zero) { "q should be false after q = true and JK = 11" }
                         // All changes at clock N are received at clock N+1 and processed at clock N+2
