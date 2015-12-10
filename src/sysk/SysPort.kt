@@ -53,7 +53,7 @@ open class SysInput<T> internal constructor(
     val value: T
         get() = bound?.value ?: throw IllegalStateException("Port $name is not bound")
 
-    fun bung(defaultValue: T): SysBusBung<T> = SysBusBung(defaultValue)
+    inline fun <reified T : SysData> bung(defaultValue: T = undefined<T>()): SysBung<T> = SysBung(defaultValue)
 
 }
 
@@ -78,6 +78,8 @@ class SysWireInput internal constructor(
     val x: Boolean
         get() = value.x
 
+    fun bung(defaultValue: SysBit = SysBit.X): SysBung<SysBit> = SysBung(defaultValue)
+
 }
 
 open class SysOutput<T> internal constructor(
@@ -91,7 +93,7 @@ open class SysOutput<T> internal constructor(
             bound!!.value = value
         }
 
-    fun bung(defaultValue: T): SysBusBung<T> = SysBusBung(defaultValue)
+    inline fun <reified T : SysData> bung(defaultValue: T = undefined<T>()): SysBung<T> = SysBung(defaultValue)
 
 }
 
@@ -131,7 +133,7 @@ open class SysFifoInput<T> constructor(
             bound!!.pop = value
         }
 
-    fun bung(defaultValue: T): SysBusBung<T> = SysBusBung(defaultValue)
+    inline fun <reified T : SysData> bung(defaultValue: T = undefined<T>()): SysFifoBung<T> = SysFifoBung(defaultValue)
 
 }
 
@@ -173,7 +175,7 @@ open class SysFifoOutput<T> constructor(
             bound!!.push = value
         }
 
-    fun bung(defaultValue: T): SysBusBung<T> = SysBusBung(defaultValue)
+    inline fun <reified T : SysData> bung(defaultValue: T = undefined<T>()): SysFifoBung<T> = SysFifoBung(defaultValue)
 
 }
 
@@ -192,6 +194,6 @@ open class SysBusPort<T> constructor(
         bound!!.set(value, index, this)
     }
 
-    fun bung(defaultValue: T): SysBusBung<T> = SysBusBung(defaultValue)
+    inline fun <reified T : SysData> bung(defaultValue: T = undefined<T>()): SysBusBung<T> = SysBusBung(defaultValue)
 
 }
