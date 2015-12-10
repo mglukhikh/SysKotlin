@@ -43,10 +43,10 @@ class Connectors {
             for (i in 0..inputs.lastIndex) {
                 if (!inputs[i].empty) {
                     output.value = inputs[i].value
-                    output.push = SysWireState.ZERO
-                    output.push = SysWireState.ONE
-                    inputs[i].pop = SysWireState.ZERO
-                    inputs[i].pop = SysWireState.ONE
+                    output.push = SysBit.ZERO
+                    output.push = SysBit.ONE
+                    inputs[i].pop = SysBit.ZERO
+                    inputs[i].pop = SysBit.ONE
                     currentInput = i
                     startListen.happens(waitListen)
                     wait = true
@@ -66,20 +66,25 @@ class Connectors {
             name: String, parent: SysModule)
     : SysModule(name, parent) {
 
-        internal open class Status : SysPackable {
+        internal open class Status : SysData {
 
             public val description: Array<SysInteger>
             public val parent: SysModule?
 
-            override val undefined: Boolean
-                get() = (parent != null)
+            companion object {
+                fun registerUndefined(): SysData {
+                    val undefined = Status()
+                    UndefinedCollection.register(Status::class, undefined)
+                    return undefined
+                }
+            }
 
-            constructor(description: Array<SysInteger>, parent: SysModule) {
+            constructor(description: Array<SysInteger>, parent: SysModule) : super() {
                 this.description = description
                 this.parent = parent
             }
 
-            constructor() {
+            constructor() : super() {
                 description = arrayOf()
                 parent = null
             }
@@ -109,8 +114,8 @@ class Connectors {
             for (i in 0..expectedDescription[expectedDescription.lastIndex].lastIndex)
                 assert(expectedDescription[expectedDescription.lastIndex][i].equals(logPort.value.description[i]))
             expectedDescription.removeAt(expectedDescription.lastIndex)
-            logPort.pop = SysWireState.ZERO
-            logPort.pop = SysWireState.ONE
+            logPort.pop = SysBit.ZERO
+            logPort.pop = SysBit.ONE
             finishSave.happens()
             startSave
         }
@@ -143,9 +148,9 @@ class Connectors {
     )
     : SysModule(name, parent) {
 
-        public val dataPort = busPort<SysWireState>("data")
-        public val addressPort = busPort<SysWireState>("address")
-        public val commandPort = busPort<SysWireState>("command")
+        public val dataPort = busPort<SysBit>("data")
+        public val addressPort = busPort<SysBit>("address")
+        public val commandPort = busPort<SysBit>("command")
         public val logPort = fifoOutput<AssertModule.Status>("log")
 
         private val memory = Array(capacity, { SysInteger(CAPACITY_DATA, 0) })
@@ -166,9 +171,9 @@ class Connectors {
         private val startUpdate = event("update")
 
         private val disable: (SysWait) -> SysWait = {
-            for (i in 0..(CAPACITY_DATA - 1)) dataPort.set(SysWireState.Z, i)
-            for (i in 0..(CAPACITY_ADDRESS - 1)) addressPort.set(SysWireState.Z, i)
-            for (i in 0..(CAPACITY_COMMAND - 1)) commandPort.set(SysWireState.Z, i)
+            for (i in 0..(CAPACITY_DATA - 1)) dataPort.set(SysBit.Z, i)
+            for (i in 0..(CAPACITY_ADDRESS - 1)) addressPort.set(SysBit.Z, i)
+            for (i in 0..(CAPACITY_COMMAND - 1)) commandPort.set(SysBit.Z, i)
             startDisable
         }
 
@@ -194,8 +199,8 @@ class Connectors {
             val address = SysInteger(Array(CAPACITY_ADDRESS, { addressPort[it] }))
             if (address.value.toInt() >= firstAddress && address.value.toInt() < firstAddress + capacity) {
                 logPort.value = AssertModule.Status(arrayOf(memory[address.value.toInt() - firstAddress], address), this)
-                logPort.push = SysWireState.ZERO
-                logPort.push = SysWireState.ONE
+                logPort.push = SysBit.ZERO
+                logPort.push = SysBit.ONE
             }
             startPrint
         }
@@ -246,9 +251,9 @@ class Connectors {
 
         internal class Command constructor(public val name: SysInteger, public val arg: SysInteger? = null) {}
 
-        public val dataPort = busPort<SysWireState>("data")
-        public val addressPort = busPort<SysWireState>("address")
-        public val commandPort = busPort<SysWireState>("command")
+        public val dataPort = busPort<SysBit>("data")
+        public val addressPort = busPort<SysBit>("address")
+        public val commandPort = busPort<SysBit>("command")
         public val logPort = fifoOutput<AssertModule.Status>("log")
 
         private var register: Array<SysInteger> = arrayOf(SysInteger(CAPACITY_DATA, A), SysInteger(CAPACITY_DATA, B))
@@ -288,9 +293,9 @@ class Connectors {
         private val startStop = event("stop")
 
         private val disable: (SysWait) -> SysWait = {
-            for (i in 0..(CAPACITY_DATA - 1)) dataPort.set(SysWireState.Z, i)
-            for (i in 0..(CAPACITY_ADDRESS - 1)) addressPort.set(SysWireState.Z, i)
-            for (i in 0..(CAPACITY_COMMAND - 1)) commandPort.set(SysWireState.Z, i)
+            for (i in 0..(CAPACITY_DATA - 1)) dataPort.set(SysBit.Z, i)
+            for (i in 0..(CAPACITY_ADDRESS - 1)) addressPort.set(SysBit.Z, i)
+            for (i in 0..(CAPACITY_COMMAND - 1)) commandPort.set(SysBit.Z, i)
             startDisable
         }
 
@@ -347,8 +352,8 @@ class Connectors {
 
         private val print: (SysWait) -> SysWait = {
             logPort.value = AssertModule.Status(register, this)
-            logPort.push = SysWireState.ZERO
-            logPort.push = SysWireState.ONE
+            logPort.push = SysBit.ZERO
+            logPort.push = SysBit.ONE
             startPrint
         }
 
@@ -465,20 +470,21 @@ class Connectors {
             val addressBus = wireBus("addressBus")
             val commandBus = wireBus("commandBus")
             val assertModule = AssertModule("AM", this)
-            val logFifoRam_1 = asynchronousFifo(10, "logFifo", AssertModule.Status())
-            val logFifoRam_2 = asynchronousFifo(10, "logFifo", AssertModule.Status())
-            val logFifoCpu = asynchronousFifo(10, "logFifo", AssertModule.Status())
-            val logFifoHub = asynchronousFifo(10, "logFifo", AssertModule.Status())
+            AssertModule.Status.registerUndefined()
+            val logFifoRam_1 = asynchronousFifo(10, "logFifo", undefined<AssertModule.Status>())
+            val logFifoRam_2 = asynchronousFifo(10, "logFifo", undefined<AssertModule.Status>())
+            val logFifoCpu = asynchronousFifo(10, "logFifo", undefined<AssertModule.Status>())
+            val logFifoHub = asynchronousFifo(10, "logFifo", undefined<AssertModule.Status>())
             for (i in 0..(CAPACITY_DATA - 1)) dataBus.addWire()
             for (i in 0..(CAPACITY_ADDRESS - 1)) addressBus.addWire()
             for (i in 0..(CAPACITY_COMMAND - 1)) commandBus.addWire()
             bind(cpu.dataPort to dataBus, cpu.addressPort to addressBus, cpu.commandPort to commandBus,
-                 ram_1.dataPort to dataBus, ram_1.addressPort to addressBus, ram_1.commandPort to commandBus,
-                 ram_2.dataPort to dataBus, ram_2.addressPort to addressBus, ram_2.commandPort to commandBus)
+                    ram_1.dataPort to dataBus, ram_1.addressPort to addressBus, ram_1.commandPort to commandBus,
+                    ram_2.dataPort to dataBus, ram_2.addressPort to addressBus, ram_2.commandPort to commandBus)
             bind(cpu.logPort to logFifoCpu, ram_1.logPort to logFifoRam_1, ram_2.logPort to logFifoRam_2,
-                 assertModule.logPort to logFifoHub,
-                 hub.inputs[0] to logFifoCpu, hub.inputs[1] to logFifoRam_1, hub.inputs[2] to logFifoRam_2,
-                 hub.output to logFifoHub)
+                    assertModule.logPort to logFifoHub,
+                    hub.inputs[0] to logFifoCpu, hub.inputs[1] to logFifoRam_1, hub.inputs[2] to logFifoRam_2,
+                    hub.output to logFifoHub)
         }
     }
 

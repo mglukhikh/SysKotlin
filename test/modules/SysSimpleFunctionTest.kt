@@ -2,7 +2,7 @@ package modules
 
 import org.junit.Test
 import sysk.SysTopModule
-import sysk.SysWireState
+import sysk.SysBit
 import sysk.bind
 
 class SysSimpleFunctionTest {
@@ -26,11 +26,11 @@ class SysSimpleFunctionTest {
                 when (counter) {
                     0 -> {
                         assert(y.x)
-                        x.value = SysWireState.ZERO
+                        x.value = SysBit.ZERO
                     }
                     1 -> {
                         assert(y.one)
-                        x.value = SysWireState.ONE
+                        x.value = SysBit.ONE
                     }
                     2 -> {
                         assert(y.zero)
@@ -65,24 +65,24 @@ class SysSimpleFunctionTest {
                 when (counter) {
                     0 -> {
                         assert(y.x)
-                        x1.value = SysWireState.ZERO
-                        x2.value = SysWireState.ZERO
+                        x1.value = SysBit.ZERO
+                        x2.value = SysBit.ZERO
                     }
                     1 -> {
                         assert(y.zero)
-                        x1.value = SysWireState.ONE
+                        x1.value = SysBit.ONE
                     }
                     2 -> {
                         assert(y.one)
-                        x2.value = SysWireState.ONE
+                        x2.value = SysBit.ONE
                     }
                     3 -> {
                         assert(y.one)
-                        x1.value = SysWireState.ZERO
+                        x1.value = SysBit.ZERO
                     }
                     4 -> {
                         assert(y.one)
-                        x2.value = SysWireState.ZERO
+                        x2.value = SysBit.ZERO
                     }
                     5 -> {
                         assert(y.zero)
@@ -117,24 +117,24 @@ class SysSimpleFunctionTest {
                 when (counter) {
                     0 -> {
                         assert(y.x)
-                        x1.value = SysWireState.ZERO
-                        x2.value = SysWireState.ZERO
+                        x1.value = SysBit.ZERO
+                        x2.value = SysBit.ZERO
                     }
                     1 -> {
                         assert(y.zero)
-                        x1.value = SysWireState.ONE
+                        x1.value = SysBit.ONE
                     }
                     2 -> {
                         assert(y.zero)
-                        x2.value = SysWireState.ONE
+                        x2.value = SysBit.ONE
                     }
                     3 -> {
                         assert(y.one)
-                        x1.value = SysWireState.ZERO
+                        x1.value = SysBit.ZERO
                     }
                     4 -> {
                         assert(y.zero)
-                        x2.value = SysWireState.ZERO
+                        x2.value = SysBit.ZERO
                     }
                     5 -> {
                         assert(y.zero)

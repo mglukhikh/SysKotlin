@@ -26,24 +26,24 @@ class SysSimpleAutomataTest {
             stagedFunction(clk) {
                 stage {
                     assert(y.x)
-                    x.value = SysWireState.ZERO
+                    x.value = SysBit.ZERO
                     assertTime(time(10, TimeUnit.NS))
                 }
                 complexStage {
                     stage {
                         assert(y.x)
-                        x.value = SysWireState.ONE
+                        x.value = SysBit.ONE
                         assertTime(time(30, TimeUnit.NS))
                     }
                     complexStage {
                         stage {
                             assert(y.zero)
-                            x.value = SysWireState.ZERO
+                            x.value = SysBit.ZERO
                             assertTime(time(50, TimeUnit.NS))
                         }
                         stage {
                             assert(y.one)
-                            x.value = SysWireState.ONE
+                            x.value = SysBit.ONE
                             assertTime(time(70, TimeUnit.NS))
                         }
                     }
@@ -83,19 +83,19 @@ class SysSimpleAutomataTest {
                 when (counter) {
                     0 -> {
                         assert(y.x) { "Expected X at 0 but was ${y.value}"}
-                        x.value = SysWireState.ZERO
+                        x.value = SysBit.ZERO
                     }
                     1 -> {
                         assert(y.x)
-                        x.value = SysWireState.ONE
+                        x.value = SysBit.ONE
                     }
                     2 -> {
                         assert(y.zero)
-                        x.value = SysWireState.ZERO
+                        x.value = SysBit.ZERO
                     }
                     3 -> {
                         assert(y.one)
-                        x.value = SysWireState.ONE
+                        x.value = SysBit.ONE
                     }
                     4 -> {
                         assert(y.zero)
@@ -138,18 +138,18 @@ class SysSimpleAutomataTest {
             stagedFunction(clk) {
                 stage {
                     assert(y.zero)
-                    x.value = SysWireState.ZERO
+                    x.value = SysBit.ZERO
                 }
                 stage {
                     assert(y.zero) { "Expected ZERO at stage 1 but was ${y.value}"}
-                    x.value = SysWireState.ONE
+                    x.value = SysBit.ONE
                 }
                 stage {
                     assert(y.zero)
                 }
                 stage {
                     assert(y.one)
-                    x.value = SysWireState.ZERO
+                    x.value = SysBit.ZERO
                 }
                 stage {
                     assert(y.zero)

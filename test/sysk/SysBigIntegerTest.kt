@@ -1,7 +1,7 @@
 package sysk
 
 import org.junit.Test
-import sysk.SysWireState.*
+import sysk.SysBit.*
 
 class SysBigIntegerTest {
     @Test

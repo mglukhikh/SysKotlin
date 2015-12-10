@@ -10,7 +10,7 @@ public class DFF (name: String, parent: SysModule): SysModule(name, parent) {
     val d = wireInput("d")
     val clk = wireInput("clk")
 
-    val q = output<SysWireState>("q")
+    val q = output<SysBit>("q")
 
     init {
         function(clk, initialize = false) {

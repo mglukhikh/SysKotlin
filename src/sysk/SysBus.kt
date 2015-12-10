@@ -39,34 +39,34 @@ abstract class SysBus<T> internal constructor(
 
 open class SysWireBus internal constructor(
         name: String, scheduler: SysScheduler, parent: SysObject? = null
-) : SysBus<SysWireState>(name, scheduler, parent) {
+) : SysBus<SysBit>(name, scheduler, parent) {
 
-    private val ports: MutableMap<SysPort<*>, MutableList<SysWireState>> = HashMap()
+    private val ports: MutableMap<SysPort<*>, MutableList<SysBit>> = HashMap()
 
     var changed = false
         private set
 
     override fun register(port: SysPort<*>) {
-        val list = ArrayList<SysWireState>()
-        for (i in signals.indices) list.add(SysWireState.Z)
+        val list = ArrayList<SysBit>()
+        for (i in signals.indices) list.add(SysBit.Z)
         ports.put(port, list)
         for (i in signals.indices) update(i)
     }
 
     // ToDo: private addWire(startValue: T)
     fun addWire() {
-        super.addWire(SysWireState.X)
-        ports.forEach { it.value.add(SysWireState.Z) }
+        super.addWire(SysBit.X)
+        ports.forEach { it.value.add(SysBit.Z) }
         if (!ports.isEmpty()) update(signals.size - 1)
     }
 
-    override fun set(value: SysWireState, index: Int, port: SysPort<*>) {
+    override fun set(value: SysBit, index: Int, port: SysPort<*>) {
         ports[port]!!.set(index, value)
         update(index)
     }
 
     private fun update(index: Int) {
-        var value = SysWireState.Z
+        var value: SysBit = SysBit.Z
         ports.forEach { value = value.wiredAnd(it.value[index]) }
         signals[index].value = value;
         if (signals[index].changed) changed = true

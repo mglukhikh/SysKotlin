@@ -22,7 +22,7 @@ interface SysEdged {
     val negEdgeEvent: SysWait
 }
 
-interface SysWireRead : SysSignalRead<SysWireState>, SysEdged {
+interface SysWireRead : SysSignalRead<SysBit>, SysEdged {
 
     override val posEdgeEvent: SysWait.Event
 

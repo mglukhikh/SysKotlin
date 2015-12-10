@@ -23,8 +23,6 @@ abstract class SysPort<IF : SysInterface> internal constructor(
 
     fun to(sysInterface: IF): Pair<SysPort<IF>, IF> = Pair(this, sysInterface)
 
-    abstract fun bung(defaultValue: SysPackable = SysPackable()): SysBung<SysPackable>
-
     operator fun invoke(): IF {
         assert(bound != null) { "Port $name is not bound" }
         return bound!!
@@ -55,15 +53,13 @@ open class SysInput<T> internal constructor(
     val value: T
         get() = bound?.value ?: throw IllegalStateException("Port $name is not bound")
 
-    override fun bung(defaultValue: SysPackable): SysBung<SysPackable> = SysBung(defaultValue)
-
     fun bung(defaultValue: T): SysBusBung<T> = SysBusBung(defaultValue)
 
 }
 
 class SysWireInput internal constructor(
         name: String, parent: SysObject? = null, signalRead: SysWireRead? = null
-) : SysInput<SysWireState>(name, parent, signalRead), SysEdged {
+) : SysInput<SysBit>(name, parent, signalRead), SysEdged {
 
     override val posEdgeEvent: SysWait.Finder = object : SysWait.Finder() {
         override fun invoke() = (bound as? SysWireRead)?.posEdgeEvent
@@ -82,8 +78,6 @@ class SysWireInput internal constructor(
     val x: Boolean
         get() = value.x
 
-    override fun bung(defaultValue: SysPackable): SysBung<SysPackable> = SysBung(defaultValue)
-
 }
 
 open class SysOutput<T> internal constructor(
@@ -96,8 +90,6 @@ open class SysOutput<T> internal constructor(
             if (bound == null) throw IllegalStateException("Port $name is not bound")
             bound!!.value = value
         }
-
-    override fun bung(defaultValue: SysPackable): SysBung<SysPackable> = SysBung(defaultValue)
 
     fun bung(defaultValue: T): SysBusBung<T> = SysBusBung(defaultValue)
 
@@ -131,15 +123,13 @@ open class SysFifoInput<T> constructor(
             return bound!!.empty
         }
 
-    var pop: SysWireState
+    var pop: SysBit
         get() = throw UnsupportedOperationException(
                 "SysFifoPort $name: Read is not supported for pop port")
         set(value) {
             if (bound == null) throw IllegalStateException("Port $name is not bound")
             bound!!.pop = value
         }
-
-    override fun bung(defaultValue: SysPackable): SysFifoBung<SysPackable> = SysFifoBung(defaultValue)
 
     fun bung(defaultValue: T): SysBusBung<T> = SysBusBung(defaultValue)
 
@@ -175,15 +165,13 @@ open class SysFifoOutput<T> constructor(
             return bound!!.empty
         }
 
-    var push: SysWireState
+    var push: SysBit
         get() = throw UnsupportedOperationException(
                 "SysFifoPort $name: Read is not supported for push port")
         set(value) {
             if (bound == null) throw IllegalStateException("Port $name is not bound")
             bound!!.push = value
         }
-
-    override fun bung(defaultValue: SysPackable): SysFifoBung<SysPackable> = SysFifoBung(defaultValue)
 
     fun bung(defaultValue: T): SysBusBung<T> = SysBusBung(defaultValue)
 
@@ -203,8 +191,6 @@ open class SysBusPort<T> constructor(
         if (bound == null) throw IllegalStateException("Port $name is not bound")
         bound!!.set(value, index, this)
     }
-
-    override fun bung(defaultValue: SysPackable): SysBusBung<SysPackable> = SysBusBung(defaultValue)
 
     fun bung(defaultValue: T): SysBusBung<T> = SysBusBung(defaultValue)
 

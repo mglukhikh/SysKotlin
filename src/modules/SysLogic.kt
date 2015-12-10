@@ -1,7 +1,7 @@
 package modules
 
 import sysk.SysModule
-import sysk.SysWireState
+import sysk.SysBit
 
 open class SysUnaryModule<Input, Output>(
         operation: (Input) -> Output, name: String, parent: SysModule
@@ -21,13 +21,13 @@ open class SysUnaryModule<Input, Output>(
 }
 
 open class SysUnaryWireModule<Output>(
-        operation: (SysWireState) -> Output, name: String, parent: SysModule
-): SysUnaryModule<SysWireState, Output>(operation, name, parent) {
+        operation: (SysBit) -> Output, name: String, parent: SysModule
+): SysUnaryModule<SysBit, Output>(operation, name, parent) {
 
     override fun createInput(name: String) = wireInput(name)
 }
 
-class SysNotModule(name: String, parent: SysModule): SysUnaryWireModule<SysWireState>({ it.not() }, name, parent)
+class SysNotModule(name: String, parent: SysModule): SysUnaryWireModule<SysBit>({ it.not() }, name, parent)
 
 open class SysBinaryModule<Input1, Input2, Output>(
         operation: (Input1, Input2) -> Output, name: String, parent: SysModule
@@ -51,8 +51,8 @@ open class SysBinaryModule<Input1, Input2, Output>(
 }
 
 open class SysBinaryWireModule<Output>(
-        operation: (SysWireState, SysWireState) -> Output, name: String, parent: SysModule
-): SysBinaryModule<SysWireState, SysWireState, Output>(operation, name, parent) {
+        operation: (SysBit, SysBit) -> Output, name: String, parent: SysModule
+): SysBinaryModule<SysBit, SysBit, Output>(operation, name, parent) {
 
     override fun createInput1(name: String) = wireInput(name)
 
@@ -60,10 +60,10 @@ open class SysBinaryWireModule<Output>(
 }
 
 class SysOrModule(name: String, parent: SysModule):
-        SysBinaryWireModule<SysWireState>({ x1, x2 -> x1.or(x2) }, name, parent)
+        SysBinaryWireModule<SysBit>({ x1, x2 -> x1.or(x2) }, name, parent)
 
 class SysAndModule(name: String, parent: SysModule):
-        SysBinaryWireModule<SysWireState>({ x1, x2 -> x1.and(x2) }, name, parent)
+        SysBinaryWireModule<SysBit>({ x1, x2 -> x1.and(x2) }, name, parent)
 
 class SysAndNotModule(name: String, parent: SysModule):
-        SysBinaryWireModule<SysWireState>({ x1, x2 -> x1.and(x2).not() }, name, parent)
+        SysBinaryWireModule<SysBit>({ x1, x2 -> x1.and(x2).not() }, name, parent)

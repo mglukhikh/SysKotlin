@@ -4,10 +4,9 @@ import java.math.BigInteger
 
 
 class SysBigInteger(
-        val width: Int,
-        val value: BigInteger,
-        defaultBitState: Boolean = false,
-        private val bitsState: Array<Boolean> = Array(width, { i -> defaultBitState })) {
+        val width: Int, val value: BigInteger, defaultBitState: Boolean = false,
+        private val bitsState: Array<Boolean> = Array(width, { i -> defaultBitState })
+) : SysData {
 
     init {
 
@@ -39,7 +38,7 @@ class SysBigInteger(
 
         constructor(value: Int) : this(SysInteger(value))
     */
-    constructor(arr: Array<SysWireState>) : this(arr.size, valueBySWSArray(arr),
+    constructor(arr: Array<SysBit>) : this(arr.size, valueBySWSArray(arr),
             bitsState = maskBySWSArray(arr))
 
     private constructor(width: Short) : this(width.toInt(), BigInteger.valueOf(0), false)
@@ -145,17 +144,17 @@ class SysBigInteger(
     }
 
     /** Extracts a single bit, accessible as [i] */
-    operator fun get(i: Int): SysWireState {
+    operator fun get(i: Int): SysBit {
 
         if (i < 0 || i >= width) throw IndexOutOfBoundsException()
 
         if (!bitsState[i])
-            return SysWireState.X
+            return SysBit.X
         val shift = bitsState.indexOf(true)
         if (value.testBit(i - shift))
-            return SysWireState.ONE
+            return SysBit.ONE
         else
-            return SysWireState.ZERO
+            return SysBit.ZERO
 
     }
 
@@ -175,9 +174,9 @@ class SysBigInteger(
         if (shift > width || shift < 0)
             throw IllegalArgumentException()
 
-        val sysWireStateExpression = Array<SysWireState>(width - shift) { i: Int -> this[i] }
+        val sysBitExpression = Array(width - shift) { i: Int -> this[i] }
 
-        return SysBigInteger(sysWireStateExpression);
+        return SysBigInteger(sysBitExpression);
     }
 
     /** Bitwise logical shift left*/
@@ -187,9 +186,9 @@ class SysBigInteger(
         if (shift > width || shift < 0)
             throw IllegalArgumentException()
 
-        val sysWireStateExpression = Array<SysWireState>(width - shift) { i: Int -> this[i + shift] }
+        val sysBitExpression = Array(width - shift) { i: Int -> this[i + shift] }
 
-        return SysBigInteger(sysWireStateExpression)
+        return SysBigInteger(sysBitExpression)
     }
 
     /** Arithmetic shift right*/
@@ -198,17 +197,17 @@ class SysBigInteger(
             return this;
         if (shift > width || shift < 0)
             throw IllegalArgumentException()
-        val sysWireStateExpression = Array<SysWireState>(width) { i -> this[i] }
+        val sysBitExpression = Array(width) { i -> this[i] }
         var i = width - 1
         while (i >= shift) {
-            sysWireStateExpression[i] = sysWireStateExpression[i - shift]
+            sysBitExpression[i] = sysBitExpression[i - shift]
             i--
         }
         while (i >= 0) {
-            sysWireStateExpression[i] = SysWireState.ZERO
+            sysBitExpression[i] = SysBit.ZERO
             i--
         }
-        return SysBigInteger(sysWireStateExpression)
+        return SysBigInteger(sysBitExpression)
     }
 
     /** Arithmetic shift left*/
@@ -217,17 +216,17 @@ class SysBigInteger(
             return this;
         if (shift > width || shift < 0)
             throw IllegalArgumentException()
-        val sysWireStateExpression = Array<SysWireState>(width) { i -> this[i] }
+        val sysBitExpression = Array(width) { i -> this[i] }
         var i = 0
-        while (i < sysWireStateExpression.size - shift) {
-            sysWireStateExpression[i] = sysWireStateExpression[i + shift]
+        while (i < sysBitExpression.size - shift) {
+            sysBitExpression[i] = sysBitExpression[i + shift]
             i++
         }
-        while (i < sysWireStateExpression.size) {
-            sysWireStateExpression[i] = SysWireState.ZERO
+        while (i < sysBitExpression.size) {
+            sysBitExpression[i] = SysBit.ZERO
             i++
         }
-        return SysBigInteger(sysWireStateExpression)
+        return SysBigInteger(sysBitExpression)
 
     }
 
@@ -241,23 +240,23 @@ class SysBigInteger(
 
         if (realShift == 0)
             return this;
-        val sysWireStateExpression = Array<SysWireState>(width) { i -> this[i] }
+        val sysBitExpression = Array(width) { i -> this[i] }
 
-        val tempArray = Array(realShift, { SysWireState.X })
+        val tempArray = Array(realShift, { SysBit.X })
 
         for (i in 0..realShift - 1) {
-            tempArray[i] = sysWireStateExpression[sysWireStateExpression.size - realShift + i]
+            tempArray[i] = sysBitExpression[sysBitExpression.size - realShift + i]
         }
-        var i = sysWireStateExpression.size - 1
+        var i = sysBitExpression.size - 1
         while (i >= realShift) {
-            sysWireStateExpression[i] = sysWireStateExpression[i - realShift]
+            sysBitExpression[i] = sysBitExpression[i - realShift]
             i--
         }
         while (i >= 0) {
-            sysWireStateExpression[i] = tempArray[i]
+            sysBitExpression[i] = tempArray[i]
             i--
         }
-        return SysBigInteger(sysWireStateExpression)
+        return SysBigInteger(sysBitExpression)
     }
 
     /** Cyclic shift left*/
@@ -269,24 +268,24 @@ class SysBigInteger(
 
         if (realShift == 0)
             return this;
-        val sysWireStateExpression = Array<SysWireState>(width) { i -> this[i] }
+        val sysBitExpression = Array(width) { i -> this[i] }
 
-        val tempArray = Array(realShift, { SysWireState.X })
+        val tempArray = Array(realShift, { SysBit.X })
 
         for (i in 0..realShift - 1) {
-            tempArray[i] = sysWireStateExpression[i]
+            tempArray[i] = sysBitExpression[i]
         }
 
         var i = 0
-        while (i < sysWireStateExpression.size - shift) {
-            sysWireStateExpression[i] = sysWireStateExpression[i + shift]
+        while (i < sysBitExpression.size - shift) {
+            sysBitExpression[i] = sysBitExpression[i + shift]
             i++
         }
-        while (i < sysWireStateExpression.size) {
-            sysWireStateExpression[i] = tempArray[i - sysWireStateExpression.size + realShift]
+        while (i < sysBitExpression.size) {
+            sysBitExpression[i] = tempArray[i - sysBitExpression.size + realShift]
             i++
         }
-        return SysBigInteger(sysWireStateExpression)
+        return SysBigInteger(sysBitExpression)
     }
 
 
@@ -353,14 +352,14 @@ class SysBigInteger(
         }
 
 
-        private fun valueBySWSArray(arr: Array<SysWireState>): BigInteger {
+        private fun valueBySWSArray(arr: Array<SysBit>): BigInteger {
 
             var leftShift = 0;
             var rightShift = 0;
-            while (leftShift < arr.size && arr[leftShift] == SysWireState.X )
+            while (leftShift < arr.size && arr[leftShift] == SysBit.X )
                 leftShift++;
 
-            while (arr.size - rightShift > leftShift && arr[arr.size - 1 - rightShift] == SysWireState.X )
+            while (arr.size - rightShift > leftShift && arr[arr.size - 1 - rightShift] == SysBit.X )
                 rightShift++;
 
 
@@ -371,9 +370,9 @@ class SysBigInteger(
 
 
             val tempArray = arr.copyOfRange(leftShift, arr.size - rightShift)
-            if (tempArray.last() != SysWireState.ONE) {
+            if (tempArray.last() != SysBit.ONE) {
                 for (i in tempArray.indices) {
-                    if (tempArray[i] == SysWireState.ONE) {
+                    if (tempArray[i] == SysBit.ONE) {
                         result = result.setBit(i)
                     }
                 }
@@ -384,7 +383,7 @@ class SysBigInteger(
                 val inverseArray = inverseSWSArray(tempArray)
 
                 for (i in inverseArray.indices) {
-                    if (inverseArray[i] == SysWireState.ONE) {
+                    if (inverseArray[i] == SysBit.ONE) {
                         result = result.setBit(i)
                     }
                 }
@@ -394,14 +393,14 @@ class SysBigInteger(
 
         }
 
-        private fun inverseSWSArray(arr: Array<SysWireState>): Array<SysWireState> {
+        private fun inverseSWSArray(arr: Array<SysBit>): Array<SysBit> {
 
             val result = arr;
             for (i in result.indices) {
-                if (result[i] == SysWireState.ZERO) {
-                    result[i] = SysWireState.ONE
+                if (result[i] == SysBit.ZERO) {
+                    result[i] = SysBit.ONE
                 } else {
-                    result[i] = SysWireState.ZERO
+                    result[i] = SysBit.ZERO
                 }
             }
 
@@ -409,12 +408,12 @@ class SysBigInteger(
             var i = 0;
             while (breaker && i < result.size ) {
 
-                if (result[i] == SysWireState.ZERO) {
-                    result[i] = SysWireState.ONE
+                if (result[i] == SysBit.ZERO) {
+                    result[i] = SysBit.ONE
                     breaker = false
                 } else {
 
-                    result[i] = SysWireState.ZERO
+                    result[i] = SysBit.ZERO
 
                 }
                 i++
@@ -423,19 +422,23 @@ class SysBigInteger(
         }
 
 
-        private fun maskBySWSArray(arr: Array<SysWireState>): Array<Boolean> {
+        private fun maskBySWSArray(arr: Array<SysBit>): Array<Boolean> {
 
 
             val mask = BooleanArray(arr.size)
 
 
             for (i in 0..mask.size - 1)
-                if (arr[i] != SysWireState.X)
+                if (arr[i] != SysBit.X)
                     mask[i] = true;
 
             return mask.toTypedArray();
         }
 
-
+        fun registerUndefined(): SysData {
+            val undefined = SysBigInteger(arrayOf<SysBit>(SysBit.X))
+            UndefinedCollection.register(SysBigInteger::class, undefined)
+            return undefined
+        }
     }
 }

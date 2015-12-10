@@ -8,14 +8,14 @@ class RSFF(name: String, parent: SysModule): SysModule(name, parent) {
     val s   = wireInput("s")
     val clk = wireInput("clk")
 
-    private var state = SysWireState.X
-    val q = output<SysWireState>("q")
+    private var state = SysBit.X
+    val q = output<SysBit>("q")
 
     init {
         function(clk, initialize = false) {
 
-            if (s.one) state = SysWireState.ONE
-            else if (r.one) state = SysWireState.ZERO
+            if (s.one) state = SysBit.ONE
+            else if (r.one) state = SysBit.ZERO
             q.value = state
         }
     }

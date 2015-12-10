@@ -2,15 +2,15 @@ package samples
 
 import sysk.*
 
-public class SReg (name: String, digPerWord: Int, parent: SysModule): SysModule(name, parent) {
+public class SReg(name: String, digPerWord: Int, parent: SysModule) : SysModule(name, parent) {
 
-    val d   = wireInput("d")
+    val d = wireInput("d")
     val clk = wireInput("clk")
     val dir = wireInput("dir")  //right: e = 0, left: e = 1
-    val q   = output<SysWireState>("q")
+    val q = output<SysBit>("q")
 
-    val trigQ = Array(digPerWord, {i -> SysWireState.X})
-    private val state = Array(digPerWord, {i -> SysWireState.X})
+    val trigQ = Array(digPerWord, { i -> SysBit.X })
+    private val state = Array(digPerWord, { i -> SysBit.X })
 
     init {
         function(clk, initialize = false) {

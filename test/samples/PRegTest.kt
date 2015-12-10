@@ -8,7 +8,7 @@ class PRegTest {
 
     private class Testbench(name: String, digPerWord: Int, parent: SysModule): SysModule(name, parent) {
 
-        val d = Array(digPerWord, {i -> output<SysWireState>("d" + i.toString())})
+        val d = Array(digPerWord, {i -> output<SysBit>("d" + i.toString())})
         val clk = wireInput("clk")
         val q   = Array(digPerWord, {i -> wireInput("q" + i.toString())})
 
@@ -22,7 +22,7 @@ class PRegTest {
             function(clk) {
                 if (it is SysWait.Initialize) {
                     while (i < digPerWord) {
-                        d[i].value = SysWireState.X
+                        d[i].value = SysBit.X
                         i += 1
                     }
                 } else {
@@ -53,8 +53,8 @@ class PRegTest {
                             i = 0
                             while (i < digPerWord) {
                                 arr[i] = r.nextBoolean()
-                                if (arr[i]) d[i].value = SysWireState.ONE
-                                else d[i].value = SysWireState.ZERO
+                                if (arr[i]) d[i].value = SysBit.ONE
+                                else d[i].value = SysBit.ZERO
                                 i += 1
                             }
                         }
@@ -75,7 +75,7 @@ class PRegTest {
 
                             i = 0
                             while (i < digPerWord) {
-                                d[i].value = SysWireState.ZERO
+                                d[i].value = SysBit.ZERO
                                 i += 1
                             }
                         }
@@ -110,10 +110,10 @@ class PRegTest {
 
     private class Top : SysTopModule("top", SysScheduler()) {
         val digPerWord = 64
-        val d = Array(digPerWord, {i -> signal("d" + i.toString(), SysWireState.X)})
+        val d = Array(digPerWord, {i -> signal("d" + i.toString(), SysBit.X)})
 
         val clk = clockedSignal("clk", time(20, TimeUnit.NS))
-        val q = Array(digPerWord, {i -> signal("q" + i.toString(), SysWireState.X)})
+        val q = Array(digPerWord, {i -> signal("q" + i.toString(), SysBit.X)})
 
         val ff = PReg("my", digPerWord, this)
         private val tb = Testbench("your", digPerWord, this)

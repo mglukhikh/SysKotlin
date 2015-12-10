@@ -60,44 +60,44 @@ class SysFifoTest {
     fun SysWireFifo() {
         var Fifo: SysWireFifo = SysWireFifo(4, "Fifo", SysScheduler())
         assert("Fifo" == Fifo.name)
-        assert(SysWireState.X == Fifo.output)
+        assert(SysBit.X == Fifo.output)
         assert(0 == Fifo.size)
         assert(4 == Fifo.capacity)
         assert(false == Fifo.full)
         assert(true == Fifo.empty)
-        Fifo.input = SysWireState.ONE
+        Fifo.input = SysBit.ONE
         Fifo.push()
-        assert(SysWireState.ONE == Fifo.output)
+        assert(SysBit.ONE == Fifo.output)
         assert(1 == Fifo.size)
         assert(4 == Fifo.capacity)
         assert(false == Fifo.full)
         assert(false == Fifo.empty)
-        Fifo.input = (SysWireState.ZERO)
+        Fifo.input = (SysBit.ZERO)
         Fifo.push()
-        Fifo.input = (SysWireState.ONE)
+        Fifo.input = (SysBit.ONE)
         Fifo.push()
-        Fifo.input = (SysWireState.ZERO)
+        Fifo.input = (SysBit.ZERO)
         Fifo.push()
-        assert(SysWireState.ONE == Fifo.output)
+        assert(SysBit.ONE == Fifo.output)
         assert(4 == Fifo.size)
         assert(4 == Fifo.capacity)
         assert(true == Fifo.full)
         assert(false == Fifo.empty)
-        Fifo.input = (SysWireState.ZERO)
+        Fifo.input = (SysBit.ZERO)
         Fifo.push()
-        assert(SysWireState.ONE == Fifo.output)
+        assert(SysBit.ONE == Fifo.output)
         assert(4 == Fifo.size)
         assert(4 == Fifo.capacity)
         assert(true == Fifo.full)
         assert(false == Fifo.empty)
         while (!Fifo.empty) Fifo.pop()
-        assert(SysWireState.ZERO == Fifo.output)
+        assert(SysBit.ZERO == Fifo.output)
         assert(0 == Fifo.size)
         assert(4 == Fifo.capacity)
         assert(false == Fifo.full)
         assert(true == Fifo.empty)
         Fifo.pop()
-        assert(SysWireState.ZERO == Fifo.output)
+        assert(SysBit.ZERO == Fifo.output)
         assert(0 == Fifo.size)
         assert(4 == Fifo.capacity)
         assert(false == Fifo.full)
@@ -106,41 +106,41 @@ class SysFifoTest {
 
     @Test
     fun SysAsynchronousFifo() {
-        var Fifo: SysAsynchronousFifo<SysWireState> = SysAsynchronousFifo(4, "Fifo", SysWireState.ZERO, SysScheduler())
+        var Fifo: SysAsynchronousFifo<SysBit> = SysAsynchronousFifo(4, "Fifo", SysBit.ZERO, SysScheduler())
         assert("Fifo" == Fifo.name)
-        assert(SysWireState.ZERO == Fifo.output)
+        assert(SysBit.ZERO == Fifo.output)
         assert(0 == Fifo.size)
         assert(4 == Fifo.capacity)
         assert(!Fifo.full)
         assert(Fifo.empty)
-        Fifo.push = SysWireState.ZERO;
-        assert(SysWireState.ZERO == Fifo.output)
+        Fifo.push = SysBit.ZERO;
+        assert(SysBit.ZERO == Fifo.output)
         assert(0 == Fifo.size)
-        Fifo.input = SysWireState.ONE;
-        Fifo.push = SysWireState.ONE;
-        assert(SysWireState.ONE == Fifo.output)
+        Fifo.input = SysBit.ONE;
+        Fifo.push = SysBit.ONE;
+        assert(SysBit.ONE == Fifo.output)
         assert(1 == Fifo.size)
-        Fifo.input = SysWireState.ZERO;
-        Fifo.push = SysWireState.ONE;
-        assert(SysWireState.ONE == Fifo.output)
+        Fifo.input = SysBit.ZERO;
+        Fifo.push = SysBit.ONE;
+        assert(SysBit.ONE == Fifo.output)
         assert(1 == Fifo.size)
-        Fifo.push = SysWireState.ZERO;
-        assert(SysWireState.ONE == Fifo.output)
+        Fifo.push = SysBit.ZERO;
+        assert(SysBit.ONE == Fifo.output)
         assert(1 == Fifo.size)
-        Fifo.push = SysWireState.ONE;
-        assert(SysWireState.ONE == Fifo.output)
+        Fifo.push = SysBit.ONE;
+        assert(SysBit.ONE == Fifo.output)
         assert(2 == Fifo.size)
-        Fifo.pop = SysWireState.ZERO;
-        assert(SysWireState.ONE == Fifo.output)
+        Fifo.pop = SysBit.ZERO;
+        assert(SysBit.ONE == Fifo.output)
         assert(2 == Fifo.size)
-        Fifo.pop = SysWireState.ONE;
-        assert(SysWireState.ZERO == Fifo.output)
+        Fifo.pop = SysBit.ONE;
+        assert(SysBit.ZERO == Fifo.output)
         assert(1 == Fifo.size)
-        Fifo.pop = SysWireState.ZERO;
-        assert(SysWireState.ZERO == Fifo.output)
+        Fifo.pop = SysBit.ZERO;
+        assert(SysBit.ZERO == Fifo.output)
         assert(1 == Fifo.size)
-        Fifo.pop = SysWireState.ONE;
-        assert(SysWireState.ZERO == Fifo.output)
+        Fifo.pop = SysBit.ONE;
+        assert(SysBit.ZERO == Fifo.output)
         assert(0 == Fifo.size)
     }
 }

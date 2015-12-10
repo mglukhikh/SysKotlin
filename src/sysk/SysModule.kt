@@ -67,10 +67,10 @@ open class SysModule internal constructor(
     protected fun <T> signal(name: String, startValue: T): SysSignal<T> =
             SysSignal(name, startValue, scheduler, this)
 
-    protected fun wireSignal(name: String, startValue: SysWireState = SysWireState.X) =
+    protected fun wireSignal(name: String, startValue: SysBit = SysBit.X) =
             SysWireSignal(name, scheduler, startValue, this)
 
-    protected fun clockedSignal(name: String, period: SysWait.Time, startValue: SysWireState = SysWireState.ZERO) =
+    protected fun clockedSignal(name: String, period: SysWait.Time, startValue: SysBit = SysBit.ZERO) =
             SysClockedSignal(name, period, scheduler, startValue)
 
     protected fun <T> fifoOutput(name: String, fifo: SysFifo<T>? = null) = SysFifoOutput<T>(name, this, fifo)

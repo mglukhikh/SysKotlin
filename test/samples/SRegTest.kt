@@ -7,8 +7,8 @@ class SRegTest {
 
     private class Testbench(name: String, digPerWord: Int, parent: SysModule): SysModule(name, parent) {
 
-        val d   = output<SysWireState>("d")
-        val dir = output<SysWireState>("dir")
+        val d   = output<SysBit>("d")
+        val dir = output<SysBit>("dir")
 
         val clk = wireInput("clk")
         val q   = wireInput("q")
@@ -20,8 +20,8 @@ class SRegTest {
             function(clk) {
 
                 if (it is SysWait.Initialize) {
-                    d.value = SysWireState.X
-                    dir.value = SysWireState.X
+                    d.value = SysBit.X
+                    dir.value = SysBit.X
                 } else {
                     when (counter) {
                         0 -> {
@@ -34,8 +34,8 @@ class SRegTest {
                                 assert(q.zero) { "q should be false after q = false and D = 0" }
 
                             // All changes at clock N are received at clock N+1 and processed at clock N+2
-                            dir.value = SysWireState.ZERO
-                            d.value = SysWireState.ONE
+                            dir.value = SysBit.ZERO
+                            d.value = SysBit.ONE
                         }
                         2 -> {
                             if (phase == 0)
@@ -43,8 +43,8 @@ class SRegTest {
                             else
                                 assert(q.zero) { "q should be false after q = false and D = 0" }
 
-                            dir.value = SysWireState.ZERO
-                            d.value = SysWireState.ZERO
+                            dir.value = SysBit.ZERO
+                            d.value = SysBit.ZERO
                         }
                         3 -> {
                             if (phase == 0)
@@ -52,8 +52,8 @@ class SRegTest {
                             else
                                 assert(q.zero) { "q should be false after q = false and D = 0" }
 
-                            dir.value = SysWireState.ZERO
-                            d.value = SysWireState.ONE
+                            dir.value = SysBit.ZERO
+                            d.value = SysBit.ONE
                         }
                         4 -> {
                             if (phase == 0)
@@ -61,47 +61,47 @@ class SRegTest {
                             else
                                 assert(q.zero) { "q should be false after q = false and D = 0" }
 
-                            dir.value = SysWireState.ZERO
-                            d.value = SysWireState.ZERO
+                            dir.value = SysBit.ZERO
+                            d.value = SysBit.ZERO
                         }
                         5 -> {
                             assert(q.one) { "q should be true after D = 1" }
-                            dir.value = SysWireState.ZERO
+                            dir.value = SysBit.ZERO
                         }
                         6 -> {
                             assert(q.zero) { "q should be false after D = 0" }
-                            dir.value = SysWireState.ZERO
+                            dir.value = SysBit.ZERO
                         }
                         7 -> {
                             assert(q.one) { "q should be true after D = 1" }
                         }
                         8 -> {
                             assert(q.zero) { "q should be false after D = 0" }
-                            dir.value = SysWireState.ONE
-                            d.value = SysWireState.ONE
+                            dir.value = SysBit.ONE
+                            d.value = SysBit.ONE
                         }
                         9 -> {
                             assert(q.zero) { "q should be false after D = 0" }
-                            dir.value = SysWireState.ONE
-                            d.value = SysWireState.ZERO
+                            dir.value = SysBit.ONE
+                            d.value = SysBit.ZERO
                         }
                         10 -> {
                             assert(q.zero) { "q should be false after D = 0" }
-                            dir.value = SysWireState.ONE
-                            d.value = SysWireState.ONE
+                            dir.value = SysBit.ONE
+                            d.value = SysBit.ONE
                         }
                         11 -> {
                             assert(q.zero) { "q should be false after D = 0" }
-                            dir.value = SysWireState.ONE
-                            d.value = SysWireState.ZERO
+                            dir.value = SysBit.ONE
+                            d.value = SysBit.ZERO
                         }
                         12 -> {
                             assert(q.one) { "q should be true after D = 1" }
-                            dir.value = SysWireState.ONE
+                            dir.value = SysBit.ONE
                         }
                         13 -> {
                             assert(q.zero) { "q should be false after D = 0" }
-                            dir.value = SysWireState.ONE
+                            dir.value = SysBit.ONE
                         }
                         14 -> {
                             assert(q.one) { "q should be true after D = 1" }
@@ -126,9 +126,9 @@ class SRegTest {
     private class Top : SysTopModule("top", SysScheduler()) {
         val digPerWord = 4
 
-        val d = signal("d", SysWireState.X)
-        val q = signal("q", SysWireState.X)
-        val dir = signal("dir", SysWireState.X)
+        val d = signal("d", SysBit.X)
+        val q = signal("q", SysBit.X)
+        val dir = signal("dir", SysBit.X)
         val clk = clockedSignal("clk", time(20, TimeUnit.NS))
 
         val ff = SReg("my", digPerWord, this)

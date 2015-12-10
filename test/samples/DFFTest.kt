@@ -8,7 +8,7 @@ class DFFTest {
 
     private class Testbench(name: String, parent: SysModule): SysModule(name, parent) {
 
-        val d = output<SysWireState>("d")
+        val d = output<SysBit>("d")
 
         val clk = wireInput("clk")
         val q   = wireInput("q")
@@ -19,7 +19,7 @@ class DFFTest {
         init {
             function(clk) {
                 if (it is SysWait.Initialize) {
-                    d.value = SysWireState.X
+                    d.value = SysBit.X
                 } else {
                     when (counter) {
                         0 -> {
@@ -32,7 +32,7 @@ class DFFTest {
                                 assert(q.zero) { "q should be false after q = false and D = 0" }
 
                             // All changes at clock N are received at clock N+1 and processed at clock N+2
-                            d.value = SysWireState.ONE
+                            d.value = SysBit.ONE
                         }
                         2 -> {
                             if (phase == 0)
@@ -40,7 +40,7 @@ class DFFTest {
                             else
                                 assert(q.zero) { "q should be false after q = false and D = 0" }
 
-                            d.value = SysWireState.ZERO
+                            d.value = SysBit.ZERO
                         }
                         3 -> {
                             assert(q.one) { "q should be true after D = 1" }
@@ -63,10 +63,10 @@ class DFFTest {
     }
 
     private class Top : SysTopModule("top") {
-        val d = signal("d", SysWireState.X)
+        val d = signal("d", SysBit.X)
 
         val clk = clockedSignal("clk", time(20, TimeUnit.NS))
-        val q = signal("q", SysWireState.X)
+        val q = signal("q", SysBit.X)
 
         val ff = DFF("my", this)
 
@@ -84,12 +84,12 @@ class DFFTest {
     }
 
     private class NotTestbench : SysTopModule("top") {
-        val d = signal("d", SysWireState.X)
+        val d = signal("d", SysBit.X)
 
         val clk = clockedSignal("clk", time(20, TimeUnit.NS))
-        val q = wireSignal("q", SysWireState.X)
+        val q = wireSignal("q", SysBit.X)
 
-        val swapOrOne = signal("en", SysWireState.X)
+        val swapOrOne = signal("en", SysBit.X)
 
         val ff = DFF("my", this)
         val andNot = SysAndNotModule("andNot", this)
@@ -101,11 +101,11 @@ class DFFTest {
             stagedFunction(clk) {
                 stage {
                     assert(q.x)
-                    swapOrOne.value = SysWireState.ZERO
+                    swapOrOne.value = SysBit.ZERO
                 }
                 stage {
                     assert(q.x)
-                    swapOrOne.value = SysWireState.ONE
+                    swapOrOne.value = SysBit.ONE
                 }
                 stage {
                     assert(q.one)

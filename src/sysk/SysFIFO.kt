@@ -29,10 +29,10 @@ open class SysFifo<T> internal constructor(
     val full: Boolean
         get() = fifo.size == capacity
 
-    open var push: SysWireState = SysWireState.X
+    open var push = SysBit.X
         set(value) = push()
 
-    open var pop: SysWireState = SysWireState.X
+    open var pop = SysBit.X
         set(value) = pop()
 
     internal open fun pop() {
@@ -65,7 +65,7 @@ open class SysFifo<T> internal constructor(
 
 open class SysWireFifo internal constructor(
         capacity: Int, name: String, scheduler: SysScheduler, parent: SysObject? = null
-) : SysFifo<SysWireState>(capacity, name, SysWireState.X, scheduler, parent) {
+) : SysFifo<SysBit>(capacity, name, SysBit.X, scheduler, parent) {
 
     val posEdgeEvent = SysWait.Event("posEdgeEvent", scheduler)
 
@@ -95,7 +95,7 @@ open class SysAsynchronousFifo<T> internal constructor(
         capacity: Int, name: String, startValue: T, scheduler: SysScheduler, parent: SysObject? = null
 ) : SysFifo<T>(capacity, name, startValue, scheduler, parent) {
 
-    override var push: SysWireState = SysWireState.X
+    override var push = SysBit.X
         get() = throw UnsupportedOperationException(
                 "SysAsynchronousFifo $name: Read is not supported for push port.")
         set(value) {
@@ -103,7 +103,7 @@ open class SysAsynchronousFifo<T> internal constructor(
             field = value;
         }
 
-    override var pop: SysWireState = SysWireState.X
+    override var pop = SysBit.X
         get() = throw UnsupportedOperationException(
                 "SysAsynchronousFifo $name: Read is not supported for pop port.")
         set(value) {

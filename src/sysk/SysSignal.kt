@@ -54,8 +54,8 @@ open class SysSignal<T> internal constructor(
 }
 
 open class SysWireSignal internal constructor(
-        name: String, scheduler: SysScheduler, startValue: SysWireState = SysWireState.X, parent: SysObject? = null
-): SysSignal<SysWireState>(name, startValue, scheduler, parent), SysWireRead {
+        name: String, scheduler: SysScheduler, startValue: SysBit = SysBit.X, parent: SysObject? = null
+): SysSignal<SysBit>(name, startValue, scheduler, parent), SysWireRead {
 
     override val posEdgeEvent = SysWait.Event("posEdgeEvent", scheduler)
 
@@ -87,7 +87,7 @@ class SysClockedSignal internal constructor(
         name: String,
         public val period: SysWait.Time,
         private val scheduler: SysScheduler,
-        startValue: SysWireState = SysWireState.ZERO,
+        startValue: SysBit = SysBit.ZERO,
         parent: SysObject? = null
 ): SysWireSignal(name, scheduler, startValue, parent) {
 

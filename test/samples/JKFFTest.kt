@@ -7,8 +7,8 @@ class JKFFTest {
 
     private class Testbench(name: String, parent: SysModule): SysModule(name, parent) {
 
-        val j = output<SysWireState>("j")
-        val k = output<SysWireState>("k")
+        val j = output<SysBit>("j")
+        val k = output<SysBit>("k")
 
         val clk = wireInput("clk")
         val q   = wireInput("q")
@@ -16,8 +16,8 @@ class JKFFTest {
         init {
             stagedFunction(clk) {
                 initStage {
-                    j.value = SysWireState.ZERO
-                    k.value = SysWireState.ZERO
+                    j.value = SysBit.ZERO
+                    k.value = SysBit.ZERO
                 }
                 stage {
                     assert(q.zero) { "q should be false at the beginning" }
@@ -26,27 +26,27 @@ class JKFFTest {
                     stage {
                         assert(q.zero) { "q should be false after q = true and JK = 11" }
                         // All changes at clock N are received at clock N+1 and processed at clock N+2
-                        j.value = SysWireState.ONE
+                        j.value = SysBit.ONE
                     }
                     stage {
                         assert(q.zero) { "q should be false after q = false and JK = 00" }
-                        j.value = SysWireState.ZERO
+                        j.value = SysBit.ZERO
                     }
                     stage {
                         assert(q.one) { "q should be true after JK = 10" }
-                        k.value = SysWireState.ONE
+                        k.value = SysBit.ONE
                     }
                     stage {
                         assert(q.one) { "q should be true after q = true and JK = 00" }
-                        j.value = SysWireState.ONE
+                        j.value = SysBit.ONE
                     }
                     stage {
                         assert(q.zero) { "q should be false after JK = 01" }
                     }
                     stage {
                         assert(q.one) { "q should be true after q = false and JK = 11" }
-                        j.value = SysWireState.ZERO
-                        k.value = SysWireState.ZERO
+                        j.value = SysBit.ZERO
+                        k.value = SysBit.ZERO
                     }
                 }
                 stage {
@@ -57,9 +57,9 @@ class JKFFTest {
     }
 
     private class Top: SysTopModule("top", SysScheduler()) {
-        val j = signal("j", SysWireState.ZERO)
-        val k = signal("k", SysWireState.ZERO)
-        val q = signal("q", SysWireState.ZERO)
+        val j = signal("j", SysBit.ZERO)
+        val k = signal("k", SysBit.ZERO)
+        val q = signal("q", SysBit.ZERO)
         val clk = clockedSignal("clk", time(20, TimeUnit.NS))
 
         val ff = JKFF("my", this)
