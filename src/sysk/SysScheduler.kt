@@ -84,7 +84,8 @@ class SysScheduler {
         when (wait) {
             is SysWait.Initialize, is SysWait.Event ->
                 if (wait in events) wait else null
-            is SysWait.Finder -> wait().let { if (it in events) it else null }
+            // Temporary (wait) (here and below in time): see KT-10483
+            is SysWait.Finder -> (wait)().let { if (it in events) it else null }
             is SysWait.Time -> if (wait <= currentTime) wait else null
             is SysWait.OneOf -> {
                 for (element in wait.elements) {
@@ -100,7 +101,7 @@ class SysScheduler {
     private fun time(wait: SysWait): SysWait.Time =
         when (wait) {
             is SysWait.Event -> happenTime(wait).let { if (it <= currentTime) currentTime else it }
-            is SysWait.Finder -> wait()?.let { if (happenTime(it) <= currentTime) currentTime else null} ?: SysWait.Time.INFINITY
+            is SysWait.Finder -> (wait)()?.let { if (happenTime(it) <= currentTime) currentTime else null} ?: SysWait.Time.INFINITY
             is SysWait.Time -> wait
             is SysWait.OneOf -> wait.elements.map { time(it) }.min() ?: SysWait.Time.INFINITY
             else -> SysWait.Time.INFINITY
