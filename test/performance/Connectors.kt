@@ -89,7 +89,13 @@ class Connectors {
                 parent = null
             }
 
-            override public fun toString() = "Status ${parent!!.name}: ${toString(description)}"
+            override public fun toString(): String {
+                if (parent == null) {
+                    return "Undefined"
+                } else {
+                    return "Status ${parent!!.name}: [${toString(description)}]"
+                }
+            }
 
             private fun toString(array: Array<SysInteger>): String {
                 val str = StringBuilder()
@@ -470,7 +476,6 @@ class Connectors {
             val addressBus = wireBus("addressBus")
             val commandBus = wireBus("commandBus")
             val assertModule = AssertModule("AM", this)
-            AssertModule.Status.registerUndefined()
             val logFifoRam_1 = asynchronousFifo(10, "logFifo", undefined<AssertModule.Status>())
             val logFifoRam_2 = asynchronousFifo(10, "logFifo", undefined<AssertModule.Status>())
             val logFifoCpu = asynchronousFifo(10, "logFifo", undefined<AssertModule.Status>())
