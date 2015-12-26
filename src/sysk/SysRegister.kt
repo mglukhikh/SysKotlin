@@ -1,11 +1,11 @@
-package samples
+package sysk
 
 import sysk.*
 
 /**
  * Register for storing any kind of information
  */
-public class Register <T : SysData> (name: String, defValue: T, parent: SysModule): SysModule(name, parent) {
+public class SysRegister <T : SysData> (name: String, defValue: T, parent: SysModule): SysModule(name, parent) {
 
     val d = input<T>("d")      // data input
     val en = bitInput("en")   // enable
@@ -16,7 +16,7 @@ public class Register <T : SysData> (name: String, defValue: T, parent: SysModul
 
     init {
         function(clk, initialize = false) {
-            // TODO [veronika]: tests
+            // TODO [mglukhikh]: tests
             if (en.one) {
                 q.value = d.value
                 state = d.value
