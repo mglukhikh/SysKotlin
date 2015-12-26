@@ -4,8 +4,8 @@ import sysk.*
 
 public class TFF(name: String, parent: SysModule) : SysModule(name, parent) {
 
-    val t = wireInput("t")
-    val clk = wireInput("clk")
+    val t = bitInput("t")
+    val clk = bitInput("clk")
 
     private var state = SysBit.ZERO
     val q = output<SysBit>("q")

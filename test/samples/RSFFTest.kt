@@ -10,8 +10,8 @@ class RSFFTest {
         val r = output<SysBit>("j")
         val s = output<SysBit>("k")
 
-        val clk = wireInput("clk")
-        val q   = wireInput("q")
+        val clk = bitInput("clk")
+        val q   = bitInput("q")
 
         private var counter = 0
         private var phase = 0

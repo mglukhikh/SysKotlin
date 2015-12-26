@@ -330,7 +330,7 @@ class SysInteger(
         return true
     }
 
-    companion object {
+    companion object : SysDataCompanion<SysInteger> {
 
         val MAX_WIDTH: Int = 64
 
@@ -419,10 +419,7 @@ class SysInteger(
             }
         }
 
-        fun registerUndefined(): SysData {
-            val undefined = SysInteger(arrayOf(SysBit.X))
-            UndefinedCollection.register(SysInteger::class, undefined)
-            return undefined
-        }
+        override val undefined: SysInteger
+            get() = SysInteger(arrayOf(SysBit.X))
     }
 }

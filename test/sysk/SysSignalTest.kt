@@ -5,9 +5,9 @@ import org.junit.Test
 class SysSignalTest {
 
     @Test
-    fun wire() {
+    fun bit() {
         val scheduler = SysScheduler()
-        val first = SysWireSignal("first", scheduler, SysBit.X)
+        val first = SysBitSignal("first", scheduler, SysBit.X)
         assert(first.x)
         first.value = SysBit.ONE
         assert(first.x)

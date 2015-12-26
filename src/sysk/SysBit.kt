@@ -12,12 +12,10 @@ enum class SysBit(
     X(x = true),
     Z(z = true);
 
-    companion object {
+    companion object : SysDataCompanion<SysBit> {
 
-        fun registerUndefined(): SysData {
-            UndefinedCollection.register(SysBit::class, SysBit.X)
-            return SysBit.X
-        }
+        override val undefined: SysBit
+            get() = SysBit.X
     }
 
     operator fun not() = when (this) {

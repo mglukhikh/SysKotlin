@@ -9,8 +9,8 @@ class PRegTest {
     private class Testbench(name: String, digPerWord: Int, parent: SysModule): SysModule(name, parent) {
 
         val d = Array(digPerWord, {i -> output<SysBit>("d" + i.toString())})
-        val clk = wireInput("clk")
-        val q   = Array(digPerWord, {i -> wireInput("q" + i.toString())})
+        val clk = bitInput("clk")
+        val q   = Array(digPerWord, {i -> bitInput("q" + i.toString())})
 
         private var counter = 0
         private var phase = 0

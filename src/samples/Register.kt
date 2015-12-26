@@ -8,8 +8,8 @@ import sysk.*
 public class Register <T : SysData> (name: String, defValue: T, parent: SysModule): SysModule(name, parent) {
 
     val d = input<T>("d")      // data input
-    val en = wireInput("en")   // enable
-    val clk = wireInput("clk") // clock
+    val en = bitInput("en")   // enable
+    val clk = bitInput("clk") // clock
 
     private var state = defValue
     val q = output<T>("q")     // data output

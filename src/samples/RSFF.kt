@@ -4,9 +4,9 @@ import sysk.*
 
 class RSFF(name: String, parent: SysModule): SysModule(name, parent) {
 
-    val r   = wireInput("r")
-    val s   = wireInput("s")
-    val clk = wireInput("clk")
+    val r   = bitInput("r")
+    val s   = bitInput("s")
+    val clk = bitInput("clk")
 
     private var state = SysBit.X
     val q = output<SysBit>("q")

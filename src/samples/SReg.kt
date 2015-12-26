@@ -4,9 +4,9 @@ import sysk.*
 
 public class SReg(name: String, digPerWord: Int, parent: SysModule) : SysModule(name, parent) {
 
-    val d = wireInput("d")
-    val clk = wireInput("clk")
-    val dir = wireInput("dir")  //right: e = 0, left: e = 1
+    val d = bitInput("d")
+    val clk = bitInput("clk")
+    val dir = bitInput("dir")  //right: e = 0, left: e = 1
     val q = output<SysBit>("q")
 
     val trigQ = Array(digPerWord, { i -> SysBit.X })

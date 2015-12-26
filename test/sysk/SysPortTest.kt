@@ -41,7 +41,7 @@ class SysPortTest {
 
     @Test
     fun SysBusPort() {
-        var connector = SysWireBus("connector", SysScheduler())
+        var connector = SysBitBus("connector", SysScheduler())
         connector.addWire()
         connector.addWire()
         connector.addWire()

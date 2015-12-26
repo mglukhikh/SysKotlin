@@ -8,8 +8,8 @@ class SysSimpleAutomataTest {
     class SysLatchStagedTester : SysTopModule() {
         val dut = LatchTriggerMoore("latch", this)
 
-        val x = wireSignal("x")
-        val y = wireSignal("y")
+        val x = bitSignal("x")
+        val y = bitSignal("y")
 
         val clk = clockedSignal("clk", time(20, TimeUnit.NS))
 
@@ -66,8 +66,8 @@ class SysSimpleAutomataTest {
 
         val dut = LatchTriggerMoore("latch", this)
 
-        val x = wireSignal("x")
-        val y = wireSignal("y")
+        val x = bitSignal("x")
+        val y = bitSignal("y")
 
         val clk = clockedSignal("clk", time(20, TimeUnit.NS))
 
@@ -124,8 +124,8 @@ class SysSimpleAutomataTest {
 
         val dut = CountTriggerMoore("count", this)
 
-        val x = wireSignal("x")
-        val y = wireSignal("y")
+        val x = bitSignal("x")
+        val y = bitSignal("y")
 
         val clk = clockedSignal("clk", time(20, TimeUnit.NS))
 

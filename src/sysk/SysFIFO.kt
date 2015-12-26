@@ -63,7 +63,7 @@ open class SysFifo<T : SysData> internal constructor(
     override fun toString() = fifo.toString()
 }
 
-open class SysWireFifo internal constructor(
+open class SysBitFifo internal constructor(
         capacity: Int, name: String, scheduler: SysScheduler, parent: SysObject? = null
 ) : SysFifo<SysBit>(capacity, name, SysBit.X, scheduler, parent) {
 

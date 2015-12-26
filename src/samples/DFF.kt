@@ -7,8 +7,8 @@ import sysk.*
  */
 public class DFF (name: String, parent: SysModule): SysModule(name, parent) {
 
-    val d = wireInput("d")
-    val clk = wireInput("clk")
+    val d = bitInput("d")
+    val clk = bitInput("clk")
 
     val q = output<SysBit>("q")
 

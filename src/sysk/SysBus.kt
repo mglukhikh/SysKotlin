@@ -37,7 +37,7 @@ abstract class SysBus<T : SysData> internal constructor(
     internal abstract fun update()
 }
 
-open class SysWireBus internal constructor(
+open class SysBitBus internal constructor(
         name: String, scheduler: SysScheduler, parent: SysObject? = null
 ) : SysBus<SysBit>(name, scheduler, parent) {
 

@@ -57,16 +57,16 @@ open class SysInput<T : SysData> internal constructor(
 
 }
 
-class SysWireInput internal constructor(
-        name: String, parent: SysObject? = null, signalRead: SysWireRead? = null
+class SysBitInput internal constructor(
+        name: String, parent: SysObject? = null, signalRead: SysBitRead? = null
 ) : SysInput<SysBit>(name, parent, signalRead), SysEdged {
 
     override val posEdgeEvent: SysWait.Finder = object : SysWait.Finder() {
-        override fun invoke() = (bound as? SysWireRead)?.posEdgeEvent
+        override fun invoke() = (bound as? SysBitRead)?.posEdgeEvent
     }
 
     override val negEdgeEvent: SysWait.Finder = object : SysWait.Finder() {
-        override fun invoke() = (bound as? SysWireRead)?.negEdgeEvent
+        override fun invoke() = (bound as? SysBitRead)?.negEdgeEvent
     }
 
     val zero: Boolean

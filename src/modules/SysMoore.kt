@@ -16,7 +16,7 @@ open class SysUnaryMoore<Input : SysData, State, Output : SysData>(
 
     val x = createInput("x")
 
-    val clk = wireInput("clk")
+    val clk = bitInput("clk")
 
     val y = output<Output>("y")
 
@@ -34,7 +34,7 @@ open class SysUnaryMoore<Input : SysData, State, Output : SysData>(
     }
 }
 
-open class SysUnaryWireMoore<State, Output : SysData>(
+open class SysUnaryBitMoore<State, Output : SysData>(
         transition: (State, SysBit) -> State,
         result: (State) -> Output,
         state: State,
@@ -42,10 +42,10 @@ open class SysUnaryWireMoore<State, Output : SysData>(
         parent: SysModule
 ): SysUnaryMoore<SysBit, State, Output>(transition, result, state, name, parent) {
 
-    override fun createInput(name: String) = wireInput(name)
+    override fun createInput(name: String) = bitInput(name)
 }
 
-class LatchTriggerMoore(name: String, parent: SysModule): SysUnaryWireMoore<SysBit, SysBit>(
+class LatchTriggerMoore(name: String, parent: SysModule): SysUnaryBitMoore<SysBit, SysBit>(
         { prev: SysBit, data: SysBit -> data },
         { it },
         SysBit.X,
@@ -53,7 +53,7 @@ class LatchTriggerMoore(name: String, parent: SysModule): SysUnaryWireMoore<SysB
         parent
 )
 
-class CountTriggerMoore(name: String, parent: SysModule): SysUnaryWireMoore<SysBit, SysBit>(
+class CountTriggerMoore(name: String, parent: SysModule): SysUnaryBitMoore<SysBit, SysBit>(
         { prev: SysBit, data: SysBit ->
             when (data) {
                 SysBit.ONE -> !prev
@@ -82,7 +82,7 @@ open class SysBinaryMoore<Input1 : SysData, Input2 : SysData, State, Output : Sy
 
     val x2 = createInput2("x2")
 
-    val clk = wireInput("clk")
+    val clk = bitInput("clk")
 
     val y = output<Output>("y")
 
@@ -95,7 +95,7 @@ open class SysBinaryMoore<Input1 : SysData, Input2 : SysData, State, Output : Sy
     }
 }
 
-open class SysBinaryWireMoore<State, Output : SysData>(
+open class SysBinaryBitMoore<State, Output : SysData>(
         transition: (State, SysBit, SysBit) -> State,
         result: (State) -> Output,
         state: State,
@@ -103,12 +103,12 @@ open class SysBinaryWireMoore<State, Output : SysData>(
         parent: SysModule
 ): SysBinaryMoore<SysBit, SysBit, State, Output>(transition, result, state, name, parent) {
 
-    override fun createInput1(name: String) = wireInput(name)
+    override fun createInput1(name: String) = bitInput(name)
 
-    override fun createInput2(name: String) = wireInput(name)
+    override fun createInput2(name: String) = bitInput(name)
 }
 
-class SetResetTriggerMoore(name: String, parent: SysModule): SysBinaryWireMoore<SysBit, SysBit>(
+class SetResetTriggerMoore(name: String, parent: SysModule): SysBinaryBitMoore<SysBit, SysBit>(
         { prev: SysBit, set: SysBit, reset: SysBit ->
             if (set.zero && reset.zero) prev
             else if (reset.one && set.zero) SysBit.ZERO
@@ -121,7 +121,7 @@ class SetResetTriggerMoore(name: String, parent: SysModule): SysBinaryWireMoore<
         parent
 )
 
-class JumpKeepTriggerMoore(name: String, parent: SysModule): SysBinaryWireMoore<SysBit, SysBit>(
+class JumpKeepTriggerMoore(name: String, parent: SysModule): SysBinaryBitMoore<SysBit, SysBit>(
         { prev: SysBit, jump: SysBit, keep: SysBit ->
             if (jump.zero && keep.zero) prev
             else if (keep.one && jump.zero) SysBit.ZERO

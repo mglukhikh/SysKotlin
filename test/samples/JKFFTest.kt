@@ -10,8 +10,8 @@ class JKFFTest {
         val j = output<SysBit>("j")
         val k = output<SysBit>("k")
 
-        val clk = wireInput("clk")
-        val q   = wireInput("q")
+        val clk = bitInput("clk")
+        val q   = bitInput("q")
 
         init {
             stagedFunction(clk) {

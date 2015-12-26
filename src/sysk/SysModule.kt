@@ -58,17 +58,20 @@ open class SysModule internal constructor(
     protected fun <T : SysData> input(name: String, signalRead: SysSignalRead<T>? = null): SysInput<T> =
             SysInput(name, this, signalRead)
 
-    protected fun wireInput(name: String, signalRead: SysWireRead? = null): SysWireInput =
-            SysWireInput(name, this, signalRead)
+    protected fun bitInput(name: String, signalRead: SysBitRead? = null): SysBitInput =
+            SysBitInput(name, this, signalRead)
 
     protected fun <T : SysData> output(name: String, signalWrite: SysSignalWrite<T>? = null): SysOutput<T> =
             SysOutput(name, this, signalWrite)
 
+    protected inline fun <reified T : SysData> signal(name: String): SysSignal<T> =
+            signal(name, undefined<T>())
+
     protected fun <T : SysData> signal(name: String, startValue: T): SysSignal<T> =
             SysSignal(name, startValue, scheduler, this)
 
-    protected fun wireSignal(name: String, startValue: SysBit = SysBit.X) =
-            SysWireSignal(name, scheduler, startValue, this)
+    protected fun bitSignal(name: String, startValue: SysBit = SysBit.X) =
+            SysBitSignal(name, scheduler, startValue, this)
 
     protected fun clockedSignal(name: String, period: SysWait.Time, startValue: SysBit = SysBit.ZERO) =
             SysClockedSignal(name, period, scheduler, startValue)
@@ -77,23 +80,23 @@ open class SysModule internal constructor(
 
     protected fun <T : SysData> fifoInput(name: String, fifo: SysFifo<T>? = null) = SysFifoInput<T>(name, this, fifo)
 
-    protected fun wireFifoOutput(name: String, fifo: SysWireFifo? = null) = SysFifoOutput(name, this, fifo)
+    protected fun bitFifoOutput(name: String, fifo: SysBitFifo? = null) = SysFifoOutput(name, this, fifo)
 
-    protected fun wireFifoInput(name: String, fifo: SysWireFifo? = null) = SysFifoInput(name, this, fifo)
+    protected fun bitFifoInput(name: String, fifo: SysBitFifo? = null) = SysFifoInput(name, this, fifo)
 
     protected fun <T : SysData> fifo(capacity: Int, name: String, startValue: T) =
             SysFifo<T>(capacity, name, startValue, scheduler, this)
 
-    protected fun wireFifo(capacity: Int, name: String) = SysWireFifo(capacity, name, scheduler, this)
+    protected fun bitFifo(capacity: Int, name: String) = SysBitFifo(capacity, name, scheduler, this)
 
     protected fun <T : SysData> asynchronousFifo(capacity: Int, name: String, startValue: T) =
             SysAsynchronousFifo<T>(capacity, name, startValue, scheduler, this)
 
     protected fun <T : SysData> busPort(name: String, bus: SysBus<T>? = null) = SysBusPort<T>(name, this, bus)
 
-    protected fun wireBusPort(name: String, bus: SysWireBus? = null) = SysBusPort(name, this, bus)
+    protected fun bitBusPort(name: String, bus: SysBitBus? = null) = SysBusPort(name, this, bus)
 
-    protected fun wireBus(name: String) = SysWireBus(name, scheduler, this)
+    protected fun bitBus(name: String) = SysBitBus(name, scheduler, this)
 
     protected fun <T : SysData> priorityBus(name: String) = SysPriorityBus<T>(name, scheduler, this)
 

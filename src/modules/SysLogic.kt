@@ -21,14 +21,14 @@ open class SysUnaryModule<Input : SysData, Output : SysData>(
     }
 }
 
-open class SysUnaryWireModule<Output : SysData>(
+open class SysUnaryBitModule<Output : SysData>(
         operation: (SysBit) -> Output, name: String, parent: SysModule
 ): SysUnaryModule<SysBit, Output>(operation, name, parent) {
 
-    override fun createInput(name: String) = wireInput(name)
+    override fun createInput(name: String) = bitInput(name)
 }
 
-class SysNotModule(name: String, parent: SysModule): SysUnaryWireModule<SysBit>({ it.not() }, name, parent)
+class SysNotModule(name: String, parent: SysModule): SysUnaryBitModule<SysBit>({ it.not() }, name, parent)
 
 open class SysBinaryModule<Input1 : SysData, Input2 : SysData, Output : SysData>(
         operation: (Input1, Input2) -> Output, name: String, parent: SysModule
@@ -51,20 +51,20 @@ open class SysBinaryModule<Input1 : SysData, Input2 : SysData, Output : SysData>
     }
 }
 
-open class SysBinaryWireModule<Output : SysData>(
+open class SysBinaryBitModule<Output : SysData>(
         operation: (SysBit, SysBit) -> Output, name: String, parent: SysModule
 ): SysBinaryModule<SysBit, SysBit, Output>(operation, name, parent) {
 
-    override fun createInput1(name: String) = wireInput(name)
+    override fun createInput1(name: String) = bitInput(name)
 
-    override fun createInput2(name: String) = wireInput(name)
+    override fun createInput2(name: String) = bitInput(name)
 }
 
 class SysOrModule(name: String, parent: SysModule):
-        SysBinaryWireModule<SysBit>({ x1, x2 -> x1.or(x2) }, name, parent)
+        SysBinaryBitModule<SysBit>({ x1, x2 -> x1.or(x2) }, name, parent)
 
 class SysAndModule(name: String, parent: SysModule):
-        SysBinaryWireModule<SysBit>({ x1, x2 -> x1.and(x2) }, name, parent)
+        SysBinaryBitModule<SysBit>({ x1, x2 -> x1.and(x2) }, name, parent)
 
 class SysAndNotModule(name: String, parent: SysModule):
-        SysBinaryWireModule<SysBit>({ x1, x2 -> x1.and(x2).not() }, name, parent)
+        SysBinaryBitModule<SysBit>({ x1, x2 -> x1.and(x2).not() }, name, parent)

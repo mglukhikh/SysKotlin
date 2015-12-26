@@ -313,7 +313,7 @@ class SysBigInteger(
         return "$value[$width]"
     }
 
-    companion object {
+    companion object : SysDataCompanion<SysBigInteger> {
 
         fun uninitialized(width: Int) = SysBigInteger(width.toShort())
 
@@ -435,10 +435,7 @@ class SysBigInteger(
             return mask.toTypedArray();
         }
 
-        fun registerUndefined(): SysData {
-            val undefined = SysBigInteger(arrayOf(SysBit.X))
-            UndefinedCollection.register(SysBigInteger::class, undefined)
-            return undefined
-        }
+        override val undefined: SysBigInteger
+            get() = SysBigInteger(arrayOf(SysBit.X))
     }
 }

@@ -11,8 +11,8 @@ class SysSimpleFunctionTest {
 
         val dut = SysNotModule("not", this)
 
-        val x = wireSignal("x")
-        val y = wireSignal("y")
+        val x = bitSignal("x")
+        val y = bitSignal("y")
 
         init {
             bind(dut.x to x)
@@ -49,9 +49,9 @@ class SysSimpleFunctionTest {
     class SysOrTester: SysTopModule() {
         val dut = SysOrModule("or", this)
 
-        val x1 = wireSignal("x1")
-        val x2 = wireSignal("x2")
-        val y = wireSignal("y")
+        val x1 = bitSignal("x1")
+        val x2 = bitSignal("x2")
+        val y = bitSignal("y")
 
         init {
             bind(dut.x1 to x1, dut.x2 to x2)
@@ -101,9 +101,9 @@ class SysSimpleFunctionTest {
     class SysAndTester: SysTopModule() {
         val dut = SysAndModule("and", this)
 
-        val x1 = wireSignal("x1")
-        val x2 = wireSignal("x2")
-        val y = wireSignal("y")
+        val x1 = bitSignal("x1")
+        val x2 = bitSignal("x2")
+        val y = bitSignal("y")
 
         init {
             bind(dut.x1 to x1, dut.x2 to x2)

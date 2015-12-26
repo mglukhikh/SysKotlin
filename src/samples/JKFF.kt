@@ -4,9 +4,9 @@ import sysk.*
 
 class JKFF(name: String, parent: SysModule) : SysModule(name, parent) {
 
-    val j = wireInput("j")
-    val k = wireInput("k")
-    val clk = wireInput("clk")
+    val j = bitInput("j")
+    val k = bitInput("k")
+    val clk = bitInput("clk")
 
     private var state = SysBit.ZERO
     val q = output<SysBit>("q")

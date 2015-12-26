@@ -4,8 +4,8 @@ import org.junit.Test
 
 class SysBusTest {
     @Test
-    fun SysWireBus() {
-        var connector = SysWireBus("connector", SysScheduler())
+    fun sysBitBus() {
+        var connector = SysBitBus("connector", SysScheduler())
         connector.addWire()
         connector.addWire()
         connector.addWire()

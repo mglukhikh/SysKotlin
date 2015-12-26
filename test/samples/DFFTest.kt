@@ -10,8 +10,8 @@ class DFFTest {
 
         val d = output<SysBit>("d")
 
-        val clk = wireInput("clk")
-        val q   = wireInput("q")
+        val clk = bitInput("clk")
+        val q   = bitInput("q")
 
         private var counter = 0
         private var phase = 0
@@ -87,7 +87,7 @@ class DFFTest {
         val d = signal("d", SysBit.X)
 
         val clk = clockedSignal("clk", time(20, TimeUnit.NS))
-        val q = wireSignal("q", SysBit.X)
+        val q = bitSignal("q", SysBit.X)
 
         val swapOrOne = signal("en", SysBit.X)
 

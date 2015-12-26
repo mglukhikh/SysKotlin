@@ -5,8 +5,8 @@ import org.junit.Test
 class SysFifoTest {
 
     @Test
-    fun sysWireFifo() {
-        val fifo = SysWireFifo(4, "Fifo", SysScheduler())
+    fun sysBitFifo() {
+        val fifo = SysBitFifo(4, "Fifo", SysScheduler())
         assert("Fifo" == fifo.name)
         assert(SysBit.X == fifo.output)
         assert(0 == fifo.size)

@@ -10,8 +10,8 @@ class SRegTest {
         val d   = output<SysBit>("d")
         val dir = output<SysBit>("dir")
 
-        val clk = wireInput("clk")
-        val q   = wireInput("q")
+        val clk = bitInput("clk")
+        val q   = bitInput("q")
 
         private var counter = 0
         private var phase = 0
