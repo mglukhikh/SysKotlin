@@ -420,7 +420,7 @@ class SysInteger(
         }
 
         fun registerUndefined(): SysData {
-            val undefined = SysInteger(arrayOf<SysBit>(SysBit.X))
+            val undefined = SysInteger(arrayOf(SysBit.X))
             UndefinedCollection.register(SysInteger::class, undefined)
             return undefined
         }

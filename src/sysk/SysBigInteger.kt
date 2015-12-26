@@ -436,7 +436,7 @@ class SysBigInteger(
         }
 
         fun registerUndefined(): SysData {
-            val undefined = SysBigInteger(arrayOf<SysBit>(SysBit.X))
+            val undefined = SysBigInteger(arrayOf(SysBit.X))
             UndefinedCollection.register(SysBigInteger::class, undefined)
             return undefined
         }

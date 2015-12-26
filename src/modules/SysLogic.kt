@@ -2,8 +2,9 @@ package modules
 
 import sysk.SysModule
 import sysk.SysBit
+import sysk.SysData
 
-open class SysUnaryModule<Input, Output>(
+open class SysUnaryModule<Input : SysData, Output : SysData>(
         operation: (Input) -> Output, name: String, parent: SysModule
 ): SysModule(name, parent) {
 
@@ -20,7 +21,7 @@ open class SysUnaryModule<Input, Output>(
     }
 }
 
-open class SysUnaryWireModule<Output>(
+open class SysUnaryWireModule<Output : SysData>(
         operation: (SysBit) -> Output, name: String, parent: SysModule
 ): SysUnaryModule<SysBit, Output>(operation, name, parent) {
 
@@ -29,7 +30,7 @@ open class SysUnaryWireModule<Output>(
 
 class SysNotModule(name: String, parent: SysModule): SysUnaryWireModule<SysBit>({ it.not() }, name, parent)
 
-open class SysBinaryModule<Input1, Input2, Output>(
+open class SysBinaryModule<Input1 : SysData, Input2 : SysData, Output : SysData>(
         operation: (Input1, Input2) -> Output, name: String, parent: SysModule
 ): SysModule(name, parent) {
 
@@ -50,7 +51,7 @@ open class SysBinaryModule<Input1, Input2, Output>(
     }
 }
 
-open class SysBinaryWireModule<Output>(
+open class SysBinaryWireModule<Output : SysData>(
         operation: (SysBit, SysBit) -> Output, name: String, parent: SysModule
 ): SysBinaryModule<SysBit, SysBit, Output>(operation, name, parent) {
 

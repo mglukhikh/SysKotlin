@@ -93,7 +93,7 @@ class Connectors {
                 if (parent == null) {
                     return "Undefined"
                 } else {
-                    return "Status ${parent!!.name}: [${toString(description)}]"
+                    return "Status ${parent.name}: [${toString(description)}]"
                 }
             }
 

@@ -5,13 +5,13 @@ import sysk.*
 /**
  * Register for storing any kind of information
  */
-public class Register <T> (name: String, defValue: T, parent: SysModule): SysModule(name, parent) {
+public class Register <T : SysData> (name: String, defValue: T, parent: SysModule): SysModule(name, parent) {
 
     val d = input<T>("d")      // data input
     val en = wireInput("en")   // enable
     val clk = wireInput("clk") // clock
 
-    private var state: T = defValue
+    private var state = defValue
     val q = output<T>("q")     // data output
 
     init {

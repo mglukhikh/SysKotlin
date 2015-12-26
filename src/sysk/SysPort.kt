@@ -46,7 +46,7 @@ fun <IF : SysInterface> bindArrays(vararg pairs: Pair<Array<out SysPort<IF>>, Ar
     }
 }
 
-open class SysInput<T> internal constructor(
+open class SysInput<T : SysData> internal constructor(
         name: String, parent: SysObject? = null, signalRead: SysSignalRead<T>? = null
 ) : SysPort<SysSignalRead<T>>(name, parent, signalRead) {
 
@@ -82,7 +82,7 @@ class SysWireInput internal constructor(
 
 }
 
-open class SysOutput<T> internal constructor(
+open class SysOutput<T : SysData> internal constructor(
         name: String, parent: SysObject? = null, signalWrite: SysSignalWrite<T>? = null
 ) : SysPort<SysSignalWrite<T>>(name, parent, signalWrite) {
 
@@ -97,7 +97,7 @@ open class SysOutput<T> internal constructor(
 
 }
 
-open class SysFifoInput<T> constructor(
+open class SysFifoInput<T : SysData>(
         name: String, parent: SysObject? = null, Fifo: SysFifo<T>? = null
 ) : SysPort<SysFifo<T>>(name, parent, Fifo) {
 
@@ -137,7 +137,7 @@ open class SysFifoInput<T> constructor(
 
 }
 
-open class SysFifoOutput<T> constructor(
+open class SysFifoOutput<T : SysData> constructor(
         name: String, parent: SysObject? = null, Fifo: SysFifo<T>? = null
 ) : SysPort<SysFifo<T>>(name, parent, Fifo) {
 
@@ -180,7 +180,7 @@ open class SysFifoOutput<T> constructor(
 }
 
 
-open class SysBusPort<T> constructor(
+open class SysBusPort<T : SysData> constructor(
         name: String, parent: SysObject? = null, bus: SysBus<T>? = null
 ) : SysPort<SysBus<T>>(name, parent, bus) {
 

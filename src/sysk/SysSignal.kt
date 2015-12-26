@@ -1,6 +1,6 @@
 package sysk
 
-open class SysSignal<T> internal constructor(
+open class SysSignal<T : SysData> internal constructor(
         name: String, startValue: T, scheduler: SysScheduler, parent: SysObject? = null
 ): SysSignalRead<T>, SysSignalWrite<T>, SysObject(name, parent) {
 

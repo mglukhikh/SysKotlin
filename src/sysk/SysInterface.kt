@@ -7,7 +7,7 @@ interface SysInterface {
     val defaultEvent: SysWait.Event
 }
 
-interface SysSignalRead<T>: SysInterface {
+interface SysSignalRead<T : SysData>: SysInterface {
 
     val value: T
         get() = read()
@@ -29,7 +29,7 @@ interface SysWireRead : SysSignalRead<SysBit>, SysEdged {
     override val negEdgeEvent: SysWait.Event
 }
 
-interface SysSignalWrite<T>: SysInterface {
+interface SysSignalWrite<T : SysData>: SysInterface {
 
     var value: T
         get() { throw UnsupportedOperationException("Signal read is not supported for writer") }

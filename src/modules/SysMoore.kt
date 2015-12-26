@@ -2,8 +2,9 @@ package modules
 
 import sysk.SysModule
 import sysk.SysBit
+import sysk.SysData
 
-open class SysUnaryMoore<Input, State, Output>(
+open class SysUnaryMoore<Input : SysData, State, Output : SysData>(
         transition: (State, Input) -> State,
         result: (State) -> Output,
         private var state: State,
@@ -33,7 +34,7 @@ open class SysUnaryMoore<Input, State, Output>(
     }
 }
 
-open class SysUnaryWireMoore<State, Output>(
+open class SysUnaryWireMoore<State, Output : SysData>(
         transition: (State, SysBit) -> State,
         result: (State) -> Output,
         state: State,
@@ -65,7 +66,7 @@ class CountTriggerMoore(name: String, parent: SysModule): SysUnaryWireMoore<SysB
         parent
 )
 
-open class SysBinaryMoore<Input1, Input2, State, Output>(
+open class SysBinaryMoore<Input1 : SysData, Input2 : SysData, State, Output : SysData>(
         transition: (State, Input1, Input2) -> State,
         result: (State) -> Output,
         private var state: State,
@@ -94,7 +95,7 @@ open class SysBinaryMoore<Input1, Input2, State, Output>(
     }
 }
 
-open class SysBinaryWireMoore<State, Output>(
+open class SysBinaryWireMoore<State, Output : SysData>(
         transition: (State, SysBit, SysBit) -> State,
         result: (State) -> Output,
         state: State,

@@ -2,7 +2,7 @@ package sysk
 
 import java.util.*
 
-abstract class SysBus<T> internal constructor(
+abstract class SysBus<T : SysData> internal constructor(
         name: String, private val scheduler: SysScheduler, parent: SysObject? = null
 ) : SysInterface, SysObject(name, parent) {
 
@@ -79,7 +79,7 @@ open class SysWireBus internal constructor(
     }
 }
 
-open class SysPriorityBus<T> internal constructor(
+open class SysPriorityBus<T : SysData> internal constructor(
         name: String, scheduler: SysScheduler, parent: SysObject? = null
 ) : SysBus<SysPriorityValue<T>>(name, scheduler, parent) {
 
@@ -111,9 +111,9 @@ open class SysPriorityBus<T> internal constructor(
     }
 }
 
-class SysPriorityValue<T> constructor(final val priority: Int, final val value: T) {}
+class SysPriorityValue<T : SysData>(val priority: Int, val value: T) : SysData
 
-open class SysFifoBus<T> internal constructor(
+open class SysFifoBus<T : SysData> internal constructor(
         name: String, scheduler: SysScheduler, parent: SysObject? = null
 ) : SysBus<T>(name, scheduler, parent) {
 
