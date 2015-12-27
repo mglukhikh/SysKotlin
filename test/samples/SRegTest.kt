@@ -126,9 +126,9 @@ class SRegTest {
     private class Top : SysTopModule("top", SysScheduler()) {
         val digPerWord = 4
 
-        val d = signal("d", SysBit.X)
-        val q = signal("q", SysBit.X)
-        val dir = signal("dir", SysBit.X)
+        val d = signal<SysBit>("d")
+        val q = signal<SysBit>("q")
+        val dir = signal<SysBit>("dir")
         val clk = clockedSignal("clk", time(20, TimeUnit.NS))
 
         val ff = SReg("my", digPerWord, this)

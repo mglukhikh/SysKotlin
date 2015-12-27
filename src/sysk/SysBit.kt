@@ -14,6 +14,11 @@ enum class SysBit(
 
     companion object : SysDataCompanion<SysBit> {
 
+        init {
+            // temporary due to Kotlin reflection bug
+            UndefinedCollection.register(SysBit::class, undefined)
+        }
+
         override val undefined: SysBit
             get() = SysBit.X
     }
