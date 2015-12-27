@@ -25,7 +25,7 @@ interface StageContainer {
         return result
     }
 
-    fun <T> iterativeStage(progression: Iterable<T>, init: Stage.Iterative<T>.() -> Unit): Stage.Iterative<T> {
+    fun <T : Any> iterativeStage(progression: Iterable<T>, init: Stage.Iterative<T>.() -> Unit): Stage.Iterative<T> {
         val result = Stage.Iterative(progression, wait(), linkedListOf())
         result.init()
         stages.add(result)
@@ -81,7 +81,7 @@ sealed class Stage {
         override fun complete() = super.complete()
     }
 
-    class Iterative<T> internal constructor(
+    class Iterative<T : Any> internal constructor(
             val progression: Iterable<T>,
             private val sensitivities: SysWait,
             override val stages: MutableList<Stage>
@@ -90,24 +90,27 @@ sealed class Stage {
 
         override var stage = 0
 
-        val iterator = progression.iterator()
+        private val iterator = progression.iterator()
 
-        var it: T? = next()
-            private set
+        private var _it: T? = null
 
-        private fun next(): T? {
+        val it: T
+            get() = _it ?: throw AssertionError("Accessing loop iterator outside the loop")
+
+        init {
+            nextIteration()
+        }
+
+        private fun nextIteration() {
             if (iterator.hasNext()) {
-                return iterator.next()
-            }
-            else {
-                return null
+                _it = iterator.next()
             }
         }
 
         override fun run(event: SysWait): SysWait {
             val result = super.run(event)
             if (super.complete()) {
-                it = next()
+                nextIteration()
                 stage = 0
             }
             return result

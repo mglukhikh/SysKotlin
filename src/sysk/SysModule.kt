@@ -76,6 +76,9 @@ open class SysModule internal constructor(
     protected fun clockedSignal(name: String, period: SysWait.Time, startValue: SysBit = SysBit.ZERO) =
             SysClockedSignal(name, period, scheduler, startValue)
 
+    protected fun <T : SysData> register(name: String, startValue: T) =
+            SysRegister(name, startValue, this)
+
     protected fun <T : SysData> fifoOutput(name: String, fifo: SysFifo<T>? = null) = SysFifoOutput<T>(name, this, fifo)
 
     protected fun <T : SysData> fifoInput(name: String, fifo: SysFifo<T>? = null) = SysFifoInput<T>(name, this, fifo)

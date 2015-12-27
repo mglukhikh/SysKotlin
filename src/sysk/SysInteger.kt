@@ -386,7 +386,7 @@ class SysInteger(
             val mask = BooleanArray(width);
 
             if (width < widthByValue) {
-                throw IllegalArgumentException()
+                throw IllegalArgumentException("value = $value, width = $width, byValue = $widthByValue")
             } else {
                 mask.fill(true, mask.lastIndex + 1 - widthByValue, mask.lastIndex + 1)
 
