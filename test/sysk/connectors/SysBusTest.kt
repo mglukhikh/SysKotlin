@@ -3,7 +3,6 @@ package sysk.connectors
 import org.junit.Test
 import sysk.core.SysScheduler
 import sysk.data.SysBit
-import sysk.data.SysBusPort
 
 class SysBusTest {
     @Test

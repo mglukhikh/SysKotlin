@@ -1,6 +1,5 @@
 package sysk.data
 
-import sysk.connectors.SysBus
 import sysk.core.SysObject
 import sysk.core.SysWait
 
@@ -92,17 +91,3 @@ open class SysOutput<T : SysData> internal constructor(
         }
 }
 
-open class SysBusPort<T : SysData> constructor(
-        name: String, parent: SysObject? = null, bus: SysBus<T>? = null
-) : SysPort<SysBus<T>>(name, parent, bus) {
-
-    operator fun get(index: Int): T {
-        if (bound == null) throw IllegalStateException("Port $name is not bound")
-        return bound!![index]
-    }
-
-    fun set(value: T, index: Int) {
-        if (bound == null) throw IllegalStateException("Port $name is not bound")
-        bound!!.set(value, index, this)
-    }
-}
