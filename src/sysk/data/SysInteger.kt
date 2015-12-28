@@ -77,7 +77,7 @@ class SysInteger(
 
     /**Unary minus*/
     operator fun unaryMinus(): SysInteger {
-        return SysInteger(-value).truncate(this.width)
+        return valueOf(-value).truncate(this.width)
     }
 
     /** Subtract arg from this integer*/
@@ -285,7 +285,7 @@ class SysInteger(
         if (j < i) throw IllegalArgumentException()
         if (j >= width || i < 0) throw IndexOutOfBoundsException()
         var result = value shr i
-        return SysInteger(result).truncate(j - i + 1)
+        return valueOf(result).truncate(j - i + 1)
     }
 
     fun toSysBigInteger(): SysBigInteger {
