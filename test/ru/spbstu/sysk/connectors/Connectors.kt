@@ -75,14 +75,6 @@ class Connectors {
             public val description: Array<SysInteger>
             public val parent: SysModule?
 
-            companion object {
-                fun registerUndefined(): SysData {
-                    val undefined = Status()
-                    UndefinedCollection.register(Status::class, undefined)
-                    return undefined
-                }
-            }
-
             constructor(description: Array<SysInteger>, parent: SysModule) : super() {
                 this.description = description
                 this.parent = parent

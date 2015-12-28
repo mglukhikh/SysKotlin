@@ -7,7 +7,7 @@ import ru.spbstu.sysk.data.bind
 
 class SRegTest {
 
-    private class Testbench(name: String, digPerWord: Int, parent: SysModule): SysModule(name, parent) {
+    private class Testbench(name: String, parent: SysModule): SysModule(name, parent) {
 
         val d   = output<SysBit>("d")
         val dir = output<SysBit>("dir")
@@ -134,7 +134,7 @@ class SRegTest {
         val clk = clockedSignal("clk", time(20, TimeUnit.NS))
 
         val ff = SReg("my", digPerWord, this)
-        private val tb = Testbench("your", digPerWord, this)
+        private val tb = Testbench("your", this)
 
         init {
             bind(ff.d to d, ff.dir to dir, ff.clk to clk, tb.clk to clk, tb.q to q)
