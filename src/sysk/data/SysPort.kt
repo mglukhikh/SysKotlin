@@ -57,9 +57,6 @@ open class SysInput<T : SysData> internal constructor(
 
     val value: T
         get() = bound?.value ?: throw IllegalStateException("Port $name is not bound")
-
-    inline fun <reified T : SysData> bung(defaultValue: T = undefined<T>()): SysBung<T> = SysBung(defaultValue)
-
 }
 
 class SysBitInput internal constructor(
@@ -82,9 +79,6 @@ class SysBitInput internal constructor(
 
     val x: Boolean
         get() = value.x
-
-    fun bung(defaultValue: SysBit = SysBit.X): SysBung<SysBit> = SysBung(defaultValue)
-
 }
 
 open class SysOutput<T : SysData> internal constructor(
@@ -97,9 +91,6 @@ open class SysOutput<T : SysData> internal constructor(
             if (bound == null) throw IllegalStateException("Port $name is not bound")
             bound!!.value = value
         }
-
-    inline fun <reified T : SysData> bung(defaultValue: T = undefined<T>()): SysBung<T> = SysBung(defaultValue)
-
 }
 
 open class SysFifoInput<T : SysData>(
@@ -137,9 +128,6 @@ open class SysFifoInput<T : SysData>(
             if (bound == null) throw IllegalStateException("Port $name is not bound")
             bound!!.pop = value
         }
-
-    inline fun <reified T : SysData> bung(defaultValue: T = undefined<T>()): SysFifoBung<T> = SysFifoBung(defaultValue)
-
 }
 
 open class SysFifoOutput<T : SysData> constructor(
@@ -179,9 +167,6 @@ open class SysFifoOutput<T : SysData> constructor(
             if (bound == null) throw IllegalStateException("Port $name is not bound")
             bound!!.push = value
         }
-
-    inline fun <reified T : SysData> bung(defaultValue: T = undefined<T>()): SysFifoBung<T> = SysFifoBung(defaultValue)
-
 }
 
 
@@ -198,7 +183,4 @@ open class SysBusPort<T : SysData> constructor(
         if (bound == null) throw IllegalStateException("Port $name is not bound")
         bound!!.set(value, index, this)
     }
-
-    inline fun <reified T : SysData> bung(defaultValue: T = undefined<T>()): SysBusBung<T> = SysBusBung(defaultValue)
-
 }
