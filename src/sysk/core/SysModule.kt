@@ -85,29 +85,12 @@ open class SysModule internal constructor(
 
     protected fun <T : SysData> fifoInput(name: String, fifo: SysFifo<T>? = null) = SysFifoInput<T>(name, this, fifo)
 
-    protected fun bitFifoOutput(name: String, fifo: SysBitFifo? = null) = SysFifoOutput(name, this, fifo)
-
-    protected fun bitFifoInput(name: String, fifo: SysBitFifo? = null) = SysFifoInput(name, this, fifo)
-
-    protected fun <T : SysData> fifo(capacity: Int, name: String, startValue: T) =
-            SysFifo<T>(capacity, name, startValue, scheduler, this)
-
-    protected fun bitFifo(capacity: Int, name: String) = SysBitFifo(capacity, name, scheduler, this)
-
     protected fun <T : SysData> asynchronousFifo(capacity: Int, name: String, startValue: T) =
             SysAsynchronousFifo<T>(capacity, name, startValue, scheduler, this)
 
     protected fun <T : SysData> busPort(name: String, bus: SysBus<T>? = null) = SysBusPort<T>(name, this, bus)
 
-    protected fun bitBusPort(name: String, bus: SysBitBus? = null) = SysBusPort(name, this, bus)
-
     protected fun bitBus(name: String) = SysBitBus(name, scheduler, this)
-
-    protected fun <T : SysData> priorityBus(name: String) = SysPriorityBus<T>(name, scheduler, this)
-
-    protected fun <T : SysData> priorityValue(priority: Int, value: T) = SysPriorityValue<T>(priority, value)
-
-    protected fun <T : SysData> fifoBus(name: String) = SysFifoBus<T>(name, scheduler, this)
 
     protected fun event(name: String): SysWait.Event = SysWait.Event(name, scheduler)
 
