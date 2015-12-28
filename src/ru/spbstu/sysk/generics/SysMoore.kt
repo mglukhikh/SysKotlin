@@ -21,14 +21,14 @@ open class SysUnaryMoore<Input : SysData, State, Output : SysData>(
     val y = output<Output>("y")
 
     init {
-        stagedFunction(clk) {
-            initStage {
-                y.value = result(state)
+        stateFunction(clk) {
+            init {
+                y.value = result(this@SysUnaryMoore.state)
             }
-            infiniteStage {
+            infinite {
                 // First calculate state, then output, one tick delay is provided by clock sensitivity
-                state = transition(state, x.value)
-                y.value = result(state)
+                this@SysUnaryMoore.state = transition(this@SysUnaryMoore.state, x.value)
+                y.value = result(this@SysUnaryMoore.state)
             }
         }
     }

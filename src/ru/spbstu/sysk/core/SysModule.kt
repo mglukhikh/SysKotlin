@@ -40,16 +40,16 @@ open class SysModule internal constructor(
             function(if (positive) clock.posEdgeEvent else clock.negEdgeEvent,
                      initialize, run)
 
-    protected fun stagedFunction(sensitivities: SysWait = SysWait.Never,
-                                 init: StagedFunction.() -> Unit): StagedFunction {
-        val result = StagedFunction(sensitivities)
+    protected fun stateFunction(sensitivities: SysWait = SysWait.Never,
+                                init: SysStateFunction.() -> Unit): SysStateFunction {
+        val result = SysStateFunction(sensitivities)
         result.init()
         return result.register()
     }
 
-    protected fun stagedFunction(clock: SysEdged, positive: Boolean = true,
-                                 init: StagedFunction.() -> Unit) =
-            stagedFunction(if (positive) clock.posEdgeEvent else clock.negEdgeEvent, init)
+    protected fun stateFunction(clock: SysEdged, positive: Boolean = true,
+                                init: SysStateFunction.() -> Unit) =
+            stateFunction(if (positive) clock.posEdgeEvent else clock.negEdgeEvent, init)
 
     private fun <T : SysFunction> T.register(): T {
         scheduler.register(this)

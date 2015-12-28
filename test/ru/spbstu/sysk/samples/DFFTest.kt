@@ -100,25 +100,25 @@ class DFFTest {
             bind(ff.d to d, ff.clk to clk, andNot.x1 to q, andNot.x2 to swapOrOne)
             bind(ff.q to q, andNot.y to d)
 
-            stagedFunction(clk) {
-                stage {
+            stateFunction(clk) {
+                state {
                     assert(q.x)
                     swapOrOne.value = SysBit.ZERO
                 }
-                stage {
+                state {
                     assert(q.x)
                     swapOrOne.value = SysBit.ONE
                 }
-                stage {
+                state {
                     assert(q.one)
                 }
-                stage {
+                state {
                     assert(q.zero)
                 }
-                stage {
+                state {
                     assert(q.one)
                 }
-                stage {
+                state {
                     assert(q.zero)
                     scheduler.stop()
                 }

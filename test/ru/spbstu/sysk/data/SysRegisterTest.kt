@@ -21,12 +21,12 @@ class SysRegisterTest {
             bind(a.d to d)
             bind(a.q to q)
 
-            stagedFunction(clk) {
-                initStage {
+            stateFunction(clk) {
+                init {
                     en.value = SysBit.ZERO
                 }
-                iterativeStage(0..9) {
-                    stage {
+                forEach(0..9) {
+                    state {
                         en.value = SysBit.ONE
                         d.value = q.value + SysInteger.valueOf(1)
                         assert(q.value == SysInteger(8, it / 2)) {
@@ -34,7 +34,7 @@ class SysRegisterTest {
                         }
                     }
                 }
-                stage {
+                state {
                     scheduler.stop()
                 }
             }
@@ -69,13 +69,13 @@ class SysRegisterTest {
 
             val values = arrayOf(1, 2, 3, 5, 8, 13, 21, 34, 55)
 
-            stagedFunction(clk) {
-                initStage {
+            stateFunction(clk) {
+                init {
                     aen.value = SysBit.ZERO
                     ben.value = SysBit.ZERO
                 }
-                iterativeStage(0..17) {
-                    stage {
+                forEach(0..17) {
+                    state {
                         aen.value = SysBit.ONE
                         ben.value = SysBit.ONE
                         ad.value = bq.value
@@ -85,7 +85,7 @@ class SysRegisterTest {
                         }
                     }
                 }
-                stage {
+                state {
                     scheduler.stop()
                 }
             }

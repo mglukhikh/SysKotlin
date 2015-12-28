@@ -15,16 +15,16 @@ public class SysRegister <T : SysData> (name: String, defValue: T, parent: SysMo
     val q = output<T>("q")     // data output
 
     init {
-        stagedFunction(clk) {
-            initStage {
-                q.value = state
+        stateFunction(clk) {
+            init {
+                q.value = this@SysRegister.state
             }
-            infiniteStage {
+            infinite {
                 if (en.one) {
                     q.value = d.value
-                    state = d.value
+                    this@SysRegister.state = d.value
                 } else {
-                    q.value = state
+                    q.value = this@SysRegister.state
                 }
             }
         }

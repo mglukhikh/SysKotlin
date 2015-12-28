@@ -1,52 +1,52 @@
 package ru.spbstu.sysk.core
 
-interface StageContainer {
-    val stages: MutableList<Stage>
+interface StateContainer {
+    val states: MutableList<State>
 
-    var stage: Int
+    var state: Int
 
-    fun complete() = stage >= stages.size
+    fun complete() = state >= states.size
 
     fun wait(): SysWait
 
-    fun stage(f: () -> Unit): Stage.Atomic {
-        val result = Stage.Atomic {
+    fun state(f: () -> Unit): State.Single {
+        val result = State.Single {
             f()
             wait()
         }
-        stages.add(result)
+        states.add(result)
         return result
     }
 
-    fun complexStage(init: Stage.Complex.() -> Unit): Stage.Complex {
-        val result = Stage.Complex(wait(), linkedListOf())
+    fun block(init: State.Block.() -> Unit): State.Block {
+        val result = State.Block(wait(), linkedListOf())
         result.init()
-        stages.add(result)
+        states.add(result)
         return result
     }
 
-    fun <T : Any> iterativeStage(progression: Iterable<T>, init: Stage.Iterative<T>.() -> Unit): Stage.Iterative<T> {
-        val result = Stage.Iterative(progression, wait(), linkedListOf())
+    fun <T : Any> forEach(progression: Iterable<T>, init: State.Iterative<T>.() -> Unit): State.Iterative<T> {
+        val result = State.Iterative(progression, wait(), linkedListOf())
         result.init()
-        stages.add(result)
+        states.add(result)
         return result
     }
 
-    fun infiniteStage(f: () -> Unit): Stage.Infinite {
-        val result = Stage.Infinite {
+    fun infinite(f: () -> Unit): State.Infinite {
+        val result = State.Infinite {
             f()
             wait()
         }
-        stages.add(result)
+        states.add(result)
         return result
     }
 
     fun run(event: SysWait): SysWait {
         if (!complete()) {
-            stages[stage].let {
+            states[state].let {
                 val result = it.run(event)
                 if (it.complete()) {
-                    stage++
+                    state++
                 }
                 return result
             }
@@ -55,26 +55,26 @@ interface StageContainer {
     }
 }
 
-sealed class Stage {
+sealed class State {
 
     abstract fun run(event: SysWait): SysWait
 
     abstract fun complete(): Boolean
 
-    class Atomic internal constructor(private val f: () -> SysWait) : Stage() {
+    class Single internal constructor(private val f: () -> SysWait) : State() {
         override fun run(event: SysWait) = f()
 
         override fun complete() = true
     }
 
-    class Complex internal constructor(
+    class Block internal constructor(
             private val sensitivities: SysWait,
-            override val stages: MutableList<Stage>
-    ) : Stage(), StageContainer {
+            override val states: MutableList<State>
+    ) : State(), StateContainer {
 
         override fun wait() = sensitivities
 
-        override var stage = 0
+        override var state = 0
 
         override fun run(event: SysWait) = super.run(event)
 
@@ -84,11 +84,11 @@ sealed class Stage {
     class Iterative<T : Any> internal constructor(
             val progression: Iterable<T>,
             private val sensitivities: SysWait,
-            override val stages: MutableList<Stage>
-    ) : Stage(), StageContainer {
+            override val states: MutableList<State>
+    ) : State(), StateContainer {
         override fun wait() = sensitivities
 
-        override var stage = 0
+        override var state = 0
 
         private val iterator = progression.iterator()
 
@@ -111,7 +111,7 @@ sealed class Stage {
             val result = super.run(event)
             if (super.complete()) {
                 nextIteration()
-                stage = 0
+                state = 0
             }
             return result
         }
@@ -119,36 +119,36 @@ sealed class Stage {
         override fun complete() = !iterator.hasNext()
     }
 
-    class Infinite internal constructor(private val f: () -> SysWait) : Stage() {
+    class Infinite internal constructor(private val f: () -> SysWait) : State() {
         override fun run(event: SysWait): SysWait = f()
 
         override fun complete() = false
     }
 }
 
-class StagedFunction private constructor(
-        override val stages: MutableList<Stage>,
-        private var initStage: Stage.Atomic? = null,
+class SysStateFunction private constructor(
+        override val states: MutableList<State>,
+        private var initState: State.Single? = null,
         sensitivities: SysWait = SysWait.Never
-): SysFunction(sensitivities, initialize = true), StageContainer {
+): SysFunction(sensitivities, initialize = true), StateContainer {
     internal constructor(sensitivities: SysWait = SysWait.Never):
             this(linkedListOf(), null, sensitivities)
 
-    fun initStage(f: () -> Unit): Stage.Atomic {
-        initStage = Stage.Atomic {
+    fun init(f: () -> Unit): State.Single {
+        initState = State.Single {
             f()
             wait()
         }
-        return initStage!!
+        return initState!!
     }
 
     private fun init(event: SysWait): SysWait {
         // BUG: return infiniteStage?.run() ?: SysWait.Never, see KT-10142
-        if (initStage == null) return wait()
-        return initStage!!.run(event)
+        if (initState == null) return wait()
+        return initState!!.run(event)
     }
 
-    override var stage = 0
+    override var state = 0
 
     override fun run(event: SysWait): SysWait {
         if (event == SysWait.Initialize) {
