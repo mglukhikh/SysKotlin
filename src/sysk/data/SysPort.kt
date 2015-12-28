@@ -1,7 +1,6 @@
 package sysk.data
 
 import sysk.connectors.SysBus
-import sysk.connectors.SysFifo
 import sysk.core.SysObject
 import sysk.core.SysWait
 
@@ -92,83 +91,6 @@ open class SysOutput<T : SysData> internal constructor(
             bound!!.value = value
         }
 }
-
-open class SysFifoInput<T : SysData>(
-        name: String, parent: SysObject? = null, Fifo: SysFifo<T>? = null
-) : SysPort<SysFifo<T>>(name, parent, Fifo) {
-
-    val value: T
-        get() {
-            if (bound == null) throw IllegalStateException("Port $name is not bound")
-            return bound!!.output
-        }
-
-    val size: Int
-        get() {
-            if (bound == null) throw IllegalStateException("Port $name is not bound")
-            return bound!!.size
-        }
-
-    val full: Boolean
-        get() {
-            if (bound == null) throw IllegalStateException("Port $name is not bound")
-            return bound!!.full
-        }
-
-    val empty: Boolean
-        get() {
-            if (bound == null) throw IllegalStateException("Port $name is not bound")
-            return bound!!.empty
-        }
-
-    var pop: SysBit
-        get() = throw UnsupportedOperationException(
-                "SysFifoPort $name: Read is not supported for pop port")
-        set(value) {
-            if (bound == null) throw IllegalStateException("Port $name is not bound")
-            bound!!.pop = value
-        }
-}
-
-open class SysFifoOutput<T : SysData> constructor(
-        name: String, parent: SysObject? = null, Fifo: SysFifo<T>? = null
-) : SysPort<SysFifo<T>>(name, parent, Fifo) {
-
-    var value: T
-        get() = throw UnsupportedOperationException(
-                "SysFifoPort $name: Read is not supported for output port")
-        set(value) {
-            if (bound == null) throw IllegalStateException("Port $name is not bound")
-            bound!!.input = value
-        }
-
-    val size: Int
-        get() {
-            if (bound == null) throw IllegalStateException("Port $name is not bound")
-            return bound!!.size
-        }
-
-    val full: Boolean
-        get() {
-            if (bound == null) throw IllegalStateException("Port $name is not bound")
-            return bound!!.full
-        }
-
-    val empty: Boolean
-        get() {
-            if (bound == null) throw IllegalStateException("Port $name is not bound")
-            return bound!!.empty
-        }
-
-    var push: SysBit
-        get() = throw UnsupportedOperationException(
-                "SysFifoPort $name: Read is not supported for push port")
-        set(value) {
-            if (bound == null) throw IllegalStateException("Port $name is not bound")
-            bound!!.push = value
-        }
-}
-
 
 open class SysBusPort<T : SysData> constructor(
         name: String, parent: SysObject? = null, bus: SysBus<T>? = null

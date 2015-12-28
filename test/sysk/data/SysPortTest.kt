@@ -3,6 +3,8 @@ package sysk.data
 import org.junit.Test
 import sysk.connectors.SysAsynchronousFifo
 import sysk.connectors.SysBitBus
+import sysk.connectors.SysFifoInput
+import sysk.connectors.SysFifoOutput
 import sysk.core.SysScheduler
 
 class SysPortTest {
