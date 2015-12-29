@@ -20,25 +20,51 @@
 
 Planned at ~ 25 Dec 2015.
 
+Delayed to 29 Feb 2015.
+
 TODO
 
 * Features
-  * function builder (mikhail)
-  * memory module (veronika)
-  * SysBigInteger (valentin)
-  * SysFloat (?) (valentin)
-  * delayed happens (?) (sergey)
-  * ports with default value (?)
+  * function builder (mikhail) -- done partially
+    * universal syntax for state & block
+    * syntax for if / else state
+    * syntax for loops / continue / break
+    * syntax for jumps to a different state
+  * memory module (veronika) -- failed
+  * integers
+    * SysBigInteger (valentin) -- done partially
+      * functions for dealing with just ints / floats / etc.
+      * base class for SysInteger & SysBigInteger
+      * remove code duplication etc.
+    * SysFloat (valentin) -- not started
+    * SysFixed (valentin) -- not started
+  * delayed happens (?) (sergei)
+  * ports with default value (mikhail) -- not started
+  * reset (?)
 * Tests
-  * FIFO / buses (sergey)
-  * memory module (veronika)
-  * register + integer (veronika or valentin)
+  * FIFO / buses (sergei) -- done
+  * memory module (veronika) -- failed
+  * register + integer (mikhail)
   * port bindings check (?) (mikhail)
-  * Some large sample (?) (mikhail or sergey)
+  * Some large sample(s) (mikhail or sergei) -- not started
+    * memory & cache
+    * multiplier pool
+    * some simple CPU
+    * some simple interface
 * Refactorings (mikhail)
-  * wireInput/ input etc. (make more or less the same)
-  * remove triggeredFunction (?)
-  * function / stagedFunction together (?)
+  * wireInput / input etc. (make more or less the same) -- cancelled (bitInput now)
+  * remove triggeredFunction -- done
+  * function / stagedFunction together -- cancelled (function / stateFunction now)
+  * do something with signal.value -- not started
+    * rename to something?
+    * use read / write?
+    * try delegates?
+    * use set / reset?
+  * SysData (sergei / mikhail) -- almost done
+    * remove all starting values of signals / registers
+* Project organization
+  * Maven
+  * Kotlin tests
 
 # Design Notes
 
@@ -46,7 +72,7 @@ TODO
 
 Signals, ports, possibly also local variables...
 
-## Arithmetics
+## Arithmetic
 
 SysInteger = fixed width integer. Width is known at runtime and (possibly) can be annotated at compile time. 
 All bit operations are supported, like my[2] or even my[5..3]. Concatenation is supported (my cat your?).
