@@ -4,6 +4,7 @@ import org.junit.Test
 import ru.spbstu.sysk.core.SysTopModule
 import ru.spbstu.sysk.core.TimeUnit
 import ru.spbstu.sysk.core.time
+import ru.spbstu.sysk.data.SysBit.*
 
 class SysRegisterTest {
 
@@ -23,11 +24,11 @@ class SysRegisterTest {
 
             stateFunction(clk) {
                 init {
-                    en.value = SysBit.ZERO
+                    en.value = ZERO
                 }
                 forEach(0..9) {
                     state {
-                        en.value = SysBit.ONE
+                        en.value = ONE
                         d.value = q.value + SysInteger.valueOf(1)
                         assert(q.value == SysInteger(8, it / 2)) {
                             "#$it: Expected ${it/2}, Actual ${q.value}"
@@ -71,13 +72,13 @@ class SysRegisterTest {
 
             stateFunction(clk) {
                 init {
-                    aen.value = SysBit.ZERO
-                    ben.value = SysBit.ZERO
+                    aen.value = ZERO
+                    ben.value = ZERO
                 }
                 forEach(0..17) {
                     state {
-                        aen.value = SysBit.ONE
-                        ben.value = SysBit.ONE
+                        aen.value = ONE
+                        ben.value = ONE
                         ad.value = bq.value
                         bd.value = aq.value + bq.value
                         assert(bq.value == SysInteger(8, values[it / 2])) {

@@ -2,6 +2,7 @@ package ru.spbstu.sysk.generics
 
 import ru.spbstu.sysk.core.SysModule
 import ru.spbstu.sysk.data.SysBit
+import ru.spbstu.sysk.data.SysBit.*
 import ru.spbstu.sysk.data.SysData
 
 open class SysUnaryMoore<Input : SysData, State, Output : SysData>(
@@ -48,7 +49,7 @@ open class SysUnaryBitMoore<State, Output : SysData>(
 class LatchTriggerMoore(name: String, parent: SysModule): SysUnaryBitMoore<SysBit, SysBit>(
         { prev: SysBit, data: SysBit -> data },
         { it },
-        SysBit.X,
+        X,
         name,
         parent
 )
@@ -56,12 +57,12 @@ class LatchTriggerMoore(name: String, parent: SysModule): SysUnaryBitMoore<SysBi
 class CountTriggerMoore(name: String, parent: SysModule): SysUnaryBitMoore<SysBit, SysBit>(
         { prev: SysBit, data: SysBit ->
             when (data) {
-                SysBit.ONE -> !prev
+                ONE -> !prev
                 else -> prev
             }
         },
         { it },
-        SysBit.ZERO,
+        ZERO,
         name,
         parent
 )
@@ -111,12 +112,12 @@ open class SysBinaryBitMoore<State, Output : SysData>(
 class SetResetTriggerMoore(name: String, parent: SysModule): SysBinaryBitMoore<SysBit, SysBit>(
         { prev: SysBit, set: SysBit, reset: SysBit ->
             if (set.zero && reset.zero) prev
-            else if (reset.one && set.zero) SysBit.ZERO
-            else if (set.one && reset.zero) SysBit.ONE
-            else SysBit.X
+            else if (reset.one && set.zero) ZERO
+            else if (set.one && reset.zero) ONE
+            else X
         },
         { it },
-        SysBit.X,
+        X,
         name,
         parent
 )
@@ -124,13 +125,13 @@ class SetResetTriggerMoore(name: String, parent: SysModule): SysBinaryBitMoore<S
 class JumpKeepTriggerMoore(name: String, parent: SysModule): SysBinaryBitMoore<SysBit, SysBit>(
         { prev: SysBit, jump: SysBit, keep: SysBit ->
             if (jump.zero && keep.zero) prev
-            else if (keep.one && jump.zero) SysBit.ZERO
-            else if (jump.one && keep.zero) SysBit.ONE
+            else if (keep.one && jump.zero) ZERO
+            else if (jump.one && keep.zero) ONE
             else if (jump.one && keep.one) !prev
-            else SysBit.X
+            else X
         },
         { it },
-        SysBit.X,
+        X,
         name,
         parent
 )

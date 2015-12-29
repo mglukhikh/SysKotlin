@@ -2,6 +2,7 @@ package ru.spbstu.sysk.samples
 
 import ru.spbstu.sysk.core.SysModule
 import ru.spbstu.sysk.data.SysBit
+import ru.spbstu.sysk.data.SysBit.*
 
 class RSFF(name: String, parent: SysModule): SysModule(name, parent) {
 
@@ -9,14 +10,14 @@ class RSFF(name: String, parent: SysModule): SysModule(name, parent) {
     val s   = bitInput("s")
     val clk = bitInput("clk")
 
-    private var state = SysBit.X
+    private var state = X
     val q = output<SysBit>("q")
 
     init {
         function(clk, initialize = false) {
 
-            if (s.one) state = SysBit.ONE
-            else if (r.one) state = SysBit.ZERO
+            if (s.one) state = ONE
+            else if (r.one) state = ZERO
             q.value = state
         }
     }

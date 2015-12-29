@@ -3,6 +3,7 @@ package ru.spbstu.sysk.generics
 import org.junit.Test
 import ru.spbstu.sysk.core.SysTopModule
 import ru.spbstu.sysk.data.SysBit
+import ru.spbstu.sysk.data.SysBit.*
 import ru.spbstu.sysk.data.bind
 
 class SysSimpleFunctionTest {
@@ -26,11 +27,11 @@ class SysSimpleFunctionTest {
                 when (counter) {
                     0 -> {
                         assert(y.x)
-                        x.value = SysBit.ZERO
+                        x.value = ZERO
                     }
                     1 -> {
                         assert(y.one)
-                        x.value = SysBit.ONE
+                        x.value = ONE
                     }
                     2 -> {
                         assert(y.zero)
@@ -65,24 +66,24 @@ class SysSimpleFunctionTest {
                 when (counter) {
                     0 -> {
                         assert(y.x)
-                        x1.value = SysBit.ZERO
-                        x2.value = SysBit.ZERO
+                        x1.value = ZERO
+                        x2.value = ZERO
                     }
                     1 -> {
                         assert(y.zero)
-                        x1.value = SysBit.ONE
+                        x1.value = ONE
                     }
                     2 -> {
                         assert(y.one)
-                        x2.value = SysBit.ONE
+                        x2.value = ONE
                     }
                     3 -> {
                         assert(y.one)
-                        x1.value = SysBit.ZERO
+                        x1.value = ZERO
                     }
                     4 -> {
                         assert(y.one)
-                        x2.value = SysBit.ZERO
+                        x2.value = ZERO
                     }
                     5 -> {
                         assert(y.zero)
@@ -117,24 +118,24 @@ class SysSimpleFunctionTest {
                 when (counter) {
                     0 -> {
                         assert(y.x)
-                        x1.value = SysBit.ZERO
-                        x2.value = SysBit.ZERO
+                        x1.value = ZERO
+                        x2.value = ZERO
                     }
                     1 -> {
                         assert(y.zero)
-                        x1.value = SysBit.ONE
+                        x1.value = ONE
                     }
                     2 -> {
                         assert(y.zero)
-                        x2.value = SysBit.ONE
+                        x2.value = ONE
                     }
                     3 -> {
                         assert(y.one)
-                        x1.value = SysBit.ZERO
+                        x1.value = ZERO
                     }
                     4 -> {
                         assert(y.zero)
-                        x2.value = SysBit.ZERO
+                        x2.value = ZERO
                     }
                     5 -> {
                         assert(y.zero)

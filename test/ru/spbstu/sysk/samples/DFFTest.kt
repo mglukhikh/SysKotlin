@@ -3,6 +3,7 @@ package ru.spbstu.sysk.samples
 import org.junit.Test
 import ru.spbstu.sysk.core.*
 import ru.spbstu.sysk.data.SysBit
+import ru.spbstu.sysk.data.SysBit.*
 import ru.spbstu.sysk.data.bind
 import ru.spbstu.sysk.generics.SysAndNotModule
 
@@ -21,7 +22,7 @@ class DFFTest {
         init {
             function(clk) {
                 if (it is SysWait.Initialize) {
-                    d.value = SysBit.X
+                    d.value = X
                 } else {
                     when (counter) {
                         0 -> {
@@ -34,7 +35,7 @@ class DFFTest {
                                 assert(q.zero) { "q should be false after q = false and D = 0" }
 
                             // All changes at clock N are received at clock N+1 and processed at clock N+2
-                            d.value = SysBit.ONE
+                            d.value = ONE
                         }
                         2 -> {
                             if (phase == 0)
@@ -42,7 +43,7 @@ class DFFTest {
                             else
                                 assert(q.zero) { "q should be false after q = false and D = 0" }
 
-                            d.value = SysBit.ZERO
+                            d.value = ZERO
                         }
                         3 -> {
                             assert(q.one) { "q should be true after D = 1" }
@@ -103,11 +104,11 @@ class DFFTest {
             stateFunction(clk) {
                 state {
                     assert(q.x)
-                    swapOrOne.value = SysBit.ZERO
+                    swapOrOne.value = ZERO
                 }
                 state {
                     assert(q.x)
-                    swapOrOne.value = SysBit.ONE
+                    swapOrOne.value = ONE
                 }
                 state {
                     assert(q.one)

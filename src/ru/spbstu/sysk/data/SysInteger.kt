@@ -349,12 +349,12 @@ class SysInteger(
                 counter++;
             var shift = 0
             while (counter < arr.size && arr[counter] != SysBit.X) {
-                if (arr[counter] == SysBit.ONE)
+                if (arr[counter].one)
                     value = value  or (1L shl shift );
                 shift++;
                 counter++;
             }
-            if (arr[counter - 1] == SysBit.ONE)
+            if (arr[counter - 1].one)
                 for (i in 0..64 - shift) {
                     value = value or (1L shl (63 - i))
                 }

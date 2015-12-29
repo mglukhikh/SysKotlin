@@ -6,6 +6,7 @@ import ru.spbstu.sysk.core.SysWait
 import ru.spbstu.sysk.core.TimeUnit
 import ru.spbstu.sysk.core.time
 import ru.spbstu.sysk.data.SysBit
+import ru.spbstu.sysk.data.SysBit.*
 import ru.spbstu.sysk.data.bind
 
 class SysSimpleAutomataTest {
@@ -31,24 +32,24 @@ class SysSimpleAutomataTest {
             stateFunction(clk) {
                 state {
                     assert(y.x)
-                    x.value = SysBit.ZERO
+                    x.value = ZERO
                     assertTime(time(10, TimeUnit.NS))
                 }
                 block {
                     state {
                         assert(y.x)
-                        x.value = SysBit.ONE
+                        x.value = ONE
                         assertTime(time(30, TimeUnit.NS))
                     }
                     block {
                         state {
                             assert(y.zero)
-                            x.value = SysBit.ZERO
+                            x.value = ZERO
                             assertTime(time(50, TimeUnit.NS))
                         }
                         state {
                             assert(y.one)
-                            x.value = SysBit.ONE
+                            x.value = ONE
                             assertTime(time(70, TimeUnit.NS))
                         }
                     }
@@ -88,19 +89,19 @@ class SysSimpleAutomataTest {
                 when (counter) {
                     0 -> {
                         assert(y.x) { "Expected X at 0 but was ${y.value}"}
-                        x.value = SysBit.ZERO
+                        x.value = ZERO
                     }
                     1 -> {
                         assert(y.x)
-                        x.value = SysBit.ONE
+                        x.value = ONE
                     }
                     2 -> {
                         assert(y.zero)
-                        x.value = SysBit.ZERO
+                        x.value = ZERO
                     }
                     3 -> {
                         assert(y.one)
-                        x.value = SysBit.ONE
+                        x.value = ONE
                     }
                     4 -> {
                         assert(y.zero)
@@ -143,18 +144,18 @@ class SysSimpleAutomataTest {
             stateFunction(clk) {
                 state {
                     assert(y.zero)
-                    x.value = SysBit.ZERO
+                    x.value = ZERO
                 }
                 state {
                     assert(y.zero) { "Expected ZERO at stage 1 but was ${y.value}"}
-                    x.value = SysBit.ONE
+                    x.value = ONE
                 }
                 state {
                     assert(y.zero)
                 }
                 state {
                     assert(y.one)
-                    x.value = SysBit.ZERO
+                    x.value = ZERO
                 }
                 state {
                     assert(y.zero)

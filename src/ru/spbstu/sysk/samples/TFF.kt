@@ -2,13 +2,14 @@ package ru.spbstu.sysk.samples
 
 import ru.spbstu.sysk.core.SysModule
 import ru.spbstu.sysk.data.SysBit
+import ru.spbstu.sysk.data.SysBit.*
 
 public class TFF(name: String, parent: SysModule) : SysModule(name, parent) {
 
     val t = bitInput("t")
     val clk = bitInput("clk")
 
-    private var state = SysBit.ZERO
+    private var state = ZERO
     val q = output<SysBit>("q")
 
     init {
@@ -16,9 +17,9 @@ public class TFF(name: String, parent: SysModule) : SysModule(name, parent) {
 
             if (t.one) {
                 if (state.one)
-                    state = SysBit.ZERO
+                    state = ZERO
                 else
-                    state = SysBit.ONE
+                    state = ONE
             }
             q.value = state
         }

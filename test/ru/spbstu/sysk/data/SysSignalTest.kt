@@ -2,25 +2,26 @@ package ru.spbstu.sysk.data
 
 import org.junit.Test
 import ru.spbstu.sysk.core.SysScheduler
+import ru.spbstu.sysk.data.SysBit.*
 
 class SysSignalTest {
 
     @Test
     fun bit() {
         val scheduler = SysScheduler()
-        val first = SysBitSignal("first", scheduler, SysBit.X)
+        val first = SysBitSignal("first", scheduler, X)
         assert(first.x)
-        first.value = SysBit.ONE
+        first.value = ONE
         assert(first.x)
         first.update()
         assert(first.one)
-        first.value = SysBit.ZERO
+        first.value = ZERO
         assert(first.one)
         first.update()
         assert(first.zero)
-        val second = SysSignal("second", SysBit.ZERO, scheduler)
+        val second = SysSignal("second", ZERO, scheduler)
         assert(first.value == second.value)
-        second.value = SysBit.ONE
+        second.value = ONE
         assert(first.value == second.value)
         second.update()
         assert(first.value != second.value)

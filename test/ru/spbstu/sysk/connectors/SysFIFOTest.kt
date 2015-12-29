@@ -3,6 +3,7 @@ package ru.spbstu.sysk.connectors
 import org.junit.Test
 import ru.spbstu.sysk.core.SysScheduler
 import ru.spbstu.sysk.data.SysBit
+import ru.spbstu.sysk.data.SysBit.*
 
 class SysFifoTest {
 
@@ -15,82 +16,82 @@ class SysFifoTest {
         assert(4 == fifo.capacity)
         assert(false == fifo.full)
         assert(true == fifo.empty)
-        fifo.input = SysBit.ONE
+        fifo.input = ONE
         fifo.push()
-        assert(SysBit.ONE == fifo.output)
+        assert(fifo.output.one)
         assert(1 == fifo.size)
         assert(4 == fifo.capacity)
-        assert(false == fifo.full)
-        assert(false == fifo.empty)
-        fifo.input = (SysBit.ZERO)
+        assert(!fifo.full)
+        assert(!fifo.empty)
+        fifo.input = ZERO
         fifo.push()
-        fifo.input = (SysBit.ONE)
+        fifo.input = ONE
         fifo.push()
-        fifo.input = (SysBit.ZERO)
+        fifo.input = ZERO
         fifo.push()
-        assert(SysBit.ONE == fifo.output)
+        assert(fifo.output.one)
         assert(4 == fifo.size)
         assert(4 == fifo.capacity)
-        assert(true == fifo.full)
-        assert(false == fifo.empty)
-        fifo.input = (SysBit.ZERO)
+        assert(fifo.full)
+        assert(!fifo.empty)
+        fifo.input = ZERO
         fifo.push()
-        assert(SysBit.ONE == fifo.output)
+        assert(fifo.output.one)
         assert(4 == fifo.size)
         assert(4 == fifo.capacity)
-        assert(true == fifo.full)
-        assert(false == fifo.empty)
+        assert(fifo.full)
+        assert(!fifo.empty)
         while (!fifo.empty) fifo.pop()
-        assert(SysBit.ZERO == fifo.output)
+        assert(fifo.output.zero)
         assert(0 == fifo.size)
         assert(4 == fifo.capacity)
-        assert(false == fifo.full)
-        assert(true == fifo.empty)
+        assert(!fifo.full)
+        assert(fifo.empty)
         fifo.pop()
-        assert(SysBit.ZERO == fifo.output)
+        assert(fifo.output.zero)
         assert(0 == fifo.size)
         assert(4 == fifo.capacity)
-        assert(false == fifo.full)
-        assert(true == fifo.empty)
+        assert(!fifo.full)
+        assert(fifo.empty)
     }
 
     @Test
     fun sysAsynchronousFifo() {
         var fifo = SysAsynchronousFifo(4, "Fifo", SysBit.ZERO, SysScheduler())
         assert("Fifo" == fifo.name)
-        assert(SysBit.ZERO == fifo.output)
+        assert(fifo.output.zero)
         assert(0 == fifo.size)
         assert(4 == fifo.capacity)
         assert(!fifo.full)
         assert(fifo.empty)
-        fifo.push = SysBit.ZERO;
-        assert(SysBit.ZERO == fifo.output)
+        fifo.push = ZERO;
+        assert(fifo.output.zero)
         assert(0 == fifo.size)
-        fifo.input = SysBit.ONE;
-        fifo.push = SysBit.ONE;
-        assert(SysBit.ONE == fifo.output)
+        fifo.input = ONE;
+        fifo.push = ONE;
+        assert(fifo.output.one)
         assert(1 == fifo.size)
-        fifo.input = SysBit.ZERO;
-        fifo.push = SysBit.ONE;
-        assert(SysBit.ONE == fifo.output)
+        fifo.input = ZERO;
+        fifo.push = ONE;
+        assert(fifo.output.one)
         assert(1 == fifo.size)
-        fifo.push = SysBit.ZERO;
-        assert(SysBit.ONE == fifo.output)
+        fifo.push = ZERO;
+        assert(fifo.output.one)
         assert(1 == fifo.size)
-        fifo.push = SysBit.ONE;
-        assert(SysBit.ONE == fifo.output)
+        fifo.push = ONE;
+        assert(fifo.output.one)
         assert(2 == fifo.size)
-        fifo.pop = SysBit.ZERO;
-        assert(SysBit.ONE == fifo.output)
+        fifo.pop = ZERO;
+        assert(fifo.output.one)
         assert(2 == fifo.size)
-        fifo.pop = SysBit.ONE;
-        assert(SysBit.ZERO == fifo.output)
+        fifo.pop = ONE;
+        assert(fifo.output.zero)
         assert(1 == fifo.size)
-        fifo.pop = SysBit.ZERO;
-        assert(SysBit.ZERO == fifo.output)
+        fifo.pop = ZERO;
+        assert(fifo.output.zero)
         assert(1 == fifo.size)
-        fifo.pop = SysBit.ONE;
-        assert(SysBit.ZERO == fifo.output)
+        fifo.pop = ONE;
+        assert(fifo.output.zero)
         assert(0 == fifo.size)
     }
 }

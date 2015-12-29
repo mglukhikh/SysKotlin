@@ -3,6 +3,7 @@ package ru.spbstu.sysk.samples
 import org.junit.Test
 import ru.spbstu.sysk.core.*
 import ru.spbstu.sysk.data.SysBit
+import ru.spbstu.sysk.data.SysBit.*
 import ru.spbstu.sysk.data.bind
 
 class RSFFTest {
@@ -21,8 +22,8 @@ class RSFFTest {
         init {
             function(clk) {
                 if (it is SysWait.Initialize) {
-                    r.value = SysBit.X
-                    s.value = SysBit.X
+                    r.value = X
+                    s.value = X
                 } else {
                     when (counter) {
                         0 -> {
@@ -35,7 +36,7 @@ class RSFFTest {
                                 assert(q.zero) { "q should be false after q = false and RS = 00" }
 
                             // All changes at clock N are received at clock N+1 and processed at clock N+2
-                            s.value = SysBit.ONE
+                            s.value = ONE
                         }
                         2 -> {
                             if (phase == 0)
@@ -43,15 +44,15 @@ class RSFFTest {
                             else
                                 assert(q.zero) { "q should be false after q = false and RS = 00" }
 
-                            s.value = SysBit.ZERO
+                            s.value = ZERO
                         }
                         3 -> {
                             assert(q.one) { "q should be true after RS = 01 or RS = X1" }
-                            r.value = SysBit.ONE
+                            r.value = ONE
                         }
                         4 -> {
                             assert(q.one) { "q should be true after q = true and RS = 00 or RS = X0" }
-                            r.value = SysBit.ZERO
+                            r.value = ZERO
                         }
                         5 -> {
                             assert(q.zero) { "q should be false after RS = 10" }
@@ -71,10 +72,10 @@ class RSFFTest {
     }
 
     private class Top : SysTopModule("top", SysScheduler()) {
-        val r = signal("r", SysBit.X)
-        val s = signal("s", SysBit.X)
+        val r = signal("r", X)
+        val s = signal("s", X)
 
-        val q = signal("q", SysBit.X)
+        val q = signal("q", X)
         val clk = clockedSignal("clk", time(20, TimeUnit.NS))
 
         val ff = RSFF("my", this)

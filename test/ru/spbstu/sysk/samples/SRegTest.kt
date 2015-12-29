@@ -3,6 +3,7 @@ package ru.spbstu.sysk.samples
 import org.junit.Test
 import ru.spbstu.sysk.core.*
 import ru.spbstu.sysk.data.SysBit
+import ru.spbstu.sysk.data.SysBit.*
 import ru.spbstu.sysk.data.bind
 
 class SRegTest {
@@ -22,8 +23,8 @@ class SRegTest {
             function(clk) {
 
                 if (it is SysWait.Initialize) {
-                    d.value = SysBit.X
-                    dir.value = SysBit.X
+                    d.value = X
+                    dir.value = X
                 } else {
                     when (counter) {
                         0 -> {
@@ -36,8 +37,8 @@ class SRegTest {
                                 assert(q.zero) { "q should be false after q = false and D = 0" }
 
                             // All changes at clock N are received at clock N+1 and processed at clock N+2
-                            dir.value = SysBit.ZERO
-                            d.value = SysBit.ONE
+                            dir.value = ZERO
+                            d.value = ONE
                         }
                         2 -> {
                             if (phase == 0)
@@ -45,8 +46,8 @@ class SRegTest {
                             else
                                 assert(q.zero) { "q should be false after q = false and D = 0" }
 
-                            dir.value = SysBit.ZERO
-                            d.value = SysBit.ZERO
+                            dir.value = ZERO
+                            d.value = ZERO
                         }
                         3 -> {
                             if (phase == 0)
@@ -54,8 +55,8 @@ class SRegTest {
                             else
                                 assert(q.zero) { "q should be false after q = false and D = 0" }
 
-                            dir.value = SysBit.ZERO
-                            d.value = SysBit.ONE
+                            dir.value = ZERO
+                            d.value = ONE
                         }
                         4 -> {
                             if (phase == 0)
@@ -63,47 +64,47 @@ class SRegTest {
                             else
                                 assert(q.zero) { "q should be false after q = false and D = 0" }
 
-                            dir.value = SysBit.ZERO
-                            d.value = SysBit.ZERO
+                            dir.value = ZERO
+                            d.value = ZERO
                         }
                         5 -> {
                             assert(q.one) { "q should be true after D = 1" }
-                            dir.value = SysBit.ZERO
+                            dir.value = ZERO
                         }
                         6 -> {
                             assert(q.zero) { "q should be false after D = 0" }
-                            dir.value = SysBit.ZERO
+                            dir.value = ZERO
                         }
                         7 -> {
                             assert(q.one) { "q should be true after D = 1" }
                         }
                         8 -> {
                             assert(q.zero) { "q should be false after D = 0" }
-                            dir.value = SysBit.ONE
-                            d.value = SysBit.ONE
+                            dir.value = ONE
+                            d.value = ONE
                         }
                         9 -> {
                             assert(q.zero) { "q should be false after D = 0" }
-                            dir.value = SysBit.ONE
-                            d.value = SysBit.ZERO
+                            dir.value = ONE
+                            d.value = ZERO
                         }
                         10 -> {
                             assert(q.zero) { "q should be false after D = 0" }
-                            dir.value = SysBit.ONE
-                            d.value = SysBit.ONE
+                            dir.value = ONE
+                            d.value = ONE
                         }
                         11 -> {
                             assert(q.zero) { "q should be false after D = 0" }
-                            dir.value = SysBit.ONE
-                            d.value = SysBit.ZERO
+                            dir.value = ONE
+                            d.value = ZERO
                         }
                         12 -> {
                             assert(q.one) { "q should be true after D = 1" }
-                            dir.value = SysBit.ONE
+                            dir.value = ONE
                         }
                         13 -> {
                             assert(q.zero) { "q should be false after D = 0" }
-                            dir.value = SysBit.ONE
+                            dir.value = ONE
                         }
                         14 -> {
                             assert(q.one) { "q should be true after D = 1" }

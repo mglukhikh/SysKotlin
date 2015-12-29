@@ -3,6 +3,7 @@ package ru.spbstu.sysk.samples
 import org.junit.Test
 import ru.spbstu.sysk.core.*
 import ru.spbstu.sysk.data.SysBit
+import ru.spbstu.sysk.data.SysBit.*
 import ru.spbstu.sysk.data.bind
 
 class TFFTest {
@@ -20,7 +21,7 @@ class TFFTest {
         init {
             function(clk) {
                 if (it is SysWait.Initialize) {
-                    t.value = SysBit.ZERO
+                    t.value = ZERO
                 } else {
                     when (counter) {
                         0 -> {
@@ -29,19 +30,19 @@ class TFFTest {
                         1 -> {
                             assert(q.zero) { "q should be false after q = true and T = 1" }
                             // All changes at clock N are received at clock N+1 and processed at clock N+2
-                            t.value = SysBit.ONE
+                            t.value = ONE
                         }
                         2 -> {
                             assert(q.zero) { "q should be false after q = false and T = 0" }
-                            t.value = SysBit.ZERO
+                            t.value = ZERO
                         }
                         3 -> {
                             assert(q.one) { "q should be true after T = 1" }
-                            t.value = SysBit.ONE
+                            t.value = ONE
                         }
                         4 -> {
                             assert(q.one) { "q should be true after q = true and T = 0" }
-                            t.value = SysBit.ZERO
+                            t.value = ZERO
                         }
                         5 -> {
                             assert(q.zero) { "q should be false after q = true and T = 1" }
@@ -61,10 +62,10 @@ class TFFTest {
     }
 
     private class Top : SysTopModule("top", SysScheduler()) {
-        val t = signal("t", SysBit.ZERO)
+        val t = signal("t", ZERO)
 
         val clk = clockedSignal("clk", time(20, TimeUnit.NS))
-        val q = signal("q", SysBit.ZERO)
+        val q = signal("q", ZERO)
 
         val ff = TFF("my", this)
         private val tb = Testbench("your", this)

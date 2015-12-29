@@ -369,9 +369,9 @@ class SysBigInteger(
 
 
             val tempArray = arr.copyOfRange(leftShift, arr.size - rightShift)
-            if (tempArray.last() != SysBit.ONE) {
+            if (!tempArray.last().one) {
                 for (i in tempArray.indices) {
-                    if (tempArray[i] == SysBit.ONE) {
+                    if (tempArray[i].one) {
                         result = result.setBit(i)
                     }
                 }
@@ -382,7 +382,7 @@ class SysBigInteger(
                 val inverseArray = inverseSWSArray(tempArray)
 
                 for (i in inverseArray.indices) {
-                    if (inverseArray[i] == SysBit.ONE) {
+                    if (inverseArray[i].one) {
                         result = result.setBit(i)
                     }
                 }

@@ -3,6 +3,7 @@ package ru.spbstu.sysk.samples
 import org.junit.Test
 import ru.spbstu.sysk.core.*
 import ru.spbstu.sysk.data.SysBit
+import ru.spbstu.sysk.data.SysBit.*
 import ru.spbstu.sysk.data.bind
 import ru.spbstu.sysk.data.bindArrays
 import java.util.*
@@ -56,8 +57,8 @@ class PRegTest {
                             i = 0
                             while (i < digPerWord) {
                                 arr[i] = r.nextBoolean()
-                                if (arr[i]) d[i].value = SysBit.ONE
-                                else d[i].value = SysBit.ZERO
+                                if (arr[i]) d[i].value = ONE
+                                else d[i].value = ZERO
                                 i += 1
                             }
                         }
@@ -78,7 +79,7 @@ class PRegTest {
 
                             i = 0
                             while (i < digPerWord) {
-                                d[i].value = SysBit.ZERO
+                                d[i].value = ZERO
                                 i += 1
                             }
                         }
