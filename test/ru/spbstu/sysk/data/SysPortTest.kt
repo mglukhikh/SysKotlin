@@ -5,6 +5,7 @@ import ru.spbstu.sysk.connectors.SysAsynchronousFifo
 import ru.spbstu.sysk.connectors.SysBitBus
 import ru.spbstu.sysk.connectors.SysFifoInput
 import ru.spbstu.sysk.connectors.SysFifoOutput
+import ru.spbstu.sysk.connectors.SysBusPort
 import ru.spbstu.sysk.core.SysScheduler
 import ru.spbstu.sysk.data.SysBit.*
 
@@ -54,9 +55,9 @@ class SysPortTest {
         connector.addWire()
         connector.addWire()
         connector.addWire()
-        val port_1 = ru.spbstu.sysk.connectors.SysBusPort("port1", null, connector)
-        val port_2 = ru.spbstu.sysk.connectors.SysBusPort("port2", null, connector)
-        val port_3 = ru.spbstu.sysk.connectors.SysBusPort("port3", null, connector)
+        val port_1 = SysBusPort("port1", null, connector)
+        val port_2 = SysBusPort("port2", null, connector)
+        val port_3 = SysBusPort("port3", null, connector)
         assert(port_1[0].x)
         assert(port_2[1].x)
         assert(port_3[2].x)
