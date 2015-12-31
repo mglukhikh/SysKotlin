@@ -39,7 +39,10 @@ TODO
     * SysFloat (valentin) -- not started
     * SysFixed (valentin) -- not started
   * delayed happens (?) (sergei)
-  * ports with default value (mikhail) -- not started
+  * ports
+    * default values (mikhail) -- not started
+    * stub signals (mikhail / sergei) -- partially done
+    * check binding (mikhail / sergei) -- not started
   * reset (?)
 * Tests
   * FIFO / buses (sergei) -- done
