@@ -26,4 +26,13 @@ class SysSignalTest {
         second.update()
         assert(first.value != second.value)
     }
+
+    @Test
+    fun stub() {
+        val scheduler = SysScheduler()
+        val stub =  SysSignalStub("stub", undefined<SysBit>(), scheduler)
+        assert(stub.value == undefined<SysBit>())
+        stub.value = SysBit.ONE
+        assert(stub.value == undefined<SysBit>())
+    }
 }

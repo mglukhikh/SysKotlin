@@ -10,7 +10,8 @@ open class SysSignal<T : SysData> internal constructor(
 ): SysSignalRead<T>, SysSignalWrite<T>, SysObject(name, parent) {
 
     /** Current signal value (backing field) */
-    private var storedValue = startValue
+    protected var storedValue = startValue
+        private set
 
     /** Current signal value */
     override var value: T
@@ -108,4 +109,11 @@ class SysClockedSignal internal constructor(
     init {
         scheduler.register(SysClockedSignalFunction())
     }
+}
+
+class SysSignalStub<T: SysData> internal constructor(
+        name: String, defaultValue: T, scheduler: SysScheduler, parent: SysObject? = null
+) : SysSignal<T>(name, defaultValue, scheduler, parent) {
+    override var value: T = storedValue
+        get() = storedValue
 }

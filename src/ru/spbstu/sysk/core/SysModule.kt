@@ -66,6 +66,9 @@ open class SysModule internal constructor(
     protected fun <T : SysData> output(name: String, signalWrite: SysSignalWrite<T>? = null): SysOutput<T> =
             SysOutput(name, scheduler, this, signalWrite)
 
+    protected fun <T : SysData> signalStub(name: String, value: T): SysSignalStub<T> =
+            SysSignalStub(name, value, scheduler, this)
+
     protected inline fun <reified T : SysData> signal(name: String): SysSignal<T> =
             signal(name, undefined<T>())
 
