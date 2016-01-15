@@ -1,6 +1,7 @@
 package ru.spbstu.sysk.core
 
 import ru.spbstu.sysk.connectors.SysBus
+import ru.spbstu.sysk.data.SysPort
 import ru.spbstu.sysk.data.SysSignal
 import java.util.*
 
@@ -14,6 +15,8 @@ class SysScheduler {
     private val signals: MutableSet<SysSignal<*>> = LinkedHashSet()
 
     private val buses: MutableSet<SysBus<*>> = LinkedHashSet()
+
+    private val ports: MutableSet<SysPort<*>> = LinkedHashSet()
 
     private val functions: MutableMap<SysFunction, SysWait> = LinkedHashMap()
 
@@ -29,6 +32,10 @@ class SysScheduler {
 
     internal fun register(bus: SysBus<*>) {
         buses.add(bus)
+    }
+
+    internal fun register(port: SysPort<*>) {
+        ports.add(port)
     }
 
     internal fun register(function: SysFunction) {
@@ -109,10 +116,12 @@ class SysScheduler {
             else -> SysWait.Time.INFINITY
         }
 
-    private var stopRequested = false
+    var stopRequested = true
+        private set
 
     fun start(endTime: SysWait.Time = SysWait.Time.INFINITY) {
         stopRequested = false
+        ports.forEach { assert(it.isBound || it.sealed) { "Port $it: is not bounded and not sealed." } }
         if (currentTime >= endTime) return
         var happenedEvents: Set<SysWait> = if (currentTime.femtoSeconds == 0L) setOf(SysWait.Initialize) else setOf()
         var initialize = true

@@ -58,13 +58,13 @@ open class SysModule internal constructor(
     }
 
     protected fun <T : SysData> input(name: String, signalRead: SysSignalRead<T>? = null): SysInput<T> =
-            SysInput(name, this, signalRead)
+            SysInput(name, scheduler, this, signalRead)
 
     protected fun bitInput(name: String, signalRead: SysBitRead? = null): SysBitInput =
-            SysBitInput(name, this, signalRead)
+            SysBitInput(name, scheduler, this, signalRead)
 
     protected fun <T : SysData> output(name: String, signalWrite: SysSignalWrite<T>? = null): SysOutput<T> =
-            SysOutput(name, this, signalWrite)
+            SysOutput(name, scheduler, this, signalWrite)
 
     protected inline fun <reified T : SysData> signal(name: String): SysSignal<T> =
             signal(name, undefined<T>())
@@ -81,14 +81,14 @@ open class SysModule internal constructor(
     protected fun <T : SysData> register(name: String, startValue: T) =
             SysRegister(name, startValue, this)
 
-    protected fun <T : SysData> fifoOutput(name: String, fifo: SysFifo<T>? = null) = SysFifoOutput<T>(name, this, fifo)
+    protected fun <T : SysData> fifoOutput(name: String, fifo: SysFifo<T>? = null) = SysFifoOutput<T>(name, scheduler, this, fifo)
 
-    protected fun <T : SysData> fifoInput(name: String, fifo: SysFifo<T>? = null) = SysFifoInput<T>(name, this, fifo)
+    protected fun <T : SysData> fifoInput(name: String, fifo: SysFifo<T>? = null) = SysFifoInput<T>(name, scheduler, this, fifo)
 
     protected fun <T : SysData> asynchronousFifo(capacity: Int, name: String, startValue: T) =
             SysAsynchronousFifo<T>(capacity, name, startValue, scheduler, this)
 
-    protected fun <T : SysData> busPort(name: String, bus: SysBus<T>? = null) = SysBusPort<T>(name, this, bus)
+    protected fun <T : SysData> busPort(name: String, bus: SysBus<T>? = null) = SysBusPort<T>(name, scheduler, this, bus)
 
     protected fun bitBus(name: String) = SysBitBus(name, scheduler, this)
 

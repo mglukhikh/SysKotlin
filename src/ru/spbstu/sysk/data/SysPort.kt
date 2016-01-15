@@ -1,14 +1,31 @@
 package ru.spbstu.sysk.data
 
 import ru.spbstu.sysk.core.SysObject
+import ru.spbstu.sysk.core.SysScheduler
 import ru.spbstu.sysk.core.SysWait
 
 abstract class SysPort<IF : SysInterface> internal constructor(
-        name: String, parent: SysObject? = null, sysInterface: IF? = null
+        name: String, private val scheduler: SysScheduler, parent: SysObject? = null, sysInterface: IF? = null
 ) : SysObject(name, parent) {
+
+    init {
+        scheduler.register(this)
+    }
 
     protected var bound: IF? = null
         private set
+
+    val isBound: Boolean
+        get() = (bound != null)
+
+    var sealed: Boolean = false
+        private set
+
+    fun seal() {
+        assert(scheduler.stopRequested) { "Impossible to seal the port while running the scheduler" }
+        assert(!isBound) { "Port $name is already bound to $bound" }
+        sealed = true
+    }
 
     init {
         sysInterface?.let { bind(it) }
@@ -17,7 +34,9 @@ abstract class SysPort<IF : SysInterface> internal constructor(
     fun bind(port: SysPort<IF>): Unit = bind(port())
 
     infix fun bind(sysInterface: IF) {
-        assert(bound == null) { "Port $name is already bound to $bound" }
+        assert(scheduler.stopRequested) { "Impossible to bind the port while running the scheduler" }
+        assert(!isBound) { "Port $name is already bound to $bound" }
+        assert(!sealed) { "Port $name is already sealed"}
         bound = sysInterface
         sysInterface.register(this)
     }
@@ -27,7 +46,7 @@ abstract class SysPort<IF : SysInterface> internal constructor(
     fun to(sysInterface: IF): Pair<SysPort<IF>, IF> = Pair(this, sysInterface)
 
     operator fun invoke(): IF {
-        assert(bound != null) { "Port $name is not bound" }
+        assert(isBound) { "Port $name is not bound" }
         return bound!!
     }
 
@@ -50,16 +69,23 @@ fun <IF : SysInterface> bindArrays(vararg pairs: Pair<Array<out SysPort<IF>>, Ar
 }
 
 open class SysInput<T : SysData> internal constructor(
-        name: String, parent: SysObject? = null, signalRead: SysSignalRead<T>? = null
-) : SysPort<SysSignalRead<T>>(name, parent, signalRead) {
+        name: String, scheduler: SysScheduler, parent: SysObject? = null, signalRead: SysSignalRead<T>? = null, private val defaultValue: T? = null
+) : SysPort<SysSignalRead<T>>(name, scheduler, parent, signalRead) {
 
     val value: T
-        get() = bound?.value ?: throw IllegalStateException("Port $name is not bound")
+        get() {
+            if (isBound) {
+                return bound!!.value
+            } else {
+                if (defaultValue == null) throw IllegalStateException("Port $name is not bound")
+                return defaultValue
+            }
+        }
 }
 
 class SysBitInput internal constructor(
-        name: String, parent: SysObject? = null, signalRead: SysBitRead? = null
-) : SysInput<SysBit>(name, parent, signalRead), SysEdged {
+        name: String, scheduler: SysScheduler, parent: SysObject? = null, signalRead: SysBitRead? = null
+) : SysInput<SysBit>(name, scheduler, parent, signalRead), SysEdged {
 
     override val posEdgeEvent: SysWait.Finder = object : SysWait.Finder() {
         override fun invoke() = (bound as? SysBitRead)?.posEdgeEvent
@@ -80,14 +106,16 @@ class SysBitInput internal constructor(
 }
 
 open class SysOutput<T : SysData> internal constructor(
-        name: String, parent: SysObject? = null, signalWrite: SysSignalWrite<T>? = null
-) : SysPort<SysSignalWrite<T>>(name, parent, signalWrite) {
+        name: String, scheduler: SysScheduler, parent: SysObject? = null, signalWrite: SysSignalWrite<T>? = null
+) : SysPort<SysSignalWrite<T>>(name, scheduler, parent, signalWrite) {
 
     var value: T
         get() = throw UnsupportedOperationException("Signal read is not supported for output port")
         set(value) {
-            if (bound == null) throw IllegalStateException("Port $name is not bound")
-            bound!!.value = value
+            if (!sealed) {
+                if (!isBound) throw IllegalStateException("Port $name is not bound")
+                bound!!.value = value
+            }
         }
 }
 

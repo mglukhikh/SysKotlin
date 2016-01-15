@@ -24,8 +24,9 @@ abstract class SysBus<T : SysData> internal constructor(
     override fun register(port: SysPort<*>) {
     }
 
-    open fun addWire(startValue: T) {
-        signals.add(SysSignal<T>((signals.size).toString(), startValue, scheduler))
+    protected open fun addWire(startValue: T) {
+        assert(scheduler.stopRequested) { "Impossible to add the wire in bus while running the scheduler" }
+        signals.add(SysSignal((signals.size).toString(), startValue, scheduler))
     }
 
     abstract fun set(value: T, index: Int, port: SysPort<*>)
@@ -57,7 +58,6 @@ open class SysBitBus internal constructor(
         for (i in signals.indices) update(i)
     }
 
-    // ToDo: private addWire(startValue: T)
     fun addWire() {
         super.addWire(SysBit.X)
         ports.forEach { it.value.add(SysBit.Z) }
@@ -65,7 +65,7 @@ open class SysBitBus internal constructor(
     }
 
     override fun set(value: SysBit, index: Int, port: SysPort<*>) {
-        ports[port]!!.set(index, value)
+        ports[port]!![index] = value
         update(index)
     }
 
@@ -92,7 +92,7 @@ open class SysPriorityBus<T : SysData> internal constructor(
     var changed = false
         private set
 
-    override fun addWire(startValue: SysPriorityValue<T>) {
+    override public fun addWire(startValue: SysPriorityValue<T>) {
         super.addWire(startValue)
         priority.add(startValue.priority)
     }
@@ -123,7 +123,7 @@ open class SysFifoBus<T : SysData> internal constructor(
 
     private val fifo: MutableList<Queue<T>> = ArrayList()
 
-    override fun addWire(startValue: T) {
+    override public fun addWire(startValue: T) {
         super.addWire(startValue)
         fifo.add(LinkedList())
     }

@@ -1,21 +1,22 @@
 package ru.spbstu.sysk.connectors
 
 import org.junit.Test
-import ru.spbstu.sysk.core.SysScheduler
+import ru.spbstu.sysk.core.SysTopModule
 import ru.spbstu.sysk.data.SysBit
 import ru.spbstu.sysk.data.SysBit.*
 
 class SysBusTest {
     @Test
     fun sysBitBus() {
-        var connector = SysBitBus("connector", SysScheduler())
+        val top = SysTopModule()
+        var connector = SysBitBus("connector", top.scheduler)
         connector.addWire()
         connector.addWire()
         connector.addWire()
         connector.addWire()
-        val port_1 = SysBusPort("port1", null, connector)
-        val port_2 = SysBusPort("port2", null, connector)
-        val port_3 = SysBusPort("port3", null, connector)
+        val port_1 = SysBusPort("port1", top.scheduler, top, connector)
+        val port_2 = SysBusPort("port2", top.scheduler, top, connector)
+        val port_3 = SysBusPort("port3", top.scheduler, top, connector)
         assert(port_1[0].x)
         assert(port_2[1].x)
         assert(port_3[2].x)
@@ -39,8 +40,9 @@ class SysBusTest {
 
     @Test
     fun SysFifoBus() {
-        var bus = SysFifoBus<SysBit>("bus", SysScheduler())
-        var port = SysBusPort("port", null, bus)
+        val top = SysTopModule()
+        var bus = SysFifoBus<SysBit>("bus", top.scheduler)
+        var port = SysBusPort("port", top.scheduler, top, bus)
         bus.addWire(ZERO)
         bus.addWire(ZERO)
         bus.addWire(ONE)
@@ -63,8 +65,9 @@ class SysBusTest {
 
     @Test
     fun SysPriorityBus() {
-        var bus = SysPriorityBus<SysBit>("bus", SysScheduler())
-        var port = SysBusPort("port", null, bus)
+        val top = SysTopModule()
+        var bus = SysPriorityBus<SysBit>("bus", top.scheduler)
+        var port = SysBusPort("port", top.scheduler, top, bus)
         bus.addWire(SysPriorityValue(1, ZERO))
         bus.addWire(SysPriorityValue(1, ZERO))
         bus.addWire(SysPriorityValue(1, ONE))
