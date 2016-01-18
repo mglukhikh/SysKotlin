@@ -3,7 +3,7 @@ package ru.spbstu.sysk.samples
 import ru.spbstu.sysk.core.SysModule
 import ru.spbstu.sysk.data.SysBit
 
-public class SReg(name: String, digPerWord: Int, parent: SysModule) : SysModule(name, parent) {
+class SReg(name: String, digPerWord: Int, parent: SysModule) : SysModule(name, parent) {
 
     val d = bitInput("d")
     val clk = bitInput("clk")

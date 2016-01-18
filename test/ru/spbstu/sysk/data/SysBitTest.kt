@@ -2,7 +2,7 @@ package ru.spbstu.sysk.data
 
 import org.junit.Test
 
-public class SysBitTest {
+class SysBitTest {
 
     @Test
     fun base() {

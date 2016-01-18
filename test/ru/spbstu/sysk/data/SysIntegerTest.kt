@@ -4,7 +4,7 @@ import org.junit.Test
 import ru.spbstu.sysk.data.SysBit.*
 
 
-public class SysIntegerTest {
+class SysIntegerTest {
 
     @Test
     fun first() {

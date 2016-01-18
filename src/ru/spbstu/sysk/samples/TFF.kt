@@ -4,7 +4,7 @@ import ru.spbstu.sysk.core.SysModule
 import ru.spbstu.sysk.data.SysBit
 import ru.spbstu.sysk.data.SysBit.*
 
-public class TFF(name: String, parent: SysModule) : SysModule(name, parent) {
+class TFF(name: String, parent: SysModule) : SysModule(name, parent) {
 
     val t = bitInput("t")
     val clk = bitInput("clk")

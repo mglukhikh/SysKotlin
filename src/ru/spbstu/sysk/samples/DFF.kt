@@ -6,7 +6,7 @@ import ru.spbstu.sysk.data.SysBit
 /**
  * Flip-flop D-trigger module
  */
-public class DFF (name: String, parent: SysModule): SysModule(name, parent) {
+class DFF (name: String, parent: SysModule): SysModule(name, parent) {
 
     val d = bitInput("d")
     val clk = bitInput("clk")

@@ -5,7 +5,7 @@ import java.math.BigInteger
 /** Width of integer / unsigned / ... */
 @Target(AnnotationTarget.EXPRESSION, AnnotationTarget.TYPE)
 @Retention(AnnotationRetention.SOURCE)
-public annotation class Width(val value: Int)
+annotation class Width(val value: Int)
 
 /**
  * Immutable class for a fixed-width integer, width can be from 0 to 64, inclusively.

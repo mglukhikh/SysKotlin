@@ -64,7 +64,7 @@ sealed class SysWait {
         }
     }
 
-    class OneOf(public val elements: List<SysWait>): SysWait() {
+    class OneOf(val elements: List<SysWait>): SysWait() {
         constructor(vararg elements: SysWait): this(elements.toList())
 
         override fun or(other: SysWait): OneOf = OneOf(elements + other)

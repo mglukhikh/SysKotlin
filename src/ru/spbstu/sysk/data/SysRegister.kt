@@ -5,7 +5,7 @@ import ru.spbstu.sysk.core.SysModule
 /**
  * Register for storing any kind of information
  */
-public class SysRegister <T : SysData> (name: String, defValue: T, parent: SysModule): SysModule(name, parent) {
+class SysRegister <T : SysData> (name: String, defValue: T, parent: SysModule): SysModule(name, parent) {
 
     val d = input<T>("d")      // data input
     val en = bitInput("en")   // enable

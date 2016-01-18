@@ -3,7 +3,7 @@ package ru.spbstu.sysk.samples
 import ru.spbstu.sysk.core.SysModule
 import ru.spbstu.sysk.data.SysBit
 
-public class PReg (name: String, digPerWord: Int, parent: SysModule): SysModule(name, parent) {
+class PReg (name: String, digPerWord: Int, parent: SysModule): SysModule(name, parent) {
 
     val d = Array(digPerWord, {i -> bitInput("d" + i.toString())})
     val clk = bitInput("clk")

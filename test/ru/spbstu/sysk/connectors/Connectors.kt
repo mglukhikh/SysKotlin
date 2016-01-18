@@ -29,15 +29,15 @@ internal val STOP = SysInteger(CAPACITY_COMMAND, 11)
 
 class Connectors {
     internal class Hub constructor(
-            public val capacity: Int, name: String, parent: SysModule)
+            val capacity: Int, name: String, parent: SysModule)
     : SysModule(name, parent) {
 
         private var currentInput = 0
 
-        public val inputs = Array(capacity, { fifoInput<AssertModule.Status>("input_$it") })
-        public val output = fifoOutput<AssertModule.Status>("output")
+        val inputs = Array(capacity, { fifoInput<AssertModule.Status>("input_$it") })
+        val output = fifoOutput<AssertModule.Status>("output")
 
-        public val waitListen = SysWait.Time(1)
+        val waitListen = SysWait.Time(1)
 
         private val startListen = event("listen")
         private val inputEvents = SysWait.OneOf(Array<SysWait>(inputs.size, { inputs[it].defaultEvent }).toList())
@@ -72,8 +72,8 @@ class Connectors {
 
         internal open class Status : SysData {
 
-            public val description: Array<SysInteger>
-            public val parent: SysModule?
+            val description: Array<SysInteger>
+            val parent: SysModule?
 
             constructor(description: Array<SysInteger>, parent: SysModule) : super() {
                 this.description = description
@@ -85,7 +85,7 @@ class Connectors {
                 parent = null
             }
 
-            override public fun toString(): String {
+            override fun toString(): String {
                 if (parent == null) {
                     return "Undefined"
                 } else {
@@ -100,12 +100,12 @@ class Connectors {
             }
         }
 
-        public val logPort = fifoInput<Status>("log")
+        val logPort = fifoInput<Status>("log")
 
         private val expectedDescription: MutableList<Array<SysInteger>> = LinkedList()
 
         companion object Static {
-            public val waitSave = SysWait.Time(3)
+            val waitSave = SysWait.Time(3)
         }
 
         private val startSave = event("save")
@@ -146,23 +146,23 @@ class Connectors {
 
     /** This class not describes the operation of the real RAM. He only needed for the test. */
     internal class RAM constructor(
-            public val capacity: Int, public val firstAddress: Int, name: String, parent: SysModule
+            val capacity: Int, val firstAddress: Int, name: String, parent: SysModule
     )
     : SysModule(name, parent) {
 
-        public val dataPort = busPort<SysBit>("data")
-        public val addressPort = busPort<SysBit>("address")
-        public val commandPort = busPort<SysBit>("command")
-        public val logPort = fifoOutput<AssertModule.Status>("log")
+        val dataPort = busPort<SysBit>("data")
+        val addressPort = busPort<SysBit>("address")
+        val commandPort = busPort<SysBit>("command")
+        val logPort = fifoOutput<AssertModule.Status>("log")
 
         private val memory = Array(capacity, { SysInteger(CAPACITY_DATA, 0) })
 
         companion object Static {
-            public val waitWrite = SysWait.Time(4)
-            public val waitRead = SysWait.Time(3)
-            public val waitPrint = SysWait.Time(2)
-            public val waitEmitUpdate = SysWait.Time(1)
-            public val waitDisable = SysWait.Time(1)
+            val waitWrite = SysWait.Time(4)
+            val waitRead = SysWait.Time(3)
+            val waitPrint = SysWait.Time(2)
+            val waitEmitUpdate = SysWait.Time(1)
+            val waitDisable = SysWait.Time(1)
         }
 
         private val startWrite = event("write")
@@ -251,32 +251,32 @@ class Connectors {
             private val A: Long, private val B: Long, name: String, parent: SysModule
     ) : SysModule(name, parent) {
 
-        internal class Command constructor(public val name: SysInteger, public val arg: SysInteger? = null) {}
+        internal class Command constructor(val name: SysInteger, val arg: SysInteger? = null) {}
 
-        public val dataPort = busPort<SysBit>("data")
-        public val addressPort = busPort<SysBit>("address")
-        public val commandPort = busPort<SysBit>("command")
-        public val logPort = fifoOutput<AssertModule.Status>("log")
+        val dataPort = busPort<SysBit>("data")
+        val addressPort = busPort<SysBit>("address")
+        val commandPort = busPort<SysBit>("command")
+        val logPort = fifoOutput<AssertModule.Status>("log")
 
         private var register: Array<SysInteger> = arrayOf(SysInteger(CAPACITY_DATA, A), SysInteger(CAPACITY_DATA, B))
         private var currentRegister = 0
         private var command = Command(NULL)
 
         companion object Static {
-            public val waitStop = SysWait.Time(10)
-            public val waitRem = SysWait.Time(5)
-            public val waitDiv = SysWait.Time(5)
-            public val waitMul = SysWait.Time(5)
-            public val waitSub = SysWait.Time(5)
-            public val waitAdd = SysWait.Time(5)
-            public val waitPush = SysWait.Time(4)
-            public val waitPull = SysWait.Time(3)
-            public val waitResponse = SysWait.Time(3)
-            public val waitPrint = SysWait.Time(2)
-            public val waitNext = SysWait.Time(2)
-            public val waitSave = SysWait.Time(2)
-            public val waitUpdate = SysWait.Time(1)
-            public val waitDisable = SysWait.Time(1)
+            val waitStop = SysWait.Time(10)
+            val waitRem = SysWait.Time(5)
+            val waitDiv = SysWait.Time(5)
+            val waitMul = SysWait.Time(5)
+            val waitSub = SysWait.Time(5)
+            val waitAdd = SysWait.Time(5)
+            val waitPush = SysWait.Time(4)
+            val waitPull = SysWait.Time(3)
+            val waitResponse = SysWait.Time(3)
+            val waitPrint = SysWait.Time(2)
+            val waitNext = SysWait.Time(2)
+            val waitSave = SysWait.Time(2)
+            val waitUpdate = SysWait.Time(1)
+            val waitDisable = SysWait.Time(1)
         }
 
         private val startRem = event("rem")
