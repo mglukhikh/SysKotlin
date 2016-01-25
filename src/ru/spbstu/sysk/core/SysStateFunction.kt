@@ -1,5 +1,7 @@
 package ru.spbstu.sysk.core
 
+import java.util.*
+
 interface StateContainer {
     val states: MutableList<State>
 
@@ -19,14 +21,14 @@ interface StateContainer {
     }
 
     fun block(init: State.Block.() -> Unit): State.Block {
-        val result = State.Block(wait(), linkedListOf())
+        val result = State.Block(wait(), LinkedList())
         result.init()
         states.add(result)
         return result
     }
 
     fun <T : Any> forEach(progression: Iterable<T>, init: State.Iterative<T>.() -> Unit): State.Iterative<T> {
-        val result = State.Iterative(progression, wait(), linkedListOf())
+        val result = State.Iterative(progression, wait(), LinkedList())
         result.init()
         states.add(result)
         return result
@@ -132,7 +134,7 @@ class SysStateFunction private constructor(
         sensitivities: SysWait = SysWait.Never
 ): SysFunction(sensitivities, initialize = true), StateContainer {
     internal constructor(sensitivities: SysWait = SysWait.Never):
-            this(linkedListOf(), null, sensitivities)
+            this(LinkedList(), null, sensitivities)
 
     fun init(f: () -> Unit): State.Single {
         initState = State.Single {

@@ -150,7 +150,7 @@ class SysScheduler {
                 }
             }
             if (functionActivated) {
-                functions -= neverCalledFunctions
+                functions.keys -= neverCalledFunctions
                 update()
                 // Proceed to next delta-cycle
             }
