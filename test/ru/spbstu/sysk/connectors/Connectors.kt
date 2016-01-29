@@ -247,7 +247,7 @@ class Connectors {
 
     /** This class not describes the operation of the real CPU. He only needed for the test. */
     internal class CPU constructor(
-            protected val commands: Queue<CPU.Command> = linkedListOf(),
+            protected val commands: Queue<CPU.Command> = LinkedList<CPU.Command>(),
             private val A: Long, private val B: Long, name: String, parent: SysModule
     ) : SysModule(name, parent) {
 
