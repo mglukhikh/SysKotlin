@@ -1,7 +1,6 @@
 package ru.spbstu.sysk.samples
 
 import org.junit.Test
-import kotlin.test.assertTrue
 import ru.spbstu.sysk.core.*
 import ru.spbstu.sysk.data.SysBit
 import ru.spbstu.sysk.data.SysBit.*
@@ -27,30 +26,30 @@ class DFFTest {
                 } else {
                     when (counter) {
                         0 -> {
-                            assertTrue(q.x, "q should be x at the beginning")
+                            assert(q.x) { "q should be x at the beginning" }
                         }
                         1 -> {
                             if (phase == 0)
-                                assertTrue(q.x, "q should be x after q = x and D = X")
+                                assert(q.x) { "q should be x after q = x and D = X" }
                             else
-                                assertTrue(q.zero, "q should be false after q = false and D = 0")
+                                assert(q.zero) { "q should be false after q = false and D = 0" }
 
                             // All changes at clock N are received at clock N+1 and processed at clock N+2
                             d.value = ONE
                         }
                         2 -> {
                             if (phase == 0)
-                                assertTrue(q.x, "q should be x after q = x and D = X")
+                                assert(q.x) { "q should be x after q = x and D = X" }
                             else
-                                assertTrue(q.zero, "q should be false after q = false and D = 0")
+                                assert(q.zero) { "q should be false after q = false and D = 0" }
 
                             d.value = ZERO
                         }
                         3 -> {
-                            assertTrue(q.one, "q should be true after D = 1")
+                            assert(q.one) { "q should be true after D = 1" }
                         }
                         4 -> {
-                            assertTrue(q.zero, "q should be false after D = 0")
+                            assert(q.zero) { "q should be false after D = 0" }
                         }
                     }
                     counter++
@@ -104,24 +103,24 @@ class DFFTest {
 
             stateFunction(clk) {
                 state {
-                    assertTrue(q.x)
+                    assert(q.x)
                     swapOrOne.value = ZERO
                 }
                 state {
-                    assertTrue(q.x)
+                    assert(q.x)
                     swapOrOne.value = ONE
                 }
                 state {
-                    assertTrue(q.one)
+                    assert(q.one)
                 }
                 state {
-                    assertTrue(q.zero)
+                    assert(q.zero)
                 }
                 state {
-                    assertTrue(q.one)
+                    assert(q.one)
                 }
                 state {
-                    assertTrue(q.zero)
+                    assert(q.zero)
                     scheduler.stop()
                 }
             }
