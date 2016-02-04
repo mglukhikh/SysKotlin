@@ -52,35 +52,33 @@ class SysRegisterTest {
 
         val clk = clockedSignal("clk", time(20, TimeUnit.NS))
 
-        val aen = bitSignal("aen")
-        val ben = bitSignal("ben")
+        var aen by readWriteSignal("aen", a.en)
+        var ben by readWriteSignal("ben", b.en)
 
-        val ad = signal<SysInteger>("ad")
-        val bd = signal<SysInteger>("bd")
+        var ad by readWriteSignal("ad", a.d)
+        var bd by readWriteSignal("bd", b.d)
 
-        val aq = signal<SysInteger>("aq")
-        val bq = signal<SysInteger>("bq")
+        val aq by readOnlySignal("aq", a.q)
+        val bq by readOnlySignal("bq", b.q)
 
         init {
-            bind(a.clk to clk, b.clk to clk, a.en to aen, b.en to ben)
-            bind(a.d to ad, b.d to bd)
-            bind(a.q to aq, b.q to bq)
+            bind(a.clk to clk, b.clk to clk)
 
             val values = arrayOf(1, 2, 3, 5, 8, 13, 21, 34, 55)
 
             stateFunction(clk) {
                 init {
-                    aen.value = ZERO
-                    ben.value = ZERO
+                    aen = ZERO
+                    ben = ZERO
                 }
                 forEach(0..17) {
                     state {
-                        aen.value = ONE
-                        ben.value = ONE
-                        ad.value = bq.value
-                        bd.value = aq.value + bq.value
-                        assert(bq.value == SysInteger(8, values[it / 2])) {
-                            "#$it: Expected ${values[it/2]}, Actual ${bq.value}"
+                        aen = ONE
+                        ben = ONE
+                        ad = bq
+                        bd = aq + bq
+                        assert(bq == SysInteger(8, values[it / 2])) {
+                            "#$it: Expected ${values[it/2]}, Actual $bq"
                         }
                     }
                 }
