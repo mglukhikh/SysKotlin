@@ -75,6 +75,14 @@ open class SysModule internal constructor(
     protected fun <T : SysData> signal(name: String, startValue: T): SysSignal<T> =
             SysSignal(name, startValue, scheduler, this)
 
+    protected inline fun <reified T : SysData> readOnlySignal(
+            name: String, writePort: SysPort<SysSignalWrite<T>>? = null
+    ) = ReadOnlySignal<T>(signal(name), writePort)
+
+    protected inline fun <reified T : SysData> readWriteSignal(
+            name: String, readPort: SysPort<SysSignalRead<T>>? = null
+    ) = ReadWriteSignal<T>(signal(name), readPort)
+
     protected fun bitSignal(name: String, startValue: SysBit = SysBit.X) =
             SysBitSignal(name, scheduler, startValue, this)
 

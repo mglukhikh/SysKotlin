@@ -1,9 +1,9 @@
 package ru.spbstu.sysk.data
 
-import ru.spbstu.sysk.core.SysFunction
-import ru.spbstu.sysk.core.SysObject
-import ru.spbstu.sysk.core.SysScheduler
-import ru.spbstu.sysk.core.SysWait
+import ru.spbstu.sysk.core.*
+import kotlin.properties.ReadOnlyProperty
+import kotlin.properties.ReadWriteProperty
+import kotlin.reflect.KProperty
 
 open class SysSignal<T : SysData> internal constructor(
         name: String, startValue: T, scheduler: SysScheduler, parent: SysObject? = null
@@ -116,4 +116,24 @@ class SysSignalStub<T: SysData> internal constructor(
 ) : SysSignal<T>(name, defaultValue, scheduler, parent) {
     override var value: T = storedValue
         get() = storedValue
+}
+
+open class ReadOnlySignal<T : SysData>(
+        val s: SysSignal<T>, val writePort: SysPort<SysSignalWrite<T>>? = null
+) : ReadOnlyProperty<SysModule, T> {
+    init {
+        writePort?.bind(s)
+    }
+    override fun getValue(thisRef: SysModule, property: KProperty<*>) = s.value
+}
+
+class ReadWriteSignal<T : SysData>(
+        s: SysSignal<T>, val readPort: SysPort<SysSignalRead<T>>? = null
+) : ReadOnlySignal<T>(s), ReadWriteProperty<SysModule, T> {
+    init {
+        readPort?.bind(s)
+    }
+    override fun setValue(thisRef: SysModule, property: KProperty<*>, value: T) {
+        s.value = value
+    }
 }
