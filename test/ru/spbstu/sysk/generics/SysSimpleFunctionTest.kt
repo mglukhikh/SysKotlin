@@ -12,11 +12,10 @@ class SysSimpleFunctionTest {
 
         val dut = SysNotModule("not", this)
 
-        val x = bitSignal("x")
+        var x by readWriteSignal("x", dut.x)
         val y = bitSignal("y")
 
         init {
-            bind(dut.x to x)
             bind(dut.y to y)
         }
 
@@ -27,11 +26,11 @@ class SysSimpleFunctionTest {
                 when (counter) {
                     0 -> {
                         assert(y.x)
-                        x.value = ZERO
+                        x = ZERO
                     }
                     1 -> {
                         assert(y.one)
-                        x.value = ONE
+                        x = ONE
                     }
                     2 -> {
                         assert(y.zero)
@@ -50,12 +49,11 @@ class SysSimpleFunctionTest {
     class SysOrTester: SysTopModule() {
         val dut = SysOrModule("or", this)
 
-        val x1 = bitSignal("x1")
-        val x2 = bitSignal("x2")
+        var x1 by readWriteSignal("x1", dut.x1)
+        var x2 by readWriteSignal("x2", dut.x2)
         val y = bitSignal("y")
 
         init {
-            bind(dut.x1 to x1, dut.x2 to x2)
             bind(dut.y to y)
         }
 
@@ -66,24 +64,24 @@ class SysSimpleFunctionTest {
                 when (counter) {
                     0 -> {
                         assert(y.x)
-                        x1.value = ZERO
-                        x2.value = ZERO
+                        x1 = ZERO
+                        x2 = ZERO
                     }
                     1 -> {
                         assert(y.zero)
-                        x1.value = ONE
+                        x1 = ONE
                     }
                     2 -> {
                         assert(y.one)
-                        x2.value = ONE
+                        x2 = ONE
                     }
                     3 -> {
                         assert(y.one)
-                        x1.value = ZERO
+                        x1 = ZERO
                     }
                     4 -> {
                         assert(y.one)
-                        x2.value = ZERO
+                        x2 = ZERO
                     }
                     5 -> {
                         assert(y.zero)
@@ -102,12 +100,11 @@ class SysSimpleFunctionTest {
     class SysAndTester: SysTopModule() {
         val dut = SysAndModule("and", this)
 
-        val x1 = bitSignal("x1")
-        val x2 = bitSignal("x2")
+        var x1 by readWriteSignal("x1", dut.x1)
+        var x2 by readWriteSignal("x2", dut.x2)
         val y = bitSignal("y")
 
         init {
-            bind(dut.x1 to x1, dut.x2 to x2)
             bind(dut.y to y)
         }
 
@@ -118,24 +115,24 @@ class SysSimpleFunctionTest {
                 when (counter) {
                     0 -> {
                         assert(y.x)
-                        x1.value = ZERO
-                        x2.value = ZERO
+                        x1 = ZERO
+                        x2 = ZERO
                     }
                     1 -> {
                         assert(y.zero)
-                        x1.value = ONE
+                        x1 = ONE
                     }
                     2 -> {
                         assert(y.zero)
-                        x2.value = ONE
+                        x2 = ONE
                     }
                     3 -> {
                         assert(y.one)
-                        x1.value = ZERO
+                        x1 = ZERO
                     }
                     4 -> {
                         assert(y.zero)
-                        x2.value = ZERO
+                        x2 = ZERO
                     }
                     5 -> {
                         assert(y.zero)

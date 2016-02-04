@@ -14,14 +14,13 @@ class SysSimpleAutomataTest {
     class SysLatchStagedTester : SysTopModule() {
         val dut = LatchTriggerMoore("latch", this)
 
-        val x = bitSignal("x")
-        val y = bitSignal("y")
+        var x by readWriteSignal("x", dut.x)
+        val y by readOnlySignal("y", dut.y)
 
         val clk = clockedSignal("clk", time(20, TimeUnit.NS))
 
         init {
-            bind(dut.x to x, dut.clk to clk)
-            bind(dut.y to y)
+            bind(dut.clk to clk)
         }
 
         fun assertTime(time: SysWait.Time) {
@@ -32,24 +31,24 @@ class SysSimpleAutomataTest {
             stateFunction(clk) {
                 state {
                     assert(y.x)
-                    x.value = ZERO
+                    x = ZERO
                     assertTime(time(10, TimeUnit.NS))
                 }
                 block {
                     state {
                         assert(y.x)
-                        x.value = ONE
+                        x = ONE
                         assertTime(time(30, TimeUnit.NS))
                     }
                     block {
                         state {
                             assert(y.zero)
-                            x.value = ZERO
+                            x = ZERO
                             assertTime(time(50, TimeUnit.NS))
                         }
                         state {
                             assert(y.one)
-                            x.value = ONE
+                            x = ONE
                             assertTime(time(70, TimeUnit.NS))
                         }
                     }
@@ -72,14 +71,13 @@ class SysSimpleAutomataTest {
 
         val dut = LatchTriggerMoore("latch", this)
 
-        val x = bitSignal("x")
-        val y = bitSignal("y")
+        var x by readWriteSignal("x", dut.x)
+        val y by readOnlySignal("y", dut.y)
 
         val clk = clockedSignal("clk", time(20, TimeUnit.NS))
 
         init {
-            bind(dut.x to x, dut.clk to clk)
-            bind(dut.y to y)
+            bind(dut.clk to clk)
         }
 
         var counter = 0
@@ -88,20 +86,20 @@ class SysSimpleAutomataTest {
             function(sensitivities = clk.posEdgeEvent, initialize = false) {
                 when (counter) {
                     0 -> {
-                        assert(y.x) { "Expected X at 0 but was ${y.value}"}
-                        x.value = ZERO
+                        assert(y.x) { "Expected X at 0 but was $y"}
+                        x = ZERO
                     }
                     1 -> {
                         assert(y.x)
-                        x.value = ONE
+                        x = ONE
                     }
                     2 -> {
                         assert(y.zero)
-                        x.value = ZERO
+                        x = ZERO
                     }
                     3 -> {
                         assert(y.one)
-                        x.value = ONE
+                        x = ONE
                     }
                     4 -> {
                         assert(y.zero)
@@ -130,32 +128,31 @@ class SysSimpleAutomataTest {
 
         val dut = CountTriggerMoore("count", this)
 
-        val x = bitSignal("x")
-        val y = bitSignal("y")
+        var x by readWriteSignal("x", dut.x)
+        val y by readOnlySignal("y", dut.y)
 
         val clk = clockedSignal("clk", time(20, TimeUnit.NS))
 
         init {
-            bind(dut.x to x, dut.clk to clk)
-            bind(dut.y to y)
+            bind(dut.clk to clk)
         }
 
         init {
             stateFunction(clk) {
                 state {
                     assert(y.zero)
-                    x.value = ZERO
+                    x = ZERO
                 }
                 state {
-                    assert(y.zero) { "Expected ZERO at stage 1 but was ${y.value}"}
-                    x.value = ONE
+                    assert(y.zero) { "Expected ZERO at stage 1 but was $y"}
+                    x = ONE
                 }
                 state {
                     assert(y.zero)
                 }
                 state {
                     assert(y.one)
-                    x.value = ZERO
+                    x = ZERO
                 }
                 state {
                     assert(y.zero)
