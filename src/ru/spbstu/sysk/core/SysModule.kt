@@ -57,8 +57,8 @@ open class SysModule internal constructor(
         return this
     }
 
-    protected fun <T : SysData> input(name: String, signalRead: SysSignalRead<T>? = null): SysInput<T> =
-            SysInput(name, scheduler, this, signalRead)
+    protected fun <T : SysData> input(name: String, signalRead: SysSignalRead<T>? = null, defaultValue: T? = null): SysInput<T> =
+            SysInput(name, scheduler, this, signalRead, defaultValue)
 
     protected fun bitInput(name: String, signalRead: SysBitRead? = null): SysBitInput =
             SysBitInput(name, scheduler, this, signalRead)

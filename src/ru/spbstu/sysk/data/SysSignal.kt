@@ -114,8 +114,9 @@ class SysClockedSignal internal constructor(
 class SysSignalStub<T: SysData> internal constructor(
         name: String, defaultValue: T, scheduler: SysScheduler, parent: SysObject? = null
 ) : SysSignal<T>(name, defaultValue, scheduler, parent) {
-    override var value: T = storedValue
+    override var value: T
         get() = storedValue
+        set(value) = throw UnsupportedOperationException("Signal write is not supported for signal stub")
 }
 
 open class ReadOnlySignal<T : SysData>(
