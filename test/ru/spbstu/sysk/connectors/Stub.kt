@@ -31,12 +31,12 @@ class Stub {
 
         private val pos: (SysWait) -> SysWait = {
             println("pos ${clk.value}")
-            clk.defaultEvent
+            clk.posEdgeEvent
         }
 
         private val neg: (SysWait) -> SysWait = {
             println("neg ${clk.value}")
-            clk.defaultEvent
+            clk.negEdgeEvent
         }
 
         init {
