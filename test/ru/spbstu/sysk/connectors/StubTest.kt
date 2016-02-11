@@ -30,11 +30,13 @@ class StubTest {
         }
 
         private val pos: (SysWait) -> SysWait = {
+            // TODO: function is never called
             println("pos ${clk.value}")
             clk.posEdgeEvent
         }
 
         private val neg: (SysWait) -> SysWait = {
+            // TODO: function is never called
             println("neg ${clk.value}")
             clk.negEdgeEvent
         }
