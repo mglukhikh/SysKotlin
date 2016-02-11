@@ -40,15 +40,15 @@ TODO
     * SysFixed (valentin) -- not started
   * delayed happens (?) (sergei)
   * ports
-    * default values (mikhail) -- not started
-    * stub signals (mikhail / sergei) -- partially done
+    * default values (sergei) -- done
+    * stub signals (sergei) -- done
     * check binding (mikhail / sergei) -- not started
   * reset (?)
 * Tests
   * FIFO / buses (sergei) -- done
   * memory module (veronika) -- failed
-  * register + integer (mikhail)
-  * port bindings check (?) (mikhail)
+  * register + integer (mikhail) -- done
+  * port bindings check 
   * Some large sample(s) (mikhail or sergei) -- not started
     * memory & cache
     * multiplier pool
@@ -58,11 +58,11 @@ TODO
   * wireInput / input etc. (make more or less the same) -- cancelled (bitInput now)
   * remove triggeredFunction -- done
   * function / stagedFunction together -- cancelled (function / stateFunction now)
-  * do something with signal.value -- not started
-    * rename to something?
-    * use read / write?
-    * try delegates?
-    * use set / reset?
+  * do something with signal.value (mikhail) -- in process
+    * rename to something? -- NO
+    * use read / write? -- ???
+    * try delegates? -- YES
+    * use set / reset? -- ???
   * SysData (sergei / mikhail) -- almost done
     * remove all starting values of signals / registers
 * Project organization
