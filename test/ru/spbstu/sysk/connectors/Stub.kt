@@ -14,10 +14,10 @@ class Stub {
             name: String, parent: SysModule)
     : SysModule(name, parent) {
 
-        val clk = bitInput("clk", null)
-        val exp = input("exp", null, SysInteger(32, 1))
-        val pow = input("pos", null, SysInteger(32, 1))
-        val result = output<SysInteger>("result", null)
+        val clk = bitInput("clk")
+        val exp = input("exp", SysInteger(32, 1))
+        val pow = input("pos", SysInteger(32, 1))
+        val result = output<SysInteger>("result")
 
         private val involution: (SysWait) -> Unit = {
             println("involution")
@@ -51,9 +51,9 @@ class Stub {
             private var qCycles: Int, name: String, parent: SysModule)
     : SysModule(name, parent) {
 
-        val clk = output<SysBit>("clk", null)
-        val exp = output<SysInteger>("exp", null)
-        val result = input<SysInteger>("result", null)
+        val clk = output<SysBit>("clk")
+        val exp = output<SysInteger>("exp")
+        val result = input<SysInteger>("result")
 
         val nextCycleEvent = event("nextCycle")
         val nextStepInitializationEvent = event("nextStepInitialization")
