@@ -144,11 +144,7 @@ class SysStateFunction private constructor(
         return initState!!
     }
 
-    private fun init(event: SysWait): SysWait {
-        // BUG: return infiniteStage?.run() ?: SysWait.Never, see KT-10142
-        if (initState == null) return wait()
-        return initState!!.run(event)
-    }
+    private fun init(event: SysWait): SysWait = initState?.run(event) ?: wait()
 
     override var state = 0
 
