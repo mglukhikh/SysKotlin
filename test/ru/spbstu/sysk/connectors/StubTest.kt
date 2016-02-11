@@ -9,7 +9,7 @@ import ru.spbstu.sysk.data.SysBit
 import ru.spbstu.sysk.data.SysInteger
 import ru.spbstu.sysk.data.undefined
 
-class Stub {
+class StubTest {
     internal class Involuator constructor(
             name: String, parent: SysModule)
     : SysModule(name, parent) {
