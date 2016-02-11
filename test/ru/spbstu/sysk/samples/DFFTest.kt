@@ -4,6 +4,7 @@ import org.junit.Test
 import ru.spbstu.sysk.core.*
 import ru.spbstu.sysk.data.SysBit
 import ru.spbstu.sysk.data.SysBit.*
+import ru.spbstu.sysk.data.SysBitInput
 import ru.spbstu.sysk.data.bind
 import ru.spbstu.sysk.generics.SysAndNotModule
 
@@ -11,10 +12,13 @@ class DFFTest {
 
     private class Testbench(name: String, parent: SysModule): SysModule(name, parent) {
 
-        val d = output<SysBit>("d")
+        val d = readWritePort<SysBit>("d")
+        private var dval by d
 
         val clk = bitInput("clk")
-        val q   = bitInput("q")
+
+        val q   = readOnlyBitPort("q")
+        private val qval by q
 
         private var counter = 0
         private var phase = 0
@@ -22,34 +26,34 @@ class DFFTest {
         init {
             function(clk) {
                 if (it is SysWait.Initialize) {
-                    d.value = X
+                    dval = X
                 } else {
                     when (counter) {
                         0 -> {
-                            assert(q.x) { "q should be x at the beginning" }
+                            assert(qval == X) { "q should be x at the beginning" }
                         }
                         1 -> {
                             if (phase == 0)
-                                assert(q.x) { "q should be x after q = x and D = X" }
+                                assert(qval == X) { "q should be x after q = x and D = X" }
                             else
-                                assert(q.zero) { "q should be false after q = false and D = 0" }
+                                assert(qval == ZERO) { "q should be false after q = false and D = 0" }
 
                             // All changes at clock N are received at clock N+1 and processed at clock N+2
-                            d.value = ONE
+                            dval = ONE
                         }
                         2 -> {
                             if (phase == 0)
-                                assert(q.x) { "q should be x after q = x and D = X" }
+                                assert(qval == X) { "q should be x after q = x and D = X" }
                             else
-                                assert(q.zero) { "q should be false after q = false and D = 0" }
+                                assert(qval == ZERO) { "q should be false after q = false and D = 0" }
 
-                            d.value = ZERO
+                            dval = ZERO
                         }
                         3 -> {
-                            assert(q.one) { "q should be true after D = 1" }
+                            assert(qval == ONE) { "q should be true after D = 1" }
                         }
                         4 -> {
-                            assert(q.zero) { "q should be false after D = 0" }
+                            assert(qval == ZERO) { "q should be false after D = 0" }
                         }
                     }
                     counter++
@@ -66,18 +70,16 @@ class DFFTest {
     }
 
     private class Top : SysTopModule("top") {
-        val d = signal<SysBit>("d")
-
-        val clk = clockedSignal("clk", time(20, TimeUnit.NS))
-        val q = signal<SysBit>("q")
-
-        val ff = DFF("my", this)
+        private val ff = DFF("my", this)
 
         private val tb = Testbench("your", this)
 
+        val clk = clockedSignal("clk", time(20, TimeUnit.NS))
+
         init {
-            bind(ff.d to d, ff.clk to clk, tb.clk to clk, tb.q to q)
-            bind(ff.q to q, tb.d to d)
+            bindSignal("d", tb.d.out, ff.d.inp)
+            bindSignal("q", ff.q.out, tb.q.inp)
+            bind(ff.clk to clk, tb.clk to clk)
         }
     }
 
@@ -87,28 +89,27 @@ class DFFTest {
     }
 
     private class NotTestbench : SysTopModule("top") {
-        val d = bitSignal("d")
-
-        val clk = clockedSignal("clk", time(20, TimeUnit.NS))
-        val q = bitSignal("q", SysBit.X)
-
-        val swapOrOne = bitSignal("en")
-
         val ff = DFF("my", this)
+
         val andNot = SysAndNotModule("andNot", this)
 
+        val clk = clockedSignal("clk", time(20, TimeUnit.NS))
+        val q by readOnlyBitSignal("q", ff.q.out, andNot.x1 as SysBitInput)
+
+        var swapOrOne by readWriteBitSignal("en", andNot.x2 as SysBitInput)
+
         init {
-            bind(ff.d to d, ff.clk to clk, andNot.x1 to q, andNot.x2 to swapOrOne)
-            bind(ff.q to q, andNot.y to d)
+            bindSignal("d", andNot.y, ff.d.inp)
+            bind(ff.clk to clk)
 
             stateFunction(clk) {
                 state {
                     assert(q.x)
-                    swapOrOne.value = ZERO
+                    swapOrOne = ZERO
                 }
                 state {
                     assert(q.x)
-                    swapOrOne.value = ONE
+                    swapOrOne = ONE
                 }
                 state {
                     assert(q.one)

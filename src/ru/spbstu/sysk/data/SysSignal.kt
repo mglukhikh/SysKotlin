@@ -119,21 +119,24 @@ class SysSignalStub<T: SysData> internal constructor(
         set(value) = throw UnsupportedOperationException("Signal write is not supported for signal stub")
 }
 
-open class ReadOnlySignal<T : SysData>(
-        val s: SysSignal<T>, val writePort: SysPort<SysSignalWrite<T>>? = null
-) : ReadOnlyProperty<SysModule, T> {
+open class ConnectingSignal<T : SysData>(
+        val s: SysSignal<T>, writePort: SysOutput<T>?, vararg readPorts: SysInput<T>
+) {
     init {
         writePort?.bind(s)
+        readPorts.forEach { it.bind(s) }
     }
+}
+
+open class ReadOnlySignal<T : SysData>(
+        s: SysSignal<T>, writePort: SysOutput<T>?, vararg readPorts: SysInput<T>
+) : ConnectingSignal<T>(s, writePort, *readPorts), ReadOnlyProperty<SysModule, T> {
     override fun getValue(thisRef: SysModule, property: KProperty<*>) = s.value
 }
 
 class ReadWriteSignal<T : SysData>(
-        s: SysSignal<T>, val readPort: SysPort<SysSignalRead<T>>? = null
-) : ReadOnlySignal<T>(s), ReadWriteProperty<SysModule, T> {
-    init {
-        readPort?.bind(s)
-    }
+        s: SysSignal<T>, vararg readPorts: SysInput<T>
+) : ReadOnlySignal<T>(s, null, *readPorts), ReadWriteProperty<SysModule, T> {
     override fun setValue(thisRef: SysModule, property: KProperty<*>, value: T) {
         s.value = value
     }

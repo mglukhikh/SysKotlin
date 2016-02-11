@@ -1,8 +1,12 @@
 package ru.spbstu.sysk.data
 
+import ru.spbstu.sysk.core.SysModule
 import ru.spbstu.sysk.core.SysObject
 import ru.spbstu.sysk.core.SysScheduler
 import ru.spbstu.sysk.core.SysWait
+import kotlin.properties.ReadOnlyProperty
+import kotlin.properties.ReadWriteProperty
+import kotlin.reflect.KProperty
 
 abstract class SysPort<IF : SysInterface> internal constructor(
         name: String, private val scheduler: SysScheduler, parent: SysObject? = null, sysInterface: IF? = null
@@ -122,4 +126,25 @@ open class SysOutput<T : SysData> internal constructor(
             }
         }
 }
+
+open class ReadOnlyPort<T : SysData>(
+        open val inp: SysInput<T>
+) : ReadOnlyProperty<SysModule, T> {
+    override fun getValue(thisRef: SysModule, property: KProperty<*>) = inp.value
+}
+
+class ReadOnlyBitPort(
+        override val inp: SysBitInput
+) : ReadOnlyPort<SysBit>(inp)
+
+class ReadWritePort<T: SysData>(
+        val out: SysOutput<T>
+) : ReadWriteProperty<SysModule, T> {
+    override fun getValue(thisRef: SysModule, property: KProperty<*>) = out.value
+
+    override fun setValue(thisRef: SysModule, property: KProperty<*>, value: T) {
+        out.value = value
+    }
+}
+
 

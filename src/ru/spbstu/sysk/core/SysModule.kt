@@ -63,8 +63,14 @@ open class SysModule internal constructor(
     protected fun bitInput(name: String, signalRead: SysBitRead? = null): SysBitInput =
             SysBitInput(name, scheduler, this, signalRead)
 
+    protected fun <T : SysData> readOnlyPort(name: String) = ReadOnlyPort<T>(input(name))
+
+    protected fun readOnlyBitPort(name: String) = ReadOnlyBitPort(bitInput(name))
+
     protected fun <T : SysData> output(name: String, signalWrite: SysSignalWrite<T>? = null): SysOutput<T> =
             SysOutput(name, scheduler, this, signalWrite)
+
+    protected fun <T : SysData> readWritePort(name: String) = ReadWritePort<T>(output(name))
 
     protected fun <T : SysData> signalStub(name: String, value: T): SysSignalStub<T> =
             SysSignalStub(name, value, scheduler, this)
@@ -75,17 +81,25 @@ open class SysModule internal constructor(
     protected fun <T : SysData> signal(name: String, startValue: T): SysSignal<T> =
             SysSignal(name, startValue, scheduler, this)
 
+    protected inline fun <reified T : SysData> bindSignal(
+            name: String, writePort: SysOutput<T>, vararg readPorts: SysInput<T>
+    ) = ConnectingSignal<T>(signal(name), writePort, *readPorts)
+
     protected inline fun <reified T : SysData> readOnlySignal(
-            name: String, writePort: SysPort<SysSignalWrite<T>>? = null
-    ) = ReadOnlySignal<T>(signal(name), writePort)
+            name: String, writePort: SysOutput<T>, vararg readPorts: SysInput<T>
+    ) = ReadOnlySignal<T>(signal(name), writePort, *readPorts)
+
+    protected fun readOnlyBitSignal(
+            name: String, writePort: SysOutput<SysBit>, vararg readPorts: SysBitInput
+    ) = ReadOnlySignal(bitSignal(name), writePort, *readPorts)
 
     protected inline fun <reified T : SysData> readWriteSignal(
-            name: String, readPort: SysPort<SysSignalRead<T>>? = null
-    ) = ReadWriteSignal<T>(signal(name), readPort)
+            name: String, vararg readPorts: SysInput<T>
+    ) = ReadWriteSignal<T>(signal(name), *readPorts)
 
     protected fun readWriteBitSignal(
-            name: String, readPort: SysBitInput? = null
-    ) = ReadWriteSignal(bitSignal(name), readPort)
+            name: String, vararg readPort: SysBitInput
+    ) = ReadWriteSignal(bitSignal(name), *readPort)
 
     protected fun bitSignal(name: String, startValue: SysBit = SysBit.X) =
             SysBitSignal(name, scheduler, startValue, this)
