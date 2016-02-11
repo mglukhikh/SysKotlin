@@ -22,8 +22,6 @@ Planned at ~ 25 Dec 2015.
 
 Delayed to 29 Feb 2015.
 
-TODO
-
 * Features
   * function builder (mikhail) -- done partially
     * universal syntax for state & block
@@ -38,17 +36,16 @@ TODO
       * remove code duplication etc.
     * SysFloat (valentin) -- not started
     * SysFixed (valentin) -- not started
-  * delayed happens (?) (sergei)
+  * delayed happens (?) -- delayed
   * ports
     * default values (sergei) -- done
     * stub signals (sergei) -- done
-    * check binding (mikhail / sergei) -- not started
+    * check binding (sergei) -- done
   * reset (?)
 * Tests
   * FIFO / buses (sergei) -- done
   * memory module (veronika) -- failed
   * register + integer (mikhail) -- done
-  * port bindings check 
   * Some large sample(s) (mikhail or sergei) -- not started
     * memory & cache
     * multiplier pool
