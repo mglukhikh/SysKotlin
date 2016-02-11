@@ -45,13 +45,13 @@ abstract class SysPort<IF : SysInterface> internal constructor(
 
     fun to(sysInterface: IF): Pair<SysPort<IF>, IF> = Pair(this, sysInterface)
 
-    operator fun invoke(): IF {
+    open operator fun invoke(): IF {
         assert(isBound) { "Port $name is not bound" }
         return bound!!
     }
 
     val defaultEvent: SysWait.Finder = object : SysWait.Finder() {
-        override operator fun invoke() = bound?.defaultEvent
+        override operator fun invoke() = this@SysPort().defaultEvent
     }
 
 }
@@ -88,11 +88,11 @@ class SysBitInput internal constructor(
 ) : SysInput<SysBit>(name, scheduler, parent, signalRead), SysEdged {
 
     override val posEdgeEvent: SysWait.Finder = object : SysWait.Finder() {
-        override fun invoke() = (bound as? SysBitRead)?.posEdgeEvent
+        override fun invoke() = this@SysBitInput().posEdgeEvent
     }
 
     override val negEdgeEvent: SysWait.Finder = object : SysWait.Finder() {
-        override fun invoke() = (bound as? SysBitRead)?.negEdgeEvent
+        override fun invoke() = this@SysBitInput().negEdgeEvent
     }
 
     val zero: Boolean
@@ -103,6 +103,10 @@ class SysBitInput internal constructor(
 
     val x: Boolean
         get() = value.x
+
+    override operator fun invoke(): SysBitRead {
+        return (super.invoke() as? SysBitRead) ?: throw AssertionError("Bit port $name is not bound to bit read interface")
+    }
 }
 
 open class SysOutput<T : SysData> internal constructor(

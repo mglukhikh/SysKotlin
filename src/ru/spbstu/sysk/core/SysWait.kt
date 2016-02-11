@@ -38,7 +38,7 @@ sealed class SysWait {
     }
 
     abstract class Finder: SysWait() {
-        abstract operator fun invoke(): Event?
+        abstract operator fun invoke(): Event
     }
 
     class Time(val femtoSeconds: Long): SysWait(), Comparable<Time> {

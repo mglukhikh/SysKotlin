@@ -2,8 +2,8 @@ package ru.spbstu.sysk.generics
 
 import org.junit.Test
 import ru.spbstu.sysk.core.SysTopModule
-import ru.spbstu.sysk.data.SysBit
 import ru.spbstu.sysk.data.SysBit.*
+import ru.spbstu.sysk.data.SysBitInput
 import ru.spbstu.sysk.data.bind
 
 class SysSimpleFunctionTest {
@@ -12,7 +12,7 @@ class SysSimpleFunctionTest {
 
         val dut = SysNotModule("not", this)
 
-        var x by readWriteSignal("x", dut.x)
+        var x by readWriteBitSignal("x", dut.x as SysBitInput)
         val y = bitSignal("y")
 
         init {
@@ -49,8 +49,8 @@ class SysSimpleFunctionTest {
     class SysOrTester: SysTopModule() {
         val dut = SysOrModule("or", this)
 
-        var x1 by readWriteSignal("x1", dut.x1)
-        var x2 by readWriteSignal("x2", dut.x2)
+        var x1 by readWriteBitSignal("x1", dut.x1 as SysBitInput)
+        var x2 by readWriteBitSignal("x2", dut.x2 as SysBitInput)
         val y = bitSignal("y")
 
         init {
@@ -100,8 +100,8 @@ class SysSimpleFunctionTest {
     class SysAndTester: SysTopModule() {
         val dut = SysAndModule("and", this)
 
-        var x1 by readWriteSignal("x1", dut.x1)
-        var x2 by readWriteSignal("x2", dut.x2)
+        var x1 by readWriteBitSignal("x1", dut.x1 as SysBitInput)
+        var x2 by readWriteBitSignal("x2", dut.x2 as SysBitInput)
         val y = bitSignal("y")
 
         init {

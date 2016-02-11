@@ -83,6 +83,10 @@ open class SysModule internal constructor(
             name: String, readPort: SysPort<SysSignalRead<T>>? = null
     ) = ReadWriteSignal<T>(signal(name), readPort)
 
+    protected fun readWriteBitSignal(
+            name: String, readPort: SysBitInput? = null
+    ) = ReadWriteSignal<SysBit>(bitSignal(name), readPort)
+
     protected fun bitSignal(name: String, startValue: SysBit = SysBit.X) =
             SysBitSignal(name, scheduler, startValue, this)
 

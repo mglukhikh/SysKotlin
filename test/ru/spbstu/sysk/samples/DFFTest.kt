@@ -87,12 +87,12 @@ class DFFTest {
     }
 
     private class NotTestbench : SysTopModule("top") {
-        val d = signal<SysBit>("d")
+        val d = bitSignal("d")
 
         val clk = clockedSignal("clk", time(20, TimeUnit.NS))
         val q = bitSignal("q", SysBit.X)
 
-        val swapOrOne = signal<SysBit>("en")
+        val swapOrOne = bitSignal("en")
 
         val ff = DFF("my", this)
         val andNot = SysAndNotModule("andNot", this)
