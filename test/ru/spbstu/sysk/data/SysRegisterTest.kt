@@ -29,7 +29,7 @@ class SysRegisterTest {
                         en = ONE
                         d = q + SysInteger.valueOf(1)
                         assert(q == SysInteger(8, it / 2)) {
-                            "#$it: Expected ${it/2}, Actual ${q.value}"
+                            "#$it: Expected ${it/2}, Actual $q"
                         }
                     }
                 }
