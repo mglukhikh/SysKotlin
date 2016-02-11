@@ -30,13 +30,11 @@ class StubTest {
         }
 
         private val pos: (SysWait) -> SysWait = {
-            // TODO: function is never called
             println("pos ${clk.value}")
             clk.posEdgeEvent
         }
 
         private val neg: (SysWait) -> SysWait = {
-            // TODO: function is never called
             println("neg ${clk.value}")
             clk.negEdgeEvent
         }
@@ -99,7 +97,7 @@ class StubTest {
         init {
             val involuator = Involuator("involuator", this)
             val tester = Tester(3, "Tester", this)
-            val clkWire = signal<SysBit>("clk")
+            val clkWire = bitSignal("clk")
             val expWire = signal<SysInteger>("exp")
             val resultWire = signal<SysInteger>("result")
             involuator.clk.bind(clkWire)
