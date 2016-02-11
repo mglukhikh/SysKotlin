@@ -7,7 +7,7 @@ import ru.spbstu.sysk.data.SysBit.*
 class SysPortTest {
 
     @Test
-    fun SysSignalPort() {
+    fun signalPortTest() {
         val top = SysTopModule()
         val connector = SysSignal("connector", ZERO, top.scheduler)
         val input = SysInput("input", top.scheduler, top, connector)
