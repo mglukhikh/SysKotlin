@@ -3,7 +3,6 @@ package ru.spbstu.sysk.data
 import ru.spbstu.sysk.core.SysWait
 
 interface SysInterface {
-    // TODO: do we really need this?
     fun register(port: SysPort<*>)
 
     val defaultEvent: SysWait.Event
