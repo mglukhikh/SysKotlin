@@ -19,13 +19,14 @@ class StubTest {
         val result = output<SysInteger>("result", null)
 
         private val involution: () -> Unit = {
-            println("involution")
             result.value = SysInteger(32, Math.pow(exp.value.value.toDouble(), pow.value.value.toDouble()).toLong())
         }
 
         init {
             stateFunction(clk, true) {
-                infinite(involution)
+                state(involution)
+                sleep(3)
+                goTo(0)
             }
         }
     }
@@ -42,21 +43,19 @@ class StubTest {
         private var one: SysInteger = SysInteger(32, 1)
 
         private val init: () -> Unit = {
-            println("init")
             if (qCycles.toLong() == A.value) scheduler.stop()
             A = A.plus(one)
             exp.value = A
         }
 
         private val check: () -> Unit = {
-            println("check")
-            assert(result.value.equals(SysInteger(32, Math.pow(A.value.toDouble(), 2.0).toLong()))) { "Lel" }
+            assert(result.value.equals(SysInteger(32, Math.pow(A.value.toDouble(), 2.0).toLong())))
         }
 
         init {
             stateFunction(clk, true) {
                 state(init)
-                state({})
+                sleep(4)
                 state(check)
                 goTo(0)
             }

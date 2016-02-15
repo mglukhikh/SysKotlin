@@ -20,10 +20,22 @@ interface StateContainer {
         return result
     }
 
-    fun goTo(number: Int): State.Function {
-        if (number < 0) {
-            throw IllegalArgumentException("State, which has a number of $number does not exist")
+    fun sleep(number: Int): State.Function {
+        if (number <= 0) {
+            throw IllegalArgumentException("Impossible to sleep $number cycles.")
         }
+        val memory = IntArray(1, { number })
+        val result = State.Function {
+            memory[0]--
+            if (memory[0] > 0) state--
+            else memory[0] = number
+            wait()
+        }
+        states.add(result)
+        return result
+    }
+
+    fun goTo(number: Int): State.Function {
         val result = State.Function {
             state = number
             states[state].let {
