@@ -20,6 +20,24 @@ interface StateContainer {
         return result
     }
 
+    fun goTo(number: Int): State.Function {
+        if (number < 0) {
+            throw IllegalArgumentException("State, which has a number of $number does not exist")
+        }
+        val result = State.Function {
+            state = number
+            states[state].let {
+                if (it is State.Function) {
+                    throw IllegalArgumentException("goTo($number) points to function")
+                }
+                it.run(SysWait.Never)
+            }
+            wait()
+        }
+        states.add(result)
+        return result
+    }
+
     fun block(init: State.Block.() -> Unit): State.Block {
         val result = State.Block(wait(), LinkedList())
         result.init()
@@ -52,8 +70,7 @@ interface StateContainer {
                 }
                 return result
             }
-        }
-        else return SysWait.Never
+        } else return SysWait.Never
     }
 }
 
@@ -126,15 +143,21 @@ sealed class State {
 
         override fun complete() = false
     }
+
+    class Function internal constructor(private val f: () -> SysWait) : State() {
+        override fun run(event: SysWait) = f()
+
+        override fun complete() = true
+    }
 }
 
 class SysStateFunction private constructor(
         override val states: MutableList<State>,
         private var initState: State.Single? = null,
         sensitivities: SysWait = SysWait.Never
-): SysFunction(sensitivities, initialize = true), StateContainer {
-    internal constructor(sensitivities: SysWait = SysWait.Never):
-            this(LinkedList(), null, sensitivities)
+) : SysFunction(sensitivities, initialize = true), StateContainer {
+    internal constructor(sensitivities: SysWait = SysWait.Never) :
+    this(LinkedList(), null, sensitivities)
 
     fun init(f: () -> Unit): State.Single {
         initState = State.Single {
@@ -151,8 +174,7 @@ class SysStateFunction private constructor(
     override fun run(event: SysWait): SysWait {
         if (event == SysWait.Initialize) {
             return init(event)
-        }
-        else {
+        } else {
             return super.run(event)
         }
     }
