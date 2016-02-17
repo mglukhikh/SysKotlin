@@ -32,12 +32,10 @@ class SysInteger(
     }
 
     /** Construct from given long value setting minimal possible width */
-    @Deprecated("Use valueOf")
-    constructor(value: Long) : this(widthByValue(value), value, true)
+    private constructor(value: Long) : this(widthByValue(value), value, true)
 
     /** Construct from given int value setting maximal possible width */
-    @Deprecated("Use valueOf")
-    constructor(value: Int) : this(widthByValue(value.toLong()), value.toLong(), true)
+    private constructor(value: Int) : this(widthByValue(value.toLong()), value.toLong(), true)
 
     /**Construct uninitialized sys integer with given width.
      *  Short is used only to male a difference between constructor from Int value*/
@@ -292,7 +290,6 @@ class SysInteger(
         return SysBigInteger(this.width, BigInteger.valueOf(this.value), bitsState = this.bitsState)
     }
 
-
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         return (other as? SysInteger)?.let {
@@ -396,10 +393,11 @@ class SysInteger(
 
 
         private fun widthByValue(value: Long): Int {
-            var result = 1
             var current = value;
             if (current == 0L)
-                return 1;
+                return 1
+            /*
+            var result = 1
             if (current > 0) {
                 while (current != 0L) {
                     result++
@@ -416,7 +414,11 @@ class SysInteger(
                     current = current shr 1
                 }
                 return result;
-            }
+            }*/
+            if (current < 0)
+                current = current.inv()
+            return java.lang.Long.SIZE - java.lang.Long.numberOfLeadingZeros(current) + 1
+
         }
 
         override val undefined: SysInteger
