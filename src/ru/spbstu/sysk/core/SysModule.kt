@@ -96,9 +96,14 @@ open class SysModule internal constructor(
     protected fun <T : SysData> register(name: String, startValue: T) =
             SysRegister(name, startValue, this)
 
-    protected fun <T : SysData> fifoOutput(name: String, fifo: SysFifo<T>? = null) = SysFifoOutput<T>(name, scheduler, this, fifo)
+    protected fun <T : SysData> fifoOutput(name: String, fifo: SysFifo<T>? = null) =
+            SysFifoOutput<T>(name, scheduler, this, fifo)
 
-    protected fun <T : SysData> fifoInput(name: String, fifo: SysFifo<T>? = null) = SysFifoInput<T>(name, scheduler, this, fifo)
+    protected fun <T : SysData> fifoInput(name: String, fifo: SysFifo<T>? = null) =
+            SysFifoInput<T>(name, scheduler, this, fifo)
+
+    protected fun <T : SysData> fifo(capacity: Int, name: String, startValue: T) =
+            SysFifo<T>(capacity, name, startValue, scheduler, this)
 
     protected fun <T : SysData> asynchronousFifo(capacity: Int, name: String, startValue: T) =
             SysAsynchronousFifo<T>(capacity, name, startValue, scheduler, this)
