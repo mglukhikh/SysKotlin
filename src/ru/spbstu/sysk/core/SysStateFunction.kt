@@ -24,11 +24,11 @@ interface StateContainer {
         if (number <= 0) {
             throw IllegalArgumentException("Impossible to sleep $number cycles.")
         }
-        val memory = IntArray(1, { number })
+        var memory = number
         val result = State.Function {
-            memory[0]--
-            if (memory[0] > 0) state--
-            else memory[0] = number
+            memory--
+            if (memory > 0) state--
+            else memory = number
             wait()
         }
         states.add(result)
