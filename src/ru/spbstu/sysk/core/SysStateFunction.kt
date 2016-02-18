@@ -64,6 +64,13 @@ interface StateContainer {
         return result
     }
 
+    fun infiniteBlock(init: State.Iterative<Nothing>.() -> Unit): State.Iterative<Nothing> {
+        val result = State.Iterative<Nothing>(wait(), LinkedList())
+        result.init()
+        states.add(result)
+        return result
+    }
+
     fun infinite(f: () -> Unit): State.Infinite {
         val result = State.Infinite {
             f()
@@ -113,15 +120,19 @@ sealed class State {
     }
 
     class Iterative<T : Any> internal constructor(
-            val progression: Iterable<T>,
+            val progression: Iterable<T>?,
             private val sensitivities: SysWait,
             override val states: MutableList<State>
     ) : State(), StateContainer {
+
+        internal constructor(sensitivities: SysWait, states: MutableList<State>):
+                this(null, sensitivities, states)
+
         override fun wait() = sensitivities
 
         override var state = 0
 
-        private val iterator = progression.iterator()
+        private val iterator = progression?.iterator()
 
         private var _it: T? = null
 
@@ -133,7 +144,7 @@ sealed class State {
         }
 
         private fun nextIteration() {
-            if (iterator.hasNext()) {
+            if (iterator != null && iterator.hasNext()) {
                 _it = iterator.next()
             }
         }
@@ -147,7 +158,7 @@ sealed class State {
             return result
         }
 
-        override fun complete() = !iterator.hasNext()
+        override fun complete() = iterator?.hasNext() == false
     }
 
     class Infinite internal constructor(private val f: () -> SysWait) : State() {
