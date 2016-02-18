@@ -8,7 +8,10 @@ import ru.spbstu.sysk.core.SysWait
 import ru.spbstu.sysk.data.SysBit
 import ru.spbstu.sysk.data.SysInteger
 
+private const val EXPONENT = 3
+
 class StubTest {
+
     internal class Involuator constructor(
             name: String, parent: SysModule)
     : SysModule(name, parent) {
@@ -27,7 +30,6 @@ class StubTest {
                 infiniteBlock {
                     state(involution)
                     sleep(3)
-                    //goTo(0)
                 }
             }
         }
@@ -42,16 +44,15 @@ class StubTest {
         val result = input<SysInteger>("result", null)
 
         private var A: SysInteger = SysInteger(32, 0)
-        private var one: SysInteger = SysInteger(32, 1)
 
         private val init: () -> Unit = {
             if (qCycles.toLong() == A.value) scheduler.stop()
-            A = A.plus(one)
+            A++
             exp.value = A
         }
 
         private val check: () -> Unit = {
-            assert(result.value.equals(SysInteger(32, Math.pow(A.value.toDouble(), 2.0).toLong())))
+            assert(result.value.equals(SysInteger(32, Math.pow(A.value.toDouble(), EXPONENT.toDouble()).toLong())))
         }
 
         init {
@@ -60,7 +61,6 @@ class StubTest {
                     state(init)
                     sleep(4)
                     state(check)
-                    //goTo(0)
                 }
             }
         }
@@ -69,7 +69,7 @@ class StubTest {
     internal object TopModule : SysTopModule("Connectors", SysScheduler()) {
         init {
             val involuator = Involuator("involuator", this)
-            val tester = Tester(3, "Tester", this)
+            val tester = Tester(10, "Tester", this)
             val clk = clockedSignal("clk", SysWait.Time(1), SysBit.ZERO)
             val expWire = signal<SysInteger>("exp")
             val resultWire = signal<SysInteger>("result")
@@ -79,7 +79,7 @@ class StubTest {
             tester.exp.bind(expWire)
             involuator.result.bind(resultWire)
             tester.result.bind(resultWire)
-            involuator.pow.bind(signalStub("pow", SysInteger(32, 2)))
+            involuator.pow.bind(signalStub("pow", SysInteger(32, EXPONENT)))
         }
     }
 

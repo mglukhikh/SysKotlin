@@ -68,10 +68,20 @@ class SysInteger(
 
     /** Adds arg to this integer, with result width is maximum of argument's widths */
     operator fun plus(arg: SysInteger): SysInteger {
-        val resWidth = Math.min(Math.max(width, arg.width), MAX_WIDTH);
+        val resWidth = Math.min(Math.max(width, arg.width), MAX_WIDTH)
         return SysInteger(resWidth, value + arg.value).truncate(resWidth)
     }
 
+    /** ToDo: I wish this functions in main build*/
+    operator fun plus(arg: Int) = SysInteger(this.width, this.value + arg).truncate(this.width)
+    operator fun plus(arg: Long) = SysInteger(this.width, this.value + arg).truncate(this.width)
+    operator fun minus(arg: Int) = SysInteger(this.width, this.value - arg).truncate(this.width)
+    operator fun minus(arg: Long) = SysInteger(this.width, this.value - arg).truncate(this.width)
+    operator fun times(arg: Int) = SysInteger(this.width, this.value * arg).truncate(this.width)
+    operator fun times(arg: Long) = SysInteger(this.width, this.value * arg).truncate(this.width)
+    operator fun inc() = SysInteger(this.width, this.value + 1).truncate(this.width)
+    operator fun dec() = SysInteger(this.width, this.value - 1).truncate(this.width)
+    /** */
 
     /**Unary minus*/
     operator fun unaryMinus(): SysInteger {
