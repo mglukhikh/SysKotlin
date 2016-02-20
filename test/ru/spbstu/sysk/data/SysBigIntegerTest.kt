@@ -74,7 +74,7 @@ class SysBigIntegerTest {
         val y: SysBigInteger = SysBigInteger(32, 128000);
         assert((x + y).equals(SysBigInteger(64, 190000)), { x + y });
         assert((x - y).equals(SysBigInteger(64, -66000)));
-        assert((x * y).equals(SysBigInteger(96, 7936000000)));
+        assert((x * y).equals(SysBigInteger(64, 7936000000)), { "x * y = ${x*y}"} );
         assert((x / y).equals(SysBigInteger(64, 0)));
         //assert((y / x).equals(SysInteger(64, 2)));
         //assert((x % y).equals(x));

@@ -5,7 +5,14 @@ import java.math.BigInteger
 class SysBigInteger(
         val width: Int, val value: BigInteger, defaultBitState: Boolean = false,
         private val bitsState: Array<Boolean> = Array(width, { i -> defaultBitState })
-) : SysData {
+) : SysData, Comparable<SysBigInteger> {
+
+    override fun compareTo(other: SysBigInteger): Int {
+        if (width != other.width) {
+            throw IllegalArgumentException("Non comparable. Width not equal.")
+        }
+        return value.compareTo(other.value)
+    }
 
     init {
 
@@ -52,6 +59,7 @@ class SysBigInteger(
     /** Decrease width to the given with value truncation */
     fun truncate(width: Int): SysBigInteger {
         val widthByValue = value.bitLength() + 1
+        //println("trunc [$width] [$widthByValue]")
         if (width >= widthByValue) return extend(width)
         if (width < 0) throw IllegalArgumentException()
         val truncated = value.shiftRight(widthByValue - width)
@@ -64,7 +72,11 @@ class SysBigInteger(
         return SysBigInteger(resWidth, value.add(arg.value)).truncate(resWidth)
     }
 
-
+    operator fun plus(arg: Long) = this + valueOf(arg)
+    operator fun minus(arg: Long) = this - valueOf(arg)
+    operator fun times(arg: Long) = this * valueOf(arg)
+    operator fun div(arg: Long) = this / valueOf(arg)
+    operator fun mod(arg: Long) = this % valueOf(arg)
     /**Unary minus*/
     operator fun unaryMinus(): SysBigInteger {
         return SysBigInteger(value.negate()).truncate(this.width)
@@ -92,7 +104,7 @@ class SysBigInteger(
 
     /** Multiplies arg to this integer, with result width is sum of argument's width */
     operator fun times(arg: SysBigInteger): SysBigInteger {
-        val resWidth = width + arg.width
+        val resWidth = Math.max(width, arg.width)
         return SysBigInteger(resWidth, value.multiply(arg.value)).truncate(resWidth)
     }
 
@@ -229,6 +241,7 @@ class SysBigInteger(
 
     }
 
+
     /** Cyclic shift right*/
     infix fun cshr(shift: Int): SysBigInteger {
 
@@ -287,6 +300,9 @@ class SysBigInteger(
         return SysBigInteger(sysBitExpression)
     }
 
+    fun abs(): SysBigInteger {
+        return SysBigInteger(width, value.abs(), bitsState = bitsState)
+    }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
