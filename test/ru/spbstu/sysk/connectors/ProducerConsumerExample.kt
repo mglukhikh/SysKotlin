@@ -6,78 +6,93 @@ import ru.spbstu.sysk.core.SysTopModule
 import ru.spbstu.sysk.core.SysWait
 import ru.spbstu.sysk.data.*
 
+private const val QEMITS : Long = 100000000
+private const val CUTOFF : Long = 1000000
+
 class ProducerConsumerExample {
-    internal class Symbol constructor(val value: Char) : SysData {
-        constructor() : this('?')
-        override fun toString() = value.toString()
+    // BUG if visibility is changed to private
+    internal data class Symbol constructor(val value: Char) : SysData {
+        companion object : SysDataCompanion<Symbol> {
+            override val undefined: Symbol
+                get() = Symbol('?')
+
+            fun rand(): Symbol {
+                return Symbol((Math.random() * 94 + 32).toChar())
+            }
+        }
     }
 
-    internal class Producer constructor(
+    private class Producer constructor(
             name: String, parent: SysModule)
     : SysModule(name, parent) {
+        val nextCycle = event("nextCycle")
         val output = fifoOutput<Symbol>("out", null)
-        val clk = bitInput("clk", null)
 
-        private val memory = "Visit www.kotlinlang.org and see what Kotlin can do for you today\n!"
-        private var index = 0
-        val main: () -> Unit = {
-            println("I am in producer")
-            if (index < memory.length) {
-                output.value = Symbol(memory[index])
+        private var qEmits: Long = 0
+
+        val main: (SysWait) -> SysWait = {
+            while (!output.full) {
+                if (qEmits % CUTOFF == 0.toLong()) println("$qEmits: I am in producer")
+                if (qEmits < QEMITS) output.value = Symbol.rand()
+                else output.value = Symbol('\n')
                 output.push = SysBit.ONE
-                index++
+                qEmits++
             }
+            nextCycle.happens()
+            nextCycle
         }
 
         init {
-            stateFunction(clk, true) {
-                infinite(main)
-            }
+            function(main, nextCycle, true)
         }
     }
 
-    internal class Consumer constructor(
+    private class Consumer constructor(
             name: String, parent: SysModule)
     : SysModule(name, parent) {
+        val nextCycle = event("nextCycle")
         val input = fifoInput<Symbol>("in", null)
-        val clk = bitInput("clk", null)
 
-        val main: () -> Unit = {
-            println("I am in consumer")
-            val symbol = input.value
-            input.pop = SysBit.ONE
-            println(symbol)
-            if (input.size == 1) println("<1>")
-            if (input.size == 9) println("<9>")
-            if (symbol.value == '\n') scheduler.stop()
+        private var qEmits: Long = 0
+
+        val main: (SysWait) -> SysWait = {
+            while (!input.empty) {
+                val symbol = input.value
+                if (qEmits % CUTOFF == 0.toLong()) println("$qEmits: I am in consumer $symbol")
+                input.pop = SysBit.ONE
+                if (symbol.value == '\n') scheduler.stop()
+                qEmits++
+            }
+            nextCycle.happens()
+            nextCycle
         }
 
         init {
-            stateFunction(clk, true) {
-                infinite(main)
-            }
+            function(main, nextCycle, true)
         }
     }
 
-    internal object Top : SysTopModule() {
+    private object Top : SysTopModule() {
 
         val consumer: Consumer
         val producer: Producer
         val fifo: SysFifo<Symbol>
-        val clk: SysClockedSignal
 
         init {
             consumer = Consumer("consumer", this)
             producer = Producer("producer", this)
             fifo = fifo(100, "fifo", undefined())
-            clk = clockedSignal("clk", SysWait.Time(1), SysBit.ZERO)
             bind(consumer.input to fifo, producer.output to fifo)
-            bind(consumer.clk to clk, producer.clk to clk)
         }
     }
 
     @Test
     fun main() {
         Top.start()
+        // 16s 278ms
+        // 16s 422ms
+        // 16s 624ms
+        // 16s 833ms
+        // 16s 441ms
     }
 }
