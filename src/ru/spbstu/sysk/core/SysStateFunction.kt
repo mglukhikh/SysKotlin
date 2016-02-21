@@ -26,7 +26,7 @@ interface StateContainer {
             throw IllegalArgumentException("Impossible to sleep $number cycles.")
         }
         var memory = number
-        val result = State.Function {
+        val result = State.Function("sleep", { true }) {
             memory--
             if (memory > 0) state--
             else memory = number
@@ -41,14 +41,57 @@ interface StateContainer {
     }
 
     fun jump(labelName: String): State.Function {
-        val result = State.Function {
-            state = labels[labelName] ?: throw IllegalArgumentException("label: $labelName not found")
-            println("GoTo: $labelName, $state")
-            if (state < states.size) states[state].let { it.run(SysWait.Never) }
+        val result = State.Function("goTo", { true }) {
+            state = -1
+            labels.forEach { if (it.key == labelName) state = it.value }
+            if (state == -1) throw IllegalArgumentException("label: $labelName not found")
+            if (state < states.size) states[state].let { it.run(wait()) }
             wait()
         }
         states.add(result)
         return result
+    }
+
+    fun If(condition: () -> Boolean, init: State.Block.() -> Unit): State.Function {
+        val block = State.Block(wait(), LinkedList(), HashMap())
+        block.init()
+        var Else: State.Function? = null
+        var tpcStruct: Boolean? = null
+        val func = State.Function("if", { block.complete() }) {
+            val cond = condition()
+            Else = Else ?: (states.elementAtOrNull(state + 1) as? State.Function)
+            tpcStruct = tpcStruct ?: (Else != null && Else!!.name == "else")
+            if (tpcStruct!!) Else!!.args = cond
+            if (cond) {
+                block.run(wait())
+                if (block.complete() && tpcStruct!!) state++
+            }
+            else {
+                block.state = 0
+                state++
+                if (state < states.size) this.run(wait())
+            }
+            wait()
+        }
+        states.add(func)
+        return func
+    }
+
+    fun Else(init: State.Block.() -> Unit): State.Function {
+        val block = State.Block(wait(), LinkedList(), HashMap())
+        block.init()
+        val func = State.Function("else", { block.complete() }) {
+            var cond = (states[state] as State.Function).args as? Boolean ?: throw AssertionError()
+            if (!cond) block.run(wait())
+            else {
+                block.state = 0
+                state++
+                if (state < states.size) this.run(wait())
+            }
+            wait()
+        }
+        states.add(func)
+        return func
     }
 
     fun block(init: State.Block.() -> Unit): State.Block {
@@ -82,15 +125,14 @@ interface StateContainer {
     }
 
     fun run(event: SysWait): SysWait {
-        if (!complete()) {
-            states[state].let {
-                val result = it.run(event)
-                if (it.complete()) {
-                    state++
-                }
-                return result
+        if (complete()) state = 0
+        states[state].let {
+            val result = it.run(event)
+            if (it.complete()) {
+                state++
             }
-        } else return SysWait.Never
+            return result
+        }
     }
 }
 
@@ -170,10 +212,16 @@ sealed class State {
         override fun complete() = false
     }
 
-    class Function internal constructor(private val f: () -> SysWait) : State() {
-        override fun run(event: SysWait) = f()
+    class Function internal constructor(
+            val name: String,
+            private val comp: () -> Boolean,
+            private val f: (SysWait) -> SysWait)
+    : State() {
+        var args: Any? = null
 
-        override fun complete() = true
+        override fun run(event: SysWait) = f(event)
+
+        override fun complete() = comp()
     }
 }
 
