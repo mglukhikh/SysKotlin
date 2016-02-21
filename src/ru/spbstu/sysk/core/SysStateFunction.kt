@@ -4,6 +4,7 @@ import java.util.*
 
 interface StateContainer {
     val states: MutableList<State>
+    val labels: MutableMap<String, Int>
 
     var state: Int
 
@@ -35,15 +36,15 @@ interface StateContainer {
         return result
     }
 
-    fun goTo(number: Int): State.Function {
+    fun label(name: String) {
+        labels[name] = states.size
+    }
+
+    fun jump(labelName: String): State.Function {
         val result = State.Function {
-            state = number
-            states[state].let {
-                if (it is State.Function) {
-                    throw IllegalArgumentException("goTo($number) points to function")
-                }
-                it.run(SysWait.Never)
-            }
+            state = labels[labelName] ?: throw IllegalArgumentException("label: $labelName not found")
+            println("GoTo: $labelName, $state")
+            if (state < states.size) states[state].let { it.run(SysWait.Never) }
             wait()
         }
         states.add(result)
@@ -51,21 +52,21 @@ interface StateContainer {
     }
 
     fun block(init: State.Block.() -> Unit): State.Block {
-        val result = State.Block(wait(), LinkedList())
+        val result = State.Block(wait(), LinkedList(), HashMap())
         result.init()
         states.add(result)
         return result
     }
 
     fun <T : Any> forEach(progression: Iterable<T>, init: State.Iterative<T>.() -> Unit): State.Iterative<T> {
-        val result = State.Iterative(progression, wait(), LinkedList())
+        val result = State.Iterative(progression, wait(), LinkedList(), HashMap())
         result.init()
         states.add(result)
         return result
     }
 
     fun infiniteBlock(init: State.Iterative<Nothing>.() -> Unit): State.Iterative<Nothing> {
-        val result = State.Iterative<Nothing>(wait(), LinkedList())
+        val result = State.Iterative<Nothing>(wait(), LinkedList(), HashMap())
         result.init()
         states.add(result)
         return result
@@ -107,7 +108,8 @@ sealed class State {
 
     class Block internal constructor(
             private val sensitivities: SysWait,
-            override val states: MutableList<State>
+            override val states: MutableList<State>,
+            override val labels: MutableMap<String, Int>
     ) : State(), StateContainer {
 
         override fun wait() = sensitivities
@@ -122,11 +124,12 @@ sealed class State {
     class Iterative<T : Any> internal constructor(
             val progression: Iterable<T>?,
             private val sensitivities: SysWait,
-            override val states: MutableList<State>
+            override val states: MutableList<State>,
+            override val labels: MutableMap<String, Int>
     ) : State(), StateContainer {
 
-        internal constructor(sensitivities: SysWait, states: MutableList<State>):
-                this(null, sensitivities, states)
+        internal constructor(sensitivities: SysWait, states: MutableList<State>, labels: MutableMap<String, Int>) :
+                this(null, sensitivities, states, labels)
 
         override fun wait() = sensitivities
 
@@ -176,11 +179,12 @@ sealed class State {
 
 class SysStateFunction private constructor(
         override val states: MutableList<State>,
+        override val labels: MutableMap<String, Int>,
         private var initState: State.Single? = null,
         sensitivities: SysWait = SysWait.Never
 ) : SysFunction(sensitivities, initialize = true), StateContainer {
     internal constructor(sensitivities: SysWait = SysWait.Never) :
-    this(LinkedList(), null, sensitivities)
+    this(LinkedList(), HashMap(), null, sensitivities)
 
     fun init(f: () -> Unit): State.Single {
         initState = State.Single {
