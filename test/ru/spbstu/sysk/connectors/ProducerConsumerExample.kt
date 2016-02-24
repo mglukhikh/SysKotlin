@@ -15,10 +15,6 @@ class ProducerConsumerExample {
         companion object : SysDataCompanion<Symbol> {
             override val undefined: Symbol
                 get() = Symbol('?')
-
-            fun rand(): Symbol {
-                return Symbol((Math.random() * 94 + 32).toChar())
-            }
         }
     }
 
@@ -33,7 +29,7 @@ class ProducerConsumerExample {
         val main: (SysWait) -> SysWait = {
             while (!output.full) {
                 if (qEmits % CUTOFF == 0.toLong()) println("$qEmits: I am in producer")
-                if (qEmits < QEMITS) output.value = Symbol.rand()
+                if (qEmits < QEMITS) output.value = Symbol.undefined
                 else output.value = Symbol('\n')
                 output.push = SysBit.ONE
                 qEmits++
@@ -58,7 +54,7 @@ class ProducerConsumerExample {
         val main: (SysWait) -> SysWait = {
             while (!input.empty) {
                 val symbol = input.value
-                if (qEmits % CUTOFF == 0.toLong()) println("$qEmits: I am in consumer $symbol")
+                if (qEmits % CUTOFF == 0L) println("$qEmits: I am in consumer $symbol")
                 input.pop = SysBit.ONE
                 if (symbol.value == '\n') scheduler.stop()
                 qEmits++
@@ -89,10 +85,15 @@ class ProducerConsumerExample {
     @Test
     fun main() {
         Top.start()
-        // 16s 278ms
-        // 16s 422ms
-        // 16s 624ms
-        // 16s 833ms
-        // 16s 441ms
+        // 8s 149ms
+        // 7s 738ms
+        // 7s 405ms
+        // 7s 378ms
+        // 7s 776ms
+        // 7s 368ms
+        // 7s 760ms
+        // 7s 259ms
+        // 7s 474ms
+        // 7s 499ms
     }
 }

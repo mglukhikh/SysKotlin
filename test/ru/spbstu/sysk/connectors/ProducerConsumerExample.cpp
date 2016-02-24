@@ -53,10 +53,6 @@ class fifo : public sc_channel, public write_if, public read_if
 const long int QEMITS = 100000001;
 const long int CUTOFF = 1000000;
 
-char randomChar() {
-    return (char)(rand() % 95 + 32);    
-}
-
 class producer : public sc_module
 {
    public:
@@ -76,7 +72,7 @@ class producer : public sc_module
             if (qEmits % CUTOFF == 0) {
                 cout<<"I am in producer \n";
             }
-            out->write(randomChar());
+            out->write('?');
             qEmits++;
         }
      }
@@ -135,10 +131,15 @@ int sc_main (int, char *[]) {
    sc_start();
    time_t delay = clock() - res;
    cout << delay / 1000000 << "s " << (delay % 1000000) / 1000 << "ms" << endl;
-   // 9s 407ms
-   // 9s 772ms
-   // 9s 376ms
-   // 9s 364ms
-   // 9s 180ms
+   // 6s 683ms
+   // 6s 986ms
+   // 6s 598ms
+   // 6s 586ms
+   // 6s 587ms
+   // 6s 591ms
+   // 6s 581ms
+   // 6s 597ms
+   // 6s 598ms
+   // 6s 649ms
    return 0;
 }
