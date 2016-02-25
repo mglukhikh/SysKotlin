@@ -72,7 +72,6 @@ class SysInteger(
         return SysInteger(resWidth, value + arg.value).truncate(resWidth)
     }
 
-    /** ToDo: I wish this functions in main build*/
     operator fun plus(arg: Int) = SysInteger(this.width, this.value + arg).truncate(this.width)
     operator fun plus(arg: Long) = SysInteger(this.width, this.value + arg).truncate(this.width)
     operator fun minus(arg: Int) = SysInteger(this.width, this.value - arg).truncate(this.width)
@@ -81,7 +80,6 @@ class SysInteger(
     operator fun times(arg: Long) = SysInteger(this.width, this.value * arg).truncate(this.width)
     operator fun inc() = SysInteger(this.width, this.value + 1).truncate(this.width)
     operator fun dec() = SysInteger(this.width, this.value - 1).truncate(this.width)
-    /** */
 
     /**Unary minus*/
     operator fun unaryMinus(): SysInteger {
@@ -109,7 +107,7 @@ class SysInteger(
 
     /** Multiplies arg to this integer, with result width is sum of argument's width */
     operator fun times(arg: SysInteger): SysInteger {
-        val resWidth = Math.min(width + arg.width, MAX_WIDTH)
+        val resWidth = Math.min(Math.max(width, arg.width), MAX_WIDTH)
         return SysInteger(resWidth, value * arg.value).truncate(resWidth)
     }
 
