@@ -11,14 +11,14 @@ private const val CUTOFF : Long = 1000000
 
 class ProducerConsumerExample {
     // BUG if visibility is changed to private
-    internal data class Symbol constructor(val value: Char) : SysData {
+    internal data class Symbol(val value: Char) : SysData {
         companion object : SysDataCompanion<Symbol> {
             override val undefined: Symbol
                 get() = Symbol('?')
         }
     }
 
-    private class Producer constructor(
+    private class Producer(
             name: String, parent: SysModule)
     : SysModule(name, parent) {
         val nextCycle = event("nextCycle")
@@ -43,7 +43,7 @@ class ProducerConsumerExample {
         }
     }
 
-    private class Consumer constructor(
+    private class Consumer(
             name: String, parent: SysModule)
     : SysModule(name, parent) {
         val nextCycle = event("nextCycle")
