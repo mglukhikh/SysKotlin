@@ -14,8 +14,8 @@ class SysRegisterTest {
         val clk = clockedSignal("clk", time(20, TimeUnit.NS))
 
         var en by readWriteSignal("aen", a.en)
-        var d by readWriteSignal("ad", a.d)
-        val q by readOnlySignal("aq", a.q)
+        var d by readWriteSignal("ad", a.d.inp)
+        val q by readOnlySignal("aq", a.q.out)
 
         init {
             bind(a.clk to clk)
@@ -27,7 +27,7 @@ class SysRegisterTest {
                 forEach(0..9) {
                     state {
                         en = ONE
-                        d = q + SysInteger.valueOf(1)
+                        d = q + 1
                         assert(q == SysInteger(8, it / 2)) {
                             "#$it: Expected ${it/2}, Actual $q"
                         }
@@ -55,11 +55,11 @@ class SysRegisterTest {
         var aen by readWriteSignal("aen", a.en)
         var ben by readWriteSignal("ben", b.en)
 
-        var ad by readWriteSignal("ad", a.d)
-        var bd by readWriteSignal("bd", b.d)
+        var ad by readWriteSignal("ad", a.d.inp)
+        var bd by readWriteSignal("bd", b.d.inp)
 
-        val aq by readOnlySignal("aq", a.q)
-        val bq by readOnlySignal("bq", b.q)
+        val aq by readOnlySignal("aq", a.q.out)
+        val bq by readOnlySignal("bq", b.q.out)
 
         init {
             bind(a.clk to clk, b.clk to clk)
