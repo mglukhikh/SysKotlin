@@ -12,7 +12,7 @@ private const val EXPONENT = 3
 
 class StubTest {
 
-    internal class Involuator constructor(
+    internal class Involuator(
             name: String, parent: SysModule)
     : SysModule(name, parent) {
 
@@ -35,7 +35,7 @@ class StubTest {
         }
     }
 
-    internal class Tester constructor(
+    internal class Tester(
             private var qCycles: Int, name: String, parent: SysModule)
     : SysModule(name, parent) {
 
