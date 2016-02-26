@@ -27,7 +27,7 @@ class SysInteger(
         }
 
         if (bitsState.size != width) {
-            throw IllegalArgumentException()
+            throw IllegalArgumentException("Width $width is too small for this value \n$value")
         }
     }
 
@@ -69,7 +69,7 @@ class SysInteger(
     /** Adds arg to this integer, with result width is maximum of argument's widths */
     operator fun plus(arg: SysInteger): SysInteger {
         val resWidth = Math.min(Math.max(width, arg.width), MAX_WIDTH)
-        return SysInteger(resWidth, value + arg.value).truncate(resWidth)
+        return SysInteger(resWidth, value + arg.value)//.truncate(resWidth)
     }
 
     operator fun plus(arg: Int) = SysInteger(this.width, this.value + arg).truncate(this.width)
@@ -108,8 +108,10 @@ class SysInteger(
     /** Multiplies arg to this integer, with result width is sum of argument's width */
     operator fun times(arg: SysInteger): SysInteger {
         val resWidth = Math.min(Math.max(width, arg.width), MAX_WIDTH)
-        return SysInteger(resWidth, value * arg.value).truncate(resWidth)
+        return SysInteger(resWidth, value * arg.value)//.truncate(resWidth)
     }
+
+    fun power(arg: Int) = SysInteger(width, Math.pow(value.toDouble(), arg.toDouble()).toLong())
 
     /** Bitwise logical shift right*/
     infix fun ushr(shift: Int): SysInteger {
@@ -391,7 +393,7 @@ class SysInteger(
             val mask = BooleanArray(width);
 
             if (width < widthByValue) {
-                throw IllegalArgumentException("value = $value, width = $width, byValue = $widthByValue")
+                throw IllegalArgumentException("Width $width is too small for this value \n$value \nwith width $widthByValue")
             } else {
                 mask.fill(true, mask.lastIndex + 1 - widthByValue, mask.lastIndex + 1)
 

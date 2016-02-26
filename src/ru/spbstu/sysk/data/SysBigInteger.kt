@@ -7,20 +7,10 @@ class SysBigInteger(
         private val bitsState: Array<Boolean> = Array(width, { i -> defaultBitState })
 ) : SysData, Comparable<SysBigInteger> {
 
-    override fun compareTo(other: SysBigInteger): Int {
-        if (width != other.width) {
-            throw IllegalArgumentException("Non comparable. Width not equal.")
-        }
-        return value.compareTo(other.value)
-    }
-
     init {
-
-
         if (bitsState.size != width) {
-            throw IllegalArgumentException()
+            throw IllegalArgumentException("Width $width is too small for this value \n$value")
         }
-
     }
 
     constructor(width: Int, value: BigInteger) : this(width, value, bitsState = maskByValue(value, width))
@@ -69,7 +59,7 @@ class SysBigInteger(
     /** Adds arg to this integer, with result width is maximum of argument's widths */
     operator fun plus(arg: SysBigInteger): SysBigInteger {
         val resWidth = Math.max(width, arg.width)
-        return SysBigInteger(resWidth, value.add(arg.value)).truncate(resWidth)
+        return SysBigInteger(resWidth, value.add(arg.value))//.truncate(resWidth)
     }
 
     operator fun plus(arg: Long) = this + valueOf(arg)
@@ -77,9 +67,12 @@ class SysBigInteger(
     operator fun times(arg: Long) = this * valueOf(arg)
     operator fun div(arg: Long) = this / valueOf(arg)
     operator fun mod(arg: Long) = this % valueOf(arg)
+
+    fun power(arg: Int) = SysBigInteger(width, value.pow(arg))
+
     /**Unary minus*/
     operator fun unaryMinus(): SysBigInteger {
-        return SysBigInteger(value.negate()).truncate(this.width)
+        return SysBigInteger(value.negate())//.truncate(this.width)
     }
 
     /** Subtract arg from this integer*/
@@ -105,7 +98,7 @@ class SysBigInteger(
     /** Multiplies arg to this integer, with result width is sum of argument's width */
     operator fun times(arg: SysBigInteger): SysBigInteger {
         val resWidth = Math.max(width, arg.width)
-        return SysBigInteger(resWidth, value.multiply(arg.value)).truncate(resWidth)
+        return SysBigInteger(resWidth, value.multiply(arg.value))//.truncate(resWidth)
     }
 
     /**
@@ -304,6 +297,13 @@ class SysBigInteger(
         return SysBigInteger(width, value.abs(), bitsState = bitsState)
     }
 
+    override fun compareTo(other: SysBigInteger): Int {
+        if (width != other.width) {
+            throw IllegalArgumentException("Non comparable. Width not equal.")
+        }
+        return value.compareTo(other.value)
+    }
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other?.javaClass != javaClass) return false
@@ -358,7 +358,7 @@ class SysBigInteger(
             val mask = BooleanArray(width);
 
             if (width < widthByValue) {
-                throw IllegalArgumentException()
+                throw IllegalArgumentException("Width $width is too small for this value \n$value \nwith width $widthByValue")
             } else {
                 mask.fill(true, mask.lastIndex + 1 - widthByValue, mask.lastIndex + 1)
 
