@@ -4,7 +4,6 @@ import org.junit.Test
 import java.math.BigInteger
 import java.util.*
 
-
 //This example is copy of SystemC example
 class RSAexample {
     val NBITS = 250
@@ -118,15 +117,20 @@ class RSAexample {
             modularExp(msg, d, n);
 
     fun rsa(seed: Long) {
-        val r = SysBigInteger(NBITS, BigInteger.probablePrime(HALF_NBITS, Random(seed)))
+
+        // val r = SysBigInteger(NBITS, BigInteger.probablePrime(HALF_NBITS, Random(seed)))
 
         // Find two large primes p and q.
-        val p = SysBigInteger(NBITS, r.value.nextProbablePrime());
-        val q = SysBigInteger(NBITS, r.value.nextProbablePrime());
+        val p = SysBigInteger(NBITS, BigInteger.probablePrime(HALF_NBITS, Random(seed)));
+        val q = SysBigInteger(NBITS, p.value.nextProbablePrime());
+
+        //println("p = $p \nq = $q")
 
         // Compute n and ( p - 1 ) * ( q - 1 ) = m.
         val n = p * q;
         val m = (p - 1) * ( q - 1 );
+
+        //println("m = $m")
 
         // Find a small odd integer e that is relatively prime to m.
         val e = findRelPrime(m);
@@ -178,7 +182,7 @@ class RSAexample {
 
     @Test
     fun start() {
-        rsa(100)
+        rsa(-1)
     }
 }
 
