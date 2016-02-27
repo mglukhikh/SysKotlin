@@ -72,7 +72,7 @@ class SysBigInteger(
 
     /**Unary minus*/
     operator fun unaryMinus(): SysBigInteger {
-        return SysBigInteger(value.negate())//.truncate(this.width)
+        return SysBigInteger(width, value.negate())//.truncate(this.width)
     }
 
     /** Subtract arg from this integer*/

@@ -72,18 +72,18 @@ class SysBigIntegerTest {
     fun testMath() {
         val x: SysBigInteger = SysBigInteger(64, 62000L);
         val y: SysBigInteger = SysBigInteger(32, 128000);
-        assert((x + y).equals(SysBigInteger(64, 190000)), { x + y });
-        assert((x - y).equals(SysBigInteger(64, -66000)));
-        assert((x * y).equals(SysBigInteger(64, 7936000000)), { "x * y = ${x*y}"} );
-        assert((x / y).equals(SysBigInteger(64, 0)));
+        assert((x + y).equals(SysBigInteger(64, 190000))) { x + y }
+        assert((x - y).equals(SysBigInteger(64, -66000))) { x - y }
+        assert((x * y).equals(SysBigInteger(64, 7936000000)), { "x * y = ${x * y}" });
+        assert((x / y).equals(SysBigInteger(64, 0))) { x / y };
         //assert((y / x).equals(SysInteger(64, 2)));
         //assert((x % y).equals(x));
         assert((x - y).equals(x + (-y)))
         assert((x - y).equals((-y) + x))
         val z = SysBigInteger(32, 62000L);
-        assert((y / z).equals(SysBigInteger(32, 2)));
-        assert((z % y).equals(z));
-        assert((-y).equals(SysBigInteger(32, -128000)))
+        assert((y / z).equals(SysBigInteger(32, 2)))
+        assert((z % y).equals(z)) { 4 }
+        assert((-y).equals(SysBigInteger(32, -128000))) { -y }
     }
 
 
@@ -130,5 +130,18 @@ class SysBigIntegerTest {
         assert((x ushl 2).equals(ushlTest)) //OK
         assert((x ushr 2).equals(ushrTest)) //OK
 
+    }
+
+    @Test //180ms
+    fun speedTest() {
+        val a = SysBigInteger(64, 0xffffffffffff)
+        val b = SysBigInteger(64, 0xffffffffffffff)
+        for (i in 0..1000) {
+            a + b
+            a - b
+            a / b
+            //a * b
+            a % b
+        }
     }
 }

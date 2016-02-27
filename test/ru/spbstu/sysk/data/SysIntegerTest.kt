@@ -10,13 +10,15 @@ class SysIntegerTest {
     fun first() {
         val x: @Width(4) SysInteger = SysInteger.valueOf(5)
         val yy: @Width(6) SysInteger = SysInteger.valueOf(9)
-        val y = yy.extend(6)
+        var y = yy.extend(6)
         assert(y.width == 6, { y })
-        val z: @Width(6) SysInteger = x + y
+        var z: @Width(6) SysInteger = x + y
         assert(z.width == 6)
         assert(z.equals(SysInteger(6, 14)), { z })
         assert(z[2] == ONE, { z[2] })
         assert(z[4, 1].equals(SysInteger(4, 7)));
+        y = y.extend(12)
+        z = z.extend(12)
         val v: @Width(12) SysInteger = y * z
         assert(v.width == 12)
         assert(v.equals(SysInteger(12, 126)), { v })
@@ -124,5 +126,18 @@ class SysIntegerTest {
         assert((x ushl 2).equals(ushlTest)) //OK
         assert((x ushr 2).equals(ushrTest)) //OK
 
+    }
+
+    @Test //120ms
+    fun speedTest() {
+        val a = SysInteger(64, 0xffffffffffff)
+        val b = SysInteger(64, 0xffffffffffffff)
+        for (i in 0..1000) {
+            a + b
+            a - b
+            a / b
+            // a * b
+            a % b
+        }
     }
 }
