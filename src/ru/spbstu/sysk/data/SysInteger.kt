@@ -66,29 +66,37 @@ class SysInteger(
         return SysInteger(width, truncated)
     }
 
+    private fun truncate(value: Long, width: Int): Long {
+        val size = widthByValue(value)
+        if (size > width)
+            return value shr (size - width)
+        return value
+    }
+
     /** Adds arg to this integer, with result width is maximum of argument's widths */
     operator fun plus(arg: SysInteger): SysInteger {
         val resWidth = Math.min(Math.max(width, arg.width), MAX_WIDTH)
-        return SysInteger(resWidth, value + arg.value)//.truncate(resWidth)
+        return SysInteger(resWidth, truncate(value + arg.value, resWidth))//.truncate(resWidth)
     }
 
-    operator fun plus(arg: Int) = SysInteger(this.width, this.value + arg).truncate(this.width)
-    operator fun plus(arg: Long) = SysInteger(this.width, this.value + arg).truncate(this.width)
-    operator fun minus(arg: Int) = SysInteger(this.width, this.value - arg).truncate(this.width)
-    operator fun minus(arg: Long) = SysInteger(this.width, this.value - arg).truncate(this.width)
-    operator fun times(arg: Int) = SysInteger(this.width, this.value * arg).truncate(this.width)
-    operator fun times(arg: Long) = SysInteger(this.width, this.value * arg).truncate(this.width)
-    operator fun inc() = SysInteger(this.width, this.value + 1).truncate(this.width)
-    operator fun dec() = SysInteger(this.width, this.value - 1).truncate(this.width)
+    operator fun plus(arg: Int) = SysInteger(this.width, truncate(this.value + arg, width))//.truncate(this.width)
+    operator fun plus(arg: Long) = SysInteger(this.width, truncate(this.value + arg, width))//.truncate(this.width)
+    operator fun minus(arg: Int) = SysInteger(this.width, truncate(this.value - arg, width))//.truncate(this.width)
+    operator fun minus(arg: Long) = SysInteger(this.width, truncate(this.value - arg, width))//.truncate(this.width)
+    operator fun times(arg: Int) = SysInteger(this.width, truncate(this.value * arg, width))//.truncate(this.width)
+    operator fun times(arg: Long) = SysInteger(this.width, truncate(this.value * arg, width))//.truncate(this.width)
+    operator fun inc() = SysInteger(this.width, this.value + 1)//.truncate(this.width)
+    operator fun dec() = SysInteger(this.width, this.value - 1)//.truncate(this.width)
 
     /**Unary minus*/
     operator fun unaryMinus(): SysInteger {
-        return valueOf(-value).truncate(this.width)
+        return SysInteger(width, -value)//.truncate(this.width)
     }
 
     /** Subtract arg from this integer*/
     operator fun minus(arg: SysInteger): SysInteger {
-        return SysInteger(Math.max(width, arg.width), value - arg.value)
+        val resWidth = Math.max(width, arg.width)
+        return SysInteger(resWidth, truncate(value - arg.value, resWidth))
     }
 
     /** Integer division by divisor*/
@@ -108,7 +116,7 @@ class SysInteger(
     /** Multiplies arg to this integer, with result width is sum of argument's width */
     operator fun times(arg: SysInteger): SysInteger {
         val resWidth = Math.min(Math.max(width, arg.width), MAX_WIDTH)
-        return SysInteger(resWidth, value * arg.value)//.truncate(resWidth)
+        return SysInteger(resWidth, truncate(value * arg.value, resWidth))//.truncate(resWidth)
     }
 
     fun power(arg: Int) = SysInteger(width, Math.pow(value.toDouble(), arg.toDouble()).toLong())

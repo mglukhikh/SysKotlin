@@ -56,10 +56,17 @@ class SysBigInteger(
         return SysBigInteger(width, truncated)
     }
 
+    private fun BigInteger.truncate(width: Int): BigInteger {
+        val size = this.bitLength() + 1
+        if (size > width)
+            return this.shiftRight(size - width)
+        return this
+    }
+
     /** Adds arg to this integer, with result width is maximum of argument's widths */
     operator fun plus(arg: SysBigInteger): SysBigInteger {
         val resWidth = Math.max(width, arg.width)
-        return SysBigInteger(resWidth, value.add(arg.value))//.truncate(resWidth)
+        return SysBigInteger(resWidth, value.add(arg.value).truncate(resWidth))//.truncate(resWidth)
     }
 
     operator fun plus(arg: Long) = this + valueOf(arg)
@@ -77,7 +84,8 @@ class SysBigInteger(
 
     /** Subtract arg from this integer*/
     operator fun minus(arg: SysBigInteger): SysBigInteger {
-        return SysBigInteger(Math.max(width, arg.width), value.subtract(arg.value))
+        val resWidth = Math.max(width, arg.width)
+        return SysBigInteger(resWidth, value.subtract(arg.value).truncate(resWidth))
     }
 
     /** Integer division by divisor*/
@@ -98,7 +106,7 @@ class SysBigInteger(
     /** Multiplies arg to this integer, with result width is sum of argument's width */
     operator fun times(arg: SysBigInteger): SysBigInteger {
         val resWidth = Math.max(width, arg.width)
-        return SysBigInteger(resWidth, value.multiply(arg.value))//.truncate(resWidth)
+        return SysBigInteger(resWidth, value.multiply(arg.value).truncate(resWidth))//.truncate(resWidth)
     }
 
     /**
