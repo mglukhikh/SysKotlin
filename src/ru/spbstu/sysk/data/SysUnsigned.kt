@@ -35,7 +35,12 @@ private constructor(
     operator fun mod(arg: SysUnsigned) = SysUnsigned(Math.max(width, arg.width),
             java.lang.Long.remainderUnsigned(value, arg.value))
 
-    operator fun get(i: Int): SysBit {
+    operator fun inc(): SysUnsigned = this + valueOf(width, 1)
+    operator fun dec(): SysUnsigned = this - valueOf(width, 1)
+
+    operator
+
+    fun get(i: Int): SysBit {
         if (i < 0 || i >= width) throw IndexOutOfBoundsException()
         if (!bitsState[i])
             return SysBit.X
@@ -102,20 +107,36 @@ private constructor(
             return this;
         if (shift > width || shift < 0)
             throw IllegalArgumentException()
-
-        val sysBitExpression = Array(width - shift) { i: Int -> this[i] }
-
+        val sysBitExpression = Array(width) { i -> this[i] }
+        var i = 0
+        while (i < sysBitExpression.size - shift) {
+            sysBitExpression[i] = sysBitExpression[i + shift]
+            i++
+        }
+        while (i < sysBitExpression.size) {
+            sysBitExpression[i] = SysBit.ZERO
+            i++
+        }
         return SysUnsigned.valueOf(sysBitExpression);
     }
 
     /** Bitwise logical shift left*/
     infix fun ushl(shift: Int): SysUnsigned {
+
         if (shift == 0)
             return this;
         if (shift > width || shift < 0)
             throw IllegalArgumentException()
-
-        val sysBitExpression = Array(width - shift) { i: Int -> this[i + shift] }
+        val sysBitExpression = Array(width) { i -> this[i] }
+        var i = width - 1
+        while (i >= shift) {
+            sysBitExpression[i] = sysBitExpression[i - shift]
+            i--
+        }
+        while (i >= 0) {
+            sysBitExpression[i] = SysBit.ZERO
+            i--
+        }
 
         return SysUnsigned.valueOf(sysBitExpression)
     }
@@ -250,6 +271,8 @@ private constructor(
 
         override val undefined: SysUnsigned
             get() = SysUnsigned.valueOf(arrayOf(SysBit.X))
+
+
     }
 
     override fun equals(other: Any?): Boolean {
@@ -273,7 +296,7 @@ private constructor(
     }
 
     override fun toString(): String {
-        return "SysUnsigned(width=$width, value=$value, bitsState=${Arrays.toString(bitsState)})"
+        return "SysUnsigned(width=$width, value=$value)"
     }
 
 }
