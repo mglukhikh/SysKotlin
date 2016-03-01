@@ -2,7 +2,6 @@ package ru.spbstu.sysk.connectors
 
 import org.junit.Test
 import ru.spbstu.sysk.core.SysModule
-import ru.spbstu.sysk.core.SysScheduler
 import ru.spbstu.sysk.core.SysTopModule
 import ru.spbstu.sysk.core.SysWait
 import ru.spbstu.sysk.data.SysBit
@@ -66,7 +65,7 @@ class StubTest {
         }
     }
 
-    internal object TopModule : SysTopModule("Connectors", SysScheduler()) {
+    internal object TopModule : SysTopModule() {
         init {
             val involuator = Involuator("involuator", this)
             val tester = Tester(10, "Tester", this)

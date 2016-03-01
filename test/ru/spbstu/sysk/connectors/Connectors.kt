@@ -2,7 +2,6 @@ package ru.spbstu.sysk.connectors
 
 import org.junit.Test
 import ru.spbstu.sysk.core.SysModule
-import ru.spbstu.sysk.core.SysScheduler
 import ru.spbstu.sysk.core.SysTopModule
 import ru.spbstu.sysk.core.SysWait
 import ru.spbstu.sysk.data.*
@@ -444,7 +443,7 @@ class Connectors {
         }
     }
 
-    internal object TopModule : SysTopModule("Connectors", SysScheduler()) {
+    internal object TopModule : SysTopModule() {
         init {
             var commands: Queue<CPU.Command> = LinkedList()
             commands.add(CPU.Command(PRINT))

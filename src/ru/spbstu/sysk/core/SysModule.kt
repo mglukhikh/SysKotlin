@@ -119,6 +119,9 @@ open class SysModule internal constructor(
     protected fun <T : SysData> fifo(capacity: Int, name: String, startValue: T) =
             SysFifo<T>(capacity, name, startValue, scheduler, this)
 
+    protected inline fun <reified T : SysData> fifo(capacity: Int, name: String) =
+            fifo(capacity, name, undefined<T>())
+
     protected fun <T : SysData> asynchronousFifo(capacity: Int, name: String, startValue: T) =
             SysAsynchronousFifo<T>(capacity, name, startValue, scheduler, this)
 
