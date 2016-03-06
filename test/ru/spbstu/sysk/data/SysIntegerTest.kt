@@ -128,16 +128,5 @@ class SysIntegerTest {
 
     }
 
-    @Test //120ms
-    fun speedTest() {
-        val a = SysInteger(64, 0xffffffffffff)
-        val b = SysInteger(64, 0xffffffffffffff)
-        for (i in 0..1000) {
-            a + b
-            a - b
-            a / b
-            a * b
-            a % b
-        }
-    }
+
 }
