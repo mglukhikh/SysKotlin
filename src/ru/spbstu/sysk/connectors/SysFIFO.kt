@@ -1,8 +1,6 @@
 package ru.spbstu.sysk.connectors
 
-import ru.spbstu.sysk.core.SysObject
-import ru.spbstu.sysk.core.SysScheduler
-import ru.spbstu.sysk.core.SysWait
+import ru.spbstu.sysk.core.*
 import ru.spbstu.sysk.data.*
 import java.util.*
 
@@ -11,6 +9,7 @@ open class SysFifo<T : SysData> internal constructor(
 ) : SysInterface, SysObject(name, parent) {
 
     private var counterSysFifoInputs: Int = 0
+    private var counterSysFifoOutputs: Int = 0
 
     protected val changeEvent = SysWait.Event("changeEvent", scheduler)
 
@@ -33,13 +32,13 @@ open class SysFifo<T : SysData> internal constructor(
     val full: Boolean
         get() = fifo.size == capacity
 
-    open var push = SysBit.X
+    open var push = SysBit.undefined
         set(value) = push()
 
-    open var pop = SysBit.X
+    open var pop = SysBit.undefined
         set(value) = pop()
 
-    internal open fun pop() {
+    protected open fun pop() {
         if (!fifo.isEmpty()) fifo.remove()
         if (!fifo.isEmpty() && output != fifo.element()) {
             this.output = fifo.element()
@@ -47,7 +46,7 @@ open class SysFifo<T : SysData> internal constructor(
         }
     }
 
-    internal open fun push() {
+    protected open fun push() {
         if (!full) fifo.add(input)
         if ((size - 1) == 0) {
             this.output = fifo.element()
@@ -62,6 +61,9 @@ open class SysFifo<T : SysData> internal constructor(
         if (port is SysFifoOutput<*>) ++counterSysFifoInputs
         if (counterSysFifoInputs > 1)
             throw IllegalStateException("SysFifo $name may have only one output port.")
+        if (port is SysFifoInput<*>) ++counterSysFifoOutputs
+        if (counterSysFifoOutputs > 1)
+            throw IllegalStateException("SysFifo $name may have only one input port.")
     }
 
     override fun toString() = fifo.toString()
@@ -69,11 +71,11 @@ open class SysFifo<T : SysData> internal constructor(
 
 open class SysBitFifo internal constructor(
         capacity: Int, name: String, scheduler: SysScheduler, parent: SysObject? = null
-) : SysFifo<SysBit>(capacity, name, SysBit.X, scheduler, parent) {
+) : SysFifo<SysBit>(capacity, name, SysBit.undefined, scheduler, parent), SysEdged {
 
-    val posEdgeEvent = SysWait.Event("posEdgeEvent", scheduler)
+    override val posEdgeEvent = SysWait.Event("posEdgeEvent", scheduler)
 
-    val negEdgeEvent = SysWait.Event("negEdgeEvent", scheduler)
+    override val negEdgeEvent = SysWait.Event("negEdgeEvent", scheduler)
 
     val zero: Boolean
         get() = output.zero
@@ -95,24 +97,64 @@ open class SysBitFifo internal constructor(
     }
 }
 
-open class SysAsynchronousFifo<T : SysData> internal constructor(
-        capacity: Int, name: String, startValue: T, scheduler: SysScheduler, parent: SysObject? = null
+open class SysSynchronousFifo<T : SysData> internal constructor(
+        capacity: Int, name: String, startValue: T, positive: Boolean, private val scheduler: SysScheduler, parent: SysObject? = null
 ) : SysFifo<T>(capacity, name, startValue, scheduler, parent) {
 
-    override var push = SysBit.X
-        get() = throw UnsupportedOperationException(
-                "SysAsynchronousFifo $name: Read is not supported for push port.")
+    val clk = SysBitInput(name, scheduler, this)
+
+    override var push = SysBit.undefined
         set(value) {
-            if (field.zero && value.one) push()
-            field = value;
+            field = value
         }
 
-    override var pop = SysBit.X
-        get() = throw UnsupportedOperationException(
-                "SysAsynchronousFifo $name: Read is not supported for pop port.")
+    override var pop = SysBit.undefined
         set(value) {
-            if (field.zero && value.one) pop()
-            field = value;
+            field = value
         }
+
+    internal val update: (SysWait) -> Any = {
+        if (push.one) push()
+        if (pop.one) pop()
+    }
+
+    private class function(
+            private val f: (SysWait) -> Any,
+            sensitivities: SysWait,
+            initialize: Boolean
+    ) : SysFunction(sensitivities, initialize = initialize) {
+        override fun run(event: SysWait): SysWait = (f(event) as? SysWait)?.let { it } ?: wait()
+    }
+
+    init {
+        scheduler.register(function(update, if (positive) clk.posEdgeEvent else clk.negEdgeEvent, initialize = false))
+    }
 }
 
+open class SysSynchronousBitFifo internal constructor(
+        capacity: Int, name: String, positive: Boolean, scheduler: SysScheduler, parent: SysObject? = null
+) : SysSynchronousFifo<SysBit>(capacity, name, SysBit.undefined, positive, scheduler, parent), SysEdged {
+
+    override val posEdgeEvent = SysWait.Event("posEdgeEvent", scheduler)
+
+    override val negEdgeEvent = SysWait.Event("negEdgeEvent", scheduler)
+
+    val zero: Boolean
+        get() = output.zero
+
+    val one: Boolean
+        get() = output.one
+
+    val x: Boolean
+        get() = output.x
+
+    override fun pop() {
+        val prevValue = this.output
+        super.pop()
+        if (prevValue.one && output.zero) {
+            negEdgeEvent.happens()
+        } else if (prevValue.zero && output.one) {
+            posEdgeEvent.happens()
+        }
+    }
+}

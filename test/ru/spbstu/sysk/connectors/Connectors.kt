@@ -200,7 +200,6 @@ class Connectors {
             val address = SysInteger(Array(CAPACITY_ADDRESS, { addressPort[it] }))
             if (address.value.toInt() >= firstAddress && address.value.toInt() < firstAddress + capacity) {
                 logPort.value = AssertModule.Status(arrayOf(memory[address.value.toInt() - firstAddress], address), this)
-                logPort.push = SysBit.ZERO
                 logPort.push = SysBit.ONE
             }
             startPrint
@@ -353,7 +352,6 @@ class Connectors {
 
         private val print: (SysWait) -> SysWait = {
             logPort.value = AssertModule.Status(register, this)
-            logPort.push = SysBit.ZERO
             logPort.push = SysBit.ONE
             startPrint
         }
@@ -471,10 +469,10 @@ class Connectors {
             val addressBus = bitBus("addressBus")
             val commandBus = bitBus("commandBus")
             val assertModule = AssertModule("AM", this)
-            val logFifoRam_1 = asynchronousFifo(10, "logFifo", undefined<AssertModule.Status>())
-            val logFifoRam_2 = asynchronousFifo(10, "logFifo", undefined<AssertModule.Status>())
-            val logFifoCpu = asynchronousFifo(10, "logFifo", undefined<AssertModule.Status>())
-            val logFifoHub = asynchronousFifo(10, "logFifo", undefined<AssertModule.Status>())
+            val logFifoRam_1 = fifo(10, "logFifo", undefined<AssertModule.Status>())
+            val logFifoRam_2 = fifo(10, "logFifo", undefined<AssertModule.Status>())
+            val logFifoCpu = fifo(10, "logFifo", undefined<AssertModule.Status>())
+            val logFifoHub = fifo(10, "logFifo", undefined<AssertModule.Status>())
             for (i in 0..(CAPACITY_DATA - 1)) dataBus.addWire()
             for (i in 0..(CAPACITY_ADDRESS - 1)) addressBus.addWire()
             for (i in 0..(CAPACITY_COMMAND - 1)) commandBus.addWire()

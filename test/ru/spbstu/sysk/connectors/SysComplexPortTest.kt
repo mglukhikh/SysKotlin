@@ -10,10 +10,9 @@ class SysComplexPortTest {
     @Test
     fun fifoPort() {
         val top = SysTopModule()
-        var connector = SysAsynchronousFifo(4, "Fifo", SysBit.ZERO, top.scheduler)
+        var connector = SysFifo(4, "Fifo", SysBit.ZERO, top.scheduler)
         val input = SysFifoInput("input", top.scheduler, top, connector)
         val output = SysFifoOutput("output", top.scheduler, top, connector)
-        output.push = SysBit.ZERO;
         assert(input.value.zero)
         assert(0 == input.size)
         output.value = SysBit.ONE;
@@ -25,7 +24,6 @@ class SysComplexPortTest {
         assert(!output.full)
         assert(!output.empty)
         assert(output.size == 1)
-        input.pop = SysBit.ZERO
         input.pop = SysBit.ONE
         assert(input.value.one)
         assert(input.size == 0)
