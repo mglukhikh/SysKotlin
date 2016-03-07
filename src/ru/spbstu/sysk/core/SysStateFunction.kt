@@ -57,16 +57,21 @@ interface StateContainer {
         block.init()
         var Else: State.Function? = null
         var tpcStruct: Boolean? = null
+        var cond: Boolean? = null
         val func = State.Function("if", { block.complete() }) {
-            val cond = condition()
+            cond = cond ?: condition()
             Else = Else ?: (states.elementAtOrNull(state + 1) as? State.Function)
             tpcStruct = tpcStruct ?: (Else != null && Else!!.name == "else")
-            if (tpcStruct!!) Else!!.args = cond
-            if (cond) {
+            if (tpcStruct!!) Else!!.args = cond!!
+            if (cond!!) {
                 block.run(wait())
-                if (block.complete() && tpcStruct!!) state++
+                if (block.complete()) {
+                    cond = null
+                    if (tpcStruct!!) state++
+                }
             }
             else {
+                cond = null
                 block.state = 0
                 state++
                 if (state < states.size) this.run(wait())
