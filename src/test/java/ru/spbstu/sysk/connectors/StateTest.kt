@@ -25,19 +25,17 @@ class StateTest {
                 var switch = false
                 label("start")
                 state { put(SysInteger.valueOf(1)) }
-                block {
-                    state {
-                        switch = !switch
-                        put(SysInteger.valueOf(2))
-                    }
-                    If ({ switch }) {
-                        state { put(SysInteger.valueOf(3)) }
-                        state { put(SysInteger.valueOf(4)) }
-                        state { put(SysInteger.valueOf(5)) }
-                    }
-                    If ({ !switch }) { sleep(3) }
-                    state { put(SysInteger.valueOf(9)) }
+                state {
+                    switch = !switch
+                    put(SysInteger.valueOf(2))
                 }
+                If ({ switch }) {
+                    state { put(SysInteger.valueOf(3)) }
+                    state { put(SysInteger.valueOf(4)) }
+                    state { put(SysInteger.valueOf(5)) }
+                }
+                If ({ !switch }) { sleep(3) }
+                state { put(SysInteger.valueOf(9)) }
                 state { put(SysInteger.valueOf(10)) }
                 jump("start")
             }
@@ -59,21 +57,19 @@ class StateTest {
                 var switch = false
                 label("start")
                 state { put(SysInteger.valueOf(1)) }
-                block {
-                    state {
-                        switch = !switch
-                        put(SysInteger.valueOf(2))
-                    }
-                    If ({ switch }) {
-                        state { put(SysInteger.valueOf(3)) }
-                        state { put(SysInteger.valueOf(4)) }
-                        state { put(SysInteger.valueOf(5)) }
-                    }
-                    Else {
-                        state { put(SysInteger.valueOf(6)) }
-                        state { put(SysInteger.valueOf(7)) }
-                        state { put(SysInteger.valueOf(8)) }
-                    }
+                state {
+                    switch = !switch
+                    put(SysInteger.valueOf(2))
+                }
+                If ({ switch }) {
+                    state { put(SysInteger.valueOf(3)) }
+                    state { put(SysInteger.valueOf(4)) }
+                    state { put(SysInteger.valueOf(5)) }
+                }
+                Else {
+                    state { put(SysInteger.valueOf(6)) }
+                    state { put(SysInteger.valueOf(7)) }
+                    state { put(SysInteger.valueOf(8)) }
                 }
                 sleep(1)
                 state { put(SysInteger.valueOf(10)) }
@@ -97,18 +93,16 @@ class StateTest {
                 var switch = false
                 label("start")
                 state { put(SysInteger.valueOf(1)) }
-                block {
-                    state {
-                        switch = !switch
-                        put(SysInteger.valueOf(2))
-                    }
-                    If ({ switch }) {
-                        state { put(SysInteger.valueOf(3)) }
-                        state { put(SysInteger.valueOf(4)) }
-                        state { put(SysInteger.valueOf(5)) }
-                    }
+                state {
+                    switch = !switch
+                    put(SysInteger.valueOf(2))
                 }
-                If ({ !switch }) { sleep(/*3*/2/*Bug in block If*/) }
+                If ({ switch }) {
+                    state { put(SysInteger.valueOf(3)) }
+                    state { put(SysInteger.valueOf(4)) }
+                    state { put(SysInteger.valueOf(5)) }
+                }
+                If ({ !switch }) { sleep(3) }
                 sleep(1)
                 state { put(SysInteger.valueOf(10)) }
                 jump("start")
@@ -142,23 +136,21 @@ class StateTest {
                 var switch = false
                 label("start")
                 state { check(SysInteger.valueOf(1)) }
-                block {
-                    state {
-                        switch = !switch
-                        check(SysInteger.valueOf(2))
-                    }
-                    If ({ switch }) {
-                        state { check(SysInteger.valueOf(3)) }
-                        state { check(SysInteger.valueOf(4)) }
-                        state { check(SysInteger.valueOf(5)) }
-                    }
-                    Else {
-                        state { check(SysInteger.valueOf(6)) }
-                        state { check(SysInteger.valueOf(7)) }
-                        state { check(SysInteger.valueOf(8)) }
-                    }
-                    state { check(SysInteger.valueOf(9)) }
+                state {
+                    switch = !switch
+                    check(SysInteger.valueOf(2))
                 }
+                If ({ switch }) {
+                    state { check(SysInteger.valueOf(3)) }
+                    state { check(SysInteger.valueOf(4)) }
+                    state { check(SysInteger.valueOf(5)) }
+                }
+                Else {
+                    state { check(SysInteger.valueOf(6)) }
+                    state { check(SysInteger.valueOf(7)) }
+                    state { check(SysInteger.valueOf(8)) }
+                }
+                state { check(SysInteger.valueOf(9)) }
                 state { check(SysInteger.valueOf(10)) }
                 jump("start")
             }

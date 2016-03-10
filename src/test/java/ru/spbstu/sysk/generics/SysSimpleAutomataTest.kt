@@ -34,28 +34,24 @@ class SysSimpleAutomataTest {
                     x = ZERO
                     assertTime(time(10, TimeUnit.NS))
                 }
-                block {
-                    state {
-                        assert(y.x)
-                        x = ONE
-                        assertTime(time(30, TimeUnit.NS))
-                    }
-                    block {
-                        state {
-                            assert(y.zero)
-                            x = ZERO
-                            assertTime(time(50, TimeUnit.NS))
-                        }
-                        state {
-                            assert(y.one)
-                            x = ONE
-                            assertTime(time(70, TimeUnit.NS))
-                        }
-                    }
+                state {
+                    assert(y.x)
+                    x = ONE
+                    assertTime(time(30, TimeUnit.NS))
                 }
                 state {
                     assert(y.zero)
-                    assert(currentTime == time(90, TimeUnit.NS)) { "Expected 90 ns but was $currentTime"}
+                    x = ZERO
+                    assertTime(time(50, TimeUnit.NS))
+                }
+                state {
+                    assert(y.one)
+                    x = ONE
+                    assertTime(time(70, TimeUnit.NS))
+                }
+                state {
+                    assert(y.zero)
+                    assert(currentTime == time(90, TimeUnit.NS)) { "Expected 90 ns but was $currentTime" }
                     assertTime(time(90, TimeUnit.NS))
                 }
                 state {
@@ -86,7 +82,7 @@ class SysSimpleAutomataTest {
             function(sensitivities = clk.posEdgeEvent, initialize = false) {
                 when (counter) {
                     0 -> {
-                        assert(y.x) { "Expected X at 0 but was $y"}
+                        assert(y.x) { "Expected X at 0 but was $y" }
                         x = ZERO
                     }
                     1 -> {
@@ -144,7 +140,7 @@ class SysSimpleAutomataTest {
                     x = ZERO
                 }
                 state {
-                    assert(y.zero) { "Expected ZERO at stage 1 but was $y"}
+                    assert(y.zero) { "Expected ZERO at stage 1 but was $y" }
                     x = ONE
                 }
                 state {

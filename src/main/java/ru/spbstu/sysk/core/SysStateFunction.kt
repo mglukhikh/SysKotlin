@@ -99,13 +99,6 @@ interface StateContainer {
         return func
     }
 
-    fun block(init: State.Block.() -> Unit): State.Block {
-        val result = State.Block(wait(), LinkedList(), HashMap())
-        result.init()
-        states.add(result)
-        return result
-    }
-
     fun <T : Any> forEach(progression: Iterable<T>, init: State.Iterative<T>.() -> Unit): State.Iterative<T> {
         val result = State.Iterative(progression, wait(), LinkedList(), HashMap())
         result.init()
