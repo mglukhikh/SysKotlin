@@ -41,61 +41,44 @@ interface StateContainer {
     }
 
     fun jump(labelName: String): State.Function {
-        val result = State.Function("goTo", { true }) {
+        val result = State.Function("goTo", { false }) {
             state = -1
             labels.forEach { if (it.key == labelName) state = it.value }
             if (state == -1) throw IllegalArgumentException("label: $labelName not found")
-            if (state < states.size) states[state].let { it.run(wait()) }
+            if (state < states.size) this.run(wait())
             wait()
         }
         states.add(result)
         return result
     }
 
-    fun If(condition: () -> Boolean, init: State.Block.() -> Unit): State.Function {
-        val block = State.Block(wait(), LinkedList(), HashMap())
-        block.init()
-        var Else: State.Function? = null
-        var tpcStruct: Boolean? = null
-        var cond: Boolean? = null
-        val func = State.Function("if", { block.complete() }) {
-            cond = cond ?: condition()
-            Else = Else ?: (states.elementAtOrNull(state + 1) as? State.Function)
-            tpcStruct = tpcStruct ?: (Else != null && Else!!.name == "else")
-            if (tpcStruct!!) Else!!.args = cond!!
-            if (cond!!) {
-                block.run(wait())
-                if (block.complete()) {
-                    cond = null
-                    if (tpcStruct!!) state++
-                }
-            }
-            else {
-                cond = null
-                block.state = 0
-                state++
-                if (state < states.size) this.run(wait())
-            }
+    fun If(condition: () -> Boolean, init: StateContainer.() -> Unit): State.Function {
+        val current = this.states.size
+        this.init()
+        val delta = this.states.size - current
+        val func = State.Function("if", { false }) {
+            val cond = condition()
+            val Else: State.Function? = states.elementAtOrNull(state + delta + 1) as? State.Function
+            if (Else != null && Else.name == "else") Else.args = cond
+            if (!cond) state += delta
+            if (++state < states.size) this.run(wait())
             wait()
         }
-        states.add(func)
+        states.add(current, func)
         return func
     }
 
-    fun Else(init: State.Block.() -> Unit): State.Function {
-        val block = State.Block(wait(), LinkedList(), HashMap())
-        block.init()
-        val func = State.Function("else", { block.complete() }) {
-            var cond = (states[state] as State.Function).args as? Boolean ?: throw AssertionError()
-            if (!cond) block.run(wait())
-            else {
-                block.state = 0
-                state++
-                if (state < states.size) this.run(wait())
-            }
+    fun Else(init: StateContainer.() -> Unit): State.Function {
+        val current = this.states.size
+        this.init()
+        val delta = this.states.size - current
+        val func = State.Function("else", { false }) {
+            val cond = (states[state] as State.Function).args as? Boolean ?: throw AssertionError()
+            if (cond) state += delta
+            if (++state < states.size) this.run(wait())
             wait()
         }
-        states.add(func)
+        states.add(current, func)
         return func
     }
 
@@ -144,21 +127,6 @@ sealed class State {
         override fun run(event: SysWait) = f()
 
         override fun complete() = true
-    }
-
-    class Block internal constructor(
-            private val sensitivities: SysWait,
-            override val states: MutableList<State>,
-            override val labels: MutableMap<String, Int>
-    ) : State(), StateContainer {
-
-        override fun wait() = sensitivities
-
-        override var state = 0
-
-        override fun run(event: SysWait) = super.run(event)
-
-        override fun complete() = super.complete()
     }
 
     class Iterative<T : Any> internal constructor(
