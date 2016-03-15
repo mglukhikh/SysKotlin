@@ -323,13 +323,13 @@ class SysInteger(
     private fun minValue(): Long {
         if (width == 0) return 0
         if (width == MAX_WIDTH) return Long.MIN_VALUE;
-        return ((-1L shl (width - 1)))
+        return -(1L shl (width ))
     }
 
     private fun maxValue(): Long {
         if (width == 0) return 0
         if (width == MAX_WIDTH) return Long.MAX_VALUE
-        return (1L shl (width - 1)) - 1
+        return (1L shl (width )) - 1
     }
 
     private fun checkWidth(): Boolean {
