@@ -18,6 +18,15 @@ class SysInteger(
 ) : SysData {
 
     init {
+
+        //        if (!checkWidth()) {
+        //            throw IllegalArgumentException()
+        //        }
+
+        //        if (minValue() > value || value > maxValue()) {
+        //            throw IllegalArgumentException()
+        //        }
+
         if (bitsState.size != width) {
             throw IllegalArgumentException("Width $width is too small for this value \n$value")
         }
