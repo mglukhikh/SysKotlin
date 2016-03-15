@@ -1,8 +1,10 @@
 package ru.spbstu.sysk.data
 
+import org.junit.Assert.assertEquals
 import org.junit.Test
 import ru.spbstu.sysk.data.SysBit.*
-
+import kotlin.reflect.declaredFunctions
+import kotlin.reflect.jvm.isAccessible
 
 class SysIntegerTest {
 
@@ -126,6 +128,25 @@ class SysIntegerTest {
         assert((x ushl 2).equals(ushlTest)) //OK
         assert((x ushr 2).equals(ushrTest)) //OK
 
+    }
+
+    @Test
+    fun testMinMaxValues() {
+        val rcv = SysInteger(8, 0)
+
+        val methods = SysInteger::class.declaredFunctions.groupBy { it.name }
+
+        val minValue_ = methods.get("minValue")?.get(0)
+        minValue_?.isAccessible = true
+
+        val minValue = minValue_?.call(rcv)
+        assertEquals(-128L, minValue)
+
+        val maxValue_ = methods.get("maxValue")?.get(0)
+        maxValue_?.isAccessible = true
+
+        val maxValue = maxValue_?.call(rcv)
+        assertEquals(127L, maxValue)
     }
 
 
