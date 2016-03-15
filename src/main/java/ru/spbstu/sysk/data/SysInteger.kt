@@ -18,14 +18,6 @@ class SysInteger(
 ) : SysData {
 
     init {
-        if (!checkWidth()) {
-            throw IllegalArgumentException()
-        }
-
-        if (minValue() > value || value > maxValue()) {
-            throw IllegalArgumentException()
-        }
-
         if (bitsState.size != width) {
             throw IllegalArgumentException("Width $width is too small for this value \n$value")
         }
@@ -331,13 +323,13 @@ class SysInteger(
     private fun minValue(): Long {
         if (width == 0) return 0
         if (width == MAX_WIDTH) return Long.MIN_VALUE;
-        return -(1L shl (width ))
+        return ((-1L shl (width - 1)))
     }
 
     private fun maxValue(): Long {
         if (width == 0) return 0
         if (width == MAX_WIDTH) return Long.MAX_VALUE
-        return (1L shl (width )) - 1
+        return (1L shl (width - 1)) - 1
     }
 
     private fun checkWidth(): Boolean {
