@@ -38,7 +38,7 @@ open class SysModule internal constructor(
                            initialize: Boolean = true,
                            run: (SysWait) -> Unit = {}) =
             function(if (positive) clock.posEdgeEvent else clock.negEdgeEvent,
-                     initialize, run)
+                    initialize, run)
 
     protected fun stateFunction(sensitivities: SysWait = SysWait.Never,
                                 init: SysStateFunction.() -> Unit): SysStateFunction {
@@ -136,6 +136,12 @@ open class SysModule internal constructor(
     protected fun bitBus(name: String) = SysBitBus(name, scheduler, this)
 
     protected fun event(name: String): SysWait.Event = SysWait.Event(name, scheduler)
+
+    protected fun <T : Any> iterator(progression: Iterable<T>) = ResetIterator.create(progression)
+
+    protected fun <T : Any> defaultIterator(): SysReference<ResetIterator<T>> = reference(null)
+
+    private fun <T : Any> reference(value: T? = null) = SysReference(value)
 
     companion object {
 

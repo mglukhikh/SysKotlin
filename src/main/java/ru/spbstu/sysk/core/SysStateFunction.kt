@@ -1,10 +1,20 @@
 package ru.spbstu.sysk.core
 
+import ru.spbstu.sysk.data.SysReference
 import java.util.*
+
+sealed class Label {
+    class User internal constructor(val name: String) : Label() {
+        override fun equals(other: Any?) = name == (other as? User)?.name
+
+        override fun hashCode() = name.hashCode()
+    }
+    class Internal internal constructor() : Label()
+}
 
 interface StateContainer {
     val states: MutableList<State>
-    val labels: MutableMap<String, Int>
+    val labels: MutableMap<Label, Int>
 
     var state: Int
 
@@ -21,7 +31,7 @@ interface StateContainer {
         return result
     }
 
-    fun sleep(number: Int): State.Function {
+    fun sleep(number: Int) {
         if (number <= 0) {
             throw IllegalArgumentException("Impossible to sleep $number cycles.")
         }
@@ -33,26 +43,26 @@ interface StateContainer {
             wait()
         }
         states.add(result)
-        return result
     }
 
-    fun label(name: String) {
-        labels[name] = states.size
+    fun label(label: String) = labelInternal(Label.User(label))
+
+    fun jump(label: String) = jumpInternal(Label.User(label))
+
+    private fun labelInternal(label: Label) {
+        labels[label] = states.size
     }
 
-    fun jump(labelName: String): State.Function {
-        val result = State.Function("goTo", { false }) {
-            state = -1
-            labels.forEach { if (it.key == labelName) state = it.value }
-            if (state == -1) throw IllegalArgumentException("label: $labelName not found")
+    private fun jumpInternal(label: Label) {
+        val result = State.Function("jump", { false }) {
+            state = labels[label] ?: throw IllegalArgumentException("label: $label not found")
             if (state < states.size) this.run(wait())
             wait()
         }
         states.add(result)
-        return result
     }
 
-    fun If(condition: () -> Boolean, init: StateContainer.() -> Unit): State.Function {
+    fun If(condition: () -> Boolean, init: StateContainer.() -> Unit) {
         val current = this.states.size
         this.init()
         val delta = this.states.size - current
@@ -65,21 +75,92 @@ interface StateContainer {
             wait()
         }
         states.add(current, func)
-        return func
     }
 
-    fun Else(init: StateContainer.() -> Unit): State.Function {
+    fun Else(init: StateContainer.() -> Unit) {
         val current = this.states.size
         this.init()
         val delta = this.states.size - current
         val func = State.Function("else", { false }) {
-            val cond = (states[state] as State.Function).args as? Boolean ?: throw AssertionError()
+            val cond = (states[state] as State.Function).args as? Boolean
+                    ?: throw AssertionError("Block 'If' expected before 'Else'")
             if (cond) state += delta
             if (++state < states.size) this.run(wait())
             wait()
         }
         states.add(current, func)
-        return func
+    }
+
+    fun Continue() {
+        states.add(State.Function("continue", { true }, {
+            throw AssertionError("'Break' and 'Continue' are only allowed inside a loop")
+        }))
+    }
+
+    fun Break() {
+        states.add(State.Function("break", { true }, {
+            throw AssertionError("'Break' and 'Continue' are only allowed inside a loop")
+        }))
+    }
+
+    private fun toJump(name: String, mark: Any, self: StateContainer, begin: Int, end: Int) {
+        if (begin > end) throw AssertionError()
+        var i = begin
+        while (i != end) {
+            if ((self.states[i] as? State.Function)?.name == name) {
+                self.states[i] = State.Function("jump", { false }) {
+                    self.state = self.labels[mark] ?: throw AssertionError()
+                    if (self.state < self.states.size) self.run(wait())
+                    wait()
+                }
+            }
+            ++i
+        }
+    }
+
+    fun While(condition: () -> Boolean, init: StateContainer.() -> Unit) {
+        val begin = Label.Internal()
+        val end = Label.Internal()
+        labelInternal(begin)
+        If({ !condition() }) { jumpInternal(end) }
+        val current = this.states.size
+        this.init()
+        toJump("break", end, this, current, this.states.size)
+        toJump("continue", begin, this, current, this.states.size)
+        jumpInternal(begin)
+        labelInternal(end)
+    }
+
+    fun <T : Any> For(ref: SysReference<ResetIterator<T>>, progression: Iterable<T>, init: StateContainer.() -> Unit) {
+        ref(ResetIterator.create(progression))
+        For(ref()!!, init)
+    }
+
+    fun <T : Any> For(progression: Iterable<T>, init: StateContainer.() -> Unit) {
+        For(ResetIterator.create(progression), init)
+    }
+
+    fun <T : Any> For(iterator: ResetIterator<T>, init: StateContainer.() -> Unit) {
+        val begin = Label.Internal()
+        val end = Label.Internal()
+        val reset = State.Function("reset", { false }) {
+            iterator.reset()
+            if (++state < states.size) this.run(wait())
+            wait()
+        }
+        states.add(reset)
+        labelInternal(begin)
+        If({
+            var cond = iterator.hasNext()
+            if (cond) iterator.next()
+            !cond
+        }) { jumpInternal(end) }
+        val current = this.states.size
+        this.init()
+        toJump("break", end, this, current, this.states.size)
+        toJump("continue", begin, this, current, this.states.size)
+        jumpInternal(begin)
+        labelInternal(end)
     }
 
     fun <T : Any> forEach(progression: Iterable<T>, init: State.Iterative<T>.() -> Unit): State.Iterative<T> {
@@ -109,9 +190,7 @@ interface StateContainer {
         if (complete()) state = 0
         states[state].let {
             val result = it.run(event)
-            if (it.complete()) {
-                state++
-            }
+            if (it.complete()) state++
             return result
         }
     }
@@ -133,11 +212,11 @@ sealed class State {
             val progression: Iterable<T>?,
             private val sensitivities: SysWait,
             override val states: MutableList<State>,
-            override val labels: MutableMap<String, Int>
+            override val labels: MutableMap<Label, Int>
     ) : State(), StateContainer {
 
-        internal constructor(sensitivities: SysWait, states: MutableList<State>, labels: MutableMap<String, Int>) :
-                this(null, sensitivities, states, labels)
+        internal constructor(sensitivities: SysWait, states: MutableList<State>, labels: MutableMap<Label, Int>) :
+        this(null, sensitivities, states, labels)
 
         override fun wait() = sensitivities
 
@@ -193,7 +272,7 @@ sealed class State {
 
 class SysStateFunction private constructor(
         override val states: MutableList<State>,
-        override val labels: MutableMap<String, Int>,
+        override val labels: MutableMap<Label, Int>,
         private var initState: State.Single? = null,
         sensitivities: SysWait = SysWait.Never
 ) : SysFunction(sensitivities, initialize = true), StateContainer {
@@ -218,5 +297,29 @@ class SysStateFunction private constructor(
         } else {
             return super.run(event)
         }
+    }
+}
+
+class ResetIterator<T : Any> internal constructor(private var parent: Iterable<T>) : Iterator<T> {
+    private var iterator = parent.iterator()
+
+    var it: T? = null
+        private set
+
+    override fun next(): T {
+        it = iterator.next()
+        return it as T
+    }
+
+    override fun hasNext(): Boolean {
+        return iterator.hasNext()
+    }
+
+    internal fun reset() {
+        iterator = parent.iterator()
+    }
+
+    companion object {
+        fun <T : Any> create(parent: Iterable<T>) = ResetIterator(parent)
     }
 }
