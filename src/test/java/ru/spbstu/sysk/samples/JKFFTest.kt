@@ -18,41 +18,41 @@ class JKFFTest {
 
         init {
             stateFunction(clk) {
-                init {
+                Init {
                     j.value = ZERO
                     k.value = ZERO
                 }
-                state {
+                State {
                     assert(q.zero) { "q should be false at the beginning" }
                 }
-                forEach(0..4) {
-                    state {
+                ForEach(0..4) {
+                    State {
                         assert(q.zero) { "q should be false after q = true and JK = 11" }
                         // All changes at clock N are received at clock N+1 and processed at clock N+2
                         j.value = ONE
                     }
-                    state {
+                    State {
                         assert(q.zero) { "q should be false after q = false and JK = 00" }
                         j.value = ZERO
                     }
-                    state {
+                    State {
                         assert(q.one) { "q should be true after JK = 10" }
                         k.value = ONE
                     }
-                    state {
+                    State {
                         assert(q.one) { "q should be true after q = true and JK = 00" }
                         j.value = ONE
                     }
-                    state {
+                    State {
                         assert(q.zero) { "q should be false after JK = 01" }
                     }
-                    state {
+                    State {
                         assert(q.one) { "q should be true after q = false and JK = 11" }
                         j.value = ZERO
                         k.value = ZERO
                     }
                 }
-                state {
+                State {
                     scheduler.stop()
                 }
             }

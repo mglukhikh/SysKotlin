@@ -26,9 +26,9 @@ class StubTest {
 
         init {
             stateFunction(clk, true) {
-                infiniteBlock {
-                    state(involution)
-                    sleep(3)
+                InfiniteBlock {
+                    State(involution)
+                    Sleep(3)
                 }
             }
         }
@@ -56,10 +56,10 @@ class StubTest {
 
         init {
             stateFunction(clk, true) {
-                infiniteBlock {
-                    state(init)
-                    sleep(4)
-                    state(check)
+                InfiniteBlock {
+                    State(init)
+                    Sleep(4)
+                    State(check)
                 }
             }
         }

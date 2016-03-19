@@ -21,12 +21,12 @@ class SysRegisterTest {
             bind(a.clk to clk)
 
             stateFunction(clk) {
-                init {
+                Init {
                     en = ZERO
                 }
                 val i = iterator(0..9)
                 For(i) {
-                    state {
+                    State {
                         en = ONE
                         d = q + 1
                         assert(q == SysInteger(8, i.it as Int / 2)) {
@@ -34,7 +34,7 @@ class SysRegisterTest {
                         }
                     }
                 }
-                state {
+                State {
                     scheduler.stop()
                 }
             }
@@ -68,13 +68,13 @@ class SysRegisterTest {
             val values = arrayOf(1, 2, 3, 5, 8, 13, 21, 34, 55)
 
             stateFunction(clk) {
-                init {
+                Init {
                     aen = ZERO
                     ben = ZERO
                 }
                 val i = iterator(0..17)
                 For(i) {
-                    state {
+                    State {
                         aen = ONE
                         ben = ONE
                         ad = bq
@@ -84,7 +84,7 @@ class SysRegisterTest {
                         }
                     }
                 }
-                state {
+                State {
                     scheduler.stop()
                 }
             }

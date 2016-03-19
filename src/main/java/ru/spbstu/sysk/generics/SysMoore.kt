@@ -23,10 +23,10 @@ open class SysUnaryMoore<Input : SysData, State, Output : SysData>(
 
     init {
         stateFunction(clk) {
-            init {
+            Init {
                 y.value = result(this@SysUnaryMoore.state)
             }
-            infinite {
+            Infinite {
                 // First calculate state, then output, one tick delay is provided by clock sensitivity
                 this@SysUnaryMoore.state = transition(this@SysUnaryMoore.state, x.value)
                 y.value = result(this@SysUnaryMoore.state)

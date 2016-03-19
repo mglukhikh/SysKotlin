@@ -22,7 +22,7 @@ interface StateContainer {
 
     fun wait(): SysWait
 
-    fun state(f: () -> Unit) {
+    fun State(f: () -> Unit) {
         val result = State.Single {
             f()
             wait()
@@ -30,7 +30,7 @@ interface StateContainer {
         states.add(result)
     }
 
-    fun sleep(number: Int) {
+    fun Sleep(number: Int) {
         if (number <= 0) {
             throw IllegalArgumentException("Impossible to sleep $number cycles.")
         }
@@ -44,9 +44,9 @@ interface StateContainer {
         states.add(result)
     }
 
-    fun label(label: String) = labelInternal(Label.User(label))
+    fun Label(label: String) = labelInternal(Label.User(label))
 
-    fun jump(label: String) = jumpInternal(Label.User(label))
+    fun Jump(label: String) = jumpInternal(Label.User(label))
 
     private fun labelInternal(label: Label) {
         labels[label] = states.size
@@ -162,15 +162,15 @@ interface StateContainer {
         labelInternal(end)
     }
 
-    fun <T : Any> forEach(progression: Iterable<T>, init: StateContainer.() -> Unit) {
+    fun <T : Any> ForEach(progression: Iterable<T>, init: StateContainer.() -> Unit) {
         For(progression, init)
     }
 
-    fun infiniteBlock(init: StateContainer.() -> Unit) {
+    fun InfiniteBlock(init: StateContainer.() -> Unit) {
         While({true}, init)
     }
 
-    fun infinite(f: () -> Unit) {
+    fun Infinite(f: () -> Unit) {
         val result = State.Function("infinite", { false }) {
             f()
             wait()
@@ -223,7 +223,7 @@ class SysStateFunction private constructor(
     internal constructor(sensitivities: SysWait = SysWait.Never) :
     this(LinkedList(), HashMap(), null, sensitivities)
 
-    fun init(f: () -> Unit): State.Single {
+    fun Init(f: () -> Unit): State.Single {
         initState = State.Single {
             f()
             wait()
@@ -231,13 +231,13 @@ class SysStateFunction private constructor(
         return initState!!
     }
 
-    private fun init(event: SysWait): SysWait = initState?.run(event) ?: wait()
+    private fun Init(event: SysWait): SysWait = initState?.run(event) ?: wait()
 
     override var state = 0
 
     override fun run(event: SysWait): SysWait {
         if (event == SysWait.Initialize) {
-            return init(event)
+            return Init(event)
         } else {
             return super.run(event)
         }

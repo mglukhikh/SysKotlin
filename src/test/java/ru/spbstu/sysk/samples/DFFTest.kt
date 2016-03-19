@@ -103,24 +103,24 @@ class DFFTest {
             bind(ff.clk to clk)
 
             stateFunction(clk) {
-                state {
+                State {
                     assert(q.x)
                     swapOrOne = ZERO
                 }
-                state {
+                State {
                     assert(q.x)
                     swapOrOne = ONE
                 }
-                state {
+                State {
                     assert(q.one)
                 }
-                state {
+                State {
                     assert(q.zero)
                 }
-                state {
+                State {
                     assert(q.one)
                 }
-                state {
+                State {
                     assert(q.zero)
                     scheduler.stop()
                 }

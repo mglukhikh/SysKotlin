@@ -5,7 +5,6 @@ import ru.spbstu.sysk.core.SysTopModule
 import ru.spbstu.sysk.core.SysWait
 import ru.spbstu.sysk.core.TimeUnit
 import ru.spbstu.sysk.core.time
-import ru.spbstu.sysk.data.SysBit
 import ru.spbstu.sysk.data.SysBit.*
 import ru.spbstu.sysk.data.bind
 
@@ -29,32 +28,32 @@ class SysSimpleAutomataTest {
 
         init {
             stateFunction(clk) {
-                state {
+                State {
                     assert(y.x)
                     x = ZERO
                     assertTime(time(10, TimeUnit.NS))
                 }
-                state {
+                State {
                     assert(y.x)
                     x = ONE
                     assertTime(time(30, TimeUnit.NS))
                 }
-                state {
+                State {
                     assert(y.zero)
                     x = ZERO
                     assertTime(time(50, TimeUnit.NS))
                 }
-                state {
+                State {
                     assert(y.one)
                     x = ONE
                     assertTime(time(70, TimeUnit.NS))
                 }
-                state {
+                State {
                     assert(y.zero)
                     assert(currentTime == time(90, TimeUnit.NS)) { "Expected 90 ns but was $currentTime" }
                     assertTime(time(90, TimeUnit.NS))
                 }
-                state {
+                State {
                     assert(y.one)
                     assertTime(time(110, TimeUnit.NS))
                     scheduler.stop()
@@ -135,25 +134,25 @@ class SysSimpleAutomataTest {
 
         init {
             stateFunction(clk) {
-                state {
+                State {
                     assert(y.zero)
                     x = ZERO
                 }
-                state {
+                State {
                     assert(y.zero) { "Expected ZERO at stage 1 but was $y" }
                     x = ONE
                 }
-                state {
+                State {
                     assert(y.zero)
                 }
-                state {
+                State {
                     assert(y.one)
                     x = ZERO
                 }
-                state {
+                State {
                     assert(y.zero)
                 }
-                state {
+                State {
                     assert(y.zero)
                     scheduler.stop()
                 }
