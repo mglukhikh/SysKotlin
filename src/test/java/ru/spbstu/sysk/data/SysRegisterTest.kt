@@ -24,12 +24,13 @@ class SysRegisterTest {
                 init {
                     en = ZERO
                 }
-                forEach(0..9) {
+                val i = iterator(0..9)
+                For(i) {
                     state {
                         en = ONE
                         d = q + 1
-                        assert(q == SysInteger(8, it / 2)) {
-                            "#$it: Expected ${it/2}, Actual $q"
+                        assert(q == SysInteger(8, i.it as Int / 2)) {
+                            "#${i.it}: Expected ${i.it as Int / 2}, Actual $q"
                         }
                     }
                 }
@@ -71,14 +72,15 @@ class SysRegisterTest {
                     aen = ZERO
                     ben = ZERO
                 }
-                forEach(0..17) {
+                val i = iterator(0..17)
+                For(i) {
                     state {
                         aen = ONE
                         ben = ONE
                         ad = bq
                         bd = aq + bq
-                        assert(bq == SysInteger(8, values[it / 2])) {
-                            "#$it: Expected ${values[it/2]}, Actual $bq"
+                        assert(bq == SysInteger(8, values[i.it as Int / 2])) {
+                            "#${i.it}: Expected ${values[i.it as Int / 2]}, Actual $bq"
                         }
                     }
                 }

@@ -22,13 +22,12 @@ interface StateContainer {
 
     fun wait(): SysWait
 
-    fun state(f: () -> Unit): State.Single {
+    fun state(f: () -> Unit) {
         val result = State.Single {
             f()
             wait()
         }
         states.add(result)
-        return result
     }
 
     fun sleep(number: Int) {
@@ -163,36 +162,30 @@ interface StateContainer {
         labelInternal(end)
     }
 
-    fun <T : Any> forEach(progression: Iterable<T>, init: State.Iterative<T>.() -> Unit): State.Iterative<T> {
-        val result = State.Iterative(progression, wait(), LinkedList(), HashMap())
-        result.init()
-        states.add(result)
-        return result
+    fun <T : Any> forEach(progression: Iterable<T>, init: StateContainer.() -> Unit) {
+        For(progression, init)
     }
 
-    fun infiniteBlock(init: State.Iterative<Nothing>.() -> Unit): State.Iterative<Nothing> {
-        val result = State.Iterative<Nothing>(wait(), LinkedList(), HashMap())
-        result.init()
-        states.add(result)
-        return result
+    fun infiniteBlock(init: StateContainer.() -> Unit) {
+        While({true}, init)
     }
 
-    fun infinite(f: () -> Unit): State.Infinite {
-        val result = State.Infinite {
+    fun infinite(f: () -> Unit) {
+        val result = State.Function("infinite", { false }) {
             f()
             wait()
         }
         states.add(result)
-        return result
     }
 
     fun run(event: SysWait): SysWait {
-        if (complete()) state = 0
-        states[state].let {
-            val result = it.run(event)
-            if (it.complete()) state++
-            return result
-        }
+        if (!complete()) {
+            states[state].let {
+                val result = it.run(event)
+                if (it.complete()) state++
+                return result
+            }
+        } else return SysWait.Never
     }
 }
 
@@ -206,55 +199,6 @@ sealed class State {
         override fun run(event: SysWait) = f()
 
         override fun complete() = true
-    }
-
-    class Iterative<T : Any> internal constructor(
-            val progression: Iterable<T>?,
-            private val sensitivities: SysWait,
-            override val states: MutableList<State>,
-            override val labels: MutableMap<Label, Int>
-    ) : State(), StateContainer {
-
-        internal constructor(sensitivities: SysWait, states: MutableList<State>, labels: MutableMap<Label, Int>) :
-        this(null, sensitivities, states, labels)
-
-        override fun wait() = sensitivities
-
-        override var state = 0
-
-        private val iterator = progression?.iterator()
-
-        private var _it: T? = null
-
-        val it: T
-            get() = _it ?: throw AssertionError("Accessing loop iterator outside the loop")
-
-        init {
-            nextIteration()
-        }
-
-        private fun nextIteration() {
-            if (iterator != null && iterator.hasNext()) {
-                _it = iterator.next()
-            }
-        }
-
-        override fun run(event: SysWait): SysWait {
-            val result = super.run(event)
-            if (super.complete()) {
-                nextIteration()
-                state = 0
-            }
-            return result
-        }
-
-        override fun complete() = iterator?.hasNext() == false
-    }
-
-    class Infinite internal constructor(private val f: () -> SysWait) : State() {
-        override fun run(event: SysWait): SysWait = f()
-
-        override fun complete() = false
     }
 
     class Function internal constructor(
