@@ -23,8 +23,8 @@ class SRegTest {
             function(clk) {
 
                 if (it is SysWait.Initialize) {
-                    d.value = X
-                    dir.value = X
+                    d(X)
+                    dir(X)
                 } else {
                     when (counter) {
                         0 -> {
@@ -37,8 +37,8 @@ class SRegTest {
                                 assert(q.zero) { "q should be false after q = false and D = 0" }
 
                             // All changes at clock N are received at clock N+1 and processed at clock N+2
-                            dir.value = ZERO
-                            d.value = ONE
+                            dir(ZERO)
+                            d(ONE)
                         }
                         2 -> {
                             if (phase == 0)
@@ -46,8 +46,8 @@ class SRegTest {
                             else
                                 assert(q.zero) { "q should be false after q = false and D = 0" }
 
-                            dir.value = ZERO
-                            d.value = ZERO
+                            dir(ZERO)
+                            d(ZERO)
                         }
                         3 -> {
                             if (phase == 0)
@@ -55,8 +55,8 @@ class SRegTest {
                             else
                                 assert(q.zero) { "q should be false after q = false and D = 0" }
 
-                            dir.value = ZERO
-                            d.value = ONE
+                            dir(ZERO)
+                            d(ONE)
                         }
                         4 -> {
                             if (phase == 0)
@@ -64,47 +64,47 @@ class SRegTest {
                             else
                                 assert(q.zero) { "q should be false after q = false and D = 0" }
 
-                            dir.value = ZERO
-                            d.value = ZERO
+                            dir(ZERO)
+                            d(ZERO)
                         }
                         5 -> {
                             assert(q.one) { "q should be true after D = 1" }
-                            dir.value = ZERO
+                            dir(ZERO)
                         }
                         6 -> {
                             assert(q.zero) { "q should be false after D = 0" }
-                            dir.value = ZERO
+                            dir(ZERO)
                         }
                         7 -> {
                             assert(q.one) { "q should be true after D = 1" }
                         }
                         8 -> {
                             assert(q.zero) { "q should be false after D = 0" }
-                            dir.value = ONE
-                            d.value = ONE
+                            dir(ONE)
+                            d(ONE)
                         }
                         9 -> {
                             assert(q.zero) { "q should be false after D = 0" }
-                            dir.value = ONE
-                            d.value = ZERO
+                            dir(ONE)
+                            d(ZERO)
                         }
                         10 -> {
                             assert(q.zero) { "q should be false after D = 0" }
-                            dir.value = ONE
-                            d.value = ONE
+                            dir(ONE)
+                            d(ONE)
                         }
                         11 -> {
                             assert(q.zero) { "q should be false after D = 0" }
-                            dir.value = ONE
-                            d.value = ZERO
+                            dir(ONE)
+                            d(ZERO)
                         }
                         12 -> {
                             assert(q.one) { "q should be true after D = 1" }
-                            dir.value = ONE
+                            dir(ONE)
                         }
                         13 -> {
                             assert(q.zero) { "q should be false after D = 0" }
-                            dir.value = ONE
+                            dir(ONE)
                         }
                         14 -> {
                             assert(q.one) { "q should be true after D = 1" }

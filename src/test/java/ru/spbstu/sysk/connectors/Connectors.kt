@@ -45,7 +45,7 @@ class Connectors {
             var wait = false
             for (i in 0..inputs.lastIndex) {
                 if (!inputs[i].empty) {
-                    output.value = inputs[i].value
+                    output(inputs[i]())
                     output.push = SysBit.ZERO
                     output.push = SysBit.ONE
                     inputs[i].pop = SysBit.ZERO
@@ -111,9 +111,9 @@ class Connectors {
         private val finishSave = event("save")
 
         private val save: (SysWait) -> SysWait = {
-            assert(expectedDescription[expectedDescription.lastIndex].size == logPort.value.description.size)
+            assert(expectedDescription[expectedDescription.lastIndex].size == logPort().description.size)
             for (i in 0..expectedDescription[expectedDescription.lastIndex].lastIndex)
-                assert(expectedDescription[expectedDescription.lastIndex][i].equals(logPort.value.description[i]))
+                assert(expectedDescription[expectedDescription.lastIndex][i].equals(logPort().description[i]))
             expectedDescription.removeAt(expectedDescription.lastIndex)
             logPort.pop = SysBit.ZERO
             logPort.pop = SysBit.ONE
@@ -172,9 +172,9 @@ class Connectors {
         private val startUpdate = event("update")
 
         private val disable: (SysWait) -> SysWait = {
-            for (i in 0..(CAPACITY_DATA - 1)) dataPort.set(SysBit.Z, i)
-            for (i in 0..(CAPACITY_ADDRESS - 1)) addressPort.set(SysBit.Z, i)
-            for (i in 0..(CAPACITY_COMMAND - 1)) commandPort.set(SysBit.Z, i)
+            for (i in 0..(CAPACITY_DATA - 1)) dataPort(SysBit.Z, i)
+            for (i in 0..(CAPACITY_ADDRESS - 1)) addressPort(SysBit.Z, i)
+            for (i in 0..(CAPACITY_COMMAND - 1)) commandPort(SysBit.Z, i)
             startDisable
         }
 
@@ -191,7 +191,7 @@ class Connectors {
             val address = SysInteger(Array(CAPACITY_ADDRESS, { addressPort[it] }))
             if ((address.value >= firstAddress) && (address.value < (firstAddress + capacity))) {
                 for (i in 0..(CAPACITY_DATA - 1))
-                    dataPort.set(memory[address.value.toInt() - firstAddress][i], i)
+                    dataPort(memory[address.value.toInt() - firstAddress][i], i)
             }
             startRead
         }
@@ -199,7 +199,7 @@ class Connectors {
         private val print: (SysWait) -> SysWait = {
             val address = SysInteger(Array(CAPACITY_ADDRESS, { addressPort[it] }))
             if (address.value.toInt() >= firstAddress && address.value.toInt() < firstAddress + capacity) {
-                logPort.value = AssertModule.Status(arrayOf(memory[address.value.toInt() - firstAddress], address), this)
+                logPort(AssertModule.Status(arrayOf(memory[address.value.toInt() - firstAddress], address), this))
                 logPort.push = SysBit.ONE
             }
             startPrint
@@ -293,9 +293,9 @@ class Connectors {
         private val startStop = event("stop")
 
         private val disable: (SysWait) -> SysWait = {
-            for (i in 0..(CAPACITY_DATA - 1)) dataPort.set(SysBit.Z, i)
-            for (i in 0..(CAPACITY_ADDRESS - 1)) addressPort.set(SysBit.Z, i)
-            for (i in 0..(CAPACITY_COMMAND - 1)) commandPort.set(SysBit.Z, i)
+            for (i in 0..(CAPACITY_DATA - 1)) dataPort(SysBit.Z, i)
+            for (i in 0..(CAPACITY_ADDRESS - 1)) addressPort(SysBit.Z, i)
+            for (i in 0..(CAPACITY_COMMAND - 1)) commandPort(SysBit.Z, i)
             startDisable
         }
 
@@ -326,16 +326,16 @@ class Connectors {
 
         private val push: (SysWait) -> SysWait = {
             val address = command.arg!!
-            for (i in 0..(CAPACITY_DATA - 1)) dataPort.set(register[currentRegister][i], i)
-            for (i in 0..(CAPACITY_ADDRESS - 1)) addressPort.set(address[i], i)
-            for (i in 0..(CAPACITY_COMMAND - 1)) commandPort.set(PUSH[i], i)
+            for (i in 0..(CAPACITY_DATA - 1)) dataPort(register[currentRegister][i], i)
+            for (i in 0..(CAPACITY_ADDRESS - 1)) addressPort(address[i], i)
+            for (i in 0..(CAPACITY_COMMAND - 1)) commandPort(PUSH[i], i)
             startPush
         }
 
         private val pull: (SysWait) -> SysWait = {
             val address = command.arg!!
-            for (i in 0..(CAPACITY_ADDRESS - 1)) addressPort.set(address[i], i)
-            for (i in 0..(CAPACITY_COMMAND - 1)) commandPort.set(PULL[i], i)
+            for (i in 0..(CAPACITY_ADDRESS - 1)) addressPort(address[i], i)
+            for (i in 0..(CAPACITY_COMMAND - 1)) commandPort(PULL[i], i)
             startPull
         }
 
@@ -351,15 +351,15 @@ class Connectors {
         }
 
         private val print: (SysWait) -> SysWait = {
-            logPort.value = AssertModule.Status(register, this)
+            logPort(AssertModule.Status(register, this))
             logPort.push = SysBit.ONE
             startPrint
         }
 
         private val response: (SysWait) -> SysWait = {
             val address = command.arg!!
-            for (i in 0..(CAPACITY_ADDRESS - 1)) addressPort.set(address[i], i)
-            for (i in 0..(CAPACITY_COMMAND - 1)) commandPort.set(RESPONSE[i], i)
+            for (i in 0..(CAPACITY_ADDRESS - 1)) addressPort(address[i], i)
+            for (i in 0..(CAPACITY_COMMAND - 1)) commandPort(RESPONSE[i], i)
             startResponse
         }
 

@@ -16,8 +16,8 @@ class PReg (name: String, digPerWord: Int, parent: SysModule): SysModule(name, p
 
             var i = 0
             while (i < digPerWord) {
-                state[i] = d[i].value
-                q[i].value = state[i]
+                state[i] = d[i]()
+                q[i](state[i])
                 i += 1
             }
         }

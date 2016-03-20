@@ -21,7 +21,7 @@ class TFF(name: String, parent: SysModule) : SysModule(name, parent) {
                 else
                     state = ONE
             }
-            q.value = state
+            q(state)
         }
     }
 }

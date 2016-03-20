@@ -24,4 +24,6 @@ open class SysBusPort<T : SysData>  internal constructor(
             bound!!.set(value, index, this)
         }
     }
+
+    operator fun invoke(value: T, index: Int) = set(value, index)
 }

@@ -30,8 +30,8 @@ class ProducerConsumerExample {
         val main: (SysWait) -> SysWait = {
             while (!output.full) {
                 if (qEmits % CUTOFF == 0.toLong()) println("$qEmits: I am in producer")
-                if (qEmits < QEMITS) output.value = Symbol.undefined
-                else output.value = Symbol('\n')
+                if (qEmits < QEMITS) output(Symbol.undefined)
+                else output(Symbol('\n'))
                 output.push = SysBit.ONE
                 qEmits++
             }
@@ -54,7 +54,7 @@ class ProducerConsumerExample {
 
         val main: (SysWait) -> SysWait = {
             while (!input.empty) {
-                val symbol = input.value
+                val symbol = input()
                 if (qEmits % CUTOFF == 0L) println("$qEmits: I am in consumer $symbol")
                 input.pop = SysBit.ONE
                 if (symbol.value == '\n') scheduler.stop()

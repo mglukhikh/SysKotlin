@@ -16,7 +16,7 @@ open class SysUnaryModule<Input : SysData, Output : SysData>(
 
     init {
         function(sensitivities = x.defaultEvent, initialize = false) {
-            y.value = operation(x.value)
+            y(operation(x()))
         }
     }
 }
@@ -46,7 +46,7 @@ open class SysBinaryModule<Input1 : SysData, Input2 : SysData, Output : SysData>
 
     init {
         function(sensitivities = x1.defaultEvent.or(x2.defaultEvent), initialize = false) {
-            y.value = operation(x1.value, x2.value)
+            y(operation(x1(), x2()))
         }
     }
 }

@@ -16,7 +16,7 @@ class StateTest {
         val result = fifoOutput<SysInteger>("result")
 
         fun put(value: SysInteger) {
-            result.value = value
+            result(value)
             result.push = SysBit.ONE
         }
 
@@ -83,7 +83,7 @@ class StateTest {
         val result = fifoOutput<SysInteger>("result")
 
         fun put(value: SysInteger) {
-            result.value = value
+            result(value)
             result.push = SysBit.ONE
         }
 
@@ -147,7 +147,7 @@ class StateTest {
         fun check(value: SysInteger) {
             for (i in 0..result.lastIndex) {
                 if (!result[i].empty) {
-                    assert(result[i].value == value)
+                    assert(result[i]() == value)
                     result[i].pop = SysBit.ONE
                 }
             }

@@ -18,7 +18,7 @@ class RSFF(name: String, parent: SysModule): SysModule(name, parent) {
 
             if (s.one) state = ONE
             else if (r.one) state = ZERO
-            q.value = state
+            q(state)
         }
     }
 }

@@ -12,15 +12,15 @@ class SysPortTest {
         val connector = SysSignal("connector", ZERO, top.scheduler)
         val input = SysInput("input", top.scheduler, top, connector)
         val output = SysOutput("output", top.scheduler, top, connector)
-        assert(input.value.zero)
-        output.value = ONE
+        assert(input().zero)
+        output(ONE)
         connector.update()
-        assert(input.value.one)
+        assert(input().one)
 
         val defaultInput = SysInput("input", top.scheduler, top, null, undefined<SysBit>())
-        assert(defaultInput.value == undefined<SysBit>())
+        assert(defaultInput() == undefined<SysBit>())
         defaultInput.bind(connector)
-        assert(defaultInput.value.one)
+        assert(defaultInput().one)
     }
 
     @Test

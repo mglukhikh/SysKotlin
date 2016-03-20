@@ -21,7 +21,7 @@ class StubTest {
         val result = output<SysInteger>("result", null)
 
         private val involution: () -> Unit = {
-            result.value = SysInteger(32, Math.pow(exp.value.value.toDouble(), pow.value.value.toDouble()).toLong())
+            result(SysInteger(32, Math.pow(exp().value.toDouble(), pow().value.toDouble()).toLong()))
         }
 
         init {
@@ -47,11 +47,11 @@ class StubTest {
         private val init: () -> Unit = {
             if (qCycles.toLong() == A.value) scheduler.stop()
             A++
-            exp.value = A
+            exp(A)
         }
 
         private val check: () -> Unit = {
-            assert(result.value.equals(SysInteger(32, Math.pow(A.value.toDouble(), EXPONENT.toDouble()).toLong())))
+            assert(result().equals(SysInteger(32, Math.pow(A.value.toDouble(), EXPONENT.toDouble()).toLong())))
         }
 
         init {

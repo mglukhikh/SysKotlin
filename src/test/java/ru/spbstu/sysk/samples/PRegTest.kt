@@ -26,7 +26,7 @@ class PRegTest {
             function(clk) {
                 if (it is SysWait.Initialize) {
                     while (i < digPerWord) {
-                        d[i].value = SysBit.X
+                        d[i](SysBit.X)
                         i += 1
                     }
                 } else {
@@ -57,8 +57,8 @@ class PRegTest {
                             i = 0
                             while (i < digPerWord) {
                                 arr[i] = r.nextBoolean()
-                                if (arr[i]) d[i].value = ONE
-                                else d[i].value = ZERO
+                                if (arr[i]) d[i](ONE)
+                                else d[i](ZERO)
                                 i += 1
                             }
                         }
@@ -79,7 +79,7 @@ class PRegTest {
 
                             i = 0
                             while (i < digPerWord) {
-                                d[i].value = ZERO
+                                d[i](ZERO)
                                 i += 1
                             }
                         }

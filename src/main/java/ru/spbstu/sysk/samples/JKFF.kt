@@ -17,7 +17,7 @@ class JKFF(name: String, parent: SysModule) : SysModule(name, parent) {
         function(clk, initialize = false) {
             if (j.one && state.zero) state = ONE
             else if (k.one && state.one) state = ZERO
-            q.value = state
+            q(state)
         }
     }
 }

@@ -16,6 +16,8 @@ open class SysFifoInput<T : SysData> internal constructor(
             return bound!!.output
         }
 
+    operator fun invoke() = value
+
     val size: Int
         get() {
             if (!isBound) throw IllegalStateException("Port $name is not bound")
@@ -58,6 +60,10 @@ open class SysFifoOutput<T : SysData> internal constructor(
                 bound!!.input = value
             }
         }
+
+    operator fun invoke(value: T) {
+        this.value = value
+    }
 
     val size: Int
         get() {

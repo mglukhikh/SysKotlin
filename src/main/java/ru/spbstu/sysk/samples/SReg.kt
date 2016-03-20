@@ -17,7 +17,7 @@ class SReg(name: String, digPerWord: Int, parent: SysModule) : SysModule(name, p
         function(clk, initialize = false) {
 
             if (dir.zero) {
-                state[0] = d.value
+                state[0] = d()
                 trigQ[0] = state[0]
 
                 var i = 1
@@ -32,11 +32,11 @@ class SReg(name: String, digPerWord: Int, parent: SysModule) : SysModule(name, p
                     i += 1
                 }
 
-                q.value = trigQ[digPerWord - 1]
+                q(trigQ[digPerWord - 1])
             }
 
             if (dir.one) {
-                state[digPerWord - 1] = d.value
+                state[digPerWord - 1] = d()
                 trigQ[digPerWord - 1] = state[digPerWord - 1]
 
                 var i = digPerWord - 2
@@ -51,7 +51,7 @@ class SReg(name: String, digPerWord: Int, parent: SysModule) : SysModule(name, p
                     i += 1
                 }
 
-                q.value = trigQ[0]
+                q(trigQ[0])
             }
         }
     }

@@ -22,8 +22,8 @@ class RSFFTest {
         init {
             function(clk) {
                 if (it is SysWait.Initialize) {
-                    r.value = X
-                    s.value = X
+                    r(X)
+                    s(X)
                 } else {
                     when (counter) {
                         0 -> {
@@ -36,7 +36,7 @@ class RSFFTest {
                                 assert(q.zero) { "q should be false after q = false and RS = 00" }
 
                             // All changes at clock N are received at clock N+1 and processed at clock N+2
-                            s.value = ONE
+                            s(ONE)
                         }
                         2 -> {
                             if (phase == 0)
@@ -44,15 +44,15 @@ class RSFFTest {
                             else
                                 assert(q.zero) { "q should be false after q = false and RS = 00" }
 
-                            s.value = ZERO
+                            s(ZERO)
                         }
                         3 -> {
                             assert(q.one) { "q should be true after RS = 01 or RS = X1" }
-                            r.value = ONE
+                            r(ONE)
                         }
                         4 -> {
                             assert(q.one) { "q should be true after q = true and RS = 00 or RS = X0" }
-                            r.value = ZERO
+                            r(ZERO)
                         }
                         5 -> {
                             assert(q.zero) { "q should be false after RS = 10" }

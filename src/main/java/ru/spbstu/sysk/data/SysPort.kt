@@ -35,7 +35,7 @@ abstract class SysPort<IF : SysInterface> internal constructor(
         sysInterface?.let { bind(it) }
     }
 
-    fun bind(port: SysPort<IF>): Unit = bind(port())
+    fun bind(port: SysPort<IF>): Unit = bind(port.bound())
 
     infix fun bind(sysInterface: IF) {
         assert(scheduler.stopRequested) { "Impossible to bind the port while running the scheduler" }
@@ -45,17 +45,17 @@ abstract class SysPort<IF : SysInterface> internal constructor(
         sysInterface.register(this)
     }
 
-    fun to(port: SysPort<IF>): Pair<SysPort<IF>, IF> = Pair(this, port())
+    fun to(port: SysPort<IF>): Pair<SysPort<IF>, IF> = Pair(this, port.bound())
 
     fun to(sysInterface: IF): Pair<SysPort<IF>, IF> = Pair(this, sysInterface)
 
-    open operator fun invoke(): IF {
+    open fun bound(): IF {
         assert(isBound) { "Port $name is not bound" }
         return bound!!
     }
 
     val defaultEvent: SysWait.Finder = object : SysWait.Finder() {
-        override operator fun invoke() = this@SysPort().defaultEvent
+        override operator fun invoke() = this@SysPort.bound().defaultEvent
     }
 
 }
@@ -85,6 +85,8 @@ open class SysInput<T : SysData> internal constructor(
                 return defaultValue
             }
         }
+
+    operator fun invoke() = value
 }
 
 class SysBitInput internal constructor(
@@ -92,11 +94,11 @@ class SysBitInput internal constructor(
 ) : SysInput<SysBit>(name, scheduler, parent, signalRead), SysEdged {
 
     override val posEdgeEvent: SysWait.Finder = object : SysWait.Finder() {
-        override fun invoke() = this@SysBitInput().posEdgeEvent
+        override fun invoke() = this@SysBitInput.bound().posEdgeEvent
     }
 
     override val negEdgeEvent: SysWait.Finder = object : SysWait.Finder() {
-        override fun invoke() = this@SysBitInput().negEdgeEvent
+        override fun invoke() = this@SysBitInput.bound().negEdgeEvent
     }
 
     val zero: Boolean
@@ -108,8 +110,8 @@ class SysBitInput internal constructor(
     val x: Boolean
         get() = value.x
 
-    override operator fun invoke(): SysBitRead {
-        return (super.invoke() as? SysBitRead) ?: throw AssertionError("Bit port $name is not bound to bit read interface")
+    override fun bound(): SysBitRead {
+        return (super.bound() as? SysBitRead) ?: throw AssertionError("Bit port $name is not bound to bit read interface")
     }
 }
 
@@ -125,12 +127,16 @@ open class SysOutput<T : SysData> internal constructor(
                 bound!!.value = value
             }
         }
+
+    operator fun invoke(value: T) {
+        this.value = value
+    }
 }
 
 open class ReadOnlyPort<T : SysData>(
         open val inp: SysInput<T>
 ) : ReadOnlyProperty<SysModule, T> {
-    override fun getValue(thisRef: SysModule, property: KProperty<*>) = inp.value
+    override fun getValue(thisRef: SysModule, property: KProperty<*>) = inp()
 }
 
 class ReadOnlyBitPort(
@@ -143,7 +149,7 @@ class ReadWritePort<T: SysData>(
     override fun getValue(thisRef: SysModule, property: KProperty<*>) = out.value
 
     override fun setValue(thisRef: SysModule, property: KProperty<*>, value: T) {
-        out.value = value
+        out(value)
     }
 }
 

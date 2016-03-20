@@ -24,12 +24,12 @@ open class SysUnaryMoore<Input : SysData, State, Output : SysData>(
     init {
         stateFunction(clk) {
             Init {
-                y.value = result(this@SysUnaryMoore.state)
+                y(result(this@SysUnaryMoore.state))
             }
             Infinite {
                 // First calculate state, then output, one tick delay is provided by clock sensitivity
-                this@SysUnaryMoore.state = transition(this@SysUnaryMoore.state, x.value)
-                y.value = result(this@SysUnaryMoore.state)
+                this@SysUnaryMoore.state = transition(this@SysUnaryMoore.state, x())
+                y(result(this@SysUnaryMoore.state))
             }
         }
     }
@@ -90,8 +90,8 @@ open class SysBinaryMoore<Input1 : SysData, Input2 : SysData, State, Output : Sy
     init {
         function(clk, initialize = false) {
             // First calculate state, then output, one tick delay is provided by clock sensitivity
-            state = transition(state, x1.value, x2.value)
-            y.value = result(state)
+            state = transition(state, x1(), x2())
+            y(result(state))
         }
     }
 }

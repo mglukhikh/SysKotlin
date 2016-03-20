@@ -115,7 +115,9 @@ open class SysPriorityBus<T : SysData> internal constructor(
     }
 }
 
-class SysPriorityValue<T : SysData>(val priority: Int, val value: T) : SysData
+class SysPriorityValue<T : SysData>(val priority: Int, val value: T) : SysData {
+    operator fun invoke() = value
+}
 
 open class SysFifoBus<T : SysData> internal constructor(
         name: String, scheduler: SysScheduler, parent: SysObject? = null
