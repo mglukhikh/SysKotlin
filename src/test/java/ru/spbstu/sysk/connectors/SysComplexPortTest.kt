@@ -33,14 +33,10 @@ class SysComplexPortTest {
     @Test
     fun busPort() {
         val top = SysTopModule()
-        var connector = SysBitBus("connector", top.scheduler)
-        connector.addWire()
-        connector.addWire()
-        connector.addWire()
-        connector.addWire()
-        val port_1 = SysBusPort("port1", top.scheduler, top, connector)
-        val port_2 = SysBusPort("port2", top.scheduler, top, connector)
-        val port_3 = SysBusPort("port3", top.scheduler, top, connector)
+        var connector = SysBitBus(4, "connector", top.scheduler)
+        val port_1 = SysBusPort(4, "port1", top.scheduler, top, connector)
+        val port_2 = SysBusPort(4, "port2", top.scheduler, top, connector)
+        val port_3 = SysBusPort(4, "port3", top.scheduler, top, connector)
         assert(port_1[0].x)
         assert(port_2[1].x)
         assert(port_3[2].x)
@@ -61,7 +57,7 @@ class SysComplexPortTest {
         connector.update()
         assert(port_1[0].zero)
 
-        val defaultPort = SysBusPort("port", top.scheduler, top, null, undefined<SysBit>())
+        val defaultPort = SysBusPort(4, "port", top.scheduler, top, null, undefined<SysBit>())
         assert(defaultPort[105] == undefined<SysBit>())
         assert(defaultPort[84462] == undefined<SysBit>())
         defaultPort.bind(connector)

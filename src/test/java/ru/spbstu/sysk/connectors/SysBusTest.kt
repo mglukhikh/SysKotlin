@@ -9,14 +9,10 @@ class SysBusTest {
     @Test
     fun sysBitBus() {
         val top = SysTopModule()
-        var connector = SysBitBus("connector", top.scheduler)
-        connector.addWire()
-        connector.addWire()
-        connector.addWire()
-        connector.addWire()
-        val port_1 = SysBusPort("port1", top.scheduler, top, connector)
-        val port_2 = SysBusPort("port2", top.scheduler, top, connector)
-        val port_3 = SysBusPort("port3", top.scheduler, top, connector)
+        var connector = SysBitBus(4, "connector", top.scheduler)
+        val port_1 = SysBusPort(4, "port1", top.scheduler, top, connector)
+        val port_2 = SysBusPort(4, "port2", top.scheduler, top, connector)
+        val port_3 = SysBusPort(4, "port3", top.scheduler, top, connector)
         assert(port_1[0].x)
         assert(port_2[1].x)
         assert(port_3[2].x)
@@ -41,12 +37,8 @@ class SysBusTest {
     @Test
     fun SysFifoBus() {
         val top = SysTopModule()
-        var bus = SysFifoBus<SysBit>("bus", top.scheduler)
-        var port = SysBusPort("port", top.scheduler, top, bus)
-        bus.addWire(ZERO)
-        bus.addWire(ZERO)
-        bus.addWire(ONE)
-        bus.addWire(ZERO)
+        var bus = SysFifoBus(4, Array(4, { if (it == 2) ONE else ZERO }), "bus", top.scheduler)
+        var port = SysBusPort(4, "port", top.scheduler, top, bus)
         assert(bus[0].zero)
         assert(bus[1].zero)
         assert(bus[2].one)
@@ -66,12 +58,8 @@ class SysBusTest {
     @Test
     fun SysPriorityBus() {
         val top = SysTopModule()
-        var bus = SysPriorityBus<SysBit>("bus", top.scheduler)
-        var port = SysBusPort("port", top.scheduler, top, bus)
-        bus.addWire(SysPriorityValue(1, ZERO))
-        bus.addWire(SysPriorityValue(1, ZERO))
-        bus.addWire(SysPriorityValue(1, ONE))
-        bus.addWire(SysPriorityValue(1, ZERO))
+        var bus = SysPriorityBus(4, Array(4, { if (it == 2) SysPriorityValue(1, ONE) else SysPriorityValue(1, ZERO) }), "bus", top.scheduler)
+        var port = SysBusPort(4, "port", top.scheduler, top, bus)
         assert(bus[0]().zero)
         assert(bus[1]().zero)
         assert(bus[2]().one)

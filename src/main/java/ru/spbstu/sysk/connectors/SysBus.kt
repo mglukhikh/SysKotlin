@@ -7,12 +7,9 @@ import ru.spbstu.sysk.data.*
 import java.util.*
 
 abstract class SysBus<T : SysData> internal constructor(
-        name: String, private val scheduler: SysScheduler, parent: SysObject? = null
+        val capacity: Int, startValues: Array<T>, name: String, private val scheduler: SysScheduler,
+        parent: SysObject? = null
 ) : SysInterface, SysObject(name, parent) {
-
-    init {
-        scheduler.register(this)
-    }
 
     protected val signals: MutableList<SysSignal<T>> = ArrayList()
 
@@ -22,11 +19,6 @@ abstract class SysBus<T : SysData> internal constructor(
         get() = changeEvent
 
     override fun register(port: SysPort<*>) {
-    }
-
-    protected open fun addWire(startValue: T) {
-        assert(scheduler.stopRequested) { "Impossible to add the wire in bus while running the scheduler" }
-        signals.add(SysSignal((signals.size).toString(), startValue, scheduler))
     }
 
     abstract fun set(value: T, index: Int, port: SysPort<*>)
@@ -40,11 +32,19 @@ abstract class SysBus<T : SysData> internal constructor(
     }
 
     internal abstract fun update()
+
+    init {
+        if (capacity != startValues.size)
+            throw IllegalArgumentException("The number of start values must be equal to the capacity of the bus $name")
+        scheduler.register(this)
+        for (i in 0..capacity - 1)
+            signals.add(SysSignal(i.toString(), startValues[i], scheduler))
+    }
 }
 
 open class SysBitBus internal constructor(
-        name: String, scheduler: SysScheduler, parent: SysObject? = null
-) : SysBus<SysBit>(name, scheduler, parent) {
+        capacity: Int, name: String, scheduler: SysScheduler, parent: SysObject? = null
+) : SysBus<SysBit>(capacity, Array(capacity, { SysBit.X }), name, scheduler, parent) {
 
     private val ports: MutableMap<SysPort<*>, MutableList<SysBit>> = HashMap()
 
@@ -56,12 +56,6 @@ open class SysBitBus internal constructor(
         for (i in signals.indices) list.add(SysBit.Z)
         ports.put(port, list)
         for (i in signals.indices) update(i)
-    }
-
-    fun addWire() {
-        super.addWire(SysBit.X)
-        ports.forEach { it.value.add(SysBit.Z) }
-        if (!ports.isEmpty()) update(signals.size - 1)
     }
 
     override fun set(value: SysBit, index: Int, port: SysPort<*>) {
@@ -84,18 +78,13 @@ open class SysBitBus internal constructor(
 }
 
 open class SysPriorityBus<T : SysData> internal constructor(
-        name: String, scheduler: SysScheduler, parent: SysObject? = null
-) : SysBus<SysPriorityValue<T>>(name, scheduler, parent) {
+        capacity: Int, startValues: Array<SysPriorityValue<T>>, name: String, scheduler: SysScheduler, parent: SysObject? = null
+) : SysBus<SysPriorityValue<T>>(capacity, startValues, name, scheduler, parent) {
 
     private val priority: MutableList<Int> = ArrayList()
 
     var changed = false
         private set
-
-    override public fun addWire(startValue: SysPriorityValue<T>) {
-        super.addWire(startValue)
-        priority.add(startValue.priority)
-    }
 
     override fun set(value: SysPriorityValue<T>, index: Int, port: SysPort<*>) {
         if (this.priority[index] < value.priority) {
@@ -113,6 +102,12 @@ open class SysPriorityBus<T : SysData> internal constructor(
         if (changed) changeEvent.happens()
         changed = false
     }
+
+    init {
+        for (i in 0..capacity - 1) {
+            priority.add(startValues[i].priority)
+        }
+    }
 }
 
 class SysPriorityValue<T : SysData>(val priority: Int, val value: T) : SysData {
@@ -120,15 +115,10 @@ class SysPriorityValue<T : SysData>(val priority: Int, val value: T) : SysData {
 }
 
 open class SysFifoBus<T : SysData> internal constructor(
-        name: String, scheduler: SysScheduler, parent: SysObject? = null
-) : SysBus<T>(name, scheduler, parent) {
+        capacity: Int, startValues: Array<T>, name: String, scheduler: SysScheduler, parent: SysObject? = null
+) : SysBus<T>(capacity, startValues, name, scheduler, parent) {
 
     private val fifo: MutableList<Queue<T>> = ArrayList()
-
-    override public fun addWire(startValue: T) {
-        super.addWire(startValue)
-        fifo.add(LinkedList())
-    }
 
     override fun set(value: T, index: Int, port: SysPort<*>) {
         fifo[index].add(value);
@@ -142,5 +132,9 @@ open class SysFifoBus<T : SysData> internal constructor(
                 changeEvent.happens()
             }
         signals.forEach { it.update() }
+    }
+
+    init {
+        for (i in 0..capacity - 1) fifo.add(LinkedList())
     }
 }

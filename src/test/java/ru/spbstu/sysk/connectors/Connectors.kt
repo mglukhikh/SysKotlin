@@ -149,9 +149,9 @@ class Connectors {
     )
     : SysModule(name, parent) {
 
-        val dataPort = busPort<SysBit>("data")
-        val addressPort = busPort<SysBit>("address")
-        val commandPort = busPort<SysBit>("command")
+        val dataPort = busPort<SysBit>(CAPACITY_DATA, "data")
+        val addressPort = busPort<SysBit>(CAPACITY_ADDRESS, "address")
+        val commandPort = busPort<SysBit>(CAPACITY_COMMAND, "command")
         val logPort = fifoOutput<AssertModule.Status>("log")
 
         private val memory = Array(capacity, { SysInteger(CAPACITY_DATA, 0) })
@@ -251,9 +251,9 @@ class Connectors {
 
         internal class Command constructor(val name: SysInteger, val arg: SysInteger? = null) {}
 
-        val dataPort = busPort<SysBit>("data")
-        val addressPort = busPort<SysBit>("address")
-        val commandPort = busPort<SysBit>("command")
+        val dataPort = busPort<SysBit>(CAPACITY_DATA, "data")
+        val addressPort = busPort<SysBit>(CAPACITY_ADDRESS, "address")
+        val commandPort = busPort<SysBit>(CAPACITY_COMMAND, "command")
         val logPort = fifoOutput<AssertModule.Status>("log")
 
         private var register: Array<SysInteger> = arrayOf(SysInteger(CAPACITY_DATA, A), SysInteger(CAPACITY_DATA, B))
@@ -465,17 +465,14 @@ class Connectors {
             val ram_2 = RAM(CAPACITY_RAM, CAPACITY_RAM * 1, "RAM #2", this)
             val cpu = CPU(commands, 123, 352, "CPU", this)
             val hub = Hub(3, "hub", this)
-            val dataBus = bitBus("dataBus")
-            val addressBus = bitBus("addressBus")
-            val commandBus = bitBus("commandBus")
+            val dataBus = bitBus(CAPACITY_DATA, "dataBus")
+            val addressBus = bitBus(CAPACITY_ADDRESS, "addressBus")
+            val commandBus = bitBus(CAPACITY_COMMAND, "commandBus")
             val assertModule = AssertModule("AM", this)
             val logFifoRam_1 = fifo(10, "logFifo", undefined<AssertModule.Status>())
             val logFifoRam_2 = fifo(10, "logFifo", undefined<AssertModule.Status>())
             val logFifoCpu = fifo(10, "logFifo", undefined<AssertModule.Status>())
             val logFifoHub = fifo(10, "logFifo", undefined<AssertModule.Status>())
-            for (i in 0..(CAPACITY_DATA - 1)) dataBus.addWire()
-            for (i in 0..(CAPACITY_ADDRESS - 1)) addressBus.addWire()
-            for (i in 0..(CAPACITY_COMMAND - 1)) commandBus.addWire()
             bind(cpu.dataPort to dataBus, cpu.addressPort to addressBus, cpu.commandPort to commandBus,
                     ram_1.dataPort to dataBus, ram_1.addressPort to addressBus, ram_1.commandPort to commandBus,
                     ram_2.dataPort to dataBus, ram_2.addressPort to addressBus, ram_2.commandPort to commandBus)

@@ -5,9 +5,19 @@ import ru.spbstu.sysk.core.SysScheduler
 import ru.spbstu.sysk.data.SysData
 import ru.spbstu.sysk.data.SysPort
 
-open class SysBusPort<T : SysData>  internal constructor(
-        name: String, scheduler: SysScheduler, parent: SysObject? = null, bus: SysBus<T>? = null, private val defaultValue: T? = null
+open class SysBusPort<T : SysData> internal constructor(
+        val capacity: Int, name: String, scheduler: SysScheduler,
+        parent: SysObject? = null, bus: SysBus<T>? = null, private val defaultValue: T? = null
 ) : SysPort<SysBus<T>>(name, scheduler, parent, bus) {
+
+    override infix fun bind(sysInterface: SysBus<T>) {
+        //BUG: capacity = 0 for any parameters in constructor
+        println("$capacity ${sysInterface.capacity}")
+//        if (capacity != sysInterface.capacity) {
+//            throw IllegalArgumentException("Port $name capacity is not the same as the capacity of the bus ${sysInterface.name}")
+//        }
+        super.bind(sysInterface)
+    }
 
     operator fun get(index: Int): T {
         if (isBound) {
