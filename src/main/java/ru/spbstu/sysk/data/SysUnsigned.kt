@@ -1,24 +1,22 @@
 package ru.spbstu.sysk.data
 
-import java.util.*
-
 class SysUnsigned
 private constructor(
-        val width: Int,
-        val value: Long,
+        width: Int,
+        override val value: Long,
         defaultBitState: Boolean = false,
-        private val bitsState: Array<Boolean> = Array(width, { i -> defaultBitState })
-) : SysData {
+        bitsState: Array<Boolean> = Array(width, { i -> defaultBitState })
+) : SysBaseInteger(width, value, bitsState) {
 
     private constructor(width: Int, value: Long) : this(width, value, bitsState = maskByValue(width, widthByValue(value)))
 
-    fun extend(width: Int): SysUnsigned {
+    override fun extend(width: Int): SysUnsigned {
         if (width < widthByValue(value))
             throw IllegalArgumentException()
         return SysUnsigned(width, value)
     }
 
-    fun truncate(width: Int): SysUnsigned {
+    override fun truncate(width: Int): SysUnsigned {
         val widthByValue = widthByValue(value)
         if (width >= widthByValue) return extend(width)
         if (width < 0) throw IllegalArgumentException()
@@ -26,21 +24,19 @@ private constructor(
         return SysUnsigned(width, truncated)
     }
 
-    operator fun plus(arg: SysUnsigned) = SysUnsigned(Math.max(width, arg.width), arg.value + value)
-    operator fun minus(arg: SysUnsigned) = SysUnsigned(Math.max(width, arg.width), value - arg.value)
-    operator fun times(arg: SysUnsigned) = SysUnsigned(Math.max(width, arg.width), value * arg.value)
-    operator fun div(arg: SysUnsigned) = SysUnsigned(Math.max(width, arg.width),
-            java.lang.Long.divideUnsigned(value, arg.value))
+    override operator fun plus(arg: SysBaseInteger) = SysUnsigned(Math.max(width, arg.width), arg.value.toLong() + value)
+    override operator fun minus(arg: SysBaseInteger) = SysUnsigned(Math.max(width, arg.width), value - arg.value.toLong())
+    override operator fun times(arg: SysBaseInteger) = SysUnsigned(Math.max(width, arg.width), value * arg.value.toLong())
+    override operator fun div(arg: SysBaseInteger) = SysUnsigned(Math.max(width, arg.width),
+            java.lang.Long.divideUnsigned(value, arg.value.toLong()))
 
-    operator fun mod(arg: SysUnsigned) = SysUnsigned(Math.max(width, arg.width),
-            java.lang.Long.remainderUnsigned(value, arg.value))
+    override operator fun mod(arg: SysBaseInteger) = SysUnsigned(Math.max(width, arg.width),
+            java.lang.Long.remainderUnsigned(value, arg.value.toLong()))
 
-    operator fun inc(): SysUnsigned = this + valueOf(width, 1)
-    operator fun dec(): SysUnsigned = this - valueOf(width, 1)
+    override operator fun inc(): SysUnsigned = this + valueOf(width, 1)
+    override operator fun dec(): SysUnsigned = this - valueOf(width, 1)
 
-    operator
-
-    fun get(i: Int): SysBit {
+    override operator fun get(i: Int): SysBit {
         if (i < 0 || i >= width) throw IndexOutOfBoundsException()
         if (!bitsState[i])
             return SysBit.X
@@ -51,7 +47,7 @@ private constructor(
             return SysBit.ZERO
     }
 
-    operator fun get(j: Int, i: Int): SysUnsigned {
+    override operator fun get(j: Int, i: Int): SysUnsigned {
         if (j < i) throw IllegalArgumentException()
         if (j >= width || i < 0) throw IndexOutOfBoundsException()
         var result = value shr i
@@ -59,7 +55,7 @@ private constructor(
     }
 
     /** Bitwise and*/
-    infix fun and(arg: SysUnsigned): SysUnsigned {
+    override infix fun and(arg: SysBaseInteger): SysUnsigned {
         var temp = arg.bitsState;
 
         for (i in 0..Math.min(temp.lastIndex, bitsState.lastIndex)) {
@@ -67,11 +63,11 @@ private constructor(
         }
         if (temp.size < bitsState.size)
             temp = temp.plus(bitsState.copyOfRange(temp.size, bitsState.size));
-        return SysUnsigned(Math.max(width, arg.width), value and arg.value, bitsState = temp)
+        return SysUnsigned(Math.max(width, arg.width), value and arg.value.toLong(), bitsState = temp)
     }
 
     /** Bitwise or*/
-    infix fun or(arg: SysUnsigned): SysUnsigned {
+    override infix fun or(arg: SysBaseInteger): SysUnsigned {
 
         var temp = arg.bitsState;
         for (i in 0..Math.min(temp.lastIndex, bitsState.lastIndex)) {
@@ -79,12 +75,12 @@ private constructor(
         }
         if (temp.size < bitsState.size)
             temp = temp.plus(bitsState.copyOfRange(temp.size, bitsState.size));
-        return SysUnsigned(Math.max(width, arg.width), value or arg.value, bitsState = temp)
+        return SysUnsigned(Math.max(width, arg.width), value or arg.value.toLong(), bitsState = temp)
 
     }
 
     /** Bitwise xor*/
-    infix fun xor(arg: SysUnsigned): SysUnsigned {
+    override infix fun xor(arg: SysBaseInteger): SysUnsigned {
 
         var temp = arg.bitsState;
         for (i in 0..Math.min(temp.lastIndex, bitsState.lastIndex)) {
@@ -92,17 +88,17 @@ private constructor(
         }
         if (temp.size < bitsState.size)
             temp = temp.plus(bitsState.copyOfRange(temp.size, bitsState.size));
-        return SysUnsigned(Math.max(width, arg.width), value xor arg.value, bitsState = temp)
+        return SysUnsigned(Math.max(width, arg.width), value xor arg.value.toLong(), bitsState = temp)
     }
 
     /**Bitwise inversion (not)*/
-    fun inv(): SysUnsigned {
+    override fun inv(): SysUnsigned {
         return SysUnsigned(width, value.inv(), bitsState = bitsState);
     }
 
 
     /** Bitwise logical shift right*/
-    infix fun ushr(shift: Int): SysUnsigned {
+    override infix fun ushr(shift: Int): SysUnsigned {
         if (shift == 0)
             return this;
         if (shift > width || shift < 0)
@@ -121,7 +117,7 @@ private constructor(
     }
 
     /** Bitwise logical shift left*/
-    infix fun ushl(shift: Int): SysUnsigned {
+    override infix fun ushl(shift: Int): SysUnsigned {
 
         if (shift == 0)
             return this;
@@ -141,9 +137,51 @@ private constructor(
         return SysUnsigned.valueOf(sysBitExpression)
     }
 
+    override fun unaryMinus(): SysBaseInteger {
+        return SysBaseInteger.valueOf(width + 1, -value)
+    }
+
+    override fun plus(arg: Int) = this + valueOf(32, arg)
+
+    override fun plus(arg: Long) = this + valueOf(64, arg)
+
+    override fun minus(arg: Int) = this - valueOf(32, arg)
+
+    override fun minus(arg: Long) = this - valueOf(64, arg)
+
+    override fun times(arg: Int) = this * valueOf(32, arg)
+
+    override fun times(arg: Long) = this * valueOf(64, arg)
+
+    override fun div(arg: Int) = this / valueOf(32, arg)
+
+    override fun div(arg: Long) = this / valueOf(64, arg)
+
+    override fun mod(arg: Int) = this % valueOf(32, arg)
+
+    override fun mod(arg: Long) = this % valueOf(64, arg)
+
+    override fun power(exp: Int) = valueOf(width, Math.pow(this.value.toDouble(), exp.toDouble()).toLong())
+
+    override fun abs() = this
+
+    override fun shl(shift: Int) = this ushl shift
+
+    override fun shr(shift: Int) = this ushr shift
+
+    override fun toSysInteger() = SysInteger.valueOf(value)
+
+    override fun toSysBigInteger() = SysBigInteger.valueOf(value)
+
+    override fun compareTo(other: SysBaseInteger): Int {
+        if (width != other.width) {
+            throw IllegalArgumentException("Non comparable. Width not equal.")
+        }
+        return value.compareTo(other.value.toLong())
+    }
 
     /** Cyclic shift right*/
-    infix fun cshr(shift: Int): SysUnsigned {
+    override infix fun cshr(shift: Int): SysUnsigned {
 
         if (shift < 0)
             return this cshl -shift
@@ -172,7 +210,7 @@ private constructor(
     }
 
     /** Cyclic shift left*/
-    infix fun cshl(shift: Int): SysUnsigned {
+    override infix fun cshl(shift: Int): SysUnsigned {
 
         if (shift < 0)
             return this cshr -shift
@@ -273,30 +311,6 @@ private constructor(
             get() = SysUnsigned.valueOf(arrayOf(SysBit.X))
 
 
-    }
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other?.javaClass != javaClass) return false
-
-        other as SysUnsigned
-
-        if (width != other.width) return false
-        if (value != other.value) return false
-        if (!Arrays.equals(bitsState, other.bitsState)) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = width
-        result += 31 * result + value.hashCode()
-        result += 31 * result + Arrays.hashCode(bitsState)
-        return result
-    }
-
-    override fun toString(): String {
-        return "SysUnsigned(width=$width, value=$value)"
     }
 
 }
