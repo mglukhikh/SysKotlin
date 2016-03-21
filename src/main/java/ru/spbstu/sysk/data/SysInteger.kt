@@ -14,22 +14,41 @@ class SysInteger private constructor(
         width: Int,
         override val value: Long,
         defaultBitState: Boolean = false,
-        bitsState: Array<Boolean> = Array(width, { i -> defaultBitState })
-) : SysBaseInteger(width, value, bitsState) {
+        bitsState: Array<Boolean> = Array(width, { i -> defaultBitState }),
+        override val positiveMask: Long,
+        override val negativeMask: Long
+) : SysBaseInteger(width, value, bitsState, positiveMask, negativeMask) {
 
     /** Construct from given long value setting minimal possible width */
-    private constructor(value: Long) : this(widthByValue(value), value, true)
+    private constructor(value: Long, width: Int = widthByValue(value)) :
+    this(width, value, true, positiveMask = maxValue(width), negativeMask = minValue(width))
 
     /**Construct uninitialized sys integer with given width.
      *  Short is used only to male a difference between constructor from Int value*/
-    private constructor(width: Short) : this(width.toInt(), 0, false)
+    private constructor(width: Short) : this(width.toInt(), 0, false,
+            positiveMask = maxValue(width.toInt()),
+            negativeMask = minValue(width.toInt()))
 
     /** Construct from given value and width*/
-    constructor(width: Int, value: Long) : this(width, value, bitsState = maskByValue(value, width))
-    constructor(width: Int, value: Int) : this(width, value.toLong(), bitsState = maskByValue(value.toLong(), width))
+    constructor(width: Int, value: Long) : this(width, value, bitsState = maskByValue(value, width),
+            positiveMask = maxValue(width),
+            negativeMask = minValue(width))
+
+    private constructor(width: Int, value: Long, positiveMask: Long, negativeMask: Long) :
+    this(width, value, bitsState = maskByValue(value, width),
+            positiveMask = positiveMask,
+            negativeMask = negativeMask)
+
+    constructor(width: Int, value: Int) : this(width, value.toLong(),
+            bitsState = maskByValue(value.toLong(), width),
+            positiveMask = maxValue(width),
+            negativeMask = minValue(width))
 
     /**Construct from given SysBit Array*/
-    constructor (arr: Array<SysBit>) : this(arr.size, valueBySWSArray(arr), bitsState = maskBySWSArray(arr))
+    constructor (arr: Array<SysBit>) : this(arr.size, valueBySWSArray(arr),
+            bitsState = maskBySWSArray(arr),
+            positiveMask = maxValue(arr.size),
+            negativeMask = minValue(arr.size))
 
     /** Increase width to the given */
     override fun extend(width: Int): SysInteger {
@@ -47,67 +66,127 @@ class SysInteger private constructor(
         return SysInteger(width, truncated)
     }
 
-    private fun truncate(value: Long, width: Int): Long {
-        val size = widthByValue(value)
-        if (size > width) {
-            return value shr (size - width)
-        }
-        return value
+    private fun truncate(width: Int, value: Long, positiveMask: Long, negativeMask: Long): SysInteger {
+        if (width == MAX_WIDTH)
+            return SysInteger(width, value, positiveMask, negativeMask)
+        if (value >= 0L)
+            return SysInteger(width, value and positiveMask, positiveMask, negativeMask)
+        else
+            return SysInteger(width, value or negativeMask, positiveMask, negativeMask)
     }
 
 
-    override operator fun plus(arg: Int) = SysInteger(this.width, truncate(this.value + arg, width))
-    override operator fun plus(arg: Long) = SysInteger(this.width, truncate(this.value + arg, width))
-    override operator fun minus(arg: Int) = SysInteger(this.width, truncate(this.value - arg, width))
-    override operator fun minus(arg: Long) = SysInteger(this.width, truncate(this.value - arg, width))
-    override operator fun times(arg: Int) = SysInteger(this.width, truncate(this.value * arg, width))
-    override operator fun times(arg: Long) = SysInteger(this.width, truncate(this.value * arg, width))
-    override operator fun div(arg: Int) = SysInteger(this.width, truncate(this.value / arg, width))
-    override operator fun div(arg: Long) = SysInteger(this.width, truncate(this.value / arg, width))
-    override operator fun mod(arg: Int) = SysInteger(this.width, truncate(this.value / arg, width))
-    override operator fun mod(arg: Long) = SysInteger(this.width, truncate(this.value / arg, width))
-    override operator fun inc() = SysInteger(this.width, this.value + 1)
-    override operator fun dec() = SysInteger(this.width, this.value - 1)
+    override operator fun plus(arg: Int) = truncate(this.width, this.value + arg, positiveMask, negativeMask)
+    override operator fun plus(arg: Long) = truncate(this.width, this.value + arg, positiveMask, negativeMask)
+    override operator fun minus(arg: Int) = truncate(this.width, this.value - arg, positiveMask, negativeMask)
+    override operator fun minus(arg: Long) = truncate(this.width, this.value - arg, positiveMask, negativeMask)
+    override operator fun times(arg: Int) = truncate(this.width, this.value * arg, positiveMask, negativeMask)
+    override operator fun times(arg: Long) = truncate(this.width, this.value * arg, positiveMask, negativeMask)
+    override operator fun div(arg: Int) = truncate(this.width, this.value / arg, positiveMask, negativeMask)
+    override operator fun div(arg: Long) = truncate(this.width, this.value / arg, positiveMask, negativeMask)
+    override operator fun mod(arg: Int) = truncate(this.width, this.value / arg, positiveMask, negativeMask)
+    override operator fun mod(arg: Long) = truncate(this.width, this.value / arg, positiveMask, negativeMask)
+    override operator fun inc() = truncate(this.width, this.value + 1, positiveMask, negativeMask)
+    override operator fun dec() = truncate(this.width, this.value - 1, positiveMask, negativeMask)
 
     /** Adds arg to this integer, with result width is maximum of argument's widths */
     override operator fun plus(arg: SysBaseInteger): SysInteger {
-        val resWidth = Math.min(Math.max(width, arg.width), MAX_WIDTH)
-        return SysInteger(resWidth, truncate(value + arg.value.toLong(), resWidth))
+        var resWidth: Int
+        var posMask: Long
+        var negMask: Long
+        if (arg.width > width) {
+            resWidth = Math.min(arg.width, MAX_WIDTH)
+            posMask = arg.positiveMask.toLong()
+            negMask = arg.negativeMask.toLong()
+        } else {
+            resWidth = Math.min(width, MAX_WIDTH)
+            posMask = positiveMask
+            negMask = negativeMask
+        }
+        return truncate(resWidth, value + arg.value.toLong(), posMask, negMask)
     }
 
     /**Unary minus*/
     override operator fun unaryMinus(): SysInteger {
-        return SysInteger(width, -value)
+        return truncate(width, -value, positiveMask, negativeMask)
     }
 
     /** Subtract arg from this integer*/
     override operator fun minus(arg: SysBaseInteger): SysInteger {
-        val resWidth = Math.max(width, arg.width)
-        return SysInteger(resWidth, truncate(value - arg.value.toLong(), resWidth))
+        var resWidth: Int
+        var posMask: Long
+        var negMask: Long
+        if (arg.width > width) {
+            resWidth = Math.min(arg.width, MAX_WIDTH)
+            posMask = arg.positiveMask.toLong()
+            negMask = arg.negativeMask.toLong()
+        } else {
+            resWidth = Math.min(width, MAX_WIDTH)
+            posMask = positiveMask
+            negMask = negativeMask
+        }
+        return truncate(resWidth, value - arg.value.toLong(), posMask, negMask)
     }
 
     /** Integer division by divisor*/
     override operator fun div(arg: SysBaseInteger): SysInteger {
         if (arg.value == 0L) throw IllegalArgumentException("Division by zero")
-        if (arg.width > width) arg.truncate(width)
-        return SysInteger(width, value / arg.value.toLong())
+        var resWidth: Int
+        var posMask: Long
+        var negMask: Long
+        if (arg.width > width) {
+            resWidth = Math.min(arg.width, MAX_WIDTH)
+            posMask = arg.positiveMask.toLong()
+            negMask = arg.negativeMask.toLong()
+        } else {
+            resWidth = Math.min(width, MAX_WIDTH)
+            posMask = positiveMask
+            negMask = negativeMask
+        }
+        return truncate(resWidth, value / arg.value.toLong(), posMask, negMask)
     }
 
     /** Remainder of integer division*/
     override operator fun mod(arg: SysBaseInteger): SysInteger {
         if (arg.value == 0L) throw IllegalArgumentException("Division by zero")
-        return SysInteger(width, value % arg.value.toLong())
+        var resWidth: Int
+        var posMask: Long
+        var negMask: Long
+        if (arg.width > width) {
+            resWidth = Math.min(arg.width, MAX_WIDTH)
+            posMask = arg.positiveMask.toLong()
+            negMask = arg.negativeMask.toLong()
+        } else {
+            resWidth = Math.min(width, MAX_WIDTH)
+            posMask = positiveMask
+            negMask = negativeMask
+        }
+
+        return truncate(resWidth, value % arg.value.toLong(), posMask, negMask)
     }
 
     /** Multiplies arg to this integer, with result width is sum of argument's width */
     override operator fun times(arg: SysBaseInteger): SysInteger {
-        val resWidth = Math.min(Math.max(width, arg.width), MAX_WIDTH)
-        return SysInteger(resWidth, truncate(value * arg.value.toLong(), resWidth))
+        var resWidth: Int
+        var posMask: Long
+        var negMask: Long
+        if (arg.width > width) {
+            resWidth = Math.min(arg.width, MAX_WIDTH)
+            posMask = arg.positiveMask.toLong()
+            negMask = arg.negativeMask.toLong()
+        } else {
+            resWidth = Math.min(width, MAX_WIDTH)
+            posMask = positiveMask
+            negMask = negativeMask
+        }
+        return truncate(resWidth, value * arg.value.toLong(), posMask, negMask)
     }
 
-    override fun power(exp: Int) = SysInteger(width, Math.pow(value.toDouble(), exp.toDouble()).toLong())
+    override fun power(exp: Int) = truncate(width, Math.pow(value.toDouble(), exp.toDouble()).toLong()
+            , positiveMask, negativeMask)
 
-    override fun abs() = SysInteger(width, if ( value >= 0L) value else -value, bitsState = bitsState)
+    override fun abs() = SysInteger(width, (if ( value >= 0L) value else -value), bitsState = bitsState,
+            positiveMask = positiveMask, negativeMask = negativeMask)
 
     /** Bitwise logical shift right*/
     override infix fun ushr(shift: Int): SysInteger {
@@ -239,7 +318,20 @@ class SysInteger private constructor(
         }
         if (temp.size < bitsState.size)
             temp = temp.plus(bitsState.copyOfRange(temp.size, bitsState.size));
-        return SysInteger(Math.max(width, arg.width), value and arg.value.toLong(), bitsState = temp)
+        var resWidth: Int
+        var posMask: Long
+        var negMask: Long
+        if (arg.width > width) {
+            resWidth = Math.min(arg.width, MAX_WIDTH)
+            posMask = arg.positiveMask.toLong()
+            negMask = arg.negativeMask.toLong()
+        } else {
+            resWidth = Math.min(width, MAX_WIDTH)
+            posMask = positiveMask
+            negMask = negativeMask
+        }
+        return SysInteger(resWidth, value and arg.value.toLong(), bitsState = temp,
+                positiveMask = posMask, negativeMask = negMask)
     }
 
     /** Bitwise or*/
@@ -250,8 +342,21 @@ class SysInteger private constructor(
             temp[i] = temp[i] and bitsState[i];
         }
         if (temp.size < bitsState.size)
-            temp = temp.plus(bitsState.copyOfRange(temp.size, bitsState.size));
-        return SysInteger(Math.max(width, arg.width), value or arg.value.toLong(), bitsState = temp)
+            temp = temp.plus(bitsState.copyOfRange(temp.size, bitsState.size))
+        var resWidth: Int
+        var posMask: Long
+        var negMask: Long
+        if (arg.width > width) {
+            resWidth = Math.min(arg.width, MAX_WIDTH)
+            posMask = arg.positiveMask.toLong()
+            negMask = arg.negativeMask.toLong()
+        } else {
+            resWidth = Math.min(width, MAX_WIDTH)
+            posMask = positiveMask
+            negMask = negativeMask
+        }
+        return SysInteger(resWidth, value or arg.value.toLong(), bitsState = temp,
+                positiveMask = posMask, negativeMask = negMask)
 
     }
 
@@ -264,12 +369,26 @@ class SysInteger private constructor(
         }
         if (temp.size < bitsState.size)
             temp = temp.plus(bitsState.copyOfRange(temp.size, bitsState.size));
-        return SysInteger(Math.max(width, arg.width), value xor arg.value.toLong(), bitsState = temp)
+        var resWidth: Int
+        var posMask: Long
+        var negMask: Long
+        if (arg.width > width) {
+            resWidth = Math.min(arg.width, MAX_WIDTH)
+            posMask = arg.positiveMask.toLong()
+            negMask = arg.negativeMask.toLong()
+        } else {
+            resWidth = Math.min(width, MAX_WIDTH)
+            posMask = positiveMask
+            negMask = negativeMask
+        }
+        return SysInteger(resWidth, value xor arg.value.toLong(), bitsState = temp,
+                positiveMask = posMask, negativeMask = negMask)
     }
 
     /**Bitwise inversion (not)*/
     override fun inv(): SysInteger {
-        return SysInteger(width, value.inv(), bitsState = bitsState);
+        return SysInteger(width, value.inv(), bitsState = bitsState,
+                positiveMask = positiveMask, negativeMask = negativeMask);
     }
 
     /** Extracts a single bit, accessible as [i] */
@@ -307,22 +426,6 @@ class SysInteger private constructor(
         return value.compareTo(other.value.toLong())
     }
 
-    private fun minValue(): Long {
-        if (width == 0) return 0
-        if (width == MAX_WIDTH) return Long.MIN_VALUE;
-        return -(1L shl (width ))
-    }
-
-    private fun maxValue(): Long {
-        if (width == 0) return 0
-        if (width == MAX_WIDTH) return Long.MAX_VALUE
-        return (1L shl (width )) - 1
-    }
-
-    private fun checkWidth(): Boolean {
-        if (width < 0 || width > MAX_WIDTH) return false
-        return true
-    }
 
     companion object : SysDataCompanion<SysInteger> {
 
@@ -388,6 +491,23 @@ class SysInteger private constructor(
                 current = current.inv()
             return java.lang.Long.SIZE - java.lang.Long.numberOfLeadingZeros(current) + 1
 
+        }
+
+        private fun minValue(width: Int): Long {
+            if (width == 0) return 0
+            if (width == MAX_WIDTH) return Long.MIN_VALUE;
+            return ((-1L shl (width - 1)))
+        }
+
+        private fun maxValue(width: Int): Long {
+            if (width == 0) return 0
+            if (width == MAX_WIDTH) return Long.MAX_VALUE
+            return (1L shl (width - 1)) - 1
+        }
+
+        private fun checkWidth(width: Int): Boolean {
+            if (width < 0 || width > MAX_WIDTH) return false
+            return true
         }
 
         override val undefined: SysInteger

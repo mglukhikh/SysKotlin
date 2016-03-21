@@ -5,10 +5,21 @@ private constructor(
         width: Int,
         override val value: Long,
         defaultBitState: Boolean = false,
-        bitsState: Array<Boolean> = Array(width, { i -> defaultBitState })
-) : SysBaseInteger(width, value, bitsState) {
+        bitsState: Array<Boolean> = Array(width, { i -> defaultBitState }),
+        override val positiveMask: Long,
+        override val negativeMask: Long = Long.MIN_VALUE
+) : SysBaseInteger(width, value, bitsState, positiveMask, negativeMask) {
 
-    private constructor(width: Int, value: Long) : this(width, value, bitsState = maskByValue(width, widthByValue(value)))
+    private constructor(width: Int, value: Long) : this(width, value, bitsState = maskByValue(width, widthByValue(value)),
+            positiveMask = maxValue(width))
+
+    private constructor(width: Int, value: Long, positiveMask: Long) :
+    this(width, value, bitsState = maskByValue(width, widthByValue(value)),
+            positiveMask = positiveMask)
+
+    private constructor(width: Int, value: Long, bitsState: Array<Boolean>) :
+    this(width, value, bitsState = bitsState,
+            positiveMask = maxValue(width))
 
     override fun extend(width: Int): SysUnsigned {
         if (width < widthByValue(value))
@@ -24,14 +35,77 @@ private constructor(
         return SysUnsigned(width, truncated)
     }
 
-    override operator fun plus(arg: SysBaseInteger) = SysUnsigned(Math.max(width, arg.width), arg.value.toLong() + value)
-    override operator fun minus(arg: SysBaseInteger) = SysUnsigned(Math.max(width, arg.width), value - arg.value.toLong())
-    override operator fun times(arg: SysBaseInteger) = SysUnsigned(Math.max(width, arg.width), value * arg.value.toLong())
-    override operator fun div(arg: SysBaseInteger) = SysUnsigned(Math.max(width, arg.width),
-            java.lang.Long.divideUnsigned(value, arg.value.toLong()))
+    private fun truncate(width: Int, value: Long, positiveMask: Long): SysUnsigned {
+        if (width == MAX_WIDTH)
+            return SysUnsigned(width, value, positiveMask)
+        else
+            return SysUnsigned(width, value and positiveMask, positiveMask)
+    }
 
-    override operator fun mod(arg: SysBaseInteger) = SysUnsigned(Math.max(width, arg.width),
-            java.lang.Long.remainderUnsigned(value, arg.value.toLong()))
+    override operator fun plus(arg: SysBaseInteger): SysUnsigned {
+        var resWidth: Int
+        var posMask: Long
+        if (arg.width > width) {
+            resWidth = Math.min(arg.width, MAX_WIDTH)
+            posMask = arg.positiveMask.toLong()
+        } else {
+            resWidth = Math.min(width, MAX_WIDTH)
+            posMask = positiveMask
+        }
+        return truncate(resWidth, value + arg.value.toLong(), posMask)
+    }
+
+    override operator fun minus(arg: SysBaseInteger): SysUnsigned {
+        var resWidth: Int
+        var posMask: Long
+        if (arg.width > width) {
+            resWidth = Math.min(arg.width, MAX_WIDTH)
+            posMask = arg.positiveMask.toLong()
+        } else {
+            resWidth = Math.min(width, MAX_WIDTH)
+            posMask = positiveMask
+        }
+        return truncate(resWidth, value - arg.value.toLong(), posMask)
+    }
+
+    override operator fun times(arg: SysBaseInteger): SysUnsigned {
+        var resWidth: Int
+        var posMask: Long
+        if (arg.width > width) {
+            resWidth = Math.min(arg.width, MAX_WIDTH)
+            posMask = arg.positiveMask.toLong()
+        } else {
+            resWidth = Math.min(width, MAX_WIDTH)
+            posMask = positiveMask
+        }
+        return truncate(resWidth, value * arg.value.toLong(), posMask)
+    }
+
+    override operator fun div(arg: SysBaseInteger): SysUnsigned {
+        var resWidth: Int
+        var posMask: Long
+        if (arg.width > width) {
+            resWidth = Math.min(arg.width, MAX_WIDTH)
+            posMask = arg.positiveMask.toLong()
+        } else {
+            resWidth = Math.min(width, MAX_WIDTH)
+            posMask = positiveMask
+        }
+        return truncate(resWidth, java.lang.Long.divideUnsigned(value, arg.value.toLong()), posMask)
+    }
+
+    override operator fun mod(arg: SysBaseInteger): SysUnsigned {
+        var resWidth: Int
+        var posMask: Long
+        if (arg.width > width) {
+            resWidth = Math.min(arg.width, MAX_WIDTH)
+            posMask = arg.positiveMask.toLong()
+        } else {
+            resWidth = Math.min(width, MAX_WIDTH)
+            posMask = positiveMask
+        }
+        return truncate(resWidth, java.lang.Long.remainderUnsigned(value, arg.value.toLong()), posMask)
+    }
 
     override operator fun inc(): SysUnsigned = this + valueOf(width, 1)
     override operator fun dec(): SysUnsigned = this - valueOf(width, 1)
@@ -161,7 +235,7 @@ private constructor(
 
     override fun mod(arg: Long) = this % valueOf(64, arg)
 
-    override fun power(exp: Int) = valueOf(width, Math.pow(this.value.toDouble(), exp.toDouble()).toLong())
+    override fun power(exp: Int) = truncate(width, Math.pow(this.value.toDouble(), exp.toDouble()).toLong(), positiveMask)
 
     override fun abs() = this
 
@@ -240,6 +314,8 @@ private constructor(
 
     companion object : SysDataCompanion<SysUnsigned> {
 
+        val MAX_WIDTH = 64
+
         fun valueOf(width: Int, value: Int): SysUnsigned {
             val lValue = Integer.toUnsignedLong(value)
             val realWidth = widthByValue(lValue)
@@ -311,6 +387,10 @@ private constructor(
             get() = SysUnsigned.valueOf(arrayOf(SysBit.X))
 
 
+        private fun maxValue(width: Int): Long {
+            if (width == 0) return 0
+            return (-1L ushr (MAX_WIDTH - width ))
+        }
     }
 
 }

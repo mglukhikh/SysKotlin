@@ -6,7 +6,9 @@ import java.util.*
 abstract class SysBaseInteger protected constructor(
         val width: Int,
         open val value: Number,
-        protected val bitsState: Array<Boolean>
+        protected val bitsState: Array<Boolean>,
+        protected open val positiveMask: Number,
+        protected open val negativeMask: Number
 ) : SysData, Comparable<SysBaseInteger> {
 
 
