@@ -1,5 +1,6 @@
 package ru.spbstu.sysk.data
 
+import org.junit.Ignore
 import org.junit.Test
 import java.math.BigInteger
 import java.util.*
@@ -179,7 +180,7 @@ class RSAexample {
         }
     }
 
-
+    @Ignore("Ignored Example")
     @Test
     fun start() {
         rsa(-1)

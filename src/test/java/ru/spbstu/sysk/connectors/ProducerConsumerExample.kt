@@ -1,13 +1,14 @@
 package ru.spbstu.sysk.connectors
 
+import org.junit.Ignore
 import org.junit.Test
 import ru.spbstu.sysk.core.SysModule
 import ru.spbstu.sysk.core.SysTopModule
 import ru.spbstu.sysk.core.SysWait
 import ru.spbstu.sysk.data.*
 
-private const val QEMITS : Long = 100000000
-private const val CUTOFF : Long = 1000000
+private const val QEMITS: Long = 100000000
+private const val CUTOFF: Long = 1000000
 
 class ProducerConsumerExample {
     // BUG if visibility is changed to private
@@ -82,6 +83,7 @@ class ProducerConsumerExample {
         }
     }
 
+    @Ignore("Ignored Example")
     @Test
     fun main() {
         Top.start()

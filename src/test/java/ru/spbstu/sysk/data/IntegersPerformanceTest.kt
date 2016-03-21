@@ -1,11 +1,12 @@
 package ru.spbstu.sysk.data
 
 
+import org.junit.Ignore
 import org.junit.Test
 import java.util.*
 
 class IntegersPerformanceTest {
-
+    @Ignore("Ignored IntegerPerformanceTest")
     @Test
     fun speedTest() {
         val size = 10000L
