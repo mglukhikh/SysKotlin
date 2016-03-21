@@ -12,12 +12,15 @@ annotation class Width(val value: Int)
  * Value is stored in a long integer.
  * Width can be checked statically (in future) if type usage is annotated by @width annotation
  */
-class SysInteger(
-        val width: Int, val value: Long, defaultBitState: Boolean = false,
+class SysInteger private constructor(
+        val width: Int,
+        val value: Long,
+        defaultBitState: Boolean = false,
         private val bitsState: Array<Boolean> = Array(width, { i -> defaultBitState })
 ) : SysData {
 
     init {
+
 
         //        if (!checkWidth()) {
         //            throw IllegalArgumentException()
@@ -69,8 +72,9 @@ class SysInteger(
 
     private fun truncate(value: Long, width: Int): Long {
         val size = widthByValue(value)
-        if (size > width)
+        if (size > width) {
             return value shr (size - width)
+        }
         return value
     }
 

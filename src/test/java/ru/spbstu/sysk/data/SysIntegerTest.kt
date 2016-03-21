@@ -1,8 +1,10 @@
 package ru.spbstu.sysk.data
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotEquals
 import org.junit.Test
 import ru.spbstu.sysk.data.SysBit.*
+import java.util.*
 import kotlin.reflect.declaredFunctions
 import kotlin.reflect.jvm.isAccessible
 
@@ -141,13 +143,128 @@ class SysIntegerTest {
 
         val minValue = minValue_?.call(rcv)
         assertEquals(-128L, minValue)
-
         val maxValue_ = methods.get("maxValue")?.get(0)
         maxValue_?.isAccessible = true
 
         val maxValue = maxValue_?.call(rcv)
         assertEquals(127L, maxValue)
+
+
+        val next = SysInteger(8, 0)
+        val min = minValue_?.call(next) as Long
+        val max = maxValue_?.call(next) as Long
+
+        var a = 127L
+        var b = a * 4
+        var c = a + 5
+        println()
+        println(java.lang.Long.toBinaryString(a))
+        println(java.lang.Long.toBinaryString(a and max))
+        println(java.lang.Long.toBinaryString(b))
+        println(java.lang.Long.toBinaryString(b and max))
+        println(java.lang.Long.toBinaryString(c))
+        println(java.lang.Long.toBinaryString(c and max))
+        println(a)
+        println(b and max)
+        println(c and max)
+        println()
+        a = a.inv()
+        b = a * 4
+        c = a - 5
+        println(java.lang.Long.toBinaryString(a))
+        println(java.lang.Long.toBinaryString(a or min))
+        println(java.lang.Long.toBinaryString(b))
+        println(java.lang.Long.toBinaryString(b or min))
+        println(a)
+        println(b or min)
+
+
+
+
     }
 
+    @Test
+    fun boundTest() {
 
+        /*
+                val next = SysInteger(8, 0)
+                val min = minValue_?.call(next) as Long
+                val max = maxValue_?.call(next) as Long
+
+                var a = 127L
+                var b = a * 4
+                var c = a + 5
+                println()
+                println(java.lang.Long.toBinaryString(a))
+                println(java.lang.Long.toBinaryString(a and max))
+                println(java.lang.Long.toBinaryString(b))
+                println(java.lang.Long.toBinaryString(b and max))
+                println(java.lang.Long.toBinaryString(c))
+                println(java.lang.Long.toBinaryString(c and max))
+                println(a)
+                println(b and max)
+                println(c and max)
+                println()
+                a = a.inv()
+                b = a * 4
+                c = a - 5
+                println(java.lang.Long.toBinaryString(a))
+                println(java.lang.Long.toBinaryString(a or min))
+                println(java.lang.Long.toBinaryString(b))
+                println(java.lang.Long.toBinaryString(b or min))
+                println(a)
+                println(b or min)
+
+
+                val a = Long.MAX_VALUE
+                val b = Long.MIN_VALUE
+                println(java.lang.Long.toBinaryString(a))
+                println(java.lang.Long.toBinaryString(a + 1L))
+                println(java.lang.Long.toBinaryString(a * 2L))
+                println(java.lang.Long.toBinaryString(a * 4L))
+                println()
+                println(java.lang.Long.toBinaryString(b))
+                println(java.lang.Long.toBinaryString(b - 1L))
+                println(java.lang.Long.toBinaryString(b * 2L))
+                println(java.lang.Long.toBinaryString(b * 4L))
+*/
+
+        var x = SysInteger.valueOf(Long.MAX_VALUE)
+        var y = SysInteger.valueOf(Long.MIN_VALUE)
+        assertEquals(x, y.inv())
+
+        assertEquals((x + y).value, Long.MAX_VALUE + Long.MIN_VALUE)
+        assertEquals((x - x).value, 0L)
+
+        val width = 52
+        var a = 1L shl width - 2
+        var b = 1L shl width - 2
+        x = SysInteger(width, a)
+        y = SysInteger(width, b)
+
+        assertNotEquals(a + b, (x + y).value)
+        assertEquals((a + b) shr 1, (x + y).value)
+
+        val mask = 0x0007ffffffffffff
+        for (i in 0..99) {
+
+            a = Random().nextLong()and mask
+            b = Random().nextLong()and mask
+
+            x = SysInteger(SysInteger.MAX_WIDTH, a)
+            y = SysInteger(SysInteger.MAX_WIDTH, b)
+
+            assertEquals(a * b, (x * y).value)
+
+            x = SysInteger(width, a)
+            y = SysInteger(width, b)
+            assertNotEquals(a * b, (x * y).value)
+
+            println("iteration $i ")
+            println(java.lang.Long.toBinaryString((x * y).value))
+            println(java.lang.Long.toBinaryString((a * b)))
+            assertEquals((a * b), (x * y).value)
+
+        }
+    }
 }
