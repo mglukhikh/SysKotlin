@@ -18,6 +18,12 @@ open class SysSignal<T : SysData> internal constructor(
         get() = storedValue
         set(value) = write(value)
 
+    operator fun invoke() = value
+
+    operator fun invoke(value: T) {
+        this.value = value
+    }
+
     /** Signal value for the next delta-cycle */
     protected var nextValue = startValue
 
