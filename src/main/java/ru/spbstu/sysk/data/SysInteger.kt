@@ -68,6 +68,7 @@ class SysInteger private constructor(
 
     private fun truncate(width: Int, value: Long, positiveMask: Long, negativeMask: Long): SysInteger {
         if (width == MAX_WIDTH)
+        //println(java.lang.Long.toBinaryString(value))
             return SysInteger(width, value, positiveMask, negativeMask)
         if (value >= 0L)
             return SysInteger(width, value and positiveMask, positiveMask, negativeMask)
