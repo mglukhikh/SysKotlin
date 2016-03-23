@@ -11,4 +11,6 @@ open class SysObject internal constructor(val sysName: SysName, val parent: SysO
         get() = parentName + sysName.name
 
     internal constructor(name: String, parent: SysObject? = null): this(SysName(name), parent)
+
+    override fun toString() = name
 }
