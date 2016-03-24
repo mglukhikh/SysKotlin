@@ -25,14 +25,21 @@ enum class SysBit(
         Z -> Z
     }
 
-    fun and(other: SysBit) = when (this) {
+    infix fun and(other: SysBit) = when (this) {
         ZERO -> ZERO
         ONE -> other
         X -> if (other == ZERO) ZERO else X
         Z -> if (other == ONE) Z else other
     }
 
-    fun or(other: SysBit) = !((!other).and(!this))
+    infix fun or(other: SysBit) = !((!other).and(!this))
+
+    infix fun xor(other: SysBit) = when(this) {
+        X -> X
+        Z -> other
+        ONE -> if (other.x) X else if (!other.one) ONE else ZERO
+        ZERO -> if (other.z) ZERO else other
+    }
 
     /** Direct connection of two wires */
     fun wiredAnd(other: SysBit) = when (this) {
