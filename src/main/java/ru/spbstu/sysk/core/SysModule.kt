@@ -140,10 +140,6 @@ open class SysModule internal constructor(
 
     protected fun <T : Any> iterator(progression: Iterable<T>) = ResetIterator.create(progression)
 
-    protected fun <T : Any> defaultIterator(): SysReference<ResetIterator<T>> = reference(null)
-
-    private fun <T : Any> reference(value: T? = null) = SysReference(value)
-
     companion object {
 
         private fun run(event: SysWait, default: SysWait, f: (SysWait) -> Any) =

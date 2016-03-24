@@ -1,6 +1,5 @@
 package ru.spbstu.sysk.core
 
-import ru.spbstu.sysk.data.SysReference
 import java.util.*
 
 sealed class Label {
@@ -128,11 +127,6 @@ interface StateContainer {
         toJump("continue", begin, this, current, this.states.size)
         jumpInternal(begin)
         labelInternal(end)
-    }
-
-    fun <T : Any> Loop(ref: SysReference<ResetIterator<T>>, progression: Iterable<T>, init: StateContainer.() -> Unit) {
-        ref(ResetIterator.create(progression))
-        Loop(ref()!!, init)
     }
 
     fun <T : Any> Loop(progression: Iterable<T>, init: StateContainer.() -> Unit) {

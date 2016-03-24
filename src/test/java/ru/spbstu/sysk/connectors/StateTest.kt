@@ -26,12 +26,12 @@ class StateTest {
                 val i = iterator(0..3)
                 Loop(i) {
                     // Kotlin BUG: try to pass 'null' as a DEFAULT argument to defaultIterator and then to reference
-                    val j = defaultIterator<Int>()
-                    Loop(j, 0..3) {
+                    val j = iterator(0..3)
+                    Loop(j) {
                         If ({ i.it == 3 }) { Jump("end") }
                         State {
                             switch = !switch
-                            println("i: ${i.it} j: ${j()!!.it}")
+                            println("i: ${i.it} j: ${j.it}")
                             println("1: start loop")
                             put(SysInteger.valueOf(1))
                         }
