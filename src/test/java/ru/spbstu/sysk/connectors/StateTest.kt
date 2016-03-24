@@ -55,7 +55,7 @@ class StateTest {
                         }
                         Case ({ !switch }) {
                             Sleep(5)
-                            Continue()
+                            ContinueLoop()
                             Sleep(101)
                         }
                         State {
@@ -119,7 +119,7 @@ class StateTest {
                     }
                     Otherwise {
                         Sleep(2)
-                        Continue()
+                        ContinueLoop()
                         Sleep(101)
                     }
                     State {
@@ -157,7 +157,7 @@ class StateTest {
             stateFunction(clk, false) {
                 var i = 0
                 InfiniteLoop {
-                    Case({ i++ > 11 }) { Break() }
+                    Case({ i++ > 11 }) { BreakLoop() }
                     var switch = false
                     State {
                         println("start loop\n")

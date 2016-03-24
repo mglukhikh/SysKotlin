@@ -89,11 +89,11 @@ interface StateContainer {
         states.add(current, func)
     }
 
-    fun Continue() {
+    fun ContinueLoop() {
         states.add(State.LoopJumpFunction("continue"))
     }
 
-    fun Break() {
+    fun BreakLoop() {
         states.add(State.LoopJumpFunction("break"))
     }
 
