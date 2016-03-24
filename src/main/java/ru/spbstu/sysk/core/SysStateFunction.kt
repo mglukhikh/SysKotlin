@@ -65,8 +65,8 @@ interface StateContainer {
         this.init()
         val delta = this.states.size - current
         val func = State.CaseFunction("if") {
-            val cond = condition()
-            val otherwise = states.elementAtOrNull(state + delta + 1) as? State.OtherwiseFunction
+            val cond = condition() /**&& !((states[state] as? State.CaseFunction)?.args as? Boolean ?: false)*/
+            val otherwise = states.elementAtOrNull(state + delta + 1) as? State.CaseFunction
             if (otherwise != null) otherwise.args = cond
             if (!cond) state += delta
             if (++state < states.size) this.run(wait())
@@ -80,8 +80,8 @@ interface StateContainer {
         this.init()
         val delta = this.states.size - current
         val func = State.OtherwiseFunction {
-            val cond = (states[state] as? State.CaseFunction)?.args as? Boolean
-                    ?: throw AssertionError("Block 'If' expected before 'Else'")
+            val cond = (states[state] as? State.OtherwiseFunction)?.args as? Boolean
+                    ?: throw AssertionError("Block 'case' expected before 'otherwise'")
             if (cond) state += delta
             if (++state < states.size) this.run(wait())
             wait()
