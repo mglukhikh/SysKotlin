@@ -92,3 +92,5 @@ sealed class SysWait {
 }
 
 fun time(num: Int, tu: TimeUnit) = SysWait.Time(num, tu)
+
+operator fun Int.invoke(tu: TimeUnit) = time(this, tu)
