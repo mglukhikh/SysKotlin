@@ -90,22 +90,18 @@ interface StateContainer {
     }
 
     fun Continue() {
-        states.add(State.Function("continue", { true }, {
-            throw AssertionError("'Break' and 'Continue' are only allowed inside a loop")
-        }))
+        states.add(State.LoopJumpFunction("continue"))
     }
 
     fun Break() {
-        states.add(State.Function("break", { true }, {
-            throw AssertionError("'Break' and 'Continue' are only allowed inside a loop")
-        }))
+        states.add(State.LoopJumpFunction("break"))
     }
 
     private fun toJump(name: String, mark: Any, self: StateContainer, begin: Int, end: Int) {
         if (begin > end) throw AssertionError()
         var i = begin
         while (i != end) {
-            if ((self.states[i] as? State.Function)?.name == name) {
+            if ((self.states[i] as? State.LoopJumpFunction)?.name == name) {
                 self.states[i] = State.Function("jump", { false }) {
                     self.state = self.labels[mark] ?: throw AssertionError()
                     if (self.state < self.states.size) self.run(wait())
@@ -191,7 +187,13 @@ sealed class State {
         override fun complete() = true
     }
 
-    class Function internal constructor(
+    class LoopJumpFunction(name: String) : Function(
+            name,
+            { true },
+            { throw AssertionError("'Break' and 'Continue' are only allowed inside a loop") }
+    )
+
+    open class Function internal constructor(
             val name: String,
             private val comp: () -> Boolean,
             private val f: (SysWait) -> SysWait)
