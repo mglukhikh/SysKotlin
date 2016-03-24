@@ -56,7 +56,7 @@ class StateTest {
                         case ({ !switch }) {
                             sleep(5)
                             continueLoop()
-                            sleep(101)
+                            state { throw AssertionError() }
                         }
                         state {
                             println("1: after IF-Else")
@@ -120,7 +120,7 @@ class StateTest {
                     otherwise {
                         sleep(2)
                         continueLoop()
-                        sleep(101)
+                        state { throw AssertionError() }
                     }
                     state {
                         println("2: after IF-Else")
