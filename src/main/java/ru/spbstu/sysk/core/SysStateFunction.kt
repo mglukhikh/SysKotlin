@@ -156,7 +156,7 @@ interface StateContainer {
         Loop({true}, init)
     }
 
-    fun Infinite(f: () -> Unit) {
+    fun InfiniteState(f: () -> Unit) {
         val result = State.Function("infinite", { false }) {
             f()
             wait()
