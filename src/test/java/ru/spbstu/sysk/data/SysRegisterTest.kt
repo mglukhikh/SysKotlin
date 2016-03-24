@@ -25,7 +25,7 @@ class SysRegisterTest {
                     en = ZERO
                 }
                 val i = iterator(0..9)
-                For(i) {
+                Loop(i) {
                     State {
                         en = ONE
                         d = q + 1
@@ -73,7 +73,7 @@ class SysRegisterTest {
                     ben = ZERO
                 }
                 val i = iterator(0..17)
-                For(i) {
+                Loop(i) {
                     State {
                         aen = ONE
                         ben = ONE

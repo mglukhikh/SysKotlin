@@ -117,7 +117,7 @@ interface StateContainer {
         }
     }
 
-    fun While(condition: () -> Boolean, init: StateContainer.() -> Unit) {
+    private fun Loop(condition: () -> Boolean, init: StateContainer.() -> Unit) {
         val begin = Label.Internal()
         val end = Label.Internal()
         labelInternal(begin)
@@ -130,16 +130,16 @@ interface StateContainer {
         labelInternal(end)
     }
 
-    fun <T : Any> For(ref: SysReference<ResetIterator<T>>, progression: Iterable<T>, init: StateContainer.() -> Unit) {
+    fun <T : Any> Loop(ref: SysReference<ResetIterator<T>>, progression: Iterable<T>, init: StateContainer.() -> Unit) {
         ref(ResetIterator.create(progression))
-        For(ref()!!, init)
+        Loop(ref()!!, init)
     }
 
-    fun <T : Any> For(progression: Iterable<T>, init: StateContainer.() -> Unit) {
-        For(ResetIterator.create(progression), init)
+    fun <T : Any> Loop(progression: Iterable<T>, init: StateContainer.() -> Unit) {
+        Loop(ResetIterator.create(progression), init)
     }
 
-    fun <T : Any> For(iterator: ResetIterator<T>, init: StateContainer.() -> Unit) {
+    fun <T : Any> Loop(iterator: ResetIterator<T>, init: StateContainer.() -> Unit) {
         val begin = Label.Internal()
         val end = Label.Internal()
         val reset = State.Function("reset", { false }) {
@@ -162,12 +162,8 @@ interface StateContainer {
         labelInternal(end)
     }
 
-    fun <T : Any> ForEach(progression: Iterable<T>, init: StateContainer.() -> Unit) {
-        For(progression, init)
-    }
-
-    fun InfiniteBlock(init: StateContainer.() -> Unit) {
-        While({true}, init)
+    fun InfiniteLoop(init: StateContainer.() -> Unit) {
+        Loop({true}, init)
     }
 
     fun Infinite(f: () -> Unit) {

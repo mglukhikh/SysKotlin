@@ -24,10 +24,10 @@ class StateTest {
             stateFunction(clk, true) {
                 var switch = false
                 val i = iterator(0..3)
-                For(i) {
+                Loop(i) {
                     // Kotlin BUG: try to pass 'null' as a DEFAULT argument to defaultIterator and then to reference
                     val j = defaultIterator<Int>()
-                    For(j, 0..3) {
+                    Loop(j, 0..3) {
                         If ({ i.it == 3 }) { Jump("end") }
                         State {
                             switch = !switch
@@ -89,7 +89,7 @@ class StateTest {
 
         init {
             stateFunction(clk, true) {
-                For(0..11) {
+                Loop(0..11) {
                     var switch = false
                     State {
                         println("2: start loop")
@@ -156,7 +156,7 @@ class StateTest {
         init {
             stateFunction(clk, false) {
                 var i = 0
-                While({ true }) {
+                InfiniteLoop {
                     If({ i++ > 11 }) { Break() }
                     var switch = false
                     State {
