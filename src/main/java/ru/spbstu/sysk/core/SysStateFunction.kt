@@ -21,7 +21,7 @@ interface StateContainer {
 
     fun wait(): SysWait
 
-    fun State(f: () -> Unit) {
+    fun state(f: () -> Unit) {
         val result = State.Single {
             f()
             wait()
@@ -29,7 +29,7 @@ interface StateContainer {
         states.add(result)
     }
 
-    fun Sleep(number: Int) {
+    fun sleep(number: Int) {
         if (number <= 0) {
             throw IllegalArgumentException("Impossible to sleep $number cycles.")
         }
@@ -43,9 +43,9 @@ interface StateContainer {
         states.add(result)
     }
 
-    fun Label(label: String) = labelInternal(Label.User(label))
+    fun label(label: String) = labelInternal(Label.User(label))
 
-    fun Jump(label: String) = jumpInternal(Label.User(label))
+    fun jump(label: String) = jumpInternal(Label.User(label))
 
     private fun labelInternal(label: Label) {
         labels[label] = states.size
@@ -60,7 +60,7 @@ interface StateContainer {
         states.add(result)
     }
 
-    fun Case(condition: () -> Boolean, init: StateContainer.() -> Unit) {
+    fun case(condition: () -> Boolean, init: StateContainer.() -> Unit) {
         val current = this.states.size
         this.init()
         val delta = this.states.size - current
@@ -75,7 +75,7 @@ interface StateContainer {
         states.add(current, func)
     }
 
-    fun Otherwise(init: StateContainer.() -> Unit) {
+    fun otherwise(init: StateContainer.() -> Unit) {
         val current = this.states.size
         this.init()
         val delta = this.states.size - current
@@ -89,11 +89,11 @@ interface StateContainer {
         states.add(current, func)
     }
 
-    fun ContinueLoop() {
+    fun continueLoop() {
         states.add(State.LoopJumpFunction("continue"))
     }
 
-    fun BreakLoop() {
+    fun breakLoop() {
         states.add(State.LoopJumpFunction("break"))
     }
 
@@ -112,11 +112,11 @@ interface StateContainer {
         }
     }
 
-    private fun Loop(condition: () -> Boolean, init: StateContainer.() -> Unit) {
+    private fun loop(condition: () -> Boolean, init: StateContainer.() -> Unit) {
         val begin = Label.Internal()
         val end = Label.Internal()
         labelInternal(begin)
-        Case({ !condition() }) { jumpInternal(end) }
+        case({ !condition() }) { jumpInternal(end) }
         val current = this.states.size
         this.init()
         toJump("break", end, this, current, this.states.size)
@@ -125,11 +125,11 @@ interface StateContainer {
         labelInternal(end)
     }
 
-    fun <T : Any> Loop(progression: Iterable<T>, init: StateContainer.() -> Unit) {
-        Loop(ResetIterator.create(progression), init)
+    fun <T : Any> loop(progression: Iterable<T>, init: StateContainer.() -> Unit) {
+        loop(ResetIterator.create(progression), init)
     }
 
-    fun <T : Any> Loop(iterator: ResetIterator<T>, init: StateContainer.() -> Unit) {
+    fun <T : Any> loop(iterator: ResetIterator<T>, init: StateContainer.() -> Unit) {
         val begin = Label.Internal()
         val end = Label.Internal()
         val reset = State.Function("reset", { false }) {
@@ -139,7 +139,7 @@ interface StateContainer {
         }
         states.add(reset)
         labelInternal(begin)
-        Case({
+        case({
             var cond = iterator.hasNext()
             if (cond) iterator.next()
             !cond
@@ -152,11 +152,11 @@ interface StateContainer {
         labelInternal(end)
     }
 
-    fun InfiniteLoop(init: StateContainer.() -> Unit) {
-        Loop({true}, init)
+    fun infiniteLoop(init: StateContainer.() -> Unit) {
+        loop({true}, init)
     }
 
-    fun InfiniteState(f: () -> Unit) {
+    fun infiniteState(f: () -> Unit) {
         val result = State.Function("infinite", { false }) {
             f()
             wait()
@@ -221,7 +221,7 @@ class SysStateFunction private constructor(
     internal constructor(sensitivities: SysWait = SysWait.Never) :
     this(LinkedList(), HashMap(), null, sensitivities)
 
-    fun Init(f: () -> Unit): State.Single {
+    fun init(f: () -> Unit): State.Single {
         initState = State.Single {
             f()
             wait()
@@ -229,13 +229,13 @@ class SysStateFunction private constructor(
         return initState!!
     }
 
-    private fun Init(event: SysWait): SysWait = initState?.run(event) ?: wait()
+    private fun init(event: SysWait): SysWait = initState?.run(event) ?: wait()
 
     override var state = 0
 
     override fun run(event: SysWait): SysWait {
         if (event == SysWait.Initialize) {
-            return Init(event)
+            return init(event)
         } else {
             return super.run(event)
         }

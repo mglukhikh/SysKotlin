@@ -28,32 +28,32 @@ class SysSimpleAutomataTest {
 
         init {
             stateFunction(clk) {
-                State {
+                state {
                     assert(y.x)
                     x = ZERO
                     assertTime(time(10, TimeUnit.NS))
                 }
-                State {
+                state {
                     assert(y.x)
                     x = ONE
                     assertTime(time(30, TimeUnit.NS))
                 }
-                State {
+                state {
                     assert(y.zero)
                     x = ZERO
                     assertTime(time(50, TimeUnit.NS))
                 }
-                State {
+                state {
                     assert(y.one)
                     x = ONE
                     assertTime(time(70, TimeUnit.NS))
                 }
-                State {
+                state {
                     assert(y.zero)
                     assert(currentTime == time(90, TimeUnit.NS)) { "Expected 90 ns but was $currentTime" }
                     assertTime(time(90, TimeUnit.NS))
                 }
-                State {
+                state {
                     assert(y.one)
                     assertTime(time(110, TimeUnit.NS))
                     scheduler.stop()
@@ -134,25 +134,25 @@ class SysSimpleAutomataTest {
 
         init {
             stateFunction(clk) {
-                State {
+                state {
                     assert(y.zero)
                     x = ZERO
                 }
-                State {
+                state {
                     assert(y.zero) { "Expected ZERO at stage 1 but was $y" }
                     x = ONE
                 }
-                State {
+                state {
                     assert(y.zero)
                 }
-                State {
+                state {
                     assert(y.one)
                     x = ZERO
                 }
-                State {
+                state {
                     assert(y.zero)
                 }
-                State {
+                state {
                     assert(y.zero)
                     scheduler.stop()
                 }

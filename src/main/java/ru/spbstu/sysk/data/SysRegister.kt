@@ -20,10 +20,10 @@ class SysRegister <T : SysData> (name: String, defValue: T, parent: SysModule): 
 
     init {
         stateFunction(clk) {
-            Init {
+            init {
                 qout = value
             }
-            InfiniteState {
+            infiniteState {
                 if (en.one) {
                     qout = dinp
                     value = dinp

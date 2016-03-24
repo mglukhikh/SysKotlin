@@ -24,52 +24,52 @@ class StateTest {
             stateFunction(clk, true) {
                 var switch = false
                 val i = iterator(0..3)
-                Loop(i) {
+                loop(i) {
                     // Kotlin BUG: try to pass 'null' as a DEFAULT argument to defaultIterator and then to reference
                     val j = iterator(0..3)
-                    Loop(j) {
-                        Case ({ i.it == 3 }) { Jump("end") }
-                        State {
+                    loop(j) {
+                        case ({ i.it == 3 }) { jump("end") }
+                        state {
                             switch = !switch
                             println("i: ${i.it} j: ${j.it}")
                             println("1: start loop")
                             put(SysInteger.valueOf(1))
                         }
-                        State {
+                        state {
                             println("1: before IF-Else")
                             put(SysInteger.valueOf(2))
                         }
-                        Case ({ switch }) {
-                            State {
+                        case ({ switch }) {
+                            state {
                                 println("1: If-1")
                                 put(SysInteger.valueOf(3))
                             }
-                            State {
+                            state {
                                 println("1: If-2")
                                 put(SysInteger.valueOf(4))
                             }
-                            State {
+                            state {
                                 println("1: If-3")
                                 put(SysInteger.valueOf(5))
                             }
                         }
-                        Case ({ !switch }) {
-                            Sleep(5)
-                            ContinueLoop()
-                            Sleep(101)
+                        case ({ !switch }) {
+                            sleep(5)
+                            continueLoop()
+                            sleep(101)
                         }
-                        State {
+                        state {
                             println("1: after IF-Else")
                             put(SysInteger.valueOf(9))
                         }
-                        State {
+                        state {
                             println("1: end loop")
                             put(SysInteger.valueOf(10))
                         }
                     }
                 }
-                Label("end")
-                State() {
+                label("end")
+                state() {
                     println("1: end")
                     put(SysInteger.valueOf(11))
                 }
@@ -89,49 +89,49 @@ class StateTest {
 
         init {
             stateFunction(clk, true) {
-                Loop(0..11) {
+                loop(0..11) {
                     var switch = false
-                    State {
+                    state {
                         println("2: start loop")
                         put(SysInteger.valueOf(1))
                     }
-                    State {
+                    state {
                         switch = !switch
                         println("2: before IF-Else")
                         put(SysInteger.valueOf(2))
                     }
-                    Case ({ switch }) {
-                        State {
+                    case ({ switch }) {
+                        state {
                             println("2: If-1")
                             put(SysInteger.valueOf(3))
                         }
-                        State {
+                        state {
                             println("2: If-2")
                             put(SysInteger.valueOf(4))
                         }
-                        State {
+                        state {
                             println("2: If-3")
                             put(SysInteger.valueOf(5))
                         }
                     }
-                    Case ({ !switch }) {
-                        Sleep(3)
+                    case ({ !switch }) {
+                        sleep(3)
                     }
-                    Otherwise {
-                        Sleep(2)
-                        ContinueLoop()
-                        Sleep(101)
+                    otherwise {
+                        sleep(2)
+                        continueLoop()
+                        sleep(101)
                     }
-                    State {
+                    state {
                         println("2: after IF-Else")
                         put(SysInteger.valueOf(9))
                     }
-                    State {
+                    state {
                         println("2: end loop")
                         put(SysInteger.valueOf(10))
                     }
                 }
-                State() {
+                state() {
                     println("2: end")
                     put(SysInteger.valueOf(11))
                 }
@@ -156,56 +156,56 @@ class StateTest {
         init {
             stateFunction(clk, false) {
                 var i = 0
-                InfiniteLoop {
-                    Case({ i++ > 11 }) { BreakLoop() }
+                infiniteLoop {
+                    case({ i++ > 11 }) { breakLoop() }
                     var switch = false
-                    State {
+                    state {
                         println("start loop\n")
                         check(SysInteger.valueOf(1))
                     }
-                    State {
+                    state {
                         switch = !switch
                         println("before IF-Else\n")
                         check(SysInteger.valueOf(2))
                     }
-                    Case ({ switch }) {
-                        State {
+                    case ({ switch }) {
+                        state {
                             println("If-1\n")
                             check(SysInteger.valueOf(3))
                         }
-                        State {
+                        state {
                             println("If-2\n")
                             check(SysInteger.valueOf(4))
                         }
-                        State {
+                        state {
                             println("If-3\n")
                             check(SysInteger.valueOf(5))
                         }
                     }
-                    Otherwise {
-                        State {
+                    otherwise {
+                        state {
                             println("Else-1\n")
                             check(SysInteger.valueOf(6))
                         }
-                        State {
+                        state {
                             println("Else-2\n")
                             check(SysInteger.valueOf(7))
                         }
-                        State {
+                        state {
                             println("Else-3\n")
                             check(SysInteger.valueOf(8))
                         }
                     }
-                    State {
+                    state {
                         println("after IF-Else\n")
                         check(SysInteger.valueOf(9))
                     }
-                    State {
+                    state {
                         println("end loop\n")
                         check(SysInteger.valueOf(10))
                     }
                 }
-                State() {
+                state() {
                     println("end\n")
                     check(SysInteger.valueOf(11))
                     scheduler.stop()
