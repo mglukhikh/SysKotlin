@@ -28,7 +28,7 @@ class StateTest {
                     // Kotlin BUG: try to pass 'null' as a DEFAULT argument to defaultIterator and then to reference
                     val j = iterator(0..3)
                     Loop(j) {
-                        If ({ i.it == 3 }) { Jump("end") }
+                        Case ({ i.it == 3 }) { Jump("end") }
                         State {
                             switch = !switch
                             println("i: ${i.it} j: ${j.it}")
@@ -39,7 +39,7 @@ class StateTest {
                             println("1: before IF-Else")
                             put(SysInteger.valueOf(2))
                         }
-                        If ({ switch }) {
+                        Case ({ switch }) {
                             State {
                                 println("1: If-1")
                                 put(SysInteger.valueOf(3))
@@ -53,7 +53,7 @@ class StateTest {
                                 put(SysInteger.valueOf(5))
                             }
                         }
-                        If ({ !switch }) {
+                        Case ({ !switch }) {
                             Sleep(5)
                             Continue()
                             Sleep(101)
@@ -100,7 +100,7 @@ class StateTest {
                         println("2: before IF-Else")
                         put(SysInteger.valueOf(2))
                     }
-                    If ({ switch }) {
+                    Case ({ switch }) {
                         State {
                             println("2: If-1")
                             put(SysInteger.valueOf(3))
@@ -114,10 +114,10 @@ class StateTest {
                             put(SysInteger.valueOf(5))
                         }
                     }
-                    If ({ !switch }) {
+                    Case ({ !switch }) {
                         Sleep(3)
                     }
-                    Else {
+                    Otherwise {
                         Sleep(2)
                         Continue()
                         Sleep(101)
@@ -157,7 +157,7 @@ class StateTest {
             stateFunction(clk, false) {
                 var i = 0
                 InfiniteLoop {
-                    If({ i++ > 11 }) { Break() }
+                    Case({ i++ > 11 }) { Break() }
                     var switch = false
                     State {
                         println("start loop\n")
@@ -168,7 +168,7 @@ class StateTest {
                         println("before IF-Else\n")
                         check(SysInteger.valueOf(2))
                     }
-                    If ({ switch }) {
+                    Case ({ switch }) {
                         State {
                             println("If-1\n")
                             check(SysInteger.valueOf(3))
@@ -182,7 +182,7 @@ class StateTest {
                             check(SysInteger.valueOf(5))
                         }
                     }
-                    Else {
+                    Otherwise {
                         State {
                             println("Else-1\n")
                             check(SysInteger.valueOf(6))

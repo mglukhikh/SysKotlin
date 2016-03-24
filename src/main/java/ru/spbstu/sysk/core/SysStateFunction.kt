@@ -60,14 +60,14 @@ interface StateContainer {
         states.add(result)
     }
 
-    fun If(condition: () -> Boolean, init: StateContainer.() -> Unit) {
+    fun Case(condition: () -> Boolean, init: StateContainer.() -> Unit) {
         val current = this.states.size
         this.init()
         val delta = this.states.size - current
-        val func = State.Function("if", { false }) {
+        val func = State.CaseFunction("if") {
             val cond = condition()
-            val Else: State.Function? = states.elementAtOrNull(state + delta + 1) as? State.Function
-            if (Else != null && Else.name == "else") Else.args = cond
+            val otherwise = states.elementAtOrNull(state + delta + 1) as? State.OtherwiseFunction
+            if (otherwise != null) otherwise.args = cond
             if (!cond) state += delta
             if (++state < states.size) this.run(wait())
             wait()
@@ -75,12 +75,12 @@ interface StateContainer {
         states.add(current, func)
     }
 
-    fun Else(init: StateContainer.() -> Unit) {
+    fun Otherwise(init: StateContainer.() -> Unit) {
         val current = this.states.size
         this.init()
         val delta = this.states.size - current
-        val func = State.Function("else", { false }) {
-            val cond = (states[state] as State.Function).args as? Boolean
+        val func = State.OtherwiseFunction {
+            val cond = (states[state] as? State.CaseFunction)?.args as? Boolean
                     ?: throw AssertionError("Block 'If' expected before 'Else'")
             if (cond) state += delta
             if (++state < states.size) this.run(wait())
@@ -116,7 +116,7 @@ interface StateContainer {
         val begin = Label.Internal()
         val end = Label.Internal()
         labelInternal(begin)
-        If({ !condition() }) { jumpInternal(end) }
+        Case({ !condition() }) { jumpInternal(end) }
         val current = this.states.size
         this.init()
         toJump("break", end, this, current, this.states.size)
@@ -139,7 +139,7 @@ interface StateContainer {
         }
         states.add(reset)
         labelInternal(begin)
-        If({
+        Case({
             var cond = iterator.hasNext()
             if (cond) iterator.next()
             !cond
@@ -194,6 +194,10 @@ sealed class State {
     )
 
     class JumpFunction(f: (SysWait) -> SysWait) : Function("jump", { false }, f)
+
+    class OtherwiseFunction(f: (SysWait) -> SysWait) : CaseFunction("otherwise", f)
+
+    open class CaseFunction(name: String, f: (SysWait) -> SysWait) : Function(name, { false }, f)
 
     open class Function internal constructor(
             val name: String,
