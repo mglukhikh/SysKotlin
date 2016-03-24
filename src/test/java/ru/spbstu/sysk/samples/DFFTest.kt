@@ -6,7 +6,7 @@ import ru.spbstu.sysk.data.SysBit
 import ru.spbstu.sysk.data.SysBit.*
 import ru.spbstu.sysk.data.SysBitInput
 import ru.spbstu.sysk.data.bind
-import ru.spbstu.sysk.generics.SysAndNotModule
+import ru.spbstu.sysk.generics.NAND
 
 class DFFTest {
 
@@ -91,7 +91,7 @@ class DFFTest {
     private class NotTestbench : SysTopModule("top") {
         val ff = DFF("my", this)
 
-        val andNot = SysAndNotModule("andNot", this)
+        val andNot = NAND("andNot", this)
 
         val clk = clockedSignal("clk", time(20, TimeUnit.NS))
         val q by readOnlyBitSignal("q", ff.q.out, andNot.x1 as SysBitInput)

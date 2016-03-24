@@ -10,7 +10,7 @@ class SysSimpleFunctionTest {
 
     class SysNotTester: SysTopModule() {
 
-        val dut = SysNotModule("not", this)
+        val dut = NOT("not", this)
 
         var x by readWriteBitSignal("x", dut.x as SysBitInput)
         val y = bitSignal("y")
@@ -47,7 +47,7 @@ class SysSimpleFunctionTest {
     }
 
     class SysOrTester: SysTopModule() {
-        val dut = SysOrModule("or", this)
+        val dut = OR("or", this)
 
         var x1 by readWriteBitSignal("x1", dut.x1 as SysBitInput)
         var x2 by readWriteBitSignal("x2", dut.x2 as SysBitInput)
@@ -98,7 +98,7 @@ class SysSimpleFunctionTest {
     }
 
     class SysAndTester: SysTopModule() {
-        val dut = SysAndModule("and", this)
+        val dut = AND("and", this)
 
         var x1 by readWriteBitSignal("x1", dut.x1 as SysBitInput)
         var x2 by readWriteBitSignal("x2", dut.x2 as SysBitInput)

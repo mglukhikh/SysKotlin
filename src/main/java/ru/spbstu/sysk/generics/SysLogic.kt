@@ -28,7 +28,7 @@ open class SysUnaryBitModule<Output : SysData>(
     override fun createInput(name: String) = bitInput(name)
 }
 
-class SysNotModule(name: String, parent: SysModule): SysUnaryBitModule<SysBit>({ it.not() }, name, parent)
+class NOT(name: String, parent: SysModule): SysUnaryBitModule<SysBit>({ !it }, name, parent)
 
 open class SysBinaryModule<Input1 : SysData, Input2 : SysData, Output : SysData>(
         operation: (Input1, Input2) -> Output, name: String, parent: SysModule
@@ -60,11 +60,20 @@ open class SysBinaryBitModule<Output : SysData>(
     override fun createInput2(name: String) = bitInput(name)
 }
 
-class SysOrModule(name: String, parent: SysModule):
-        SysBinaryBitModule<SysBit>({ x1, x2 -> x1.or(x2) }, name, parent)
+class AND(name: String, parent: SysModule):
+        SysBinaryBitModule<SysBit>({ x1, x2 -> x1 and x2 }, name, parent)
 
-class SysAndModule(name: String, parent: SysModule):
-        SysBinaryBitModule<SysBit>({ x1, x2 -> x1.and(x2) }, name, parent)
+class NAND(name: String, parent: SysModule):
+        SysBinaryBitModule<SysBit>({ x1, x2 -> !(x1 and x2) }, name, parent)
 
-class SysAndNotModule(name: String, parent: SysModule):
-        SysBinaryBitModule<SysBit>({ x1, x2 -> x1.and(x2).not() }, name, parent)
+class OR(name: String, parent: SysModule):
+        SysBinaryBitModule<SysBit>({ x1, x2 -> x1 or x2 }, name, parent)
+
+class NOR(name: String, parent: SysModule):
+        SysBinaryBitModule<SysBit>({ x1, x2 -> !(x1 or x2) }, name, parent)
+
+class XOR(name: String, parent: SysModule):
+        SysBinaryBitModule<SysBit>({ x1, x2 -> x1 xor x2 }, name, parent)
+
+class NXOR(name: String, parent: SysModule):
+        SysBinaryBitModule<SysBit>({ x1, x2 -> !(x1 xor x2) }, name, parent)
