@@ -52,7 +52,7 @@ interface StateContainer {
     }
 
     private fun jumpInternal(label: Label) {
-        val result = State.Function("jump", { false }) {
+        val result = State.JumpFunction {
             state = labels[label] ?: throw IllegalArgumentException("label: $label not found")
             if (state < states.size) this.run(wait())
             wait()
@@ -102,7 +102,7 @@ interface StateContainer {
         var i = begin
         while (i != end) {
             if ((self.states[i] as? State.LoopJumpFunction)?.name == name) {
-                self.states[i] = State.Function("jump", { false }) {
+                self.states[i] = State.JumpFunction {
                     self.state = self.labels[mark] ?: throw AssertionError()
                     if (self.state < self.states.size) self.run(wait())
                     wait()
@@ -192,6 +192,8 @@ sealed class State {
             { true },
             { throw AssertionError("'Break' and 'Continue' are only allowed inside a loop") }
     )
+
+    class JumpFunction(f: (SysWait) -> SysWait) : Function("jump", { false }, f)
 
     open class Function internal constructor(
             val name: String,
