@@ -21,18 +21,20 @@ class SysInteger private constructor(
 
     /** Construct from given long value setting minimal possible width */
     private constructor(value: Long, width: Int = widthByValue(value)) :
-    this(width, value, true, positiveMask = maxValue(width), negativeMask = minValue(width))
+    this(width, value, true,
+            positiveMask = positiveValues[width],
+            negativeMask = negativeValues[width])
 
     /**Construct uninitialized sys integer with given width.
      *  Short is used only to male a difference between constructor from Int value*/
     private constructor(width: Short) : this(width.toInt(), 0, false,
-            positiveMask = maxValue(width.toInt()),
-            negativeMask = minValue(width.toInt()))
+            positiveMask = positiveValues[width.toInt()],
+            negativeMask = negativeValues[width.toInt()])
 
     /** Construct from given value and width*/
     constructor(width: Int, value: Long) : this(width, value, bitsState = maskByValue(value, width),
-            positiveMask = maxValue(width),
-            negativeMask = minValue(width))
+            positiveMask = positiveValues[width],
+            negativeMask = negativeValues[width])
 
     private constructor(width: Int, value: Long, positiveMask: Long, negativeMask: Long) :
     this(width, value, bitsState = maskByValue(value, width),
@@ -41,14 +43,14 @@ class SysInteger private constructor(
 
     constructor(width: Int, value: Int) : this(width, value.toLong(),
             bitsState = maskByValue(value.toLong(), width),
-            positiveMask = maxValue(width),
-            negativeMask = minValue(width))
+            positiveMask = positiveValues[width],
+            negativeMask = negativeValues[width])
 
     /**Construct from given SysBit Array*/
     constructor (arr: Array<SysBit>) : this(arr.size, valueBySWSArray(arr),
             bitsState = maskBySWSArray(arr),
-            positiveMask = maxValue(arr.size),
-            negativeMask = minValue(arr.size))
+            positiveMask = positiveValues[arr.size],
+            negativeMask = negativeValues[arr.size])
 
     /** Increase width to the given */
     override fun extend(width: Int): SysInteger {
@@ -431,6 +433,10 @@ class SysInteger private constructor(
     companion object : SysDataCompanion<SysInteger> {
 
         val MAX_WIDTH: Int = 64
+
+        private val positiveValues = LongArray(MAX_WIDTH + 1, { i -> maxValue(i) })
+
+        private val negativeValues = LongArray(MAX_WIDTH + 1, { i -> minValue(i) })
 
         fun valueOf(value: Long) = SysInteger(value)
 

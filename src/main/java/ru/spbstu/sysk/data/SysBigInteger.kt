@@ -12,11 +12,11 @@ class SysBigInteger private constructor(
 ) : SysBaseInteger (width, value, bitsState, positiveMask, negativeMask) {
 
     constructor(width: Int, value: BigInteger) : this(width, value, bitsState = maskByValue(value, width),
-            positiveMask = maxValue(width), negativeMask = minValue(width))
+            positiveMask = getMaxValue(width), negativeMask = getMinValue(width))
 
     private constructor(width: Int, value: BigInteger, bitsState: Array<Boolean>) :
     this(width, value, bitsState = maskByValue(value, width),
-            positiveMask = maxValue(width), negativeMask = minValue(width))
+            positiveMask = getMaxValue(width), negativeMask = getMinValue(width))
 
     private constructor(width: Int, value: BigInteger, positiveMask: BigInteger, negativeMask: BigInteger) :
     this(width, value, bitsState = maskByValue(value, width),
@@ -26,17 +26,17 @@ class SysBigInteger private constructor(
 
     constructor(width: Int, value: Long) : this(width, BigInteger.valueOf(value),
             bitsState = maskByValue(BigInteger.valueOf(value), width),
-            positiveMask = maxValue(width), negativeMask = minValue(width))
+            positiveMask = getMaxValue(width), negativeMask = getMinValue(width))
 
     private constructor(value: BigInteger, width: Int = value.bitLength() + 1) : this(width, value,
             bitsState = maskByValue(value, value.bitLength() + 1),
-            positiveMask = maxValue(width), negativeMask = minValue(width))
+            positiveMask = getMaxValue(width), negativeMask = getMinValue(width))
 
     constructor(arr: Array<SysBit>) : this(arr.size, valueBySWSArray(arr),
-            bitsState = maskBySWSArray(arr), positiveMask = maxValue(arr.size), negativeMask = minValue(arr.size))
+            bitsState = maskBySWSArray(arr), positiveMask = getMaxValue(arr.size), negativeMask = getMinValue(arr.size))
 
     private constructor(width: Short) : this(width.toInt(), BigInteger.ZERO, false,
-            positiveMask = maxValue(width.toInt()), negativeMask = minValue(width.toInt()))
+            positiveMask = getMaxValue(width.toInt()), negativeMask = getMinValue(width.toInt()))
 
     /** Increase width to the given */
     override fun extend(width: Int): SysBigInteger {
@@ -467,6 +467,12 @@ class SysBigInteger private constructor(
             }
             return result
         }
+
+        private val positiveValues = Array<BigInteger>(129, { i -> maxValue(i) })
+        private val negativeValues = Array<BigInteger>(129, { i -> minValue(i) })
+
+        private fun getMaxValue(width: Int): BigInteger = (if (128 >= width) positiveValues[width] else maxValue(width))
+        private fun getMinValue(width: Int): BigInteger = (if (128 >= width) negativeValues[width] else minValue(width))
 
         private fun minValue(width: Int): BigInteger {
             if (width == 0) return BigInteger.ZERO
