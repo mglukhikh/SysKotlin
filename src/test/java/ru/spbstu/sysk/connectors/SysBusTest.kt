@@ -4,15 +4,17 @@ import org.junit.Test
 import ru.spbstu.sysk.core.SysTopModule
 import ru.spbstu.sysk.data.SysBit
 import ru.spbstu.sysk.data.SysBit.*
+import ru.spbstu.sysk.data.bind
 
 class SysBusTest {
     @Test
     fun sysBitBus() {
         val top = SysTopModule()
         var connector = SysBitBus(4, "connector", top.scheduler)
-        val port_1 = SysBusPort(4, "port1", top.scheduler, top, connector)
-        val port_2 = SysBusPort(4, "port2", top.scheduler, top, connector)
-        val port_3 = SysBusPort(4, "port3", top.scheduler, top, connector)
+        val port_1 = SysBusPort<SysBit>(4, "port1", top.scheduler, top)
+        val port_2 = SysBusPort<SysBit>(4, "port2", top.scheduler, top)
+        val port_3 = SysBusPort<SysBit>(4, "port3", top.scheduler, top)
+        bind(port_1 to connector, port_2 to connector, port_3 to connector)
         assert(port_1[0].x)
         assert(port_2[1].x)
         assert(port_3[2].x)
@@ -38,7 +40,8 @@ class SysBusTest {
     fun SysFifoBus() {
         val top = SysTopModule()
         var bus = SysFifoBus(4, Array(4, { if (it == 2) ONE else ZERO }), "bus", top.scheduler)
-        var port = SysBusPort(4, "port", top.scheduler, top, bus)
+        var port = SysBusPort<SysBit>(4, "port", top.scheduler, top)
+        port bind bus
         assert(bus[0].zero)
         assert(bus[1].zero)
         assert(bus[2].one)
@@ -59,7 +62,8 @@ class SysBusTest {
     fun SysPriorityBus() {
         val top = SysTopModule()
         var bus = SysPriorityBus(4, Array(4, { if (it == 2) SysPriorityValue(1, ONE) else SysPriorityValue(1, ZERO) }), "bus", top.scheduler)
-        var port = SysBusPort(4, "port", top.scheduler, top, bus)
+        var port = SysBusPort<SysPriorityValue<SysBit>>(4, "port", top.scheduler, top)
+        port bind bus
         assert(bus[0]().zero)
         assert(bus[1]().zero)
         assert(bus[2]().one)
