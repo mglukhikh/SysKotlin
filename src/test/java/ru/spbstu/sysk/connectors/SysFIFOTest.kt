@@ -96,4 +96,45 @@ class FifoTest : SysTopModule() {
         }
         start(1(S))
     }
+
+    @Test
+    fun synchronousBitFifo() {
+        val fifo = synchronousBitFifo(4, "fifo", false)
+        val clk = clockedSignal("clk", 2(FS))
+        val input = fifoInput("input", fifo)
+        val output = fifoOutput("output", fifo)
+        fifo.clk bind clk
+        stateFunction(clk) {
+            state {
+                assert(output.empty)
+            }
+            val i = iterator(0..5)
+            loop(i) {
+                state {
+                    if (i.it == 0) output.push = ONE
+                    if (i.it!! % 2 == 0) output(ONE)
+                    else output(ZERO)
+                }
+            }
+            state {
+                assert(output.full)
+                output.push = ZERO
+            }
+            loop(i) {
+                state {
+                    if (i.it == 0) input.pop = ONE
+                    if (i.it!! < 4) {
+                        if (i.it!! % 2 == 0) assert(input() == ONE)
+                        else assert(input() == ZERO)
+                    } else assert(input() == ZERO)
+                }
+            }
+            state {
+                input.pop = ZERO
+                assert(input.empty)
+                scheduler.stop()
+            }
+        }
+        start(1(S))
+    }
 }
