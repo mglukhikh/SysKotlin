@@ -132,8 +132,8 @@ open class SysSynchronousFifo<T : SysData> internal constructor(
 }
 
 open class SysSynchronousBitFifo internal constructor(
-        capacity: Int, name: String, positive: Boolean, scheduler: SysScheduler, parent: SysObject? = null
-) : SysSynchronousFifo<SysBit>(capacity, name, SysBit.undefined, positive, scheduler, parent), SysEdged {
+        capacity: Int, name: String, positive: Boolean, startValue: SysBit, scheduler: SysScheduler, parent: SysObject? = null
+) : SysSynchronousFifo<SysBit>(capacity, name, startValue, positive, scheduler, parent), SysEdged {
 
     override val posEdgeEvent = SysWait.Event("posEdgeEvent", scheduler)
 

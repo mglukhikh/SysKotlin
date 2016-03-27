@@ -131,8 +131,8 @@ open class SysModule internal constructor(
     protected inline fun <reified T : SysData> synchronousFifo(capacity: Int, name: String, positive: Boolean) =
             synchronousFifo(capacity, name, undefined<T>(), positive)
 
-    protected fun synchronousBitFifo(capacity: Int, name: String, positive: Boolean) =
-            SysSynchronousBitFifo(capacity, name, positive, scheduler, this)
+    protected fun synchronousBitFifo(capacity: Int, name: String, positive: Boolean, startValue: SysBit = undefined()) =
+            SysSynchronousBitFifo(capacity, name, positive, startValue, scheduler, this)
 
     protected fun <T : SysData> busPort(capacity: Int, name: String)
             = SysBusPort<T>(capacity, name, scheduler, this)
