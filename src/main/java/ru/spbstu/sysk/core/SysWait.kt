@@ -74,7 +74,7 @@ sealed class SysWait {
         override fun hashCode() = elements.hashCode()
     }
 
-    open fun or(other: SysWait): SysWait = if (other is OneOf) other.or(this) else OneOf(this, other)
+    infix open fun or(other: SysWait): SysWait = if (other is OneOf) other.or(this) else OneOf(this, other)
 
     companion object {
         fun reduce(elements: List<SysWait>): SysWait {

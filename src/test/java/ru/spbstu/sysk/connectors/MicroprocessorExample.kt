@@ -1,5 +1,6 @@
 package ru.spbstu.sysk.connectors
 
+import org.junit.Ignore
 import org.junit.Test
 import ru.spbstu.sysk.core.*
 import ru.spbstu.sysk.data.*
@@ -17,6 +18,7 @@ class MicroprocessorExample : SysTopModule() {
         CPU.clk bind clk
     }
 
+    @Ignore
     @Test
     fun show() = start(1(NS))
 }
