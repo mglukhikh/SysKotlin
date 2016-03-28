@@ -1,11 +1,10 @@
-package ru.spbstu.sysk.generics.triggers
+package ru.spbstu.sysk.samples.triggers
 
 import org.junit.Test
 import ru.spbstu.sysk.core.SysTopModule
 import ru.spbstu.sysk.core.TimeUnit.*
 import ru.spbstu.sysk.core.invoke
 import ru.spbstu.sysk.data.SysBit.*
-import ru.spbstu.sysk.samples.triggers.nRS
 import java.util.*
 
 class nRSTest : SysTopModule() {
