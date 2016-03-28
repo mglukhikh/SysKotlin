@@ -412,13 +412,13 @@ class SysInteger private constructor(
         return valueOf(result).truncate(j - i + 1)
     }
 
-    override fun toSysInteger(): SysInteger {
-        return this
-    }
+    override fun toSysInteger() = this
 
-    override fun toSysBigInteger(): SysBigInteger {
-        return SysBigInteger(width, value)
-    }
+    override fun toSysBigInteger() = SysBigInteger(width, value)
+
+    override fun toInt() = value.toInt()
+
+    override fun toLong() = value
 
     override fun compareTo(other: SysBaseInteger): Int {
         if (width != other.width) {

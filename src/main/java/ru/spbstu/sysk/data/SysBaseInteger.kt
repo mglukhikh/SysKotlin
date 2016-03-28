@@ -55,6 +55,8 @@ abstract class SysBaseInteger protected constructor(
 
     abstract fun toSysInteger(): SysInteger
     abstract fun toSysBigInteger(): SysBigInteger
+    abstract fun toInt(): Int
+    abstract fun toLong(): Long
 
     override abstract fun compareTo(other: SysBaseInteger): Int
 

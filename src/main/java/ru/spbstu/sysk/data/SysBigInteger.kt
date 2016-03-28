@@ -348,13 +348,13 @@ class SysBigInteger private constructor(
         return SysBigInteger(sysBitExpression)
     }
 
-    override fun toSysBigInteger(): SysBigInteger {
-        return this
-    }
+    override fun toSysBigInteger() = this
 
-    override fun toSysInteger(): SysInteger {
-        return SysInteger(width, value.toLong())
-    }
+    override fun toSysInteger() = SysInteger(width, value.toLong())
+
+    override fun toInt() = value.toInt()
+
+    override fun toLong() = value.toLong()
 
     override fun abs(): SysBigInteger {
         return SysBigInteger(width, value.abs(), bitsState = bitsState)

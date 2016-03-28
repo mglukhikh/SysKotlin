@@ -247,6 +247,10 @@ private constructor(
 
     override fun toSysBigInteger() = SysBigInteger.valueOf(value)
 
+    override fun toInt() = value.toInt()
+
+    override fun toLong() = value
+
     override fun compareTo(other: SysBaseInteger): Int {
         if (width != other.width) {
             throw IllegalArgumentException("Non comparable. Width not equal.")
