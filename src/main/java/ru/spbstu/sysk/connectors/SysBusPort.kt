@@ -3,6 +3,7 @@ package ru.spbstu.sysk.connectors
 import ru.spbstu.sysk.core.SysObject
 import ru.spbstu.sysk.core.SysScheduler
 import ru.spbstu.sysk.data.SysBit
+import ru.spbstu.sysk.data.SysBit.*
 import ru.spbstu.sysk.data.SysData
 import ru.spbstu.sysk.data.SysInteger
 import ru.spbstu.sysk.data.SysPort
@@ -46,10 +47,14 @@ class SysBitBusPort internal constructor(
 
     operator fun invoke(value: SysInteger) {
         for (i in 0..capacity - 1) {
-            if (i >= value.width) set(SysBit.X, i)
+            if (i >= value.width) set(X, i)
             else set(value[i], i)
         }
     }
 
     operator fun invoke() = SysInteger(Array(capacity, { get(it) }))
+
+    fun disable() {
+        for (i in 0..capacity-1) set(Z, i)
+    }
 }
