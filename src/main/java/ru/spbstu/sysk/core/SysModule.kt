@@ -137,6 +137,9 @@ open class SysModule internal constructor(
     protected fun <T : SysData> busPort(capacity: Int, name: String)
             = SysBusPort<T>(capacity, name, scheduler, this)
 
+    protected fun bitBusPort(capacity: Int, name: String)
+            = SysBitBusPort(capacity, name, scheduler, this)
+
     protected fun bitBus(capacity: Int, name: String) = SysBitBus(capacity, name, scheduler, this)
 
     protected fun event(name: String): SysWait.Event = SysWait.Event(name, scheduler)

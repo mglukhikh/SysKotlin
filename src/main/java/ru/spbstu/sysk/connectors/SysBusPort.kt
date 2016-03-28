@@ -2,7 +2,9 @@ package ru.spbstu.sysk.connectors
 
 import ru.spbstu.sysk.core.SysObject
 import ru.spbstu.sysk.core.SysScheduler
+import ru.spbstu.sysk.data.SysBit
 import ru.spbstu.sysk.data.SysData
+import ru.spbstu.sysk.data.SysInteger
 import ru.spbstu.sysk.data.SysPort
 
 open class SysBusPort<T : SysData> internal constructor(
@@ -35,4 +37,19 @@ open class SysBusPort<T : SysData> internal constructor(
     }
 
     operator fun invoke(value: T, index: Int) = set(value, index)
+}
+
+class SysBitBusPort internal constructor(
+        capacity: Int, name: String, scheduler: SysScheduler,
+        parent: SysObject? = null, defaultValue: SysBit? = null
+) : SysBusPort<SysBit>(capacity, name, scheduler, parent, defaultValue) {
+
+    operator fun invoke(value: SysInteger) {
+        for (i in 0..capacity - 1) {
+            if (i >= value.width) set(SysBit.X, i)
+            else set(value[i], i)
+        }
+    }
+
+    operator fun invoke() = SysInteger(Array(capacity, { get(it) }))
 }
