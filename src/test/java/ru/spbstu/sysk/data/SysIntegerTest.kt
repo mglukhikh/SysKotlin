@@ -205,7 +205,7 @@ class SysIntegerTest {
     }
 
     fun allBitsEquals(left: Long, right: SysInteger, number: Int): Boolean {
-        var mask = 1L
+        var mask: Long
         for (i in 0..number - 1) {
             mask = 1L shl i
             if ((left and mask) != (right.value and mask))
