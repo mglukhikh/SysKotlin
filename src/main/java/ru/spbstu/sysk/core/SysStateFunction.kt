@@ -65,7 +65,7 @@ interface StateContainer {
         this.init()
         val delta = this.states.size - current
         val func = State.CaseFunction("if") {
-            val cond = condition() /**&& !((states[state] as? State.CaseFunction)?.args as? Boolean ?: false)*/
+            val cond = condition() && !((states[state] as? State.CaseFunction)?.args as? Boolean ?: false)
             val otherwise = states.elementAtOrNull(state + delta + 1) as? State.CaseFunction
             if (otherwise != null) otherwise.args = cond
             if (!cond) state += delta
