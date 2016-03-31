@@ -17,7 +17,7 @@ class SysLongInteger private constructor(
         bitsState: Array<Boolean> = Array(width, { i -> defaultBitState }),
         override val positiveMask: Long,
         override val negativeMask: Long
-) : SysBaseInteger(width, value, bitsState, positiveMask, negativeMask) {
+) : SysInteger(width, value, bitsState, positiveMask, negativeMask) {
 
     /** Construct from given long value setting minimal possible width */
     private constructor(value: Long, width: Int = widthByValue(value)) :
@@ -93,7 +93,7 @@ class SysLongInteger private constructor(
     override operator fun dec() = truncate(this.width, this.value - 1, positiveMask, negativeMask)
 
     /** Adds arg to this integer, with result width is maximum of argument's widths */
-    override operator fun plus(arg: SysBaseInteger): SysLongInteger {
+    override operator fun plus(arg: SysInteger): SysLongInteger {
         var resWidth: Int
         var posMask: Long
         var negMask: Long
@@ -115,7 +115,7 @@ class SysLongInteger private constructor(
     }
 
     /** Subtract arg from this integer*/
-    override operator fun minus(arg: SysBaseInteger): SysLongInteger {
+    override operator fun minus(arg: SysInteger): SysLongInteger {
         var resWidth: Int
         var posMask: Long
         var negMask: Long
@@ -132,7 +132,7 @@ class SysLongInteger private constructor(
     }
 
     /** Integer division by divisor*/
-    override operator fun div(arg: SysBaseInteger): SysLongInteger {
+    override operator fun div(arg: SysInteger): SysLongInteger {
         if (arg.value == 0L) throw IllegalArgumentException("Division by zero")
         var resWidth: Int
         var posMask: Long
@@ -150,7 +150,7 @@ class SysLongInteger private constructor(
     }
 
     /** Remainder of integer division*/
-    override operator fun mod(arg: SysBaseInteger): SysLongInteger {
+    override operator fun mod(arg: SysInteger): SysLongInteger {
         if (arg.value == 0L) throw IllegalArgumentException("Division by zero")
         var resWidth: Int
         var posMask: Long
@@ -169,7 +169,7 @@ class SysLongInteger private constructor(
     }
 
     /** Multiplies arg to this integer, with result width is sum of argument's width */
-    override operator fun times(arg: SysBaseInteger): SysLongInteger {
+    override operator fun times(arg: SysInteger): SysLongInteger {
         var resWidth: Int
         var posMask: Long
         var negMask: Long
@@ -313,7 +313,7 @@ class SysLongInteger private constructor(
     }
 
     /** Bitwise and*/
-    override infix fun and(arg: SysBaseInteger): SysLongInteger {
+    override infix fun and(arg: SysInteger): SysLongInteger {
         var temp = arg.bitsState;
 
         for (i in 0..Math.min(temp.lastIndex, bitsState.lastIndex)) {
@@ -338,7 +338,7 @@ class SysLongInteger private constructor(
     }
 
     /** Bitwise or*/
-    override infix fun or(arg: SysBaseInteger): SysLongInteger {
+    override infix fun or(arg: SysInteger): SysLongInteger {
 
         var temp = arg.bitsState;
         for (i in 0..Math.min(temp.lastIndex, bitsState.lastIndex)) {
@@ -364,7 +364,7 @@ class SysLongInteger private constructor(
     }
 
     /** Bitwise xor*/
-    override infix fun xor(arg: SysBaseInteger): SysLongInteger {
+    override infix fun xor(arg: SysInteger): SysLongInteger {
 
         var temp = arg.bitsState;
         for (i in 0..Math.min(temp.lastIndex, bitsState.lastIndex)) {
@@ -422,7 +422,7 @@ class SysLongInteger private constructor(
 
     override fun toLong() = value
 
-    override fun compareTo(other: SysBaseInteger): Int {
+    override fun compareTo(other: SysInteger): Int {
         if (width != other.width) {
             throw IllegalArgumentException("Non comparable. Width not equal.")
         }

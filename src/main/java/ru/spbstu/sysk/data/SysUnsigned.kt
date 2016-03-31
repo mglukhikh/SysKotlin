@@ -8,7 +8,7 @@ private constructor(
         bitsState: Array<Boolean> = Array(width, { i -> defaultBitState }),
         override val positiveMask: Long,
         override val negativeMask: Long = Long.MIN_VALUE
-) : SysBaseInteger(width, value, bitsState, positiveMask, negativeMask) {
+) : SysInteger(width, value, bitsState, positiveMask, negativeMask) {
 
     private constructor(width: Int, value: Long) : this(width, value, bitsState = maskByValue(width, widthByValue(value)),
             positiveMask = maxValue(width))
@@ -42,7 +42,7 @@ private constructor(
             return SysUnsigned(width, value and positiveMask, positiveMask)
     }
 
-    override operator fun plus(arg: SysBaseInteger): SysUnsigned {
+    override operator fun plus(arg: SysInteger): SysUnsigned {
         var resWidth: Int
         var posMask: Long
         if (arg.width > width) {
@@ -55,7 +55,7 @@ private constructor(
         return truncate(resWidth, value + arg.value.toLong(), posMask)
     }
 
-    override operator fun minus(arg: SysBaseInteger): SysUnsigned {
+    override operator fun minus(arg: SysInteger): SysUnsigned {
         var resWidth: Int
         var posMask: Long
         if (arg.width > width) {
@@ -68,7 +68,7 @@ private constructor(
         return truncate(resWidth, value - arg.value.toLong(), posMask)
     }
 
-    override operator fun times(arg: SysBaseInteger): SysUnsigned {
+    override operator fun times(arg: SysInteger): SysUnsigned {
         var resWidth: Int
         var posMask: Long
         if (arg.width > width) {
@@ -81,7 +81,7 @@ private constructor(
         return truncate(resWidth, value * arg.value.toLong(), posMask)
     }
 
-    override operator fun div(arg: SysBaseInteger): SysUnsigned {
+    override operator fun div(arg: SysInteger): SysUnsigned {
         var resWidth: Int
         var posMask: Long
         if (arg.width > width) {
@@ -94,7 +94,7 @@ private constructor(
         return truncate(resWidth, java.lang.Long.divideUnsigned(value, arg.value.toLong()), posMask)
     }
 
-    override operator fun mod(arg: SysBaseInteger): SysUnsigned {
+    override operator fun mod(arg: SysInteger): SysUnsigned {
         var resWidth: Int
         var posMask: Long
         if (arg.width > width) {
@@ -129,7 +129,7 @@ private constructor(
     }
 
     /** Bitwise and*/
-    override infix fun and(arg: SysBaseInteger): SysUnsigned {
+    override infix fun and(arg: SysInteger): SysUnsigned {
         var temp = arg.bitsState;
 
         for (i in 0..Math.min(temp.lastIndex, bitsState.lastIndex)) {
@@ -141,7 +141,7 @@ private constructor(
     }
 
     /** Bitwise or*/
-    override infix fun or(arg: SysBaseInteger): SysUnsigned {
+    override infix fun or(arg: SysInteger): SysUnsigned {
 
         var temp = arg.bitsState;
         for (i in 0..Math.min(temp.lastIndex, bitsState.lastIndex)) {
@@ -154,7 +154,7 @@ private constructor(
     }
 
     /** Bitwise xor*/
-    override infix fun xor(arg: SysBaseInteger): SysUnsigned {
+    override infix fun xor(arg: SysInteger): SysUnsigned {
 
         var temp = arg.bitsState;
         for (i in 0..Math.min(temp.lastIndex, bitsState.lastIndex)) {
@@ -211,8 +211,8 @@ private constructor(
         return SysUnsigned.valueOf(sysBitExpression)
     }
 
-    override fun unaryMinus(): SysBaseInteger {
-        return SysBaseInteger.valueOf(width + 1, -value)
+    override fun unaryMinus(): SysInteger {
+        return SysInteger.valueOf(width + 1, -value)
     }
 
     override fun plus(arg: Int) = this + valueOf(32, arg)
@@ -251,7 +251,7 @@ private constructor(
 
     override fun toLong() = value
 
-    override fun compareTo(other: SysBaseInteger): Int {
+    override fun compareTo(other: SysInteger): Int {
         if (width != other.width) {
             throw IllegalArgumentException("Non comparable. Width not equal.")
         }

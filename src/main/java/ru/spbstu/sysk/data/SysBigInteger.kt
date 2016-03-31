@@ -9,7 +9,7 @@ class SysBigInteger private constructor(
         bitsState: Array<Boolean> = Array(width, { i -> defaultBitState }),
         override val positiveMask: BigInteger,
         override val negativeMask: BigInteger
-) : SysBaseInteger (width, value, bitsState, positiveMask, negativeMask) {
+) : SysInteger (width, value, bitsState, positiveMask, negativeMask) {
 
     constructor(width: Int, value: BigInteger) : this(width, value, bitsState = maskByValue(value, width),
             positiveMask = getMaxValue(width), negativeMask = getMinValue(width))
@@ -63,7 +63,7 @@ class SysBigInteger private constructor(
     }
 
     /** Adds arg to this integer, with result width is maximum of argument's widths */
-    override operator fun plus(arg: SysBaseInteger): SysBigInteger {
+    override operator fun plus(arg: SysInteger): SysBigInteger {
         val arg = arg.toSysBigInteger()
         var resWidth: Int = width
         var posMask: BigInteger = positiveMask
@@ -98,7 +98,7 @@ class SysBigInteger private constructor(
     }
 
     /** Subtract arg from this integer*/
-    override operator fun minus(arg: SysBaseInteger): SysBigInteger {
+    override operator fun minus(arg: SysInteger): SysBigInteger {
         val arg = arg.toSysBigInteger()
         var resWidth: Int = width
         var posMask: BigInteger = positiveMask
@@ -112,7 +112,7 @@ class SysBigInteger private constructor(
     }
 
     /** Integer division by divisor*/
-    override operator fun div(arg: SysBaseInteger): SysBigInteger {
+    override operator fun div(arg: SysInteger): SysBigInteger {
         if (arg.value == BigInteger.ZERO) throw IllegalArgumentException("Division by zero")
         val arg = arg.toSysBigInteger()
         var resWidth: Int = width
@@ -127,7 +127,7 @@ class SysBigInteger private constructor(
     }
 
     /** Remainder of integer division*/
-    override operator fun mod(arg: SysBaseInteger): SysBigInteger {
+    override operator fun mod(arg: SysInteger): SysBigInteger {
         if (arg.value == BigInteger.ZERO) throw IllegalArgumentException("Division by zero")
         val arg = arg.toSysBigInteger()
         var resWidth: Int = width
@@ -142,7 +142,7 @@ class SysBigInteger private constructor(
     }
 
     /** Multiplies arg to this integer, with result width is sum of argument's width */
-    override operator fun times(arg: SysBaseInteger): SysBigInteger {
+    override operator fun times(arg: SysInteger): SysBigInteger {
         val arg = arg.toSysBigInteger()
         var resWidth: Int = width
         var posMask: BigInteger = positiveMask
@@ -158,7 +158,7 @@ class SysBigInteger private constructor(
     /**
      * Bitwise and
      * */
-    override infix fun and(arg: SysBaseInteger): SysBigInteger {
+    override infix fun and(arg: SysInteger): SysBigInteger {
         val arg = arg.toSysBigInteger()
         var temp = arg.bitsState;
 
@@ -173,7 +173,7 @@ class SysBigInteger private constructor(
 
 
     /** Bitwise or*/
-    override infix fun or(arg: SysBaseInteger): SysBigInteger {
+    override infix fun or(arg: SysInteger): SysBigInteger {
         val arg = arg.toSysBigInteger()
         var temp = arg.bitsState;
         for (i in 0..Math.min(temp.lastIndex, bitsState.lastIndex)) {
@@ -186,7 +186,7 @@ class SysBigInteger private constructor(
     }
 
     /** Bitwise xor*/
-    override infix fun xor(arg: SysBaseInteger): SysBigInteger {
+    override infix fun xor(arg: SysInteger): SysBigInteger {
         val arg = arg.toSysBigInteger()
         var temp = arg.bitsState;
         for (i in 0..Math.min(temp.lastIndex, bitsState.lastIndex)) {
@@ -360,7 +360,7 @@ class SysBigInteger private constructor(
         return SysBigInteger(width, value.abs(), bitsState = bitsState)
     }
 
-    override fun compareTo(other: SysBaseInteger): Int {
+    override fun compareTo(other: SysInteger): Int {
         if (width != other.width) {
             throw IllegalArgumentException("Non comparable. Width not equal.")
         }
@@ -379,7 +379,7 @@ class SysBigInteger private constructor(
 
         fun valueOf(value: BigInteger) = SysBigInteger(value)
 
-        fun valueOf(value: SysBaseInteger) = value.toSysBigInteger()
+        fun valueOf(value: SysInteger) = value.toSysBigInteger()
 
         private fun maskByValue(value: BigInteger, width: Int): Array<Boolean> {
 
