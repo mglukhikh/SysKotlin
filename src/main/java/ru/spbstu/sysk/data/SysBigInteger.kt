@@ -350,7 +350,7 @@ class SysBigInteger private constructor(
 
     override fun toSysBigInteger() = this
 
-    override fun toSysInteger() = SysInteger(width, value.toLong())
+    override fun toSysInteger() = SysLongInteger(width, value.toLong())
 
     override fun toInt() = value.toInt()
 

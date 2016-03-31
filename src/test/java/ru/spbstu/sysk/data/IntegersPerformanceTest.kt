@@ -17,8 +17,8 @@ class IntegersPerformanceTest {
 
         var startTime = System.currentTimeMillis()
         for (i in longArr.indices) {
-            val a = SysInteger(64, longArr[i])
-            val b = SysInteger(64, longArr[longArr.lastIndex - i])
+            val a = SysLongInteger(64, longArr[i])
+            val b = SysLongInteger(64, longArr[longArr.lastIndex - i])
 
             a + b
             a - b
@@ -48,8 +48,8 @@ class IntegersPerformanceTest {
         println("SysBigInteger width 64   " + result / 1000 + "s" + result % 1000 + "ms")
         startTime = System.currentTimeMillis()
         for (i in intArr.indices) {
-            val a = SysInteger(32, intArr[i])
-            val b = SysInteger(32, intArr[intArr.lastIndex - i])
+            val a = SysLongInteger(32, intArr[i])
+            val b = SysLongInteger(32, intArr[intArr.lastIndex - i])
 
             a + b
             a - b

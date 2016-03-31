@@ -53,7 +53,7 @@ abstract class SysBaseInteger protected constructor(
     abstract infix fun cshl(shift: Int): SysBaseInteger
     abstract infix fun cshr(shift: Int): SysBaseInteger
 
-    abstract fun toSysInteger(): SysInteger
+    abstract fun toSysInteger(): SysLongInteger
     abstract fun toSysBigInteger(): SysBigInteger
     abstract fun toInt(): Int
     abstract fun toLong(): Long
@@ -63,8 +63,8 @@ abstract class SysBaseInteger protected constructor(
     companion object : SysDataCompanion<SysBaseInteger> {
 
         fun uninitialized(width: Int): SysBaseInteger {
-            if (width <= SysInteger.MAX_WIDTH)
-                return SysInteger.uninitialized(width)
+            if (width <= SysLongInteger.MAX_WIDTH)
+                return SysLongInteger.uninitialized(width)
             else
                 return SysBigInteger.uninitialized(width)
         }
@@ -73,12 +73,12 @@ abstract class SysBaseInteger protected constructor(
             if (value is BigInteger)
                 return SysBigInteger.valueOf(value)
             else
-                return SysInteger.valueOf(value.toLong())
+                return SysLongInteger.valueOf(value.toLong())
         }
 
         fun valueOf(width: Int, value: Number): SysBaseInteger {
-            if (width <= SysInteger.MAX_WIDTH)
-                return SysInteger(width, value.toLong())
+            if (width <= SysLongInteger.MAX_WIDTH)
+                return SysLongInteger(width, value.toLong())
             else
                 if (value is BigInteger)
                     return SysBigInteger(width, value)
@@ -87,8 +87,8 @@ abstract class SysBaseInteger protected constructor(
         }
 
         fun valueOf(array: Array<SysBit>): SysBaseInteger {
-            if (array.size <= SysInteger.MAX_WIDTH)
-                return SysInteger(array)
+            if (array.size <= SysLongInteger.MAX_WIDTH)
+                return SysLongInteger(array)
             else
                 return SysBigInteger(array)
         }

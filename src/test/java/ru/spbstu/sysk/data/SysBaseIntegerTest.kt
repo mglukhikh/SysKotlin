@@ -14,7 +14,7 @@ class SysBaseIntegerTest {
         val b = SysBaseInteger.valueOf(100, 2222222)
         assertEquals(b + a, SysBigInteger(100, 4444444))
         assertNotEquals(a + b, SysBigInteger(100, 4444444))
-        assertEquals(a + b, SysInteger(SysInteger.MAX_WIDTH, 4444444))
+        assertEquals(a + b, SysLongInteger(SysLongInteger.MAX_WIDTH, 4444444))
 
 
     }

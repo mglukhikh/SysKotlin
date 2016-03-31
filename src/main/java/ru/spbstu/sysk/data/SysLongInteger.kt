@@ -10,7 +10,7 @@ annotation class Width(val value: Int)
  * Value is stored in a long integer.
  * Width can be checked statically (in future) if type usage is annotated by @width annotation
  */
-class SysInteger private constructor(
+class SysLongInteger private constructor(
         width: Int,
         override val value: Long,
         defaultBitState: Boolean = false,
@@ -53,29 +53,29 @@ class SysInteger private constructor(
             negativeMask = negativeValues[arr.size])
 
     /** Increase width to the given */
-    override fun extend(width: Int): SysInteger {
+    override fun extend(width: Int): SysLongInteger {
         if (width < widthByValue(value))
             throw IllegalArgumentException()
-        return SysInteger(width, value)
+        return SysLongInteger(width, value)
     }
 
     /** Decrease width to the given with value truncation */
-    override fun truncate(width: Int): SysInteger {
+    override fun truncate(width: Int): SysLongInteger {
         val widthByValue = widthByValue(value)
         if (width >= widthByValue) return extend(width)
         if (width < 0) throw IllegalArgumentException()
         val truncated = value shr (widthByValue - width)
-        return SysInteger(width, truncated)
+        return SysLongInteger(width, truncated)
     }
 
-    private fun truncate(width: Int, value: Long, positiveMask: Long, negativeMask: Long): SysInteger {
+    private fun truncate(width: Int, value: Long, positiveMask: Long, negativeMask: Long): SysLongInteger {
         if (width == MAX_WIDTH)
         //println(java.lang.Long.toBinaryString(value))
-            return SysInteger(width, value, positiveMask, negativeMask)
+            return SysLongInteger(width, value, positiveMask, negativeMask)
         if (value >= 0L)
-            return SysInteger(width, value and positiveMask, positiveMask, negativeMask)
+            return SysLongInteger(width, value and positiveMask, positiveMask, negativeMask)
         else
-            return SysInteger(width, value or negativeMask, positiveMask, negativeMask)
+            return SysLongInteger(width, value or negativeMask, positiveMask, negativeMask)
     }
 
 
@@ -93,7 +93,7 @@ class SysInteger private constructor(
     override operator fun dec() = truncate(this.width, this.value - 1, positiveMask, negativeMask)
 
     /** Adds arg to this integer, with result width is maximum of argument's widths */
-    override operator fun plus(arg: SysBaseInteger): SysInteger {
+    override operator fun plus(arg: SysBaseInteger): SysLongInteger {
         var resWidth: Int
         var posMask: Long
         var negMask: Long
@@ -110,12 +110,12 @@ class SysInteger private constructor(
     }
 
     /**Unary minus*/
-    override operator fun unaryMinus(): SysInteger {
+    override operator fun unaryMinus(): SysLongInteger {
         return truncate(width, -value, positiveMask, negativeMask)
     }
 
     /** Subtract arg from this integer*/
-    override operator fun minus(arg: SysBaseInteger): SysInteger {
+    override operator fun minus(arg: SysBaseInteger): SysLongInteger {
         var resWidth: Int
         var posMask: Long
         var negMask: Long
@@ -132,7 +132,7 @@ class SysInteger private constructor(
     }
 
     /** Integer division by divisor*/
-    override operator fun div(arg: SysBaseInteger): SysInteger {
+    override operator fun div(arg: SysBaseInteger): SysLongInteger {
         if (arg.value == 0L) throw IllegalArgumentException("Division by zero")
         var resWidth: Int
         var posMask: Long
@@ -150,7 +150,7 @@ class SysInteger private constructor(
     }
 
     /** Remainder of integer division*/
-    override operator fun mod(arg: SysBaseInteger): SysInteger {
+    override operator fun mod(arg: SysBaseInteger): SysLongInteger {
         if (arg.value == 0L) throw IllegalArgumentException("Division by zero")
         var resWidth: Int
         var posMask: Long
@@ -169,7 +169,7 @@ class SysInteger private constructor(
     }
 
     /** Multiplies arg to this integer, with result width is sum of argument's width */
-    override operator fun times(arg: SysBaseInteger): SysInteger {
+    override operator fun times(arg: SysBaseInteger): SysLongInteger {
         var resWidth: Int
         var posMask: Long
         var negMask: Long
@@ -188,11 +188,11 @@ class SysInteger private constructor(
     override fun power(exp: Int) = truncate(width, Math.pow(value.toDouble(), exp.toDouble()).toLong()
             , positiveMask, negativeMask)
 
-    override fun abs() = SysInteger(width, (if ( value >= 0L) value else -value), bitsState = bitsState,
+    override fun abs() = SysLongInteger(width, (if ( value >= 0L) value else -value), bitsState = bitsState,
             positiveMask = positiveMask, negativeMask = negativeMask)
 
     /** Bitwise logical shift right*/
-    override infix fun ushr(shift: Int): SysInteger {
+    override infix fun ushr(shift: Int): SysLongInteger {
         if (shift == 0)
             return this;
         if (shift > width || shift < 0)
@@ -200,11 +200,11 @@ class SysInteger private constructor(
 
         val sysBitExpression = Array(width - shift) { i: Int -> this[i] }
 
-        return SysInteger(sysBitExpression);
+        return SysLongInteger(sysBitExpression);
     }
 
     /** Bitwise logical shift left*/
-    override infix fun ushl(shift: Int): SysInteger {
+    override infix fun ushl(shift: Int): SysLongInteger {
         if (shift == 0)
             return this;
         if (shift > width || shift < 0)
@@ -212,11 +212,11 @@ class SysInteger private constructor(
 
         val sysBitExpression = Array(width - shift) { i: Int -> this[i + shift] }
 
-        return SysInteger(sysBitExpression)
+        return SysLongInteger(sysBitExpression)
     }
 
     /** Arithmetic shift right*/
-    override infix fun shr(shift: Int): SysInteger {
+    override infix fun shr(shift: Int): SysLongInteger {
         if (shift == 0)
             return this;
         if (shift > width || shift < 0)
@@ -231,11 +231,11 @@ class SysInteger private constructor(
             sysBitExpression[i] = SysBit.ZERO
             i--
         }
-        return SysInteger(sysBitExpression)
+        return SysLongInteger(sysBitExpression)
     }
 
     /** Arithmetic shift left*/
-    override infix fun shl(shift: Int): SysInteger {
+    override infix fun shl(shift: Int): SysLongInteger {
         if (shift == 0)
             return this;
         if (shift > width || shift < 0)
@@ -250,12 +250,12 @@ class SysInteger private constructor(
             sysBitExpression[i] = SysBit.ZERO
             i++
         }
-        return SysInteger(sysBitExpression)
+        return SysLongInteger(sysBitExpression)
 
     }
 
     /** Cyclic shift right*/
-    override infix fun cshr(shift: Int): SysInteger {
+    override infix fun cshr(shift: Int): SysLongInteger {
 
         if (shift < 0)
             return this cshl -shift
@@ -280,11 +280,11 @@ class SysInteger private constructor(
             sysBitExpression[i] = tempArray[i]
             i--
         }
-        return SysInteger(sysBitExpression)
+        return SysLongInteger(sysBitExpression)
     }
 
     /** Cyclic shift left*/
-    override infix fun cshl(shift: Int): SysInteger {
+    override infix fun cshl(shift: Int): SysLongInteger {
 
         if (shift < 0)
             return this cshr -shift
@@ -309,11 +309,11 @@ class SysInteger private constructor(
             sysBitExpression[i] = tempArray[i - sysBitExpression.size + realShift]
             i++
         }
-        return SysInteger(sysBitExpression)
+        return SysLongInteger(sysBitExpression)
     }
 
     /** Bitwise and*/
-    override infix fun and(arg: SysBaseInteger): SysInteger {
+    override infix fun and(arg: SysBaseInteger): SysLongInteger {
         var temp = arg.bitsState;
 
         for (i in 0..Math.min(temp.lastIndex, bitsState.lastIndex)) {
@@ -333,12 +333,12 @@ class SysInteger private constructor(
             posMask = positiveMask
             negMask = negativeMask
         }
-        return SysInteger(resWidth, value and arg.value.toLong(), bitsState = temp,
+        return SysLongInteger(resWidth, value and arg.value.toLong(), bitsState = temp,
                 positiveMask = posMask, negativeMask = negMask)
     }
 
     /** Bitwise or*/
-    override infix fun or(arg: SysBaseInteger): SysInteger {
+    override infix fun or(arg: SysBaseInteger): SysLongInteger {
 
         var temp = arg.bitsState;
         for (i in 0..Math.min(temp.lastIndex, bitsState.lastIndex)) {
@@ -358,13 +358,13 @@ class SysInteger private constructor(
             posMask = positiveMask
             negMask = negativeMask
         }
-        return SysInteger(resWidth, value or arg.value.toLong(), bitsState = temp,
+        return SysLongInteger(resWidth, value or arg.value.toLong(), bitsState = temp,
                 positiveMask = posMask, negativeMask = negMask)
 
     }
 
     /** Bitwise xor*/
-    override infix fun xor(arg: SysBaseInteger): SysInteger {
+    override infix fun xor(arg: SysBaseInteger): SysLongInteger {
 
         var temp = arg.bitsState;
         for (i in 0..Math.min(temp.lastIndex, bitsState.lastIndex)) {
@@ -384,13 +384,13 @@ class SysInteger private constructor(
             posMask = positiveMask
             negMask = negativeMask
         }
-        return SysInteger(resWidth, value xor arg.value.toLong(), bitsState = temp,
+        return SysLongInteger(resWidth, value xor arg.value.toLong(), bitsState = temp,
                 positiveMask = posMask, negativeMask = negMask)
     }
 
     /**Bitwise inversion (not)*/
-    override fun inv(): SysInteger {
-        return SysInteger(width, value.inv(), bitsState = bitsState,
+    override fun inv(): SysLongInteger {
+        return SysLongInteger(width, value.inv(), bitsState = bitsState,
                 positiveMask = positiveMask, negativeMask = negativeMask);
     }
 
@@ -407,7 +407,7 @@ class SysInteger private constructor(
     }
 
     /** Extracts a range of bits, accessible as [j,i] */
-    override operator fun get(j: Int, i: Int): SysInteger {
+    override operator fun get(j: Int, i: Int): SysLongInteger {
         if (j < i) throw IllegalArgumentException()
         if (j >= width || i < 0) throw IndexOutOfBoundsException()
         var result = value shr i
@@ -430,7 +430,7 @@ class SysInteger private constructor(
     }
 
 
-    companion object : SysDataCompanion<SysInteger> {
+    companion object : SysDataCompanion<SysLongInteger> {
 
         val MAX_WIDTH: Int = 64
 
@@ -438,9 +438,9 @@ class SysInteger private constructor(
 
         private val negativeValues = LongArray(MAX_WIDTH + 1, { i -> minValue(i) })
 
-        fun valueOf(value: Long) = SysInteger(value)
+        fun valueOf(value: Long) = SysLongInteger(value)
 
-        fun uninitialized(width: Int) = SysInteger(width.toShort())
+        fun uninitialized(width: Int) = SysLongInteger(width.toShort())
 
         private fun valueBySWSArray(arr: Array<SysBit>): Long {
             var value: Long = 0L
@@ -517,7 +517,7 @@ class SysInteger private constructor(
             return true
         }
 
-        override val undefined: SysInteger
-            get() = SysInteger(arrayOf(SysBit.X))
+        override val undefined: SysLongInteger
+            get() = SysLongInteger(arrayOf(SysBit.X))
     }
 }
