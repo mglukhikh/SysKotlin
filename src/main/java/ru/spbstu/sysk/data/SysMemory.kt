@@ -14,7 +14,7 @@ open class SysMemory<T : SysData>(
 
     val din = input<T>("din")
     val dout = output<T>("dout")
-    val addr = input<SysInteger>("addr")
+    val addr = input<SysUnsigned>("addr")
 
     val en = bitInput("en")   // enable
     val clk = bitInput("clk") // clock

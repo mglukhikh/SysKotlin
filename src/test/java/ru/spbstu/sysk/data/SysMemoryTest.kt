@@ -25,28 +25,29 @@ class SysMemoryTest {
                 init {
                     en = SysBit.ZERO
                     wr = SysBit.ZERO
-                    addr = SysInteger(8, 0)
+                    addr = SysUnsigned.valueOf(8, 0)
                 }
-                val i = iterator(0..127)
+                val i = iterator(0..255)
                 loop(i) {
                     state {
                         en = SysBit.ONE
                         wr = SysBit.ONE
-                        addr = SysInteger(8, i.it)
-                        d = SysInteger(8, i.it)
+                        addr = SysUnsigned.valueOf(8, i.it)
+                        d = SysInteger(8, i.it - 128)
                     }
                 }
-                val j = iterator(0..127)
+                val j = iterator(0..255)
                 loop(j) {
                     state {
                         en = SysBit.ONE
                         wr = SysBit.ZERO
-                        addr = SysInteger(8, j.it)
+                        addr = SysUnsigned.valueOf(8, j.it)
                     }
                     state {}
                     state {
-                        assert(q == SysInteger(8, j.it)) {
-                            "#${j.it}: Expected ${j.it}, Actual $q"
+                        val expected = SysInteger(8, j.it - 128)
+                        assert(q == expected) {
+                            "#${j.it}: Expected $expected, Actual $q"
                         }
                     }
                 }
