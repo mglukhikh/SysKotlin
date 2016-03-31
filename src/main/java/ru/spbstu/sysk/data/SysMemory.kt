@@ -56,8 +56,15 @@ open class SysMemory<T : SysData>(
         for (address in 0..lastAddress()) {
             val data = what(address) ?: continue
             storage[address] = data
-
         }
+    }
+
+    fun check(what: (Long) -> T?): Boolean {
+        for (address in 0..lastAddress()) {
+            val data = what(address) ?: continue
+            if (storage[address] != data) return false
+        }
+        return true
     }
 }
 

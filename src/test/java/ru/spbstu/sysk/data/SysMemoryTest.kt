@@ -80,6 +80,9 @@ class SysMemoryTest {
             m.load {
                 if (it.toInt() % 2 == 0) SysBit.ZERO else SysBit.ONE
             }
+            assert(m.check {
+                if (it.toInt() % 2 == 0) SysBit.ZERO else SysBit.ONE
+            })
 
             stateFunction(clk) {
                 init {
