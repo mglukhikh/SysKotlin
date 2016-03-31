@@ -180,7 +180,7 @@ class Connectors {
 
         private val write: (SysWait) -> SysWait = {
             val data = SysInteger(Array(CAPACITY_DATA, { dataPort[it] }))
-            val address = SysInteger(Array(CAPACITY_ADDRESS, { addressPort[it] }))
+            val address = SysLongInteger(Array(CAPACITY_ADDRESS, { addressPort[it] }))
             if ((address.value > firstAddress) && (address.value < (firstAddress + capacity))) {
                 memory[address.value.toInt() - firstAddress] = data
             }
@@ -188,7 +188,7 @@ class Connectors {
         }
 
         private val read: (SysWait) -> SysWait = {
-            val address = SysInteger(Array(CAPACITY_ADDRESS, { addressPort[it] }))
+            val address = SysLongInteger(Array(CAPACITY_ADDRESS, { addressPort[it] }))
             if ((address.value >= firstAddress) && (address.value < (firstAddress + capacity))) {
                 for (i in 0..(CAPACITY_DATA - 1))
                     dataPort(memory[address.value.toInt() - firstAddress][i], i)

@@ -11,7 +11,6 @@ abstract class SysInteger protected constructor(
         protected open val negativeMask: Number
 ) : SysData, Comparable<SysInteger> {
 
-
     abstract fun extend(width: Int): SysInteger
     abstract fun truncate(width: Int): SysInteger
 
@@ -69,12 +68,16 @@ abstract class SysInteger protected constructor(
                 return SysBigInteger.uninitialized(width)
         }
 
+        operator fun invoke(width: Int, value: Number) = valueOf(width, value)
+        operator fun invoke(arr: Array<SysBit>) = valueOf(arr)
+
         fun valueOf(value: Number): SysInteger {
             if (value is BigInteger)
                 return SysBigInteger.valueOf(value)
             else
                 return SysLongInteger.valueOf(value.toLong())
         }
+
 
         fun valueOf(width: Int, value: Number): SysInteger {
             if (width <= SysLongInteger.MAX_WIDTH)
