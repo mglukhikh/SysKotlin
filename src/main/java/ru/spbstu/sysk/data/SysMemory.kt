@@ -43,6 +43,22 @@ open class SysMemory<T : SysData>(
             }
         }
     }
+
+    private fun lastAddress(): Long {
+        var result = 1
+        for (i in 0..addrWidth-1) {
+            result *= 2
+        }
+        return result - 1L
+    }
+
+    fun load(what: (Long) -> T?) {
+        for (address in 0..lastAddress()) {
+            val data = what(address) ?: continue
+            storage[address] = data
+
+        }
+    }
 }
 
 class SysIntegerMemory(
