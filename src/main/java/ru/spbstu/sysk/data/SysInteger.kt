@@ -52,7 +52,7 @@ abstract class SysInteger protected constructor(
     abstract infix fun cshl(shift: Int): SysInteger
     abstract infix fun cshr(shift: Int): SysInteger
 
-    abstract fun toSysInteger(): SysLongInteger
+    abstract fun toSysLongInteger(): SysLongInteger
     abstract fun toSysBigInteger(): SysBigInteger
     abstract fun toInt(): Int
     abstract fun toLong(): Long

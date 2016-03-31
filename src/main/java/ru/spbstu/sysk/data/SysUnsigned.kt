@@ -243,7 +243,7 @@ private constructor(
 
     override fun shr(shift: Int) = this ushr shift
 
-    override fun toSysInteger() = SysLongInteger.valueOf(value)
+    override fun toSysLongInteger() = SysLongInteger.valueOf(value)
 
     override fun toSysBigInteger() = SysBigInteger.valueOf(value)
 

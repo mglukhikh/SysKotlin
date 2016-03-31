@@ -13,9 +13,9 @@ class SysBigIntegerTest {
         val y = SysBigInteger.valueOf(SysLongInteger(10, 127));
         val z = SysBigInteger.valueOf(SysLongInteger(10, -1));
 
-        val arrx = arrayOf(X, X, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ONE);
-        val arry = arrayOf(X, X, ONE, ONE, ONE, ONE, ONE, ONE, ONE, ZERO);
-        val arrz = arrayOf(X, X, X, X, X, X, X, X, X, ONE);
+        val arrx = arrayOf(ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ONE, ONE, ONE);
+        val arry = arrayOf(ONE, ONE, ONE, ONE, ONE, ONE, ONE, ZERO, ZERO, ZERO);
+        val arrz = arrayOf(ONE, ONE, ONE, ONE, ONE, ONE, ONE, ONE, ONE, ONE);
 
 
         for (i in 0..9) {
@@ -47,9 +47,9 @@ class SysBigIntegerTest {
     @Test
     fun testSWSOperations() {
 
-        val arrx = arrayOf(X, X, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ONE);
-        val arry = arrayOf(X, X, ONE, ONE, ONE, ONE, ONE, ONE, ONE, ZERO);
-        val arrz = arrayOf(X, X, X, X, X, X, X, X, X, ONE);
+        val arrx = arrayOf(ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ONE, ONE, ONE);
+        val arry = arrayOf(ONE, ONE, ONE, ONE, ONE, ONE, ONE, ZERO, ZERO, ZERO);
+        val arrz = arrayOf(ONE, ONE, ONE, ONE, ONE, ONE, ONE, ONE, ONE, ONE);
 
         val x = SysBigInteger(arrx);
         val y = SysBigInteger(arry);
@@ -62,9 +62,9 @@ class SysBigIntegerTest {
 
         }
 
-        assert(x.equals(SysBigInteger(10, -128))) { x }
-        assert(y.equals(SysBigInteger(10, 127))) { y }
-        assert(z.equals(SysBigInteger(10, -1))) { z }
+        assertEquals(x, (SysBigInteger(10, -128)))
+        assertEquals(y, (SysBigInteger(10, 127)))
+        assertEquals(z, (SysBigInteger(10, -1)))
 
 
     }
@@ -95,22 +95,21 @@ class SysBigIntegerTest {
         val y: SysBigInteger = SysBigInteger(8, 64)
 
 
-        var arr = arrayOf (X, X, ONE, ONE, ONE, ONE, ONE, ONE, ONE, ZERO);
+        var arr = arrayOf (ONE, ONE, ONE, ONE, ONE, ONE, ONE, ZERO, ZERO, ZERO);
         var z = SysBigInteger(arr);
 
         assertEquals((x or y), (z))
 
-        arr = arrayOf(X, X, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ONE, ZERO);
+        arr = arrayOf(ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ONE, ZERO, ZERO, ZERO);
         z = SysBigInteger(arr);
 
         assertEquals((x and y), (z))
         assertEquals((x.inv()), (SysBigInteger(10, -128)))
 
-        arr = arrayOf(X, X, ONE, ONE, ONE, ONE, ONE, ONE, ZERO, ZERO);
+        arr = arrayOf(ONE, ONE, ONE, ONE, ONE, ONE, ZERO, ZERO, ZERO, ZERO);
         z = SysBigInteger(arr);
 
-        //TODO Bug with equals.
-        //assertEquals(x xor y, z)
+        assertEquals(z, x xor y)
 
     }
 

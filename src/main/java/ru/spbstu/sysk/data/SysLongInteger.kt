@@ -53,19 +53,23 @@ class SysLongInteger private constructor(
             negativeMask = negativeValues[arr.size])
 
     /** Increase width to the given */
-    override fun extend(width: Int): SysLongInteger {
-        if (width < widthByValue(value))
-            throw IllegalArgumentException()
+    override fun extend(width: Int): SysInteger {
+        if (width < this.width)
+            return truncate(width)
+
+        if (width > MAX_WIDTH)
+            return SysInteger(width, value)
+
         return SysLongInteger(width, value)
     }
 
     /** Decrease width to the given with value truncation */
-    override fun truncate(width: Int): SysLongInteger {
-        val widthByValue = widthByValue(value)
-        if (width >= widthByValue) return extend(width)
+    override fun truncate(width: Int): SysInteger {
         if (width < 0) throw IllegalArgumentException()
-        val truncated = value shr (widthByValue - width)
-        return SysLongInteger(width, truncated)
+        if (width > MAX_WIDTH)
+            return SysInteger(width, value)
+        if (width >= this.width) return SysLongInteger(width, value)
+        return truncate(width, value, positiveValues[width], negativeValues[width])
     }
 
     private fun truncate(width: Int, value: Long, positiveMask: Long, negativeMask: Long): SysLongInteger {
@@ -93,20 +97,10 @@ class SysLongInteger private constructor(
     override operator fun dec() = truncate(this.width, this.value - 1, positiveMask, negativeMask)
 
     /** Adds arg to this integer, with result width is maximum of argument's widths */
-    override operator fun plus(arg: SysInteger): SysLongInteger {
-        var resWidth: Int
-        var posMask: Long
-        var negMask: Long
-        if (arg.width > width) {
-            resWidth = Math.min(arg.width, MAX_WIDTH)
-            posMask = arg.positiveMask.toLong()
-            negMask = arg.negativeMask.toLong()
-        } else {
-            resWidth = Math.min(width, MAX_WIDTH)
-            posMask = positiveMask
-            negMask = negativeMask
-        }
-        return truncate(resWidth, value + arg.value.toLong(), posMask, negMask)
+    override operator fun plus(arg: SysInteger): SysInteger {
+        if (arg.width > width)
+            return arg + this
+        return truncate(width, value + arg.value.toLong(), positiveMask, negativeMask)
     }
 
     /**Unary minus*/
@@ -115,74 +109,41 @@ class SysLongInteger private constructor(
     }
 
     /** Subtract arg from this integer*/
-    override operator fun minus(arg: SysInteger): SysLongInteger {
-        var resWidth: Int
-        var posMask: Long
-        var negMask: Long
-        if (arg.width > width) {
-            resWidth = Math.min(arg.width, MAX_WIDTH)
-            posMask = arg.positiveMask.toLong()
-            negMask = arg.negativeMask.toLong()
-        } else {
-            resWidth = Math.min(width, MAX_WIDTH)
-            posMask = positiveMask
-            negMask = negativeMask
-        }
-        return truncate(resWidth, value - arg.value.toLong(), posMask, negMask)
+    override operator fun minus(arg: SysInteger): SysInteger {
+        if (arg.width > width)
+            return arg - this
+        return truncate(width, value - arg.value.toLong(), positiveMask, negativeMask)
     }
 
     /** Integer division by divisor*/
-    override operator fun div(arg: SysInteger): SysLongInteger {
+    override operator fun div(arg: SysInteger): SysInteger {
+        if (arg.width > MAX_WIDTH)
+            return this.extend(arg.width) / arg
         if (arg.value == 0L) throw IllegalArgumentException("Division by zero")
-        var resWidth: Int
-        var posMask: Long
-        var negMask: Long
-        if (arg.width > width) {
-            resWidth = Math.min(arg.width, MAX_WIDTH)
-            posMask = arg.positiveMask.toLong()
-            negMask = arg.negativeMask.toLong()
-        } else {
-            resWidth = Math.min(width, MAX_WIDTH)
-            posMask = positiveMask
-            negMask = negativeMask
-        }
-        return truncate(resWidth, value / arg.value.toLong(), posMask, negMask)
+
+        if (arg.width > width)
+            return truncate(arg.width, value / arg.value.toLong(), arg.positiveMask.toLong(), arg.negativeMask.toLong())
+
+        return truncate(width, value / arg.value.toLong(), positiveMask, negativeMask)
     }
 
     /** Remainder of integer division*/
-    override operator fun mod(arg: SysInteger): SysLongInteger {
+    override operator fun mod(arg: SysInteger): SysInteger {
+        if (arg.width > MAX_WIDTH)
+            return this.extend(arg.width) % arg
         if (arg.value == 0L) throw IllegalArgumentException("Division by zero")
-        var resWidth: Int
-        var posMask: Long
-        var negMask: Long
-        if (arg.width > width) {
-            resWidth = Math.min(arg.width, MAX_WIDTH)
-            posMask = arg.positiveMask.toLong()
-            negMask = arg.negativeMask.toLong()
-        } else {
-            resWidth = Math.min(width, MAX_WIDTH)
-            posMask = positiveMask
-            negMask = negativeMask
-        }
 
-        return truncate(resWidth, value % arg.value.toLong(), posMask, negMask)
+        if (arg.width > width)
+            return truncate(arg.width, value % arg.value.toLong(), arg.positiveMask.toLong(), arg.negativeMask.toLong())
+        return truncate(width, value % arg.value.toLong(), positiveMask, negativeMask)
     }
 
+
     /** Multiplies arg to this integer, with result width is sum of argument's width */
-    override operator fun times(arg: SysInteger): SysLongInteger {
-        var resWidth: Int
-        var posMask: Long
-        var negMask: Long
-        if (arg.width > width) {
-            resWidth = Math.min(arg.width, MAX_WIDTH)
-            posMask = arg.positiveMask.toLong()
-            negMask = arg.negativeMask.toLong()
-        } else {
-            resWidth = Math.min(width, MAX_WIDTH)
-            posMask = positiveMask
-            negMask = negativeMask
-        }
-        return truncate(resWidth, value * arg.value.toLong(), posMask, negMask)
+    override operator fun times(arg: SysInteger): SysInteger {
+        if (arg.width > width)
+            return arg * this
+        return truncate(width, value * arg.value.toLong(), positiveMask, negativeMask)
     }
 
     override fun power(exp: Int) = truncate(width, Math.pow(value.toDouble(), exp.toDouble()).toLong()
@@ -411,10 +372,11 @@ class SysLongInteger private constructor(
         if (j < i) throw IllegalArgumentException()
         if (j >= width || i < 0) throw IndexOutOfBoundsException()
         var result = value shr i
-        return valueOf(result).truncate(j - i + 1)
+        val resWidth = j - i + 1
+        return truncate(resWidth, result, positiveValues[resWidth], negativeValues[width])
     }
 
-    override fun toSysInteger() = this
+    override fun toSysLongInteger() = this
 
     override fun toSysBigInteger() = SysBigInteger(width, value)
 
@@ -472,21 +434,23 @@ class SysLongInteger private constructor(
 
         private fun maskByValue(value: Long, width: Int): Array<Boolean> {
 
-            if (width == 0)
-                return BooleanArray(0).toTypedArray();
+            //            if (width == 0)
+            //                return BooleanArray(0).toTypedArray();
+            //
+            //            val widthByValue = widthByValue(value)
+            //
+            //
+            //            val mask = BooleanArray(width);
+            //
+            //            if (width < widthByValue) {
+            //                throw IllegalArgumentException("Width $width is too small for this value \n$value \nwith width $widthByValue")
+            //            } else {
+            //                mask.fill(true, mask.lastIndex + 1 - widthByValue, mask.lastIndex + 1)
+            //
+            //            }
+            //            return mask.toTypedArray();
 
-            val widthByValue = widthByValue(value)
-
-
-            val mask = BooleanArray(width);
-
-            if (width < widthByValue) {
-                throw IllegalArgumentException("Width $width is too small for this value \n$value \nwith width $widthByValue")
-            } else {
-                mask.fill(true, mask.lastIndex + 1 - widthByValue, mask.lastIndex + 1)
-
-            }
-            return mask.toTypedArray();
+            return Array<Boolean>(width, { i -> true })
         }
 
 

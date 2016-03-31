@@ -39,20 +39,23 @@ class SysBigInteger private constructor(
             positiveMask = getMaxValue(width.toInt()), negativeMask = getMinValue(width.toInt()))
 
     /** Increase width to the given */
-    override fun extend(width: Int): SysBigInteger {
-        if (width < value.bitLength())
-            throw IllegalArgumentException()
+    override fun extend(width: Int): SysInteger {
+        if (width < this.width)
+            return truncate(width)
         return SysBigInteger(width, value)
     }
 
     /** Decrease width to the given with value truncation */
-    override fun truncate(width: Int): SysBigInteger {
-        val widthByValue = value.bitLength() + 1
-        //println("trunc [$width] [$widthByValue]")
-        if (width >= widthByValue) return extend(width)
+    override fun truncate(width: Int): SysInteger {
         if (width < 0) throw IllegalArgumentException()
-        val truncated = value.shiftRight(widthByValue - width)
-        return SysBigInteger(width, truncated)
+
+        if (width <= SysLongInteger.MAX_WIDTH)
+            return truncate(width, value, getMaxValue(width), getMinValue(width)).toSysLongInteger()
+
+        if (width > this.width)
+            return extend(width)
+
+        return truncate(width, value, getMaxValue(width), getMinValue(width))
     }
 
     private fun truncate(width: Int, value: BigInteger, positiveMask: BigInteger, negativeMask: BigInteger): SysBigInteger {
@@ -64,16 +67,12 @@ class SysBigInteger private constructor(
 
     /** Adds arg to this integer, with result width is maximum of argument's widths */
     override operator fun plus(arg: SysInteger): SysBigInteger {
-        val arg = arg.toSysBigInteger()
-        var resWidth: Int = width
-        var posMask: BigInteger = positiveMask
-        var negMask: BigInteger = negativeMask
-        if (arg.width > width) {
-            resWidth = arg.width
-            posMask = arg.positiveMask
-            negMask = arg.negativeMask
-        }
-        return truncate(resWidth, value + arg.value, posMask, negMask)
+
+        val argv = arg.toSysBigInteger()
+        if (argv.width > width)
+            return truncate(argv.width, value + argv.value, argv.positiveMask, argv.negativeMask)
+
+        return truncate(width, value + argv.value, positiveMask, negativeMask)
     }
 
     override operator fun plus(arg: Long) = this + valueOf(arg)
@@ -99,60 +98,40 @@ class SysBigInteger private constructor(
 
     /** Subtract arg from this integer*/
     override operator fun minus(arg: SysInteger): SysBigInteger {
-        val arg = arg.toSysBigInteger()
-        var resWidth: Int = width
-        var posMask: BigInteger = positiveMask
-        var negMask: BigInteger = negativeMask
-        if (arg.width > width) {
-            resWidth = arg.width
-            posMask = arg.positiveMask
-            negMask = arg.negativeMask
-        }
-        return truncate(resWidth, value - arg.value, posMask, negMask)
+        val argv = arg.toSysBigInteger()
+        if (argv.width > width)
+            return truncate(argv.width, value - argv.value, argv.positiveMask, argv.negativeMask)
+
+        return truncate(width, value - argv.value, positiveMask, negativeMask)
     }
 
     /** Integer division by divisor*/
     override operator fun div(arg: SysInteger): SysBigInteger {
+        val argv = arg.toSysBigInteger()
         if (arg.value == BigInteger.ZERO) throw IllegalArgumentException("Division by zero")
-        val arg = arg.toSysBigInteger()
-        var resWidth: Int = width
-        var posMask: BigInteger = positiveMask
-        var negMask: BigInteger = negativeMask
-        if (arg.width > width) {
-            resWidth = arg.width
-            posMask = arg.positiveMask
-            negMask = arg.negativeMask
-        }
-        return truncate(resWidth, value / arg.value, posMask, negMask)
+        if (argv.width > width)
+            return truncate(argv.width, value / argv.value, argv.positiveMask, argv.negativeMask)
+
+        return truncate(width, value / argv.value, positiveMask, negativeMask)
     }
 
     /** Remainder of integer division*/
     override operator fun mod(arg: SysInteger): SysBigInteger {
+        val argv = arg.toSysBigInteger()
         if (arg.value == BigInteger.ZERO) throw IllegalArgumentException("Division by zero")
-        val arg = arg.toSysBigInteger()
-        var resWidth: Int = width
-        var posMask: BigInteger = positiveMask
-        var negMask: BigInteger = negativeMask
-        if (arg.width > width) {
-            resWidth = arg.width
-            posMask = arg.positiveMask
-            negMask = arg.negativeMask
-        }
-        return truncate(resWidth, value % arg.value, posMask, negMask)
+        if (argv.width > width)
+            return truncate(argv.width, value % argv.value, argv.positiveMask, argv.negativeMask)
+
+        return truncate(width, value % argv.value, positiveMask, negativeMask)
     }
 
     /** Multiplies arg to this integer, with result width is sum of argument's width */
     override operator fun times(arg: SysInteger): SysBigInteger {
-        val arg = arg.toSysBigInteger()
-        var resWidth: Int = width
-        var posMask: BigInteger = positiveMask
-        var negMask: BigInteger = negativeMask
-        if (arg.width > width) {
-            resWidth = arg.width
-            posMask = arg.positiveMask
-            negMask = arg.negativeMask
-        }
-        return truncate(resWidth, value * arg.value, posMask, negMask)
+        val argv = arg.toSysBigInteger()
+        if (argv.width > width)
+            return truncate(argv.width, value * argv.value, argv.positiveMask, argv.negativeMask)
+
+        return truncate(width, value * argv.value, positiveMask, negativeMask)
     }
 
     /**
@@ -222,7 +201,8 @@ class SysBigInteger private constructor(
         if (j < i) throw IllegalArgumentException()
         if (j >= width || i < 0) throw IndexOutOfBoundsException()
         var result = value.shiftRight(i)
-        return SysBigInteger(result).truncate(j - i + 1)
+        val resWidth = j - i + 1
+        return truncate(resWidth, result, getMaxValue(resWidth), getMinValue(resWidth))
     }
 
 
@@ -350,7 +330,7 @@ class SysBigInteger private constructor(
 
     override fun toSysBigInteger() = this
 
-    override fun toSysInteger() = SysLongInteger(width, value.toLong())
+    override fun toSysLongInteger() = SysLongInteger(width, value.toLong())
 
     override fun toInt() = value.toInt()
 
@@ -383,19 +363,20 @@ class SysBigInteger private constructor(
 
         private fun maskByValue(value: BigInteger, width: Int): Array<Boolean> {
 
-            if (width == 0)
-                return BooleanArray(0).toTypedArray();
-
-            val widthByValue = value.bitLength() + 1
-            val mask = BooleanArray(width);
-
-            if (width < widthByValue) {
-                throw IllegalArgumentException("Width $width is too small for this value \n$value \nwith width $widthByValue")
-            } else {
-                mask.fill(true, mask.lastIndex + 1 - widthByValue, mask.lastIndex + 1)
-
-            }
-            return mask.toTypedArray();
+            //            if (width == 0)
+            //                return BooleanArray(0).toTypedArray();
+            //
+            //            val widthByValue = value.bitLength() + 1
+            //            val mask = BooleanArray(width);
+            //
+            //            if (width < widthByValue) {
+            //                throw IllegalArgumentException("Width $width is too small for this value \n$value \nwith width $widthByValue")
+            //            } else {
+            //                mask.fill(true, mask.lastIndex + 1 - widthByValue, mask.lastIndex + 1)
+            //
+            //            }
+            //            return mask.toTypedArray();
+            return Array<Boolean>(width, { i -> true })
         }
 
 

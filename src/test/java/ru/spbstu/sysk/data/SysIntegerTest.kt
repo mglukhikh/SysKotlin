@@ -16,21 +16,21 @@ class SysIntegerTest {
         val yy: @Width(6) SysLongInteger = SysLongInteger.valueOf(9)
         var y = yy.extend(6)
         assert(y.width == 6, { y })
-        var z: @Width(6) SysLongInteger = x + y
+        var z: @Width(6) SysInteger = (x + y).toSysLongInteger()
         assert(z.width == 6)
         assert(z.equals(SysLongInteger(6, 14)), { z })
         assert(z[2] == ONE, { z[2] })
         assert(z[4, 1].equals(SysLongInteger(4, 7)));
         y = y.extend(12)
         z = z.extend(12)
-        val v: @Width(12) SysLongInteger = y * z
+        val v: @Width(12) SysInteger = y * z
         assert(v.width == 12)
-        assert(v.equals(SysLongInteger(12, 126)), { v })
+        assert(v.equals(SysInteger(12, 126)), { v })
         val m = SysLongInteger(0, 0);
         val n = SysLongInteger(32, 0)
-        assert(n[10] == X);
+        //assert(n[10] == X);
         assert((m + n).equals(SysLongInteger(32, 0)));
-        assert((m + n)[10] == X)
+        //assert((m + n)[10] == X)
     }
 
     @Test
@@ -40,15 +40,16 @@ class SysIntegerTest {
         val y = SysLongInteger(10, 127);
         val z = SysLongInteger(10, -1);
 
-        val arrx = arrayOf(X, X, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ONE);
-        val arry = arrayOf(X, X, ONE, ONE, ONE, ONE, ONE, ONE, ONE, ZERO);
-        val arrz = arrayOf(X, X, X, X, X, X, X, X, X, ONE);
+        val arrx = arrayOf(ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ONE, ONE, ONE);
+        val arry = arrayOf(ONE, ONE, ONE, ONE, ONE, ONE, ONE, ZERO, ZERO, ZERO);
+        val arrz = arrayOf(ONE, ONE, ONE, ONE, ONE, ONE, ONE, ONE, ONE, ONE);
 
 
         for (i in 0..9) {
-            assert(arrx[i].equals(x[i])) { "x" + i + " " + x[i] }
-            assert(arry[i].equals(y[i])) { "y" + i + " " + y[i] }
-            assert(arrz[i].equals(z[i])) { "z" + i + " " + z[i] }
+            assert(arrx[i].equals(x[i])) { "x " + i + " " + arrx[i] + " " + x[i] }
+            assert(arry[i].equals(y[i])) { "y " + i + " " + arry[i] + " " + y[i] }
+            assert(arrz[i].equals(z[i])) { "z " + i + " " + arrz[i] + " " + z[i] }
+
 
         }
 
@@ -62,10 +63,9 @@ class SysIntegerTest {
             assert(arrz[i].equals(c[i])) { "c" + i + " " + c[i] }
 
         }
-
-        assert(a.equals(x))
-        assert(b.equals(y))
-        assert(c.equals(z))
+        assertEquals(a, x)
+        assertEquals(b, y)
+        assertEquals(c, z)
 
     }
 
@@ -94,22 +94,22 @@ class SysIntegerTest {
         val y: SysLongInteger = SysLongInteger(8, 64)
 
 
-        var arr = arrayOf (X, X, ONE, ONE, ONE, ONE, ONE, ONE, ONE, ZERO);
+        var arr = arrayOf (ONE, ONE, ONE, ONE, ONE, ONE, ONE, ZERO, ZERO, ZERO);
         var z = SysLongInteger(arr);
 
-        assert((x or y).equals(z), { x or y });
+        assertEquals(z, x or y)
 
-        arr = arrayOf(X, X, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ONE, ZERO);
+        arr = arrayOf(ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ONE, ZERO, ZERO, ZERO);
         z = SysLongInteger(arr);
 
-        assert((x and y).equals(z));
+        assertEquals(z, x and y)
 
-        assert((x.inv()).equals(SysLongInteger(10, -128)));
+        assertEquals(SysLongInteger(10, -128), x.inv())
 
-        arr = arrayOf(X, X, ONE, ONE, ONE, ONE, ONE, ONE, ZERO, ZERO);
+        arr = arrayOf(ONE, ONE, ONE, ONE, ONE, ONE, ZERO, ZERO, ZERO, ZERO);
         z = SysLongInteger(arr);
 
-        assert((x xor y).equals(z));
+        assertEquals(z, x xor y);
     }
 
     @Test
@@ -176,9 +176,9 @@ class SysIntegerTest {
         //                        "${java.lang.Long.toBinaryString((y).value)}\n" +
         //                        "${java.lang.Long.toBinaryString((x + y).value)}\n"
         //        )
-        assert(allBitsEquals(a + b, x + y, width - 1)) {
+        assert(allBitsEquals(a + b, (x + y).toSysLongInteger(), width - 1)) {
             "\n${java.lang.Long.toBinaryString(a + b)}\n" +
-                    "${java.lang.Long.toBinaryString((x + y).value)}"
+                    "${java.lang.Long.toBinaryString((x + y).value.toLong())}"
         }
 
         for (i in 0..99) {
@@ -191,24 +191,25 @@ class SysIntegerTest {
             //println("iteration $i test 1")
             assert(allBitsEquals(a * b, x * y, SysLongInteger.MAX_WIDTH)) {
                 "\n${java.lang.Long.toBinaryString(a * b)}\n" +
-                        "${java.lang.Long.toBinaryString((x * y).value)}"
+                        "${java.lang.Long.toBinaryString((x * y).value.toLong())}"
             }
             //println("iteration $i test 2")
             x = SysLongInteger(width, a)
             y = SysLongInteger(width, b)
             assert(allBitsEquals(a * b, x * y, width - 1)) {
                 "\n${java.lang.Long.toBinaryString(a * b)}\n" +
-                        "${java.lang.Long.toBinaryString((x * y).value)}"
+                        "${java.lang.Long.toBinaryString((x * y).value.toLong())}"
             }
 
         }
     }
 
-    fun allBitsEquals(left: Long, right: SysLongInteger, number: Int): Boolean {
+    fun allBitsEquals(left: Long, rightInt: SysInteger, number: Int): Boolean {
+        val right = rightInt.value.toLong()
         var mask: Long
         for (i in 0..number - 1) {
             mask = 1L shl i
-            if ((left and mask) != (right.value and mask))
+            if ((left and mask) != (right and mask))
                 return false
         }
         return true
