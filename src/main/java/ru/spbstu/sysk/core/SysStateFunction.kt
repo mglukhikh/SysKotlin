@@ -245,12 +245,12 @@ class SysStateFunction private constructor(
 class ResetIterator<T : Any> internal constructor(private var parent: Iterable<T>) : Iterator<T> {
     private var iterator = parent.iterator()
 
-    var it: T? = null
+    lateinit var it: T
         private set
 
     override fun next(): T {
         it = iterator.next()
-        return it as T
+        return it
     }
 
     override fun hasNext(): Boolean {

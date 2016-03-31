@@ -71,7 +71,7 @@ class FifoTest : SysTopModule() {
             loop(i) {
                 state {
                     if (i.it == 0) output.push = ONE
-                    if (i.it!! % 2 == 0) output(ONE)
+                    if (i.it % 2 == 0) output(ONE)
                     else output(ZERO)
                 }
             }
@@ -82,8 +82,8 @@ class FifoTest : SysTopModule() {
             loop(i) {
                 state {
                     if (i.it == 0) input.pop = ONE
-                    if (i.it!! < 4) {
-                        if (i.it!! % 2 == 0) assert(input() == ONE)
+                    if (i.it < 4) {
+                        if (i.it % 2 == 0) assert(input() == ONE)
                         else assert(input() == ZERO)
                     } else assert(input() == ZERO)
                 }
@@ -112,7 +112,7 @@ class FifoTest : SysTopModule() {
             loop(i) {
                 state {
                     if (i.it == 0) output.push = ONE
-                    if (i.it!! % 2 == 0) output(ONE)
+                    if (i.it % 2 == 0) output(ONE)
                     else output(ZERO)
                 }
             }
@@ -123,8 +123,8 @@ class FifoTest : SysTopModule() {
             loop(i) {
                 state {
                     if (i.it == 0) input.pop = ONE
-                    if (i.it!! < 4) {
-                        if (i.it!! % 2 == 0) assert(input() == ONE)
+                    if (i.it < 4) {
+                        if (i.it % 2 == 0) assert(input() == ONE)
                         else assert(input() == ZERO)
                     } else assert(input() == ZERO)
                 }

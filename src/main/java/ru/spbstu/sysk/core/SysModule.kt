@@ -113,7 +113,7 @@ open class SysModule internal constructor(
     protected fun <T : SysData> memory(name: String, addrWidth: Int, defaultValue: T) =
             SysMemory(name, addrWidth, defaultValue, this)
 
-    protected fun <T : SysData> integerMemory(name: String, addrWidth: Int, dataWidth: Int) =
+    protected fun integerMemory(name: String, addrWidth: Int, dataWidth: Int) =
             SysIntegerMemory(name, addrWidth, dataWidth, this)
 
     protected fun <T : SysData> fifoOutput(name: String, fifo: SysFifo<T>? = null) =

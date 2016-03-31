@@ -29,8 +29,8 @@ class SysRegisterTest {
                     state {
                         en = ONE
                         d = q + 1
-                        assert(q == SysInteger(8, i.it as Int / 2)) {
-                            "#${i.it}: Expected ${i.it as Int / 2}, Actual $q"
+                        assert(q == SysInteger(8, i.it / 2)) {
+                            "#${i.it}: Expected ${i.it / 2}, Actual $q"
                         }
                     }
                 }
@@ -79,8 +79,8 @@ class SysRegisterTest {
                         ben = ONE
                         ad = bq
                         bd = aq + bq
-                        assert(bq == SysInteger(8, values[i.it as Int / 2])) {
-                            "#${i.it}: Expected ${values[i.it as Int / 2]}, Actual $bq"
+                        assert(bq == SysInteger(8, values[i.it / 2])) {
+                            "#${i.it}: Expected ${values[i.it / 2]}, Actual $bq"
                         }
                     }
                 }
