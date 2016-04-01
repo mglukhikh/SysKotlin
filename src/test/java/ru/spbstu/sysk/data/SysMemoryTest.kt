@@ -2,21 +2,21 @@ package ru.spbstu.sysk.data
 
 import org.junit.Test
 import ru.spbstu.sysk.core.SysTopModule
-import ru.spbstu.sysk.core.TimeUnit
-import ru.spbstu.sysk.core.time
+import ru.spbstu.sysk.core.TimeUnit.*
+import ru.spbstu.sysk.core.invoke
 
 class SysMemoryTest {
 
     private class SequenceTester : SysTopModule("tester") {
         val m = integerMemory("memory", 8, 8)
 
-        val clk = clockedSignal("clk", time(20, TimeUnit.NS))
+        val clk = clockedSignal("clk", 20(NS))
 
-        var en by readWriteSignal("men", m.en)
-        var wr by readWriteSignal("mwr", m.wr)
-        var d by readWriteSignal("md", m.din)
-        val q by readOnlySignal("mq", m.dout)
-        var addr by readWriteSignal("maddr", m.addr)
+        var en by signalWriter("men", m.en)
+        var wr by signalWriter("mwr", m.wr)
+        var d by signalWriter("md", m.din)
+        val q by signalReader("mq", m.dout)
+        var addr by signalWriter("maddr", m.addr)
 
         init {
             bind(m.clk to clk)
@@ -66,15 +66,15 @@ class SysMemoryTest {
     private class LoadTester : SysTopModule("tester") {
         val m = memory<SysBit>("memory", 8, SysBit.X)
 
-        val clk = clockedSignal("clk", time(20, TimeUnit.NS))
+        val clk = clockedSignal("clk", 20(NS))
 
-        var en by readWriteSignal("men", m.en)
-        var wr by readWriteSignal("mwr", m.wr)
-        var d by readWriteSignal("md", m.din)
-        val q by readOnlyBitSignal("mq", m.dout)
-        var addr by readWriteSignal("maddr", m.addr)
+        var en by signalWriter("men", m.en)
+        var wr by signalWriter("mwr", m.wr)
+        val q by bitSignalReader("mq", m.dout)
+        var addr by signalWriter("maddr", m.addr)
 
         init {
+            connector("md", m.din)
             bind(m.clk to clk)
 
             m.load {

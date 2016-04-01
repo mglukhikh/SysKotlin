@@ -13,9 +13,9 @@ class SysRegisterTest {
 
         val clk = clockedSignal("clk", time(20, TimeUnit.NS))
 
-        var en by readWriteSignal("aen", a.en)
-        var d by readWriteSignal("ad", a.d.inp)
-        val q by readOnlySignal("aq", a.q.out)
+        var en by signalWriter("aen", a.en)
+        var d by signalWriter("ad", a.d.inp)
+        val q by signalReader("aq", a.q.out)
 
         init {
             bind(a.clk to clk)
@@ -53,14 +53,14 @@ class SysRegisterTest {
 
         val clk = clockedSignal("clk", time(20, TimeUnit.NS))
 
-        var aen by readWriteSignal("aen", a.en)
-        var ben by readWriteSignal("ben", b.en)
+        var aen by signalWriter("aen", a.en)
+        var ben by signalWriter("ben", b.en)
 
-        var ad by readWriteSignal("ad", a.d.inp)
-        var bd by readWriteSignal("bd", b.d.inp)
+        var ad by signalWriter("ad", a.d.inp)
+        var bd by signalWriter("bd", b.d.inp)
 
-        val aq by readOnlySignal("aq", a.q.out)
-        val bq by readOnlySignal("bq", b.q.out)
+        val aq by signalReader("aq", a.q.out)
+        val bq by signalReader("bq", b.q.out)
 
         init {
             bind(a.clk to clk, b.clk to clk)

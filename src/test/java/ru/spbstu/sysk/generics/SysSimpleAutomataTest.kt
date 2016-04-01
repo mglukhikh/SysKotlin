@@ -13,8 +13,8 @@ class SysSimpleAutomataTest {
     class SysLatchStagedTester : SysTopModule() {
         val dut = LatchTriggerMoore("latch", this)
 
-        var x by readWriteSignal("x", dut.x)
-        val y by readOnlySignal("y", dut.y)
+        var x by signalWriter("x", dut.x)
+        val y by signalReader("y", dut.y)
 
         val clk = clockedSignal("clk", time(20, TimeUnit.NS))
 
@@ -66,8 +66,8 @@ class SysSimpleAutomataTest {
 
         val dut = LatchTriggerMoore("latch", this)
 
-        var x by readWriteSignal("x", dut.x)
-        val y by readOnlySignal("y", dut.y)
+        var x by signalWriter("x", dut.x)
+        val y by signalReader("y", dut.y)
 
         val clk = clockedSignal("clk", time(20, TimeUnit.NS))
 
@@ -123,8 +123,8 @@ class SysSimpleAutomataTest {
 
         val dut = CountTriggerMoore("count", this)
 
-        var x by readWriteSignal("x", dut.x)
-        val y by readOnlySignal("y", dut.y)
+        var x by signalWriter("x", dut.x)
+        val y by signalReader("y", dut.y)
 
         val clk = clockedSignal("clk", time(20, TimeUnit.NS))
 

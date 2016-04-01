@@ -77,8 +77,8 @@ class DFFTest {
         val clk = clockedSignal("clk", time(20, TimeUnit.NS))
 
         init {
-            bindSignal("d", tb.d.out, ff.d.inp)
-            bindSignal("q", ff.q.out, tb.q.inp)
+            connector("d", tb.d.out, ff.d.inp)
+            connector("q", ff.q.out, tb.q.inp)
             bind(ff.clk to clk, tb.clk to clk)
         }
     }
@@ -94,12 +94,12 @@ class DFFTest {
         val andNot = NAND("andNot", this)
 
         val clk = clockedSignal("clk", time(20, TimeUnit.NS))
-        val q by readOnlyBitSignal("q", ff.q.out, andNot.x1 as SysBitInput)
+        val q by bitSignalReader("q", ff.q.out, andNot.x1 as SysBitInput)
 
-        var swapOrOne by readWriteBitSignal("en", andNot.x2 as SysBitInput)
+        var swapOrOne by bitSignalWriter("en", andNot.x2 as SysBitInput)
 
         init {
-            bindSignal("d", andNot.y, ff.d.inp)
+            connector("d", andNot.y, ff.d.inp)
             bind(ff.clk to clk)
 
             stateFunction(clk) {
