@@ -1,14 +1,11 @@
-package ru.spbstu.sysk.connectors
+package ru.spbstu.sysk.core
 
 import org.junit.Test
-import ru.spbstu.sysk.core.SysModule
-import ru.spbstu.sysk.core.SysTopModule
-import ru.spbstu.sysk.core.SysWait
 import ru.spbstu.sysk.data.SysBit
 import ru.spbstu.sysk.data.SysInteger
 import ru.spbstu.sysk.data.bind
 
-class StateTest {
+class SysStateFunctionTest {
 
     internal class Test1(name: String, parent: SysModule) : SysModule(name, parent) {
 
