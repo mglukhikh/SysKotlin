@@ -18,7 +18,7 @@ class RSCTest : SysTopModule() {
     val nq = bitSignal("nq")
 
     /** BUG?: val clk = clockedSignal("clk", 1(FS)) */
-    val clk = clockedSignal("clk", 2(FS))
+    val clk = clock("clk", 2(FS))
 
     val jumps = arrayOf(
             /** arrayOf(R, S, C, Q(t), nQ(t), Q(t+1), nQ(t+1)*/

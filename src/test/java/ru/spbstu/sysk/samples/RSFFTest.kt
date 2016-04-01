@@ -2,6 +2,7 @@ package ru.spbstu.sysk.samples
 
 import org.junit.Test
 import ru.spbstu.sysk.core.*
+import ru.spbstu.sysk.core.TimeUnit.*
 import ru.spbstu.sysk.data.SysBit
 import ru.spbstu.sysk.data.SysBit.*
 import ru.spbstu.sysk.data.bind
@@ -76,7 +77,7 @@ class RSFFTest {
         val s = signal("s", X)
 
         val q = signal("q", X)
-        val clk = clockedSignal("clk", time(20, TimeUnit.NS))
+        val clk = clock("clk", 20(NS))
 
         val ff = RSFF("my", this)
         private val tb = Testbench("your", this)

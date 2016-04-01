@@ -9,7 +9,7 @@ import ru.spbstu.sysk.generics.OR
 
 class ORTest : SysTopModule() {
 
-    val clk = clockedSignal("clock", 1(FS))
+    val clk = clock("clock", 1(FS))
 
     val or = OR("or", this)
 

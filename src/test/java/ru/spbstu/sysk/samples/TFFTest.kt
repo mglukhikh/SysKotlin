@@ -2,6 +2,7 @@ package ru.spbstu.sysk.samples
 
 import org.junit.Test
 import ru.spbstu.sysk.core.*
+import ru.spbstu.sysk.core.TimeUnit.*
 import ru.spbstu.sysk.data.SysBit
 import ru.spbstu.sysk.data.SysBit.*
 import ru.spbstu.sysk.data.bind
@@ -64,7 +65,7 @@ class TFFTest {
     private class Top : SysTopModule("top", SysScheduler()) {
         val t = signal("t", ZERO)
 
-        val clk = clockedSignal("clk", time(20, TimeUnit.NS))
+        val clk = clock("clk", 20(NS))
         val q = signal("q", ZERO)
 
         val ff = TFF("my", this)

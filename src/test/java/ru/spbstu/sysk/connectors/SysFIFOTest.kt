@@ -59,7 +59,7 @@ class FifoTest : SysTopModule() {
     @Test
     fun synchronousFifo() {
         val fifo = synchronousFifo<SysBit>(4, "fifo", false)
-        val clk = clockedSignal("clk", 2(FS))
+        val clk = clock("clk", 2(FS))
         val input = fifoInput("input", fifo)
         val output = fifoOutput("output", fifo)
         fifo.clk bind clk
@@ -100,7 +100,7 @@ class FifoTest : SysTopModule() {
     @Test
     fun synchronousBitFifo() {
         val fifo = synchronousBitFifo(4, "fifo", false)
-        val clk = clockedSignal("clk", 2(FS))
+        val clk = clock("clk", 2(FS))
         val input = fifoInput("input", fifo)
         val output = fifoOutput("output", fifo)
         fifo.clk bind clk

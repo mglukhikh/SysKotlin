@@ -1,10 +1,8 @@
 package ru.spbstu.sysk.generics
 
 import org.junit.Test
-import ru.spbstu.sysk.core.SysTopModule
-import ru.spbstu.sysk.core.SysWait
-import ru.spbstu.sysk.core.TimeUnit
-import ru.spbstu.sysk.core.time
+import ru.spbstu.sysk.core.*
+import ru.spbstu.sysk.core.TimeUnit.*
 import ru.spbstu.sysk.data.SysBit.*
 import ru.spbstu.sysk.data.bind
 
@@ -16,7 +14,7 @@ class SysSimpleAutomataTest {
         var x by signalWriter("x", dut.x)
         val y by signalReader("y", dut.y)
 
-        val clk = clockedSignal("clk", time(20, TimeUnit.NS))
+        val clk = clock("clk", 20(NS))
 
         init {
             bind(dut.clk to clk)
@@ -31,31 +29,31 @@ class SysSimpleAutomataTest {
                 state {
                     assert(y.x)
                     x = ZERO
-                    assertTime(time(10, TimeUnit.NS))
+                    assertTime(10(NS))
                 }
                 state {
                     assert(y.x)
                     x = ONE
-                    assertTime(time(30, TimeUnit.NS))
+                    assertTime(30(NS))
                 }
                 state {
                     assert(y.zero)
                     x = ZERO
-                    assertTime(time(50, TimeUnit.NS))
+                    assertTime(50(NS))
                 }
                 state {
                     assert(y.one)
                     x = ONE
-                    assertTime(time(70, TimeUnit.NS))
+                    assertTime(70(NS))
                 }
                 state {
                     assert(y.zero)
-                    assert(currentTime == time(90, TimeUnit.NS)) { "Expected 90 ns but was $currentTime" }
-                    assertTime(time(90, TimeUnit.NS))
+                    assert(currentTime == 90(NS)) { "Expected 90 ns but was $currentTime" }
+                    assertTime(90(NS))
                 }
                 state {
                     assert(y.one)
-                    assertTime(time(110, TimeUnit.NS))
+                    assertTime(110(NS))
                     scheduler.stop()
                 }
             }
@@ -69,7 +67,7 @@ class SysSimpleAutomataTest {
         var x by signalWriter("x", dut.x)
         val y by signalReader("y", dut.y)
 
-        val clk = clockedSignal("clk", time(20, TimeUnit.NS))
+        val clk = clock("clk", 20(NS))
 
         init {
             bind(dut.clk to clk)
@@ -126,7 +124,7 @@ class SysSimpleAutomataTest {
         var x by signalWriter("x", dut.x)
         val y by signalReader("y", dut.y)
 
-        val clk = clockedSignal("clk", time(20, TimeUnit.NS))
+        val clk = clock("clk", 20(NS))
 
         init {
             bind(dut.clk to clk)

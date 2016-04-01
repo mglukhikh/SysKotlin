@@ -95,7 +95,7 @@ open class SysBitSignal internal constructor(
     }
 }
 
-class SysClockedSignal internal constructor(
+class SysClock internal constructor(
         name: String,
         val period: SysWait.Time,
         private val scheduler: SysScheduler,

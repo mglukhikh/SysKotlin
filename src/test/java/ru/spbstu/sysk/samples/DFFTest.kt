@@ -2,6 +2,7 @@ package ru.spbstu.sysk.samples
 
 import org.junit.Test
 import ru.spbstu.sysk.core.*
+import ru.spbstu.sysk.core.TimeUnit.*
 import ru.spbstu.sysk.data.SysBit
 import ru.spbstu.sysk.data.SysBit.*
 import ru.spbstu.sysk.data.SysBitInput
@@ -74,7 +75,7 @@ class DFFTest {
 
         private val tb = Testbench("your", this)
 
-        val clk = clockedSignal("clk", time(20, TimeUnit.NS))
+        val clk = clock("clk", 20(NS))
 
         init {
             connector("d", tb.d.out, ff.d.inp)
@@ -93,7 +94,7 @@ class DFFTest {
 
         val andNot = NAND("andNot", this)
 
-        val clk = clockedSignal("clk", time(20, TimeUnit.NS))
+        val clk = clock("clk", 20(NS))
         val q by bitSignalReader("q", ff.q.out, andNot.x1 as SysBitInput)
 
         var swapOrOne by bitSignalWriter("en", andNot.x2 as SysBitInput)

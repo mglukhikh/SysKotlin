@@ -69,7 +69,7 @@ class StubTest {
         init {
             val involuator = Involuator("involuator", this)
             val tester = Tester(10, "Tester", this)
-            val clk = clockedSignal("clk", SysWait.Time(1), SysBit.ZERO)
+            val clk = clock("clk", SysWait.Time(1), SysBit.ZERO)
             val expWire = signal<SysInteger>("exp")
             val resultWire = signal<SysInteger>("result")
             involuator.clk.bind(clk)

@@ -10,11 +10,11 @@ import ru.spbstu.sysk.core.TimeUnit.*
 class MicroprocessorExample : SysTopModule() {
 
     val CPU: Microprocessor
-    val clk: SysClockedSignal
+    val clk: SysClock
 
     init {
         CPU = Microprocessor("M001", this)
-        clk = clockedSignal("clock", 10(FS))
+        clk = clock("clock", 10(FS))
         CPU.clk bind clk
     }
 

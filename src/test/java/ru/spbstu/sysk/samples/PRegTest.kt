@@ -2,6 +2,7 @@ package ru.spbstu.sysk.samples
 
 import org.junit.Test
 import ru.spbstu.sysk.core.*
+import ru.spbstu.sysk.core.TimeUnit.*
 import ru.spbstu.sysk.data.SysBit
 import ru.spbstu.sysk.data.SysBit.*
 import ru.spbstu.sysk.data.bind
@@ -116,7 +117,7 @@ class PRegTest {
         val digPerWord = 64
         val d = Array(digPerWord, {i -> signal<SysBit>("d" + i.toString())})
 
-        val clk = clockedSignal("clk", time(20, TimeUnit.NS))
+        val clk = clock("clk", 20(NS))
         val q = Array(digPerWord, {i -> signal<SysBit>("q" + i.toString())})
 
         val ff = PReg("my", digPerWord, this)

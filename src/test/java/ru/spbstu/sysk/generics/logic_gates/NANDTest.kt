@@ -9,7 +9,7 @@ import ru.spbstu.sysk.generics.NAND
 
 class NANDTest : SysTopModule() {
 
-    val clk = clockedSignal("clock", 1(FS))
+    val clk = clock("clock", 1(FS))
 
     val nand = NAND("nand", this)
 

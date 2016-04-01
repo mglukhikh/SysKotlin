@@ -3,6 +3,8 @@ package ru.spbstu.sysk.data
 import org.junit.Test
 import ru.spbstu.sysk.core.SysTopModule
 import ru.spbstu.sysk.core.TimeUnit
+import ru.spbstu.sysk.core.TimeUnit.*
+import ru.spbstu.sysk.core.invoke
 import ru.spbstu.sysk.core.time
 import ru.spbstu.sysk.data.SysBit.*
 
@@ -11,7 +13,7 @@ class SysRegisterTest {
     private class Counter : SysTopModule("counter") {
         val a = register("a", SysInteger(8, 0))
 
-        val clk = clockedSignal("clk", time(20, TimeUnit.NS))
+        val clk = clock("clk", 20(NS))
 
         var en by signalWriter("aen", a.en)
         var d by signalWriter("ad", a.d.inp)
@@ -51,7 +53,7 @@ class SysRegisterTest {
 
         val b = register("b", SysInteger(8, 1))
 
-        val clk = clockedSignal("clk", time(20, TimeUnit.NS))
+        val clk = clock("clk", 20(NS))
 
         var aen by signalWriter("aen", a.en)
         var ben by signalWriter("ben", b.en)

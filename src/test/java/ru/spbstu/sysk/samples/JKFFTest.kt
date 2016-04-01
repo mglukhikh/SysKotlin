@@ -2,6 +2,7 @@ package ru.spbstu.sysk.samples
 
 import org.junit.Test
 import ru.spbstu.sysk.core.*
+import ru.spbstu.sysk.core.TimeUnit.*
 import ru.spbstu.sysk.data.SysBit
 import ru.spbstu.sysk.data.bind
 import ru.spbstu.sysk.data.SysBit.*
@@ -63,7 +64,7 @@ class JKFFTest {
         val j = signal("j", ZERO)
         val k = signal("k", ZERO)
         val q = signal("q", ZERO)
-        val clk = clockedSignal("clk", time(20, TimeUnit.NS))
+        val clk = clock("clk", 20(NS))
 
         val ff = JKFF("my", this)
         private val tb = Testbench("your", this)

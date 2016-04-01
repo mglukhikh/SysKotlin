@@ -216,7 +216,7 @@ class StateTest {
 
     internal object TopModule : SysTopModule() {
         init {
-            val clk = clockedSignal("clk", SysWait.Time(1))
+            val clk = clock("clk", SysWait.Time(1))
             val fifo1 = fifo<SysInteger>(1, "fifo")
             val fifo2 = fifo<SysInteger>(1, "fifo")
             val tester = Tester("tester", this)

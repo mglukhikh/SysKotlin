@@ -108,8 +108,8 @@ open class SysModule internal constructor(
     protected fun bitSignal(name: String, startValue: SysBit = SysBit.X) =
             SysBitSignal(name, scheduler, startValue, this)
 
-    protected fun clockedSignal(name: String, period: SysWait.Time, startValue: SysBit = SysBit.ZERO) =
-            SysClockedSignal(name, period, scheduler, startValue)
+    protected fun clock(name: String, period: SysWait.Time, startValue: SysBit = SysBit.ZERO) =
+            SysClock(name, period, scheduler, startValue)
 
     protected fun <T : SysData> register(name: String, startValue: T) =
             SysRegister(name, startValue, this)

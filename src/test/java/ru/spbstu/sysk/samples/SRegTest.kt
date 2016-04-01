@@ -2,6 +2,7 @@ package ru.spbstu.sysk.samples
 
 import org.junit.Test
 import ru.spbstu.sysk.core.*
+import ru.spbstu.sysk.core.TimeUnit.*
 import ru.spbstu.sysk.data.SysBit
 import ru.spbstu.sysk.data.SysBit.*
 import ru.spbstu.sysk.data.bind
@@ -132,7 +133,7 @@ class SRegTest {
         val d = signal<SysBit>("d")
         val q = signal<SysBit>("q")
         val dir = signal<SysBit>("dir")
-        val clk = clockedSignal("clk", time(20, TimeUnit.NS))
+        val clk = clock("clk", 20(NS))
 
         val ff = SReg("my", digPerWord, this)
         private val tb = Testbench("your", this)

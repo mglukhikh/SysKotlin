@@ -10,7 +10,7 @@ class SysMemoryTest {
     private class SequenceTester : SysTopModule("tester") {
         val m = integerMemory("memory", 8, 8)
 
-        val clk = clockedSignal("clk", 20(NS))
+        val clk = clock("clk", 20(NS))
 
         var en by signalWriter("men", m.en)
         var wr by signalWriter("mwr", m.wr)
@@ -66,7 +66,7 @@ class SysMemoryTest {
     private class LoadTester : SysTopModule("tester") {
         val m = memory<SysBit>("memory", 8, SysBit.X)
 
-        val clk = clockedSignal("clk", 20(NS))
+        val clk = clock("clk", 20(NS))
 
         var en by signalWriter("men", m.en)
         var wr by signalWriter("mwr", m.wr)

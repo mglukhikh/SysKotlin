@@ -9,7 +9,7 @@ import ru.spbstu.sysk.generics.NXOR
 
 class NXORTest : SysTopModule() {
 
-    val clk = clockedSignal("clock", 1(FS))
+    val clk = clock("clock", 1(FS))
 
     val nxor = NXOR("nxor", this)
 

@@ -13,7 +13,7 @@ class RegisterFileTest : SysTopModule() {
     val data = bitBus(8, "data")
     val command = signal("command", STORAGE)
     val address = signal<SysInteger>("address")
-    val clk = clockedSignal("clk", 20(FS))
+    val clk = clock("clk", 20(FS))
     val dataPort = bitBusPort(8, "data")
 
     init {
