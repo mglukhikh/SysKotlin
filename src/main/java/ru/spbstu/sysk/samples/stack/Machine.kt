@@ -1,11 +1,9 @@
 package ru.spbstu.sysk.samples.stack
 
-import ru.spbstu.sysk.channels.SysSignalRead
-import ru.spbstu.sysk.channels.bind
 import ru.spbstu.sysk.core.SysModule
 import ru.spbstu.sysk.data.SysBit
-import ru.spbstu.sysk.data.SysInteger
-import ru.spbstu.sysk.data.SysUnsigned
+import ru.spbstu.sysk.data.integer.SysInteger
+import ru.spbstu.sysk.data.integer.SysUnsigned
 import ru.spbstu.sysk.samples.stack.Opcode.*
 
 class Machine(

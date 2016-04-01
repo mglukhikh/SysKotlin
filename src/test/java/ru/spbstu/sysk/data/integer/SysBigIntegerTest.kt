@@ -1,4 +1,4 @@
-package ru.spbstu.sysk.data
+package ru.spbstu.sysk.data.integer
 
 import org.junit.Assert.assertEquals
 import org.junit.Test

@@ -2,9 +2,10 @@ package ru.spbstu.sysk.samples.i8080
 
 import org.junit.Test
 import ru.spbstu.sysk.core.SysTopModule
-import ru.spbstu.sysk.core.TimeUnit.*
+import ru.spbstu.sysk.core.TimeUnit.FS
+import ru.spbstu.sysk.core.TimeUnit.S
 import ru.spbstu.sysk.core.invoke
-import ru.spbstu.sysk.data.SysInteger
+import ru.spbstu.sysk.data.integer.SysInteger
 
 class RegisterFileTest : SysTopModule() {
 

@@ -1,4 +1,4 @@
-package ru.spbstu.sysk.data
+package ru.spbstu.sysk.data.integer
 
 import org.junit.Test
 import ru.spbstu.sysk.data.SysBit.ONE

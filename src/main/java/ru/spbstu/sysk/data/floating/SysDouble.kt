@@ -1,4 +1,8 @@
-package ru.spbstu.sysk.data
+package ru.spbstu.sysk.data.floating
+
+import ru.spbstu.sysk.data.SysBit
+import ru.spbstu.sysk.data.SysDataCompanion
+import ru.spbstu.sysk.data.integer.SysUnsigned
 
 class SysDouble private constructor(
         sign: SysBit,

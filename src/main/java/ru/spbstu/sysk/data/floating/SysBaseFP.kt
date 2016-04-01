@@ -1,4 +1,8 @@
-package ru.spbstu.sysk.data
+package ru.spbstu.sysk.data.floating
+
+import ru.spbstu.sysk.data.SysBit
+import ru.spbstu.sysk.data.SysData
+import ru.spbstu.sysk.data.integer.SysUnsigned
 
 abstract class SysBaseFP protected constructor(
         val sign: SysBit,

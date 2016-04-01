@@ -1,4 +1,7 @@
-package ru.spbstu.sysk.data
+package ru.spbstu.sysk.data.integer
+
+import ru.spbstu.sysk.data.SysBit
+import ru.spbstu.sysk.data.SysDataCompanion
 
 class SysUnsigned
 private constructor(
@@ -209,7 +212,7 @@ private constructor(
             sysBitExpression[i] = SysBit.ZERO
             i++
         }
-        return SysUnsigned.valueOf(sysBitExpression);
+        return Companion.valueOf(sysBitExpression);
     }
 
     /** Bitwise logical shift left*/
@@ -230,7 +233,7 @@ private constructor(
             i--
         }
 
-        return SysUnsigned.valueOf(sysBitExpression)
+        return Companion.valueOf(sysBitExpression)
     }
 
     override fun unaryMinus(): SysInteger {
@@ -306,7 +309,7 @@ private constructor(
             sysBitExpression[i] = tempArray[i]
             i--
         }
-        return SysUnsigned.valueOf(sysBitExpression)
+        return Companion.valueOf(sysBitExpression)
     }
 
     /** Cyclic shift left*/
@@ -335,7 +338,7 @@ private constructor(
             sysBitExpression[i] = tempArray[i - sysBitExpression.size + realShift]
             i++
         }
-        return SysUnsigned.valueOf(sysBitExpression)
+        return Companion.valueOf(sysBitExpression)
     }
 
     companion object : SysDataCompanion<SysUnsigned> {
@@ -412,7 +415,7 @@ private constructor(
         }
 
         override val undefined: SysUnsigned
-            get() = SysUnsigned.valueOf(arrayOf(SysBit.X))
+            get() = Companion.valueOf(arrayOf(SysBit.X))
 
 
         private fun maxValue(width: Int): Long {

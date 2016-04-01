@@ -5,7 +5,7 @@ import ru.spbstu.sysk.core.SysModule
 import ru.spbstu.sysk.core.SysTopModule
 import ru.spbstu.sysk.core.SysWait
 import ru.spbstu.sysk.data.SysBit
-import ru.spbstu.sysk.data.SysInteger
+import ru.spbstu.sysk.data.integer.SysInteger
 
 private const val EXPONENT = 3
 

@@ -1,4 +1,4 @@
-package ru.spbstu.sysk.data
+package ru.spbstu.sysk.data.integer
 
 import org.junit.Assert.assertEquals
 import org.junit.Ignore
@@ -186,8 +186,8 @@ class SysIntegerTest {
             a = Random().nextLong()and mask
             b = Random().nextLong()and mask
 
-            x = SysLongInteger(SysLongInteger.MAX_WIDTH, a)
-            y = SysLongInteger(SysLongInteger.MAX_WIDTH, b)
+            x = SysLongInteger(SysLongInteger.Companion.MAX_WIDTH, a)
+            y = SysLongInteger(SysLongInteger.Companion.MAX_WIDTH, b)
             //println("iteration $i test 1")
             assert(allBitsEquals(a * b, x * y, SysLongInteger.MAX_WIDTH)) {
                 "\n${java.lang.Long.toBinaryString(a * b)}\n" +

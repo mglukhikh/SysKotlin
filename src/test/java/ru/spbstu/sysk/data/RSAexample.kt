@@ -2,6 +2,7 @@ package ru.spbstu.sysk.data
 
 import org.junit.Ignore
 import org.junit.Test
+import ru.spbstu.sysk.data.integer.SysBigInteger
 import java.math.BigInteger
 import java.util.*
 

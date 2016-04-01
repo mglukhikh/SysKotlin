@@ -1,4 +1,4 @@
-package ru.spbstu.sysk.data;
+package ru.spbstu.sysk.data.floating;
 
 import org.junit.Test
 

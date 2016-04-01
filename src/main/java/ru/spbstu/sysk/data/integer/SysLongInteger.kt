@@ -1,4 +1,7 @@
-package ru.spbstu.sysk.data
+package ru.spbstu.sysk.data.integer
+
+import ru.spbstu.sysk.data.SysBit
+import ru.spbstu.sysk.data.SysDataCompanion
 
 /** Width of integer / unsigned / ... */
 @Target(AnnotationTarget.EXPRESSION, AnnotationTarget.TYPE)

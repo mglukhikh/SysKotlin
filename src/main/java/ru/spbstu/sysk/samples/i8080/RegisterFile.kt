@@ -2,8 +2,8 @@ package ru.spbstu.sysk.samples.i8080
 
 import ru.spbstu.sysk.core.SysModule
 import ru.spbstu.sysk.data.SysBit
-import ru.spbstu.sysk.data.SysBit.*
-import ru.spbstu.sysk.data.SysInteger
+import ru.spbstu.sysk.data.SysBit.ZERO
+import ru.spbstu.sysk.data.integer.SysInteger
 import java.util.*
 
 val A = SysInteger(5, 0)
