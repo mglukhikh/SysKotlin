@@ -117,17 +117,15 @@ class SysIntegerTest {
         val x = SysLongInteger(arrayOf(X, X, ONE, ONE, ZERO, ZERO, ONE, ZERO, ONE));
         val cshrTest = SysLongInteger(arrayOf(ZERO, ONE, X, X, ONE, ONE, ZERO, ZERO, ONE));//OK
         val cshlTest = SysLongInteger(arrayOf(ONE, ONE, ZERO, ZERO, ONE, ZERO, ONE, X, X));//OK
-        val shlTest = SysLongInteger(arrayOf(ONE, ONE, ZERO, ZERO, ONE, ZERO, ONE, ZERO, ZERO));//OK
-        val shrTest = SysLongInteger(arrayOf(ZERO, ZERO, X, X, ONE, ONE, ZERO, ZERO, ONE));//OK
-        val ushlTest = SysLongInteger(arrayOf(ONE, ONE, ZERO, ZERO, ONE, ZERO, ONE)); //OK
-        val ushrTest = SysLongInteger(arrayOf(X, X, ONE, ONE, ZERO, ZERO, ONE)); //OK
+        val shlTest = SysLongInteger(arrayOf(ONE, ZERO, ZERO, ONE, ZERO, ONE, ZERO, ZERO, ZERO));//OK
+        val shrTest = SysLongInteger(arrayOf(X, X, X, X, ONE, ONE, ZERO, ZERO, ONE));//OK
+        val ushrTest = SysLongInteger(arrayOf(ZERO, ZERO, X, X, ONE, ONE, ZERO, ZERO, ONE)); //OK
 
-        assert((x cshr 2).equals(cshrTest))//OK
-        assert((x cshl 2).equals(cshlTest))//OK
-        assert((x shr 2).equals(shrTest))//OK
-        assert((x shl 2).equals(shlTest))//OK
-        assert((x ushl 2).equals(ushlTest)) //OK
-        assert((x ushr 2).equals(ushrTest)) //OK
+        assertEquals(cshrTest, (x cshr 2))
+        assertEquals(cshlTest, (x cshl 2))
+        assertEquals(shrTest, (x shr 2))
+        assertEquals(shlTest, (x shl 3))
+        assertEquals(ushrTest, (x ushr 2))
 
     }
 

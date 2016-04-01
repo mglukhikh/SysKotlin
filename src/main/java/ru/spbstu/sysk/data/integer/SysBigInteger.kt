@@ -12,7 +12,7 @@ class SysBigInteger private constructor(
         override val negativeMask: BigInteger
 ) : SysInteger (width, value, hasUndefined, positiveMask, negativeMask) {
 
-    private lateinit var bitsState: Array<SysBit>
+    override lateinit var bitsState: Array<SysBit>
 
     constructor(width: Int, value: BigInteger) : this(width, value, false,
             positiveMask = getMaxValue(width), negativeMask = getMinValue(width))
@@ -222,17 +222,6 @@ class SysBigInteger private constructor(
         return SysBigInteger(sysBitExpression);
     }
 
-    /** Bitwise logical shift left*/
-    override infix fun ushl(shift: Int): SysBigInteger {
-        if (shift == 0)
-            return this;
-        if (shift > width || shift < 0)
-            throw IllegalArgumentException()
-
-        val sysBitExpression = Array(width - shift) { i: Int -> this[i + shift] }
-
-        return SysBigInteger(sysBitExpression)
-    }
 
     /** Arithmetic shift right*/
     override infix fun shr(shift: Int): SysBigInteger {

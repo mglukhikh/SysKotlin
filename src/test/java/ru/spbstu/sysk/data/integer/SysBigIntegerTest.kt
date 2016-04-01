@@ -128,7 +128,7 @@ class SysBigIntegerTest {
         assert((x cshl 2).equals(cshlTest))//OK
         assert((x shr 2).equals(shrTest))//OK
         assert((x shl 2).equals(shlTest))//OK
-        assert((x ushl 2).equals(ushlTest)) //OK
+        assert((x shl 2).equals(ushlTest)) //OK
         assert((x ushr 2).equals(ushrTest)) //OK
 
     }

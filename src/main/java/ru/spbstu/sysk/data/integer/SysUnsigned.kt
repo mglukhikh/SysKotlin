@@ -12,7 +12,7 @@ private constructor(
         override val negativeMask: Long = Long.MIN_VALUE
 ) : SysInteger(width, value, hasUndefined, positiveMask, negativeMask) {
 
-    private lateinit var bitsState: Array<SysBit>
+    override lateinit var bitsState: Array<SysBit>
 
     private constructor(width: Int, value: Long) : this(width, value,
             positiveMask = maxValue(width))
@@ -216,7 +216,7 @@ private constructor(
     }
 
     /** Bitwise logical shift left*/
-    override infix fun ushl(shift: Int): SysUnsigned {
+    override infix fun shl(shift: Int): SysUnsigned {
 
         if (shift == 0)
             return this;
@@ -264,7 +264,7 @@ private constructor(
 
     override fun abs() = this
 
-    override fun shl(shift: Int) = this ushl shift
+    //override fun shl(shift: Int) = this ushl shift
 
     override fun shr(shift: Int) = this ushr shift
 
@@ -343,7 +343,7 @@ private constructor(
 
     companion object : SysDataCompanion<SysUnsigned> {
 
-        val MAX_WIDTH = 64
+        const val MAX_WIDTH = 64
 
         val positiveValues = Array(MAX_WIDTH + 1, { i -> maxValue(i) })
 

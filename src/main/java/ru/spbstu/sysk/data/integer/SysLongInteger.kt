@@ -21,7 +21,7 @@ class SysLongInteger private constructor(
         override val negativeMask: Long
 ) : SysInteger(width, value, hasUndefined, positiveMask, negativeMask) {
 
-    private lateinit var bitsState: Array<SysBit>
+    override lateinit var bitsState: Array<SysBit>
 
 
     /** Construct from given long value setting minimal possible width */
@@ -79,9 +79,8 @@ class SysLongInteger private constructor(
     }
 
     private fun truncate(width: Int, value: Long, positiveMask: Long, negativeMask: Long): SysLongInteger {
-        if (width == MAX_WIDTH)
-        //println(java.lang.Long.toBinaryString(value))
-            return SysLongInteger(width, value, positiveMask, negativeMask)
+        //if (width == MAX_WIDTH)
+        //  return SysLongInteger(width, value, positiveMask, negativeMask)
         if (value >= 0L)
             return SysLongInteger(width, value and positiveMask, positiveMask, negativeMask)
         else
@@ -104,6 +103,8 @@ class SysLongInteger private constructor(
 
     /** Adds arg to this integer, with result width is maximum of argument's widths */
     override operator fun plus(arg: SysInteger): SysInteger {
+        if (hasUndefined)
+            throw UnsupportedOperationException("Not implemented yet")
         if (arg.width > width)
             return arg + this
         return truncate(width, value + arg.value.toLong(), positiveMask, negativeMask)
@@ -111,11 +112,15 @@ class SysLongInteger private constructor(
 
     /**Unary minus*/
     override operator fun unaryMinus(): SysLongInteger {
+        if (hasUndefined)
+            throw UnsupportedOperationException("Not implemented yet")
         return truncate(width, -value, positiveMask, negativeMask)
     }
 
     /** Subtract arg from this integer*/
     override operator fun minus(arg: SysInteger): SysInteger {
+        if (hasUndefined)
+            throw UnsupportedOperationException("Not implemented yet")
         if (arg.width > width)
             return arg - this
         return truncate(width, value - arg.value.toLong(), positiveMask, negativeMask)
@@ -123,6 +128,8 @@ class SysLongInteger private constructor(
 
     /** Integer division by divisor*/
     override operator fun div(arg: SysInteger): SysInteger {
+        if (hasUndefined)
+            throw UnsupportedOperationException("Not implemented yet")
         if (arg.width > MAX_WIDTH)
             return this.extend(arg.width) / arg
         if (arg.value == 0L) throw IllegalArgumentException("Division by zero")
@@ -135,6 +142,8 @@ class SysLongInteger private constructor(
 
     /** Remainder of integer division*/
     override operator fun mod(arg: SysInteger): SysInteger {
+        if (hasUndefined)
+            throw UnsupportedOperationException("Not implemented yet")
         if (arg.width > MAX_WIDTH)
             return this.extend(arg.width) % arg
         if (arg.value == 0L) throw IllegalArgumentException("Division by zero")
@@ -147,6 +156,8 @@ class SysLongInteger private constructor(
 
     /** Multiplies arg to this integer, with result width is sum of argument's width */
     override operator fun times(arg: SysInteger): SysInteger {
+        if (hasUndefined)
+            throw UnsupportedOperationException("Not implemented yet")
         if (arg.width > width)
             return arg * this
         return truncate(width, value * arg.value.toLong(), positiveMask, negativeMask)
@@ -162,25 +173,32 @@ class SysLongInteger private constructor(
     override infix fun ushr(shift: Int): SysLongInteger {
         if (shift == 0)
             return this;
-        if (shift > width || shift < 0)
+        if (shift > width )
             throw IllegalArgumentException()
+        var realShift = shift
+        if (shift < 0)
+            realShift = width + shift
+        if (hasUndefined) {
+            val newBitsState = bitsState.copyOf()
+            for (i in newBitsState.lastIndex downTo realShift) {
+                newBitsState[i] = newBitsState[i - realShift]
+            }
+            for (i in 0..realShift - 1) {
+                newBitsState[i] = SysBit.ZERO
+            }
+            return SysLongInteger(newBitsState)
+        }
+        if (value >= 0L)
+            return SysLongInteger(width, value.ushr(realShift), positiveMask, negativeMask)
+        else {
+            if (width == MAX_WIDTH)
+                return SysLongInteger(width, value.ushr(realShift), positiveMask, negativeMask)
 
-        val sysBitExpression = Array(width - shift) { i: Int -> this[i] }
-
-        return SysLongInteger(sysBitExpression);
+            val result = (value and positiveMask).ushr(realShift)
+            return SysLongInteger(width, result, positiveMask, negativeMask)
+        }
     }
 
-    /** Bitwise logical shift left*/
-    override infix fun ushl(shift: Int): SysLongInteger {
-        if (shift == 0)
-            return this;
-        if (shift > width || shift < 0)
-            throw IllegalArgumentException()
-
-        val sysBitExpression = Array(width - shift) { i: Int -> this[i + shift] }
-
-        return SysLongInteger(sysBitExpression)
-    }
 
     /** Arithmetic shift right*/
     override infix fun shr(shift: Int): SysLongInteger {
@@ -188,37 +206,39 @@ class SysLongInteger private constructor(
             return this;
         if (shift > width || shift < 0)
             throw IllegalArgumentException()
-        val sysBitExpression = Array(width) { i -> this[i] }
-        var i = width - 1
-        while (i >= shift) {
-            sysBitExpression[i] = sysBitExpression[i - shift]
-            i--
+        if (hasUndefined) {
+            val newBitsState = bitsState.copyOf()
+            for (i in newBitsState.lastIndex downTo shift) {
+                newBitsState[i] = newBitsState[i - shift]
+            }
+            for (i in 0..shift) {
+                newBitsState[i] = bitsState[0]
+            }
+            return SysLongInteger(newBitsState)
         }
-        while (i >= 0) {
-            sysBitExpression[i] = SysBit.ZERO
-            i--
-        }
-        return SysLongInteger(sysBitExpression)
+        return SysLongInteger(width, value shr shift, positiveMask, negativeMask)
     }
 
     /** Arithmetic shift left*/
     override infix fun shl(shift: Int): SysLongInteger {
         if (shift == 0)
             return this;
-        if (shift > width || shift < 0)
+        if (shift > width )
             throw IllegalArgumentException()
-        val sysBitExpression = Array(width) { i -> this[i] }
-        var i = 0
-        while (i < sysBitExpression.size - shift) {
-            sysBitExpression[i] = sysBitExpression[i + shift]
-            i++
+        var realShift = shift
+        if (shift < 0)
+            realShift = width + shift
+        if (hasUndefined) {
+            val newBitsState = bitsState.copyOf()
+            for (i in 0..newBitsState.lastIndex - realShift) {
+                newBitsState[i] = newBitsState[i + realShift]
+            }
+            for (i in newBitsState.size - realShift..newBitsState.lastIndex) {
+                newBitsState[i] = SysBit.ZERO
+            }
+            return SysLongInteger(newBitsState)
         }
-        while (i < sysBitExpression.size) {
-            sysBitExpression[i] = SysBit.ZERO
-            i++
-        }
-        return SysLongInteger(sysBitExpression)
-
+        return SysLongInteger(width, value shl realShift, positiveMask, negativeMask)
     }
 
     /** Cyclic shift right*/
@@ -231,23 +251,9 @@ class SysLongInteger private constructor(
 
         if (realShift == 0)
             return this;
-        val sysBitExpression = Array(width) { i -> this[i] }
 
-        val tempArray = Array(realShift, { SysBit.X })
+        return ((this ushr realShift)or(this shl -realShift))
 
-        for (i in 0..realShift - 1) {
-            tempArray[i] = sysBitExpression[sysBitExpression.size - realShift + i]
-        }
-        var i = sysBitExpression.size - 1
-        while (i >= realShift) {
-            sysBitExpression[i] = sysBitExpression[i - realShift]
-            i--
-        }
-        while (i >= 0) {
-            sysBitExpression[i] = tempArray[i]
-            i--
-        }
-        return SysLongInteger(sysBitExpression)
     }
 
     /** Cyclic shift left*/
@@ -259,34 +265,32 @@ class SysLongInteger private constructor(
 
         if (realShift == 0)
             return this;
-        val sysBitExpression = Array(width) { i -> this[i] }
 
-        val tempArray = Array(realShift, { SysBit.X })
-
-        for (i in 0..realShift - 1) {
-            tempArray[i] = sysBitExpression[i]
-        }
-
-        var i = 0
-        while (i < sysBitExpression.size - shift) {
-            sysBitExpression[i] = sysBitExpression[i + shift]
-            i++
-        }
-        while (i < sysBitExpression.size) {
-            sysBitExpression[i] = tempArray[i - sysBitExpression.size + realShift]
-            i++
-        }
-        return SysLongInteger(sysBitExpression)
+        return ((this shl realShift)or(this ushr -realShift))
     }
 
     /** Bitwise and*/
     override infix fun and(arg: SysInteger): SysLongInteger {
-        if (hasUndefined)
-            throw UnsupportedOperationException("Not implemented")
-
         if (arg.width > MAX_WIDTH)
             throw UnsupportedOperationException("Not implemented")
 
+        if (hasUndefined || arg.hasUndefined) {
+
+            val state = (if (hasUndefined) bitsState else Array(width, { i -> get(i) }))
+            val argState = (if (arg.hasUndefined) arg.bitsState else Array(arg.width, { i -> arg.get(i) }))
+            var resultState: Array<SysBit>
+            if (state.size > argState.size) {
+                resultState = state
+                for (i in argState.indices)
+                    resultState[i] = resultState[i]and argState[i]
+            } else {
+                resultState = argState
+                for (i in state.indices)
+                    resultState[i] = resultState[i]and state[i]
+            }
+
+            return SysLongInteger(resultState)
+        }
 
         if (arg.width > width)
             return SysLongInteger(arg.width, value and arg.value.toLong(),
@@ -299,11 +303,27 @@ class SysLongInteger private constructor(
     /** Bitwise or*/
     override infix fun or(arg: SysInteger): SysLongInteger {
 
-        if (hasUndefined)
-            throw UnsupportedOperationException("Not implemented")
-
         if (arg.width > MAX_WIDTH)
             throw UnsupportedOperationException("Not implemented")
+
+        if (hasUndefined || arg.hasUndefined) {
+
+            val state = (if (hasUndefined) bitsState else Array(width, { i -> get(i) }))
+            val argState = (if (arg.hasUndefined) arg.bitsState else Array(arg.width, { i -> arg.get(i) }))
+            var resultState: Array<SysBit>
+            if (state.size > argState.size) {
+                resultState = state
+                for (i in argState.indices)
+                    resultState[i] = resultState[i]or argState[i]
+            } else {
+                resultState = argState
+                for (i in state.indices)
+                    resultState[i] = resultState[i]or state[i]
+            }
+
+            return SysLongInteger(resultState)
+        }
+
 
 
         if (arg.width > width)
@@ -317,12 +337,27 @@ class SysLongInteger private constructor(
     /** Bitwise xor*/
     override infix fun xor(arg: SysInteger): SysLongInteger {
 
-        if (hasUndefined)
-            throw UnsupportedOperationException("Not implemented")
 
         if (arg.width > MAX_WIDTH)
             throw UnsupportedOperationException("Not implemented")
 
+        if (hasUndefined || arg.hasUndefined) {
+
+            val state = (if (hasUndefined) bitsState else Array(width, { i -> get(i) }))
+            val argState = (if (arg.hasUndefined) arg.bitsState else Array(arg.width, { i -> arg.get(i) }))
+            var resultState: Array<SysBit>
+            if (state.size > argState.size) {
+                resultState = state
+                for (i in argState.indices)
+                    resultState[i] = resultState[i]xor  argState[i]
+            } else {
+                resultState = argState
+                for (i in state.indices)
+                    resultState[i] = resultState[i]xor state[i]
+            }
+
+            return SysLongInteger(resultState)
+        }
 
         if (arg.width > width)
             return SysLongInteger(arg.width, value xor  arg.value.toLong(),
@@ -334,8 +369,10 @@ class SysLongInteger private constructor(
 
     /**Bitwise inversion (not)*/
     override fun inv(): SysLongInteger {
-        if (hasUndefined)
-            throw UnsupportedOperationException("Not implemented")
+        if (hasUndefined) {
+            val resultState = Array(bitsState.size, { i -> bitsState[i].not() })
+            return SysLongInteger(resultState)
+        }
         return SysLongInteger(width, value.inv(),
                 positiveMask = positiveMask, negativeMask = negativeMask);
     }
@@ -378,7 +415,7 @@ class SysLongInteger private constructor(
 
     companion object : SysDataCompanion<SysLongInteger> {
 
-        val MAX_WIDTH: Int = 64
+        const val MAX_WIDTH: Int = 64
 
         private val positiveValues = LongArray(MAX_WIDTH + 1, { i -> maxValue(i) })
 

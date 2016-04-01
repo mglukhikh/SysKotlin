@@ -4,6 +4,7 @@ import ru.spbstu.sysk.data.SysBit
 import ru.spbstu.sysk.data.SysData
 import ru.spbstu.sysk.data.SysDataCompanion
 import java.math.BigInteger
+import java.util.*
 
 abstract class SysInteger protected constructor(
         val width: Int,
@@ -12,6 +13,8 @@ abstract class SysInteger protected constructor(
         protected open val positiveMask: Number,
         protected open val negativeMask: Number
 ) : SysData, Comparable<SysInteger> {
+
+    protected abstract var bitsState: Array<SysBit>
 
     abstract fun extend(width: Int): SysInteger
     abstract fun truncate(width: Int): SysInteger
@@ -49,7 +52,6 @@ abstract class SysInteger protected constructor(
 
     abstract infix fun shl(shift: Int): SysInteger
     abstract infix fun shr(shift: Int): SysInteger
-    abstract infix fun ushl(shift: Int): SysInteger
     abstract infix fun ushr(shift: Int): SysInteger
     abstract infix fun cshl(shift: Int): SysInteger
     abstract infix fun cshr(shift: Int): SysInteger
@@ -106,7 +108,7 @@ abstract class SysInteger protected constructor(
 
 
     override fun toString(): String {
-        return "$value [$width]"
+        return "$value [$width] ${if (hasUndefined) Arrays.toString(bitsState) else ""}"
     }
 
     override fun equals(other: Any?): Boolean {
