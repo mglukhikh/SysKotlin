@@ -6,7 +6,6 @@ import ru.spbstu.sysk.core.SysTopModule
 import ru.spbstu.sysk.core.SysWait
 import ru.spbstu.sysk.data.SysBit
 import ru.spbstu.sysk.data.SysData
-import ru.spbstu.sysk.data.bind
 import ru.spbstu.sysk.data.integer.SysInteger
 import ru.spbstu.sysk.data.integer.SysLongInteger
 import ru.spbstu.sysk.data.undefined

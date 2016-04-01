@@ -1,4 +1,4 @@
-package ru.spbstu.sysk.data
+package ru.spbstu.sysk.samples.examples
 
 import org.junit.Ignore
 import org.junit.Test
@@ -69,7 +69,7 @@ class RSAexample {
             // d = a;
             //x = SysBigInteger.valueOf(1);
             //y = SysBigInteger.valueOf(0);
-            return EuclidData(arg.a, arg.b, arg.a, SysBigInteger.valueOf(1), SysBigInteger.valueOf(0))
+            return EuclidData(arg.a, arg.b, arg.a, SysBigInteger.Companion.valueOf(1), SysBigInteger.Companion.valueOf(0))
         }
     }
 

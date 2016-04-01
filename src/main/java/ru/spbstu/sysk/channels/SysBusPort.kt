@@ -3,9 +3,10 @@ package ru.spbstu.sysk.channels
 import ru.spbstu.sysk.core.SysObject
 import ru.spbstu.sysk.core.SysScheduler
 import ru.spbstu.sysk.data.SysBit
-import ru.spbstu.sysk.data.SysBit.*
+import ru.spbstu.sysk.data.SysBit.X
+import ru.spbstu.sysk.data.SysBit.Z
 import ru.spbstu.sysk.data.SysData
-import ru.spbstu.sysk.data.SysInteger
+import ru.spbstu.sysk.data.integer.SysInteger
 
 open class SysBusPort<T : SysData> internal constructor(
         val capacity: Int, name: String, scheduler: SysScheduler,
