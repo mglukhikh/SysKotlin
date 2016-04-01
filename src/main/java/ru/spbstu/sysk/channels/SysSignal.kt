@@ -1,6 +1,8 @@
-package ru.spbstu.sysk.data
+package ru.spbstu.sysk.channels
 
 import ru.spbstu.sysk.core.*
+import ru.spbstu.sysk.data.SysBit
+import ru.spbstu.sysk.data.SysData
 import kotlin.properties.ReadOnlyProperty
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
@@ -103,7 +105,7 @@ class SysClock internal constructor(
         parent: SysObject? = null
 ): SysBitSignal(name, scheduler, startValue, parent) {
 
-    protected inner class SysClockedSignalFunction :
+    private inner class SysClockedSignalFunction :
             SysFunction(period / 2, initialize = false) {
 
         override fun run(event: SysWait): SysWait {

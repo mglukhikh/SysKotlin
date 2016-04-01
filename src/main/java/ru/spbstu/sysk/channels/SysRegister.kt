@@ -1,6 +1,7 @@
-package ru.spbstu.sysk.data
+package ru.spbstu.sysk.channels
 
 import ru.spbstu.sysk.core.SysModule
+import ru.spbstu.sysk.data.SysData
 
 /**
  * Register for storing any kind of information

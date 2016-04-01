@@ -1,8 +1,10 @@
-package ru.spbstu.sysk.data
+package ru.spbstu.sysk.channels
 
 import org.junit.Test
 import ru.spbstu.sysk.core.SysScheduler
+import ru.spbstu.sysk.data.SysBit
 import ru.spbstu.sysk.data.SysBit.*
+import ru.spbstu.sysk.data.undefined
 
 class SysSignalTest {
 
@@ -30,7 +32,7 @@ class SysSignalTest {
     @Test
     fun stub() {
         val scheduler = SysScheduler()
-        val stub =  SysSignalStub("stub", undefined<SysBit>(), scheduler)
+        val stub = SysSignalStub("stub", undefined<SysBit>(), scheduler)
         assert(stub.value == undefined<SysBit>())
     }
 }

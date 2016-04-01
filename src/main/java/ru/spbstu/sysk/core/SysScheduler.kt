@@ -1,8 +1,8 @@
 package ru.spbstu.sysk.core
 
 import ru.spbstu.sysk.channels.SysBus
-import ru.spbstu.sysk.data.SysPort
-import ru.spbstu.sysk.data.SysSignal
+import ru.spbstu.sysk.channels.SysPort
+import ru.spbstu.sysk.channels.SysSignal
 import java.util.*
 
 class SysScheduler {

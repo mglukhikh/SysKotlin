@@ -3,7 +3,7 @@ package ru.spbstu.sysk.core
 import org.junit.Test
 import ru.spbstu.sysk.data.SysBit
 import ru.spbstu.sysk.data.SysInteger
-import ru.spbstu.sysk.data.bind
+import ru.spbstu.sysk.channels.bind
 
 class SysStateFunctionTest {
 

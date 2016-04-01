@@ -1,11 +1,9 @@
-package ru.spbstu.sysk.data
+package ru.spbstu.sysk.channels
 
 import org.junit.Test
 import ru.spbstu.sysk.core.SysScheduler
-import ru.spbstu.sysk.core.TimeUnit
 import ru.spbstu.sysk.core.TimeUnit.*
 import ru.spbstu.sysk.core.invoke
-import ru.spbstu.sysk.core.time
 
 class SysClockTest {
 

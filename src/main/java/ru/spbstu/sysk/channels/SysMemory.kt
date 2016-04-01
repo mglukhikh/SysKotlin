@@ -1,6 +1,9 @@
-package ru.spbstu.sysk.data
+package ru.spbstu.sysk.channels
 
 import ru.spbstu.sysk.core.SysModule
+import ru.spbstu.sysk.data.SysData
+import ru.spbstu.sysk.data.SysInteger
+import ru.spbstu.sysk.data.SysUnsigned
 
 open class SysMemory<T : SysData>(
         name: String,

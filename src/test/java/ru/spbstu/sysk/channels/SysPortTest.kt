@@ -1,8 +1,10 @@
-package ru.spbstu.sysk.data
+package ru.spbstu.sysk.channels
 
 import org.junit.Test
 import ru.spbstu.sysk.core.SysTopModule
+import ru.spbstu.sysk.data.SysBit
 import ru.spbstu.sysk.data.SysBit.*
+import ru.spbstu.sysk.data.undefined
 
 class SysPortTest {
 

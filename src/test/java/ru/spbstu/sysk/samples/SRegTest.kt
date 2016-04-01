@@ -5,7 +5,7 @@ import ru.spbstu.sysk.core.*
 import ru.spbstu.sysk.core.TimeUnit.*
 import ru.spbstu.sysk.data.SysBit
 import ru.spbstu.sysk.data.SysBit.*
-import ru.spbstu.sysk.data.bind
+import ru.spbstu.sysk.channels.bind
 
 class SRegTest {
 

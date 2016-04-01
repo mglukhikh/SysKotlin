@@ -5,8 +5,8 @@ import ru.spbstu.sysk.core.*
 import ru.spbstu.sysk.core.TimeUnit.*
 import ru.spbstu.sysk.data.SysBit
 import ru.spbstu.sysk.data.SysBit.*
-import ru.spbstu.sysk.data.bind
-import ru.spbstu.sysk.data.bindArrays
+import ru.spbstu.sysk.channels.bind
+import ru.spbstu.sysk.channels.bindArrays
 import java.util.*
 
 class PRegTest {

@@ -5,8 +5,8 @@ import ru.spbstu.sysk.core.*
 import ru.spbstu.sysk.core.TimeUnit.*
 import ru.spbstu.sysk.data.SysBit
 import ru.spbstu.sysk.data.SysBit.*
-import ru.spbstu.sysk.data.SysBitInput
-import ru.spbstu.sysk.data.bind
+import ru.spbstu.sysk.channels.SysBitInput
+import ru.spbstu.sysk.channels.bind
 import ru.spbstu.sysk.generics.NAND
 
 class DFFTest {

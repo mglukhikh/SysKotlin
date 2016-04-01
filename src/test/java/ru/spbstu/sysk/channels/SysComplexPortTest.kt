@@ -3,7 +3,6 @@ package ru.spbstu.sysk.channels
 import org.junit.Test
 import ru.spbstu.sysk.core.SysTopModule
 import ru.spbstu.sysk.data.SysBit
-import ru.spbstu.sysk.data.bind
 import ru.spbstu.sysk.data.undefined
 
 class SysComplexPortTest {
@@ -11,7 +10,7 @@ class SysComplexPortTest {
     @Test
     fun fifoPort() {
         val top = SysTopModule()
-        var connector = SysFifo(4, "Fifo", SysBit.ZERO, top.scheduler)
+        val connector = SysFifo(4, "Fifo", SysBit.ZERO, top.scheduler)
         val input = SysFifoInput("input", top.scheduler, top, connector)
         val output = SysFifoOutput("output", top.scheduler, top, connector)
         assert(input().zero)
@@ -34,7 +33,7 @@ class SysComplexPortTest {
     @Test
     fun busPort() {
         val top = SysTopModule()
-        var connector = SysBitBus(4, "connector", top.scheduler)
+        val connector = SysBitBus(4, "connector", top.scheduler)
         val port_1 = SysBusPort<SysBit>(4, "port1", top.scheduler, top)
         val port_2 = SysBusPort<SysBit>(4, "port2", top.scheduler, top)
         val port_3 = SysBusPort<SysBit>(4, "port3", top.scheduler, top)

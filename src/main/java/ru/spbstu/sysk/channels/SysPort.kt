@@ -1,9 +1,11 @@
-package ru.spbstu.sysk.data
+package ru.spbstu.sysk.channels
 
 import ru.spbstu.sysk.core.SysModule
 import ru.spbstu.sysk.core.SysObject
 import ru.spbstu.sysk.core.SysScheduler
 import ru.spbstu.sysk.core.SysWait
+import ru.spbstu.sysk.data.SysBit
+import ru.spbstu.sysk.data.SysData
 import kotlin.properties.ReadOnlyProperty
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty

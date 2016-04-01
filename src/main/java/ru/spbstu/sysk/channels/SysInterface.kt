@@ -1,6 +1,8 @@
-package ru.spbstu.sysk.data
+package ru.spbstu.sysk.channels
 
 import ru.spbstu.sysk.core.SysWait
+import ru.spbstu.sysk.data.SysData
+import ru.spbstu.sysk.data.SysBit
 
 interface SysInterface {
     fun register(port: SysPort<*>)

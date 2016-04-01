@@ -3,8 +3,8 @@ package ru.spbstu.sysk.generics
 import org.junit.Test
 import ru.spbstu.sysk.core.SysTopModule
 import ru.spbstu.sysk.data.SysBit.*
-import ru.spbstu.sysk.data.SysBitInput
-import ru.spbstu.sysk.data.bind
+import ru.spbstu.sysk.channels.SysBitInput
+import ru.spbstu.sysk.channels.bind
 
 class SysSimpleFunctionTest {
 

@@ -4,7 +4,6 @@ import ru.spbstu.sysk.core.SysObject
 import ru.spbstu.sysk.core.SysScheduler
 import ru.spbstu.sysk.data.SysBit
 import ru.spbstu.sysk.data.SysData
-import ru.spbstu.sysk.data.SysPort
 
 open class SysFifoInput<T : SysData> internal constructor(
         name: String, scheduler: SysScheduler, parent: SysObject? = null, Fifo: SysFifo<T>? = null

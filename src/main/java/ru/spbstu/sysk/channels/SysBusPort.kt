@@ -6,7 +6,6 @@ import ru.spbstu.sysk.data.SysBit
 import ru.spbstu.sysk.data.SysBit.*
 import ru.spbstu.sysk.data.SysData
 import ru.spbstu.sysk.data.SysInteger
-import ru.spbstu.sysk.data.SysPort
 
 open class SysBusPort<T : SysData> internal constructor(
         val capacity: Int, name: String, scheduler: SysScheduler,
