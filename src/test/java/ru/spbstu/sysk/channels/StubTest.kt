@@ -1,4 +1,4 @@
-package ru.spbstu.sysk.connectors
+package ru.spbstu.sysk.channels
 
 import org.junit.Test
 import ru.spbstu.sysk.core.SysModule

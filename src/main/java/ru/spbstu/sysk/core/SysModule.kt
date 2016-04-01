@@ -1,6 +1,6 @@
 package ru.spbstu.sysk.core
 
-import ru.spbstu.sysk.connectors.*
+import ru.spbstu.sysk.channels.*
 import ru.spbstu.sysk.data.*
 import java.util.*
 

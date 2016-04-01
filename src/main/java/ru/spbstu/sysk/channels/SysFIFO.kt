@@ -1,4 +1,4 @@
-package ru.spbstu.sysk.connectors
+package ru.spbstu.sysk.channels
 
 import ru.spbstu.sysk.core.*
 import ru.spbstu.sysk.data.*

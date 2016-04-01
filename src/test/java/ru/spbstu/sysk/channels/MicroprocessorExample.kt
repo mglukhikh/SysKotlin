@@ -1,4 +1,4 @@
-package ru.spbstu.sysk.connectors
+package ru.spbstu.sysk.channels
 
 import org.junit.Ignore
 import org.junit.Test
