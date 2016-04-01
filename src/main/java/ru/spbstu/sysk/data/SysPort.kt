@@ -133,18 +133,18 @@ open class SysOutput<T : SysData> internal constructor(
     }
 }
 
-open class ReadOnlyPort<T : SysData>(
-        open val inp: SysInput<T>
+open class PortReader<T : SysData>(
+        open protected val inp: SysInput<T>
 ) : ReadOnlyProperty<SysModule, T> {
     override fun getValue(thisRef: SysModule, property: KProperty<*>) = inp()
 }
 
-class ReadOnlyBitPort(
+class BitPortReader(
         override val inp: SysBitInput
-) : ReadOnlyPort<SysBit>(inp)
+) : PortReader<SysBit>(inp)
 
-class ReadWritePort<T: SysData>(
-        val out: SysOutput<T>
+open class PortWriter<T: SysData>(
+        open protected val out: SysOutput<T>
 ) : ReadWriteProperty<SysModule, T> {
     override fun getValue(thisRef: SysModule, property: KProperty<*>) = out.value
 

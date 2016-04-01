@@ -13,13 +13,13 @@ class DFFTest {
 
     private class Testbench(name: String, parent: SysModule): SysModule(name, parent) {
 
-        val d = readWritePort<SysBit>("d")
-        private var dval by d
+        val d = output<SysBit>("d")
+        private var dval by portWriter(d)
 
         val clk = bitInput("clk")
 
-        val q   = readOnlyBitPort("q")
-        private val qval by q
+        val q   = bitInput("q")
+        private val qval by bitPortReader(q)
 
         private var counter = 0
         private var phase = 0
@@ -78,8 +78,8 @@ class DFFTest {
         val clk = clock("clk", 20(NS))
 
         init {
-            connector("d", tb.d.out, ff.d.inp)
-            connector("q", ff.q.out, tb.q.inp)
+            connector("d", tb.d, ff.d)
+            connector("q", ff.q, tb.q)
             bind(ff.clk to clk, tb.clk to clk)
         }
     }
@@ -95,12 +95,12 @@ class DFFTest {
         val andNot = NAND("andNot", this)
 
         val clk = clock("clk", 20(NS))
-        val q by bitSignalReader("q", ff.q.out, andNot.x1 as SysBitInput)
+        val q by bitSignalReader("q", ff.q, andNot.x1 as SysBitInput)
 
         var swapOrOne by bitSignalWriter("en", andNot.x2 as SysBitInput)
 
         init {
-            connector("d", andNot.y, ff.d.inp)
+            connector("d", andNot.y, ff.d)
             bind(ff.clk to clk)
 
             stateFunction(clk) {

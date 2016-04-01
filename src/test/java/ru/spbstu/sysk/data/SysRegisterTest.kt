@@ -16,8 +16,8 @@ class SysRegisterTest {
         val clk = clock("clk", 20(NS))
 
         var en by signalWriter("aen", a.en)
-        var d by signalWriter("ad", a.d.inp)
-        val q by signalReader("aq", a.q.out)
+        var d by signalWriter("ad", a.d)
+        val q by signalReader("aq", a.q)
 
         init {
             bind(a.clk to clk)
@@ -58,11 +58,11 @@ class SysRegisterTest {
         var aen by signalWriter("aen", a.en)
         var ben by signalWriter("ben", b.en)
 
-        var ad by signalWriter("ad", a.d.inp)
-        var bd by signalWriter("bd", b.d.inp)
+        var ad by signalWriter("ad", a.d)
+        var bd by signalWriter("bd", b.d)
 
-        val aq by signalReader("aq", a.q.out)
-        val bq by signalReader("bq", b.q.out)
+        val aq by signalReader("aq", a.q)
+        val bq by signalReader("bq", b.q)
 
         init {
             bind(a.clk to clk, b.clk to clk)

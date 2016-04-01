@@ -7,16 +7,16 @@ import ru.spbstu.sysk.core.SysModule
  */
 class SysRegister <T : SysData> (name: String, defValue: T, parent: SysModule): SysModule(name, parent) {
 
-    val d = readOnlyPort<T>("d")      // data input
-    private val dinp by d
+    val d = input<T>("d")      // data input
+    private val dinp by portReader(d)
 
     val en = bitInput("en")   // enable
     val clk = bitInput("clk") // clock
 
     private var value = defValue
 
-    val q = readWritePort<T>("q")     // data output
-    private var qout by q
+    val q = output<T>("q")     // data output
+    private var qout by portWriter(q)
 
     init {
         stateFunction(clk) {

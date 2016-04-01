@@ -63,14 +63,14 @@ open class SysModule internal constructor(
     protected fun bitInput(name: String, signalRead: SysBitRead? = null): SysBitInput =
             SysBitInput(name, scheduler, this, signalRead)
 
-    protected fun <T : SysData> readOnlyPort(name: String) = ReadOnlyPort<T>(input(name))
+    protected fun <T : SysData> portReader(input: SysInput<T>) = PortReader<T>(input)
 
-    protected fun readOnlyBitPort(name: String) = ReadOnlyBitPort(bitInput(name))
+    protected fun bitPortReader(bitInput: SysBitInput) = BitPortReader(bitInput)
 
     protected fun <T : SysData> output(name: String, signalWrite: SysSignalWrite<T>? = null): SysOutput<T> =
             SysOutput(name, scheduler, this, signalWrite)
 
-    protected fun <T : SysData> readWritePort(name: String) = ReadWritePort<T>(output(name))
+    protected fun <T : SysData> portWriter(output: SysOutput<T>) = PortWriter<T>(output)
 
     protected fun <T : SysData> signalStub(name: String, value: T): SysSignalStub<T> =
             SysSignalStub(name, value, scheduler, this)

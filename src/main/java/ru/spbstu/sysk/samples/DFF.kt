@@ -8,12 +8,12 @@ import ru.spbstu.sysk.data.SysBit
  */
 class DFF (name: String, parent: SysModule): SysModule(name, parent) {
 
-    val d = readOnlyBitPort("d")
-    private val dval by d
+    val d = bitInput("d")
+    private val dval by bitPortReader(d)
     val clk = bitInput("clk")
 
-    val q = readWritePort<SysBit>("q")
-    private var qval by q
+    val q = output<SysBit>("q")
+    private var qval by portWriter(q)
 
     init {
         function(clk, initialize = false) {
