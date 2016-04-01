@@ -140,8 +140,23 @@ class SysBigInteger private constructor(
      * Bitwise and
      * */
     override infix fun and(arg: SysInteger): SysBigInteger {
-        if (hasUndefined)
-            throw UnsupportedOperationException("Not implemented")
+        if (hasUndefined || arg.hasUndefined) {
+
+            val state = (if (hasUndefined) bitsState else Array(width, { i -> get(i) }))
+            val argState = (if (arg.hasUndefined) arg.bitsState else Array(arg.width, { i -> arg.get(i) }))
+            var resultState: Array<SysBit>
+            if (state.size > argState.size) {
+                resultState = state
+                for (i in argState.indices)
+                    resultState[i] = resultState[i]and argState[i]
+            } else {
+                resultState = argState
+                for (i in state.indices)
+                    resultState[i] = resultState[i]and state[i]
+            }
+
+            return SysBigInteger(resultState)
+        }
         val argv = arg.toSysBigInteger()
         if (argv.width > width)
             return SysBigInteger(argv.width, argv.value.and(value),
@@ -155,8 +170,23 @@ class SysBigInteger private constructor(
 
     /** Bitwise or*/
     override infix fun or(arg: SysInteger): SysBigInteger {
-        if (hasUndefined)
-            throw UnsupportedOperationException("Not implemented")
+        if (hasUndefined || arg.hasUndefined) {
+
+            val state = (if (hasUndefined) bitsState else Array(width, { i -> get(i) }))
+            val argState = (if (arg.hasUndefined) arg.bitsState else Array(arg.width, { i -> arg.get(i) }))
+            var resultState: Array<SysBit>
+            if (state.size > argState.size) {
+                resultState = state
+                for (i in argState.indices)
+                    resultState[i] = resultState[i]or argState[i]
+            } else {
+                resultState = argState
+                for (i in state.indices)
+                    resultState[i] = resultState[i]or state[i]
+            }
+
+            return SysBigInteger(resultState)
+        }
         val argv = arg.toSysBigInteger()
         if (argv.width > width)
             return SysBigInteger(argv.width, argv.value.or(value),
@@ -169,8 +199,23 @@ class SysBigInteger private constructor(
 
     /** Bitwise xor*/
     override infix fun xor(arg: SysInteger): SysBigInteger {
-        if (hasUndefined)
-            throw UnsupportedOperationException("Not implemented")
+        if (hasUndefined || arg.hasUndefined) {
+
+            val state = (if (hasUndefined) bitsState else Array(width, { i -> get(i) }))
+            val argState = (if (arg.hasUndefined) arg.bitsState else Array(arg.width, { i -> arg.get(i) }))
+            var resultState: Array<SysBit>
+            if (state.size > argState.size) {
+                resultState = state
+                for (i in argState.indices)
+                    resultState[i] = resultState[i]xor argState[i]
+            } else {
+                resultState = argState
+                for (i in state.indices)
+                    resultState[i] = resultState[i]xor state[i]
+            }
+
+            return SysBigInteger(resultState)
+        }
         val argv = arg.toSysBigInteger()
         if (argv.width > width)
             return SysBigInteger(argv.width, argv.value.xor(value),
@@ -183,7 +228,10 @@ class SysBigInteger private constructor(
 
     /**Bitwise inversion (not)*/
     override fun inv(): SysBigInteger {
-        return SysBigInteger(width, value.not());
+        if (hasUndefined) {
+            return SysBigInteger(Array(bitsState.size, { i -> bitsState[i].not() }))
+        }
+        return SysBigInteger(width, value.not(), positiveMask, negativeMask);
     }
 
     /** Extracts a single bit, accessible as [i] */
@@ -214,12 +262,27 @@ class SysBigInteger private constructor(
     override infix fun ushr(shift: Int): SysBigInteger {
         if (shift == 0)
             return this;
-        if (shift > width || shift < 0)
+        if (shift > width )
             throw IllegalArgumentException()
-
-        val sysBitExpression = Array(width - shift) { i: Int -> this[i] }
-
-        return SysBigInteger(sysBitExpression);
+        var realShift = shift
+        if (shift < 0)
+            realShift = width + shift
+        if (hasUndefined) {
+            val newBitsState = bitsState.copyOf()
+            for (i in newBitsState.lastIndex downTo realShift) {
+                newBitsState[i] = newBitsState[i - realShift]
+            }
+            for (i in 0..realShift - 1) {
+                newBitsState[i] = SysBit.ZERO
+            }
+            return SysBigInteger(newBitsState)
+        }
+        if (value >= BigInteger.ZERO)
+            return SysBigInteger(width, value.shiftRight(realShift), positiveMask, negativeMask)
+        else {
+            val result = (value.and(positiveMask)).shiftRight(realShift)
+            return SysBigInteger(width, result, positiveMask, negativeMask)
+        }
     }
 
 
@@ -229,37 +292,39 @@ class SysBigInteger private constructor(
             return this;
         if (shift > width || shift < 0)
             throw IllegalArgumentException()
-        val sysBitExpression = Array(width) { i -> this[i] }
-        var i = width - 1
-        while (i >= shift) {
-            sysBitExpression[i] = sysBitExpression[i - shift]
-            i--
+        if (hasUndefined) {
+            val newBitsState = bitsState.copyOf()
+            for (i in newBitsState.lastIndex downTo shift) {
+                newBitsState[i] = newBitsState[i - shift]
+            }
+            for (i in 0..shift) {
+                newBitsState[i] = bitsState[0]
+            }
+            return SysBigInteger(newBitsState)
         }
-        while (i >= 0) {
-            sysBitExpression[i] = SysBit.ZERO
-            i--
-        }
-        return SysBigInteger(sysBitExpression)
+        return SysBigInteger(width, value.shiftRight(shift), positiveMask, negativeMask)
     }
 
     /** Arithmetic shift left*/
     override infix fun shl(shift: Int): SysBigInteger {
         if (shift == 0)
             return this;
-        if (shift > width || shift < 0)
+        if (shift > width )
             throw IllegalArgumentException()
-        val sysBitExpression = Array(width) { i -> this[i] }
-        var i = 0
-        while (i < sysBitExpression.size - shift) {
-            sysBitExpression[i] = sysBitExpression[i + shift]
-            i++
+        var realShift = shift
+        if (shift < 0)
+            realShift = width + shift
+        if (hasUndefined) {
+            val newBitsState = bitsState.copyOf()
+            for (i in 0..newBitsState.lastIndex - realShift) {
+                newBitsState[i] = newBitsState[i + realShift]
+            }
+            for (i in newBitsState.size - realShift..newBitsState.lastIndex) {
+                newBitsState[i] = SysBit.ZERO
+            }
+            return SysBigInteger(newBitsState)
         }
-        while (i < sysBitExpression.size) {
-            sysBitExpression[i] = SysBit.ZERO
-            i++
-        }
-        return SysBigInteger(sysBitExpression)
-
+        return SysBigInteger(width, value.shiftLeft(realShift), positiveMask, negativeMask)
     }
 
 
@@ -273,23 +338,8 @@ class SysBigInteger private constructor(
 
         if (realShift == 0)
             return this;
-        val sysBitExpression = Array(width) { i -> this[i] }
 
-        val tempArray = Array(realShift, { SysBit.X })
-
-        for (i in 0..realShift - 1) {
-            tempArray[i] = sysBitExpression[sysBitExpression.size - realShift + i]
-        }
-        var i = sysBitExpression.size - 1
-        while (i >= realShift) {
-            sysBitExpression[i] = sysBitExpression[i - realShift]
-            i--
-        }
-        while (i >= 0) {
-            sysBitExpression[i] = tempArray[i]
-            i--
-        }
-        return SysBigInteger(sysBitExpression)
+        return ((this ushr realShift)or(this shl -realShift))
     }
 
     /** Cyclic shift left*/
@@ -301,24 +351,8 @@ class SysBigInteger private constructor(
 
         if (realShift == 0)
             return this;
-        val sysBitExpression = Array(width) { i -> this[i] }
 
-        val tempArray = Array(realShift, { SysBit.X })
-
-        for (i in 0..realShift - 1) {
-            tempArray[i] = sysBitExpression[i]
-        }
-
-        var i = 0
-        while (i < sysBitExpression.size - shift) {
-            sysBitExpression[i] = sysBitExpression[i + shift]
-            i++
-        }
-        while (i < sysBitExpression.size) {
-            sysBitExpression[i] = tempArray[i - sysBitExpression.size + realShift]
-            i++
-        }
-        return SysBigInteger(sysBitExpression)
+        return ((this shl realShift)or(this ushr -realShift))
     }
 
     override fun toSysBigInteger() = this
