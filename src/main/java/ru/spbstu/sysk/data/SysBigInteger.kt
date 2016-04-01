@@ -5,38 +5,38 @@ import java.math.BigInteger
 class SysBigInteger private constructor(
         width: Int,
         override val value: BigInteger,
-        defaultBitState: Boolean = false,
-        bitsState: Array<Boolean> = Array(width, { i -> defaultBitState }),
+        hasUndefined: Boolean = false,
         override val positiveMask: BigInteger,
         override val negativeMask: BigInteger
-) : SysInteger (width, value, bitsState, positiveMask, negativeMask) {
+) : SysInteger (width, value, hasUndefined, positiveMask, negativeMask) {
 
-    constructor(width: Int, value: BigInteger) : this(width, value, bitsState = maskByValue(value, width),
+    private lateinit var bitsState: Array<SysBit>
+
+    constructor(width: Int, value: BigInteger) : this(width, value, false,
             positiveMask = getMaxValue(width), negativeMask = getMinValue(width))
 
-    private constructor(width: Int, value: BigInteger, bitsState: Array<Boolean>) :
-    this(width, value, bitsState = maskByValue(value, width),
-            positiveMask = getMaxValue(width), negativeMask = getMinValue(width))
+    //    private constructor(width: Int, value: BigInteger, bitsState: Array<Boolean>) :
+    //    this(width, value, bitsState = maskByValue(value, width),
+    //            positiveMask = getMaxValue(width), negativeMask = getMinValue(width))
 
     private constructor(width: Int, value: BigInteger, positiveMask: BigInteger, negativeMask: BigInteger) :
-    this(width, value, bitsState = maskByValue(value, width),
+    this(width, value, false,
             positiveMask = positiveMask, negativeMask = negativeMask)
 
     constructor(width: Int, value: Int) : this(width, value.toLong())
 
     constructor(width: Int, value: Long) : this(width, BigInteger.valueOf(value),
-            bitsState = maskByValue(BigInteger.valueOf(value), width),
-            positiveMask = getMaxValue(width), negativeMask = getMinValue(width))
+            false, positiveMask = getMaxValue(width), negativeMask = getMinValue(width))
 
     private constructor(value: BigInteger, width: Int = value.bitLength() + 1) : this(width, value,
-            bitsState = maskByValue(value, value.bitLength() + 1),
-            positiveMask = getMaxValue(width), negativeMask = getMinValue(width))
+            false, positiveMask = getMaxValue(width), negativeMask = getMinValue(width))
 
     constructor(arr: Array<SysBit>) : this(arr.size, valueBySWSArray(arr),
-            bitsState = maskBySWSArray(arr), positiveMask = getMaxValue(arr.size), negativeMask = getMinValue(arr.size))
+            arr.contains(SysBit.X), positiveMask = getMaxValue(arr.size), negativeMask = getMinValue(arr.size)) {
+        bitsState = arr
+    }
 
-    private constructor(width: Short) : this(width.toInt(), BigInteger.ZERO, false,
-            positiveMask = getMaxValue(width.toInt()), negativeMask = getMinValue(width.toInt()))
+    private constructor(width: Short) : this(Array(width.toInt(), { i -> SysBit.X }))
 
     /** Increase width to the given */
     override fun extend(width: Int): SysInteger {
@@ -138,47 +138,50 @@ class SysBigInteger private constructor(
      * Bitwise and
      * */
     override infix fun and(arg: SysInteger): SysBigInteger {
-        val arg = arg.toSysBigInteger()
-        var temp = arg.bitsState;
+        if (hasUndefined)
+            throw UnsupportedOperationException("Not implemented")
+        val argv = arg.toSysBigInteger()
+        if (argv.width > width)
+            return SysBigInteger(argv.width, argv.value.and(value),
+                    argv.positiveMask, argv.negativeMask)
 
-        for (i in 0..Math.min(temp.lastIndex, bitsState.lastIndex)) {
-            temp[i] = temp[i] and bitsState[i];
-        }
-        if (temp.size < bitsState.size)
-            temp = temp.plus(bitsState.copyOfRange(temp.size, bitsState.size));
-        return SysBigInteger(Math.max(width, arg.width), value.and(arg.value), bitsState = temp)
+        return SysBigInteger(width, value.and(argv.value),
+                positiveMask, negativeMask)
 
     }
 
 
     /** Bitwise or*/
     override infix fun or(arg: SysInteger): SysBigInteger {
-        val arg = arg.toSysBigInteger()
-        var temp = arg.bitsState;
-        for (i in 0..Math.min(temp.lastIndex, bitsState.lastIndex)) {
-            temp[i] = temp[i] and bitsState[i];
-        }
-        if (temp.size < bitsState.size)
-            temp = temp.plus(bitsState.copyOfRange(temp.size, bitsState.size));
-        return SysBigInteger(Math.max(width, arg.width), value.or(arg.value), bitsState = temp)
+        if (hasUndefined)
+            throw UnsupportedOperationException("Not implemented")
+        val argv = arg.toSysBigInteger()
+        if (argv.width > width)
+            return SysBigInteger(argv.width, argv.value.or(value),
+                    argv.positiveMask, argv.negativeMask)
+
+        return SysBigInteger(width, value.or(argv.value),
+                positiveMask, negativeMask)
 
     }
 
     /** Bitwise xor*/
     override infix fun xor(arg: SysInteger): SysBigInteger {
-        val arg = arg.toSysBigInteger()
-        var temp = arg.bitsState;
-        for (i in 0..Math.min(temp.lastIndex, bitsState.lastIndex)) {
-            temp[i] = temp[i] and  bitsState[i];
-        }
-        if (temp.size < bitsState.size)
-            temp = temp.plus(bitsState.copyOfRange(temp.size, bitsState.size));
-        return SysBigInteger(Math.max(width, arg.width), value.xor(arg.value), bitsState = temp)
+        if (hasUndefined)
+            throw UnsupportedOperationException("Not implemented")
+        val argv = arg.toSysBigInteger()
+        if (argv.width > width)
+            return SysBigInteger(argv.width, argv.value.xor(value),
+                    argv.positiveMask, argv.negativeMask)
+
+        return SysBigInteger(width, value.xor(argv.value),
+                positiveMask, negativeMask)
+
     }
 
     /**Bitwise inversion (not)*/
     override fun inv(): SysBigInteger {
-        return SysBigInteger(width, value.not(), bitsState = bitsState);
+        return SysBigInteger(width, value.not());
     }
 
     /** Extracts a single bit, accessible as [i] */
@@ -186,10 +189,9 @@ class SysBigInteger private constructor(
 
         if (i < 0 || i >= width) throw IndexOutOfBoundsException()
 
-        if (!bitsState[i])
-            return SysBit.X
-        val shift = bitsState.indexOf(true)
-        if (value.testBit(i - shift))
+        if (hasUndefined)
+            return bitsState[i]
+        if (value.testBit(i))
             return SysBit.ONE
         else
             return SysBit.ZERO
@@ -337,7 +339,7 @@ class SysBigInteger private constructor(
     override fun toLong() = value.toLong()
 
     override fun abs(): SysBigInteger {
-        return SysBigInteger(width, value.abs(), bitsState = bitsState)
+        return SysBigInteger(width, value.abs())
     }
 
     override fun compareTo(other: SysInteger): Int {
@@ -353,7 +355,7 @@ class SysBigInteger private constructor(
 
     companion object : SysDataCompanion<SysBigInteger> {
 
-        fun uninitialized(width: Int) = SysBigInteger(width.toShort())
+        //fun uninitialized(width: Int) = SysBigInteger(width.toShort())
 
         fun valueOf(value: Long) = SysBigInteger(BigInteger.valueOf(value))
 
@@ -361,23 +363,23 @@ class SysBigInteger private constructor(
 
         fun valueOf(value: SysInteger) = value.toSysBigInteger()
 
-        private fun maskByValue(value: BigInteger, width: Int): Array<Boolean> {
-
-            //            if (width == 0)
-            //                return BooleanArray(0).toTypedArray();
-            //
-            //            val widthByValue = value.bitLength() + 1
-            //            val mask = BooleanArray(width);
-            //
-            //            if (width < widthByValue) {
-            //                throw IllegalArgumentException("Width $width is too small for this value \n$value \nwith width $widthByValue")
-            //            } else {
-            //                mask.fill(true, mask.lastIndex + 1 - widthByValue, mask.lastIndex + 1)
-            //
-            //            }
-            //            return mask.toTypedArray();
-            return Array<Boolean>(width, { i -> true })
-        }
+        //        private fun maskByValue(value: BigInteger, width: Int): Array<Boolean> {
+        //
+        //                        if (width == 0)
+        //                            return BooleanArray(0).toTypedArray();
+        //
+        //                        val widthByValue = value.bitLength() + 1
+        //                        val mask = BooleanArray(width);
+        //
+        //                        if (width < widthByValue) {
+        //                            throw IllegalArgumentException("Width $width is too small for this value \n$value \nwith width $widthByValue")
+        //                        } else {
+        //                            mask.fill(true, mask.lastIndex + 1 - widthByValue, mask.lastIndex + 1)
+        //
+        //                        }
+        //                        return mask.toTypedArray();
+        //            return Array(width, { i -> true })
+        //        }
 
 
         private fun valueBySWSArray(arr: Array<SysBit>): BigInteger {
@@ -449,8 +451,8 @@ class SysBigInteger private constructor(
             return result
         }
 
-        private val positiveValues = Array<BigInteger>(129, { i -> maxValue(i) })
-        private val negativeValues = Array<BigInteger>(129, { i -> minValue(i) })
+        private val positiveValues = Array(129, { i -> maxValue(i) })
+        private val negativeValues = Array(129, { i -> minValue(i) })
 
         private fun getMaxValue(width: Int): BigInteger = (if (128 >= width) positiveValues[width] else maxValue(width))
         private fun getMinValue(width: Int): BigInteger = (if (128 >= width) negativeValues[width] else minValue(width))
@@ -465,18 +467,19 @@ class SysBigInteger private constructor(
             return (BigInteger.ONE.shiftLeft (width - 1)) - BigInteger.ONE
         }
 
-        private fun maskBySWSArray(arr: Array<SysBit>): Array<Boolean> {
+        //        private fun maskBySWSArray(arr: Array<SysBit>): Array<Boolean> {
+        //
+        //
+        //            val mask = BooleanArray(arr.size)
+        //
+        //
+        //            for (i in 0..mask.size - 1)
+        //                if (arr[i] != SysBit.X)
+        //                    mask[i] = true;
+        //
+        //            return mask.toTypedArray();
+        //        }
 
-
-            val mask = BooleanArray(arr.size)
-
-
-            for (i in 0..mask.size - 1)
-                if (arr[i] != SysBit.X)
-                    mask[i] = true;
-
-            return mask.toTypedArray();
-        }
 
         override val undefined: SysBigInteger
             get() = SysBigInteger(arrayOf(SysBit.X))

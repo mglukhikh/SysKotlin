@@ -20,7 +20,7 @@ class SysIntegerTest {
         assert(z.width == 6)
         assert(z.equals(SysLongInteger(6, 14)), { z })
         assert(z[2] == ONE, { z[2] })
-        assert(z[4, 1].equals(SysLongInteger(4, 7)));
+        assertEquals(SysLongInteger(4, 7), z[4, 1])
         y = y.extend(12)
         z = z.extend(12)
         val v: @Width(12) SysInteger = y * z
@@ -138,12 +138,12 @@ class SysIntegerTest {
 
         val methods = SysLongInteger::class.declaredFunctions.groupBy { it.name }
 
-        val minValue_ = methods.get("minValue")?.get(0)
+        val minValue_ = methods["minValue"]?.get(0)
         minValue_?.isAccessible = true
 
         val minValue = minValue_?.call(rcv)
         assertEquals(-128L, minValue)
-        val maxValue_ = methods.get("maxValue")?.get(0)
+        val maxValue_ = methods["maxValue"]?.get(0)
         maxValue_?.isAccessible = true
 
         val maxValue = maxValue_?.call(rcv)

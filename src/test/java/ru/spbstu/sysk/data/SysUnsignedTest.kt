@@ -1,14 +1,16 @@
 package ru.spbstu.sysk.data
 
 import org.junit.Test
+import ru.spbstu.sysk.data.SysBit.ONE
+import ru.spbstu.sysk.data.SysBit.ZERO
 
 class SysUnsignedTest {
     @Test
     fun constructionTest() {
-        val a = SysUnsigned.valueOf(7, 127)
+        SysUnsigned.valueOf(7, 127)
         //println(a.toString())
         //println(java.lang.Long.toBinaryString(a.value))
-        val b = SysUnsigned.valueOf(7, 127L)
+        SysUnsigned.valueOf(7, 127L)
     }
 
     @Test
@@ -18,9 +20,9 @@ class SysUnsignedTest {
         val y = SysUnsigned.valueOf(10, 127);
         val z = SysUnsigned.valueOf(10, 1);
 
-        val arrx = arrayOf(SysBit.X, SysBit.X, SysBit.ZERO, SysBit.ZERO, SysBit.ZERO, SysBit.ZERO, SysBit.ZERO, SysBit.ZERO, SysBit.ZERO, SysBit.ONE);
-        val arry = arrayOf(SysBit.X, SysBit.X, SysBit.X, SysBit.ONE, SysBit.ONE, SysBit.ONE, SysBit.ONE, SysBit.ONE, SysBit.ONE, SysBit.ONE);
-        val arrz = arrayOf(SysBit.X, SysBit.X, SysBit.X, SysBit.X, SysBit.X, SysBit.X, SysBit.X, SysBit.X, SysBit.X, SysBit.ONE);
+        val arrx = arrayOf(ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ONE, ZERO, ZERO);
+        val arry = arrayOf(ONE, ONE, ONE, ONE, ONE, ONE, ONE, ZERO, ZERO, ZERO);
+        val arrz = arrayOf(ONE, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO);
 
 
         for (i in 0..9) {

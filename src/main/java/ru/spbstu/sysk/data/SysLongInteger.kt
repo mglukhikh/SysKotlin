@@ -13,44 +13,47 @@ annotation class Width(val value: Int)
 class SysLongInteger private constructor(
         width: Int,
         override val value: Long,
-        defaultBitState: Boolean = false,
-        bitsState: Array<Boolean> = Array(width, { i -> defaultBitState }),
+        hasUndefined: Boolean = false,
         override val positiveMask: Long,
         override val negativeMask: Long
-) : SysInteger(width, value, bitsState, positiveMask, negativeMask) {
+) : SysInteger(width, value, hasUndefined, positiveMask, negativeMask) {
+
+    private lateinit var bitsState: Array<SysBit>
+
 
     /** Construct from given long value setting minimal possible width */
     private constructor(value: Long, width: Int = widthByValue(value)) :
-    this(width, value, true,
+    this(width, value, false,
             positiveMask = positiveValues[width],
             negativeMask = negativeValues[width])
 
     /**Construct uninitialized sys integer with given width.
      *  Short is used only to male a difference between constructor from Int value*/
-    private constructor(width: Short) : this(width.toInt(), 0, false,
+    private constructor(width: Short) : this(width.toInt(), 0, true,
             positiveMask = positiveValues[width.toInt()],
-            negativeMask = negativeValues[width.toInt()])
+            negativeMask = negativeValues[width.toInt()]) {
+        bitsState = Array(width.toInt(), { i -> SysBit.X })
+    }
 
     /** Construct from given value and width*/
-    constructor(width: Int, value: Long) : this(width, value, bitsState = maskByValue(value, width),
+    constructor(width: Int, value: Long) : this(width, value, false,
             positiveMask = positiveValues[width],
             negativeMask = negativeValues[width])
 
     private constructor(width: Int, value: Long, positiveMask: Long, negativeMask: Long) :
-    this(width, value, bitsState = maskByValue(value, width),
-            positiveMask = positiveMask,
+    this(width, value, false, positiveMask = positiveMask,
             negativeMask = negativeMask)
 
-    constructor(width: Int, value: Int) : this(width, value.toLong(),
-            bitsState = maskByValue(value.toLong(), width),
+    constructor(width: Int, value: Int) : this(width, value.toLong(), false,
             positiveMask = positiveValues[width],
             negativeMask = negativeValues[width])
 
     /**Construct from given SysBit Array*/
-    constructor (arr: Array<SysBit>) : this(arr.size, valueBySWSArray(arr),
-            bitsState = maskBySWSArray(arr),
+    constructor (arr: Array<SysBit>) : this(arr.size, valueBySWSArray(arr), arr.contains(SysBit.X),
             positiveMask = positiveValues[arr.size],
-            negativeMask = negativeValues[arr.size])
+            negativeMask = negativeValues[arr.size]) {
+        bitsState = arr
+    }
 
     /** Increase width to the given */
     override fun extend(width: Int): SysInteger {
@@ -149,7 +152,7 @@ class SysLongInteger private constructor(
     override fun power(exp: Int) = truncate(width, Math.pow(value.toDouble(), exp.toDouble()).toLong()
             , positiveMask, negativeMask)
 
-    override fun abs() = SysLongInteger(width, (if ( value >= 0L) value else -value), bitsState = bitsState,
+    override fun abs() = SysLongInteger(width, (if ( value >= 0L) value else -value),
             positiveMask = positiveMask, negativeMask = negativeMask)
 
     /** Bitwise logical shift right*/
@@ -275,93 +278,71 @@ class SysLongInteger private constructor(
 
     /** Bitwise and*/
     override infix fun and(arg: SysInteger): SysLongInteger {
-        var temp = arg.bitsState;
+        if (hasUndefined)
+            throw UnsupportedOperationException("Not implemented")
 
-        for (i in 0..Math.min(temp.lastIndex, bitsState.lastIndex)) {
-            temp[i] = temp[i] and bitsState[i];
-        }
-        if (temp.size < bitsState.size)
-            temp = temp.plus(bitsState.copyOfRange(temp.size, bitsState.size));
-        var resWidth: Int
-        var posMask: Long
-        var negMask: Long
-        if (arg.width > width) {
-            resWidth = Math.min(arg.width, MAX_WIDTH)
-            posMask = arg.positiveMask.toLong()
-            negMask = arg.negativeMask.toLong()
-        } else {
-            resWidth = Math.min(width, MAX_WIDTH)
-            posMask = positiveMask
-            negMask = negativeMask
-        }
-        return SysLongInteger(resWidth, value and arg.value.toLong(), bitsState = temp,
-                positiveMask = posMask, negativeMask = negMask)
+        if (arg.width > MAX_WIDTH)
+            throw UnsupportedOperationException("Not implemented")
+
+
+        if (arg.width > width)
+            return SysLongInteger(arg.width, value and arg.value.toLong(),
+                    arg.positiveMask.toLong(), arg.negativeMask.toLong())
+
+        return SysLongInteger(width, value and arg.value.toLong(),
+                positiveMask, negativeMask)
     }
 
     /** Bitwise or*/
     override infix fun or(arg: SysInteger): SysLongInteger {
 
-        var temp = arg.bitsState;
-        for (i in 0..Math.min(temp.lastIndex, bitsState.lastIndex)) {
-            temp[i] = temp[i] and bitsState[i];
-        }
-        if (temp.size < bitsState.size)
-            temp = temp.plus(bitsState.copyOfRange(temp.size, bitsState.size))
-        var resWidth: Int
-        var posMask: Long
-        var negMask: Long
-        if (arg.width > width) {
-            resWidth = Math.min(arg.width, MAX_WIDTH)
-            posMask = arg.positiveMask.toLong()
-            negMask = arg.negativeMask.toLong()
-        } else {
-            resWidth = Math.min(width, MAX_WIDTH)
-            posMask = positiveMask
-            negMask = negativeMask
-        }
-        return SysLongInteger(resWidth, value or arg.value.toLong(), bitsState = temp,
-                positiveMask = posMask, negativeMask = negMask)
+        if (hasUndefined)
+            throw UnsupportedOperationException("Not implemented")
 
+        if (arg.width > MAX_WIDTH)
+            throw UnsupportedOperationException("Not implemented")
+
+
+        if (arg.width > width)
+            return SysLongInteger(arg.width, value or arg.value.toLong(),
+                    arg.positiveMask.toLong(), arg.negativeMask.toLong())
+
+        return SysLongInteger(width, value or arg.value.toLong(),
+                positiveMask, negativeMask)
     }
 
     /** Bitwise xor*/
     override infix fun xor(arg: SysInteger): SysLongInteger {
 
-        var temp = arg.bitsState;
-        for (i in 0..Math.min(temp.lastIndex, bitsState.lastIndex)) {
-            temp[i] = temp[i] and  bitsState[i];
-        }
-        if (temp.size < bitsState.size)
-            temp = temp.plus(bitsState.copyOfRange(temp.size, bitsState.size));
-        var resWidth: Int
-        var posMask: Long
-        var negMask: Long
-        if (arg.width > width) {
-            resWidth = Math.min(arg.width, MAX_WIDTH)
-            posMask = arg.positiveMask.toLong()
-            negMask = arg.negativeMask.toLong()
-        } else {
-            resWidth = Math.min(width, MAX_WIDTH)
-            posMask = positiveMask
-            negMask = negativeMask
-        }
-        return SysLongInteger(resWidth, value xor arg.value.toLong(), bitsState = temp,
-                positiveMask = posMask, negativeMask = negMask)
+        if (hasUndefined)
+            throw UnsupportedOperationException("Not implemented")
+
+        if (arg.width > MAX_WIDTH)
+            throw UnsupportedOperationException("Not implemented")
+
+
+        if (arg.width > width)
+            return SysLongInteger(arg.width, value xor  arg.value.toLong(),
+                    arg.positiveMask.toLong(), arg.negativeMask.toLong())
+
+        return SysLongInteger(width, value xor  arg.value.toLong(),
+                positiveMask, negativeMask)
     }
 
     /**Bitwise inversion (not)*/
     override fun inv(): SysLongInteger {
-        return SysLongInteger(width, value.inv(), bitsState = bitsState,
+        if (hasUndefined)
+            throw UnsupportedOperationException("Not implemented")
+        return SysLongInteger(width, value.inv(),
                 positiveMask = positiveMask, negativeMask = negativeMask);
     }
 
     /** Extracts a single bit, accessible as [i] */
     override operator fun get(i: Int): SysBit {
         if (i < 0 || i >= width) throw IndexOutOfBoundsException()
-        if (!bitsState[i])
-            return SysBit.X
-        val shift = bitsState.indexOf(true)
-        if ((value and (1L shl i - shift)) != 0L)
+        if (hasUndefined)
+            return bitsState[i]
+        if ((value and (1L shl i)) != 0L)
             return SysBit.ONE
         else
             return SysBit.ZERO
@@ -373,7 +354,7 @@ class SysLongInteger private constructor(
         if (j >= width || i < 0) throw IndexOutOfBoundsException()
         var result = value shr i
         val resWidth = j - i + 1
-        return truncate(resWidth, result, positiveValues[resWidth], negativeValues[width])
+        return truncate(resWidth, result, positiveValues[resWidth], negativeValues[resWidth])
     }
 
     override fun toSysLongInteger() = this
@@ -402,7 +383,7 @@ class SysLongInteger private constructor(
 
         fun valueOf(value: Long) = SysLongInteger(value)
 
-        fun uninitialized(width: Int) = SysLongInteger(width.toShort())
+        //fun uninitialized(width: Int) = SysLongInteger(width.toShort())
 
         private fun valueBySWSArray(arr: Array<SysBit>): Long {
             var value: Long = 0L
@@ -424,34 +405,34 @@ class SysLongInteger private constructor(
         }
 
 
-        private fun maskBySWSArray(arr: Array<SysBit>): Array<Boolean> {
-            val mask = BooleanArray(arr.size)
-            for (i in 0..mask.size - 1)
-                if (arr[i] != SysBit.X)
-                    mask[i] = true;
-            return mask.toTypedArray();
-        }
+        //        private fun maskBySWSArray(arr: Array<SysBit>): Array<Boolean> {
+        //            val mask = BooleanArray(arr.size)
+        //            for (i in 0..mask.size - 1)
+        //                if (arr[i] != SysBit.X)
+        //                    mask[i] = true;
+        //            return mask.toTypedArray();
+        //        }
 
-        private fun maskByValue(value: Long, width: Int): Array<Boolean> {
-
-            //            if (width == 0)
-            //                return BooleanArray(0).toTypedArray();
-            //
-            //            val widthByValue = widthByValue(value)
-            //
-            //
-            //            val mask = BooleanArray(width);
-            //
-            //            if (width < widthByValue) {
-            //                throw IllegalArgumentException("Width $width is too small for this value \n$value \nwith width $widthByValue")
-            //            } else {
-            //                mask.fill(true, mask.lastIndex + 1 - widthByValue, mask.lastIndex + 1)
-            //
-            //            }
-            //            return mask.toTypedArray();
-
-            return Array<Boolean>(width, { i -> true })
-        }
+        //        private fun maskByValue(value: Long, width: Int): Array<Boolean> {
+        //
+        //                        if (width == 0)
+        //                            return BooleanArray(0).toTypedArray();
+        //
+        //                        val widthByValue = widthByValue(value)
+        //
+        //
+        //                        val mask = BooleanArray(width);
+        //
+        //                        if (width < widthByValue) {
+        //                            throw IllegalArgumentException("Width $width is too small for this value \n$value \nwith width $widthByValue")
+        //                        } else {
+        //                            mask.fill(true, mask.lastIndex + 1 - widthByValue, mask.lastIndex + 1)
+        //
+        //                        }
+        //                        return mask.toTypedArray();
+        //
+        //            return Array(width, { i -> true })
+        //        }
 
 
         private fun widthByValue(value: Long): Int {
@@ -476,10 +457,10 @@ class SysLongInteger private constructor(
             return (1L shl (width - 1)) - 1
         }
 
-        private fun checkWidth(width: Int): Boolean {
-            if (width < 0 || width > MAX_WIDTH) return false
-            return true
-        }
+        //        private fun checkWidth(width: Int): Boolean {
+        //            if (width < 0 || width > MAX_WIDTH) return false
+        //            return true
+        //        }
 
         override val undefined: SysLongInteger
             get() = SysLongInteger(arrayOf(SysBit.X))

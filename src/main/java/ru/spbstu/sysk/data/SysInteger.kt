@@ -1,12 +1,11 @@
 package ru.spbstu.sysk.data
 
 import java.math.BigInteger
-import java.util.*
 
 abstract class SysInteger protected constructor(
         val width: Int,
         open val value: Number,
-        protected val bitsState: Array<Boolean>,
+        protected val hasUndefined: Boolean,
         protected open val positiveMask: Number,
         protected open val negativeMask: Number
 ) : SysData, Comparable<SysInteger> {
@@ -62,10 +61,11 @@ abstract class SysInteger protected constructor(
     companion object : SysDataCompanion<SysInteger> {
 
         fun uninitialized(width: Int): SysInteger {
+            val initializer = Array(width, { i -> SysBit.X })
             if (width <= SysLongInteger.MAX_WIDTH)
-                return SysLongInteger.uninitialized(width)
+                return SysLongInteger(initializer)
             else
-                return SysBigInteger.uninitialized(width)
+                return SysBigInteger(initializer)
         }
 
         operator fun invoke(width: Int, value: Number) = valueOf(width, value)
@@ -101,13 +101,20 @@ abstract class SysInteger protected constructor(
 
     }
 
+
+    override fun toString(): String {
+        return "$value [$width]"
+    }
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is SysInteger) return false
 
         if (width != other.width) return false
         if (value != other.value) return false
-        if (!Arrays.equals(bitsState, other.bitsState)) return false
+        if (hasUndefined != other.hasUndefined) return false
+        if (positiveMask != other.positiveMask) return false
+        if (negativeMask != other.negativeMask) return false
 
         return true
     }
@@ -115,12 +122,10 @@ abstract class SysInteger protected constructor(
     override fun hashCode(): Int {
         var result = width
         result += 31 * result + value.hashCode()
-        result += 31 * result + Arrays.hashCode(bitsState)
+        result += 31 * result + hasUndefined.hashCode()
+        result += 31 * result + positiveMask.hashCode()
+        result += 31 * result + negativeMask.hashCode()
         return result
-    }
-
-    override fun toString(): String {
-        return "$value [$width]"
     }
 
 

@@ -4,35 +4,41 @@ class SysUnsigned
 private constructor(
         width: Int,
         override val value: Long,
-        defaultBitState: Boolean = false,
-        bitsState: Array<Boolean> = Array(width, { i -> defaultBitState }),
+        hasUndefined: Boolean = false,
         override val positiveMask: Long,
         override val negativeMask: Long = Long.MIN_VALUE
-) : SysInteger(width, value, bitsState, positiveMask, negativeMask) {
+) : SysInteger(width, value, hasUndefined, positiveMask, negativeMask) {
 
-    private constructor(width: Int, value: Long) : this(width, value, bitsState = maskByValue(width, widthByValue(value)),
+    private lateinit var bitsState: Array<SysBit>
+
+    private constructor(width: Int, value: Long) : this(width, value,
             positiveMask = maxValue(width))
 
     private constructor(width: Int, value: Long, positiveMask: Long) :
-    this(width, value, bitsState = maskByValue(width, widthByValue(value)),
+    this(width, value, false,
             positiveMask = positiveMask)
 
-    private constructor(width: Int, value: Long, bitsState: Array<Boolean>) :
-    this(width, value, bitsState = bitsState,
-            positiveMask = maxValue(width))
+    private constructor(arr: Array<SysBit>) :
+    this(arr.size, valueBySWSArray(arr), arr.contains(SysBit.X), positiveValues[arr.size]) {
+        bitsState = arr
+    }
 
-    override fun extend(width: Int): SysUnsigned {
-        if (width < widthByValue(value))
+    //    private constructor(width: Int, value: Long, bitsState: Array<Boolean>) :
+    //    this(width, value, bitsState = bitsState,
+    //            positiveMask = maxValue(width))
+
+    override fun extend(width: Int): SysInteger {
+        if (width < this.width)
             throw IllegalArgumentException()
+        if (width > MAX_WIDTH)
+            return SysBigInteger(width, value)
         return SysUnsigned(width, value)
     }
 
-    override fun truncate(width: Int): SysUnsigned {
-        val widthByValue = widthByValue(value)
-        if (width >= widthByValue) return extend(width)
+    override fun truncate(width: Int): SysInteger {
+        if (width > this.width) return extend(width)
         if (width < 0) throw IllegalArgumentException()
-        val truncated = value shr (widthByValue - width)
-        return SysUnsigned(width, truncated)
+        return truncate(width, value, positiveValues[width])
     }
 
     private fun truncate(width: Int, value: Long, positiveMask: Long): SysUnsigned {
@@ -42,69 +48,69 @@ private constructor(
             return SysUnsigned(width, value and positiveMask, positiveMask)
     }
 
-    override operator fun plus(arg: SysInteger): SysUnsigned {
-        var resWidth: Int
-        var posMask: Long
-        if (arg.width > width) {
-            resWidth = Math.min(arg.width, MAX_WIDTH)
-            posMask = arg.positiveMask.toLong()
-        } else {
-            resWidth = Math.min(width, MAX_WIDTH)
-            posMask = positiveMask
-        }
-        return truncate(resWidth, value + arg.value.toLong(), posMask)
+    operator fun plus(arg: SysUnsigned): SysUnsigned {
+        if (arg.width > width)
+            return truncate(arg.width, value + arg.value, arg.positiveMask)
+        else
+            return truncate(width, value + arg.value, positiveMask)
     }
 
-    override operator fun minus(arg: SysInteger): SysUnsigned {
-        var resWidth: Int
-        var posMask: Long
-        if (arg.width > width) {
-            resWidth = Math.min(arg.width, MAX_WIDTH)
-            posMask = arg.positiveMask.toLong()
-        } else {
-            resWidth = Math.min(width, MAX_WIDTH)
-            posMask = positiveMask
-        }
-        return truncate(resWidth, value - arg.value.toLong(), posMask)
+    operator fun minus(arg: SysUnsigned): SysUnsigned {
+        if (arg.width > width)
+            return truncate(arg.width, value - arg.value, arg.positiveMask)
+        else
+            return truncate(width, value - arg.value, positiveMask)
     }
 
-    override operator fun times(arg: SysInteger): SysUnsigned {
-        var resWidth: Int
-        var posMask: Long
-        if (arg.width > width) {
-            resWidth = Math.min(arg.width, MAX_WIDTH)
-            posMask = arg.positiveMask.toLong()
-        } else {
-            resWidth = Math.min(width, MAX_WIDTH)
-            posMask = positiveMask
-        }
-        return truncate(resWidth, value * arg.value.toLong(), posMask)
+    operator fun times(arg: SysUnsigned): SysUnsigned {
+        if (arg.width > width)
+            return truncate(arg.width, value * arg.value, arg.positiveMask)
+        else
+            return truncate(width, value * arg.value, positiveMask)
     }
 
-    override operator fun div(arg: SysInteger): SysUnsigned {
-        var resWidth: Int
-        var posMask: Long
-        if (arg.width > width) {
-            resWidth = Math.min(arg.width, MAX_WIDTH)
-            posMask = arg.positiveMask.toLong()
-        } else {
-            resWidth = Math.min(width, MAX_WIDTH)
-            posMask = positiveMask
-        }
-        return truncate(resWidth, java.lang.Long.divideUnsigned(value, arg.value.toLong()), posMask)
+    operator fun div(arg: SysUnsigned): SysUnsigned {
+        if (arg.width > width)
+            return truncate(arg.width, java.lang.Long.divideUnsigned(value, arg.value), arg.positiveMask)
+        else
+            return truncate(width, java.lang.Long.divideUnsigned(value, arg.value), positiveMask)
     }
 
-    override operator fun mod(arg: SysInteger): SysUnsigned {
-        var resWidth: Int
-        var posMask: Long
-        if (arg.width > width) {
-            resWidth = Math.min(arg.width, MAX_WIDTH)
-            posMask = arg.positiveMask.toLong()
-        } else {
-            resWidth = Math.min(width, MAX_WIDTH)
-            posMask = positiveMask
-        }
-        return truncate(resWidth, java.lang.Long.remainderUnsigned(value, arg.value.toLong()), posMask)
+    operator fun mod(arg: SysUnsigned): SysUnsigned {
+        if (arg.width > width)
+            return truncate(arg.width, java.lang.Long.remainderUnsigned (value, arg.value), arg.positiveMask)
+        else
+            return truncate(width, java.lang.Long.remainderUnsigned(value, arg.value), positiveMask)
+    }
+
+    override operator fun plus(arg: SysInteger): SysInteger {
+        if (arg.width > MAX_WIDTH)
+            return toSysBigInteger() + arg
+        return toSysLongInteger() + arg
+    }
+
+    override operator fun minus(arg: SysInteger): SysInteger {
+        if (arg.width > MAX_WIDTH)
+            return toSysBigInteger() - arg
+        return toSysLongInteger() - arg
+    }
+
+    override operator fun times(arg: SysInteger): SysInteger {
+        if (arg.width > MAX_WIDTH)
+            return toSysBigInteger() * arg
+        return toSysLongInteger() * arg
+    }
+
+    override operator fun div(arg: SysInteger): SysInteger {
+        if (arg.width > MAX_WIDTH)
+            return toSysBigInteger() / arg
+        return toSysLongInteger() / arg
+    }
+
+    override operator fun mod(arg: SysInteger): SysInteger {
+        if (arg.width > MAX_WIDTH)
+            return toSysBigInteger() % arg
+        return toSysLongInteger() % arg
     }
 
     override operator fun inc(): SysUnsigned = this + valueOf(width, 1)
@@ -112,10 +118,9 @@ private constructor(
 
     override operator fun get(i: Int): SysBit {
         if (i < 0 || i >= width) throw IndexOutOfBoundsException()
-        if (!bitsState[i])
-            return SysBit.X
-        val shift = bitsState.indexOf(true)
-        if ((value and (1L shl i - shift)) != 0L)
+        if (hasUndefined)
+            return bitsState[i]
+        if ((value and (1L shl i )) != 0L)
             return SysBit.ONE
         else
             return SysBit.ZERO
@@ -124,50 +129,67 @@ private constructor(
     override operator fun get(j: Int, i: Int): SysUnsigned {
         if (j < i) throw IllegalArgumentException()
         if (j >= width || i < 0) throw IndexOutOfBoundsException()
-        var result = value shr i
-        return SysUnsigned(j - i + 1, result)
+        val result = value shr i
+        val resWidth = j - i + 1
+        return truncate(resWidth, result, positiveValues[resWidth])
     }
 
     /** Bitwise and*/
     override infix fun and(arg: SysInteger): SysUnsigned {
-        var temp = arg.bitsState;
+        if (hasUndefined)
+            throw UnsupportedOperationException("Not implemented")
 
-        for (i in 0..Math.min(temp.lastIndex, bitsState.lastIndex)) {
-            temp[i] = temp[i] and bitsState[i];
-        }
-        if (temp.size < bitsState.size)
-            temp = temp.plus(bitsState.copyOfRange(temp.size, bitsState.size));
-        return SysUnsigned(Math.max(width, arg.width), value and arg.value.toLong(), bitsState = temp)
+        if (arg.width > MAX_WIDTH)
+            throw UnsupportedOperationException("Not implemented")
+
+
+        if (arg.width > width)
+            return SysUnsigned(arg.width, value and arg.value.toLong(), false,
+                    arg.positiveMask.toLong(), arg.negativeMask.toLong())
+
+        return SysUnsigned(width, value and arg.value.toLong(), false,
+                positiveMask, negativeMask)
     }
 
     /** Bitwise or*/
     override infix fun or(arg: SysInteger): SysUnsigned {
+        if (hasUndefined)
+            throw UnsupportedOperationException("Not implemented")
 
-        var temp = arg.bitsState;
-        for (i in 0..Math.min(temp.lastIndex, bitsState.lastIndex)) {
-            temp[i] = temp[i] and bitsState[i];
-        }
-        if (temp.size < bitsState.size)
-            temp = temp.plus(bitsState.copyOfRange(temp.size, bitsState.size));
-        return SysUnsigned(Math.max(width, arg.width), value or arg.value.toLong(), bitsState = temp)
+        if (arg.width > MAX_WIDTH)
+            throw UnsupportedOperationException("Not implemented")
+
+
+        if (arg.width > width)
+            return SysUnsigned(arg.width, value or arg.value.toLong(), false,
+                    arg.positiveMask.toLong(), arg.negativeMask.toLong())
+
+        return SysUnsigned(width, value or arg.value.toLong(), false,
+                positiveMask, negativeMask)
 
     }
 
     /** Bitwise xor*/
     override infix fun xor(arg: SysInteger): SysUnsigned {
 
-        var temp = arg.bitsState;
-        for (i in 0..Math.min(temp.lastIndex, bitsState.lastIndex)) {
-            temp[i] = temp[i] and  bitsState[i];
-        }
-        if (temp.size < bitsState.size)
-            temp = temp.plus(bitsState.copyOfRange(temp.size, bitsState.size));
-        return SysUnsigned(Math.max(width, arg.width), value xor arg.value.toLong(), bitsState = temp)
+        if (hasUndefined)
+            throw UnsupportedOperationException("Not implemented")
+
+        if (arg.width > MAX_WIDTH)
+            throw UnsupportedOperationException("Not implemented")
+
+
+        if (arg.width > width)
+            return SysUnsigned(arg.width, value xor  arg.value.toLong(), false,
+                    arg.positiveMask.toLong(), arg.negativeMask.toLong())
+
+        return SysUnsigned(width, value xor  arg.value.toLong(), false,
+                positiveMask, negativeMask)
     }
 
     /**Bitwise inversion (not)*/
     override fun inv(): SysUnsigned {
-        return SysUnsigned(width, value.inv(), bitsState = bitsState);
+        return SysUnsigned(width, value.inv());
     }
 
 
@@ -320,16 +342,18 @@ private constructor(
 
         val MAX_WIDTH = 64
 
+        val positiveValues = Array(MAX_WIDTH + 1, { i -> maxValue(i) })
+
         fun valueOf(width: Int, value: Int): SysUnsigned {
             val lValue = Integer.toUnsignedLong(value)
             val realWidth = widthByValue(lValue)
             if (realWidth > width)
                 throw IllegalArgumentException("Minimal possible width is $realWidth")
-            return SysUnsigned(width, lValue, bitsState = maskByValue(width, realWidth))
+            return SysUnsigned(width, lValue)
         }
 
         fun valueOf(arr: Array<SysBit>): SysUnsigned {
-            return SysUnsigned(arr.size, valueBySWSArray(arr), bitsState = maskBySWSArray(arr))
+            return SysUnsigned(arr)
         }
 
         //maybe some bugs
@@ -337,7 +361,7 @@ private constructor(
             val realWidth = widthByValue(value)
             if (realWidth > width)
                 throw IllegalArgumentException("Minimal possible width is $realWidth")
-            return SysUnsigned(width, value, bitsState = maskByValue(width, realWidth))
+            return SysUnsigned(width, value)
         }
 
         private fun valueBySWSArray(arr: Array<SysBit>): Long {
@@ -355,33 +379,33 @@ private constructor(
             return java.lang.Long.parseUnsignedLong(String(value), 2)
         }
 
-        private fun maskBySWSArray(arr: Array<SysBit>): Array<Boolean> {
+        //        private fun maskBySWSArray(arr: Array<SysBit>): Array<Boolean> {
+        //
+        //
+        //            val mask = BooleanArray(arr.size)
+        //
+        //
+        //            for (i in 0..mask.size - 1)
+        //                if (arr[i] != SysBit.X)
+        //                    mask[i] = true;
+        //
+        //            return mask.toTypedArray();
+        //        }
 
-
-            val mask = BooleanArray(arr.size)
-
-
-            for (i in 0..mask.size - 1)
-                if (arr[i] != SysBit.X)
-                    mask[i] = true;
-
-            return mask.toTypedArray();
-        }
-
-        private fun maskByValue(width: Int, minimalWidth: Int): Array<Boolean> {
-
-            if (width == 0)
-                return BooleanArray(0).toTypedArray();
-
-            val mask = BooleanArray(width);
-
-            if (width < minimalWidth) {
-                throw IllegalArgumentException("width = $width, byValue = $minimalWidth")
-            } else {
-                mask.fill(true, mask.lastIndex + 1 - minimalWidth, mask.lastIndex + 1)
-            }
-            return mask.toTypedArray();
-        }
+        //        private fun maskByValue(width: Int, minimalWidth: Int): Array<Boolean> {
+        //
+        //            if (width == 0)
+        //                return BooleanArray(0).toTypedArray();
+        //
+        //            val mask = BooleanArray(width);
+        //
+        //            if (width < minimalWidth) {
+        //                throw IllegalArgumentException("width = $width, byValue = $minimalWidth")
+        //            } else {
+        //                mask.fill(true, mask.lastIndex + 1 - minimalWidth, mask.lastIndex + 1)
+        //            }
+        //            return mask.toTypedArray();
+        //        }
 
         private fun widthByValue(value: Long): Int {
             return java.lang.Long.SIZE - java.lang.Long.numberOfLeadingZeros(value)

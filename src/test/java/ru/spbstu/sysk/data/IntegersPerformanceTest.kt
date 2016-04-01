@@ -11,8 +11,8 @@ class IntegersPerformanceTest {
     fun speedTest() {
         val size = 10000L
         val rand = Random(100)
-        val longArr = rand.longs(size).toArray()
-        val intArr = rand.ints(size).toArray()
+        val longArr = rand.longs(size).filter { it >= 0L }.toArray()
+        val intArr = rand.ints(size).filter { it >= 0L }.toArray()
         var result: Long
 
         var startTime = System.currentTimeMillis()
