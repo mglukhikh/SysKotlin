@@ -52,6 +52,8 @@ private constructor(
     }
 
     operator fun plus(arg: SysUnsigned): SysUnsigned {
+        if (hasUndefined)
+            throw UnsupportedOperationException("Not implemented yet")
         if (arg.width > width)
             return truncate(arg.width, value + arg.value, arg.positiveMask)
         else
@@ -59,6 +61,8 @@ private constructor(
     }
 
     operator fun minus(arg: SysUnsigned): SysUnsigned {
+        if (hasUndefined)
+            throw UnsupportedOperationException("Not implemented yet")
         if (arg.width > width)
             return truncate(arg.width, value - arg.value, arg.positiveMask)
         else
@@ -66,6 +70,8 @@ private constructor(
     }
 
     operator fun times(arg: SysUnsigned): SysUnsigned {
+        if (hasUndefined)
+            throw UnsupportedOperationException("Not implemented yet")
         if (arg.width > width)
             return truncate(arg.width, value * arg.value, arg.positiveMask)
         else
@@ -73,6 +79,8 @@ private constructor(
     }
 
     operator fun div(arg: SysUnsigned): SysUnsigned {
+        if (hasUndefined)
+            throw UnsupportedOperationException("Not implemented yet")
         if (arg.width > width)
             return truncate(arg.width, java.lang.Long.divideUnsigned(value, arg.value), arg.positiveMask)
         else
@@ -80,6 +88,8 @@ private constructor(
     }
 
     operator fun mod(arg: SysUnsigned): SysUnsigned {
+        if (hasUndefined)
+            throw UnsupportedOperationException("Not implemented yet")
         if (arg.width > width)
             return truncate(arg.width, java.lang.Long.remainderUnsigned (value, arg.value), arg.positiveMask)
         else
@@ -87,30 +97,40 @@ private constructor(
     }
 
     override operator fun plus(arg: SysInteger): SysInteger {
+        if (hasUndefined)
+            throw UnsupportedOperationException("Not implemented yet")
         if (arg.width > MAX_WIDTH)
             return toSysBigInteger() + arg
         return toSysLongInteger() + arg
     }
 
     override operator fun minus(arg: SysInteger): SysInteger {
+        if (hasUndefined)
+            throw UnsupportedOperationException("Not implemented yet")
         if (arg.width > MAX_WIDTH)
             return toSysBigInteger() - arg
         return toSysLongInteger() - arg
     }
 
     override operator fun times(arg: SysInteger): SysInteger {
+        if (hasUndefined)
+            throw UnsupportedOperationException("Not implemented yet")
         if (arg.width > MAX_WIDTH)
             return toSysBigInteger() * arg
         return toSysLongInteger() * arg
     }
 
     override operator fun div(arg: SysInteger): SysInteger {
+        if (hasUndefined)
+            throw UnsupportedOperationException("Not implemented yet")
         if (arg.width > MAX_WIDTH)
             return toSysBigInteger() / arg
         return toSysLongInteger() / arg
     }
 
     override operator fun mod(arg: SysInteger): SysInteger {
+        if (hasUndefined)
+            throw UnsupportedOperationException("Not implemented yet")
         if (arg.width > MAX_WIDTH)
             return toSysBigInteger() % arg
         return toSysLongInteger() % arg
@@ -137,14 +157,103 @@ private constructor(
         return truncate(resWidth, result, positiveValues[resWidth])
     }
 
+    /** Bitwise logical shift right*/
+    override infix fun ushr(shift: Int): SysUnsigned {
+        if (shift == 0)
+            return this;
+        if (shift > width )
+            throw IllegalArgumentException()
+        var realShift = shift
+        if (shift < 0)
+            realShift = width + shift
+        if (hasUndefined) {
+            val newBitsState = bitsState.copyOf()
+            for (i in newBitsState.lastIndex downTo realShift) {
+                newBitsState[i] = newBitsState[i - realShift]
+            }
+            for (i in 0..realShift - 1) {
+                newBitsState[i] = SysBit.ZERO
+            }
+            return SysUnsigned(newBitsState)
+        }
+
+        return SysUnsigned(width, value.ushr(realShift), false, positiveMask, negativeMask)
+
+    }
+
+
+    /** Arithmetic shift left*/
+    override infix fun shl(shift: Int): SysUnsigned {
+        if (shift == 0)
+            return this;
+        if (shift > width )
+            throw IllegalArgumentException()
+        var realShift = shift
+        if (shift < 0)
+            realShift = width + shift
+        if (hasUndefined) {
+            val newBitsState = bitsState.copyOf()
+            for (i in 0..newBitsState.lastIndex - realShift) {
+                newBitsState[i] = newBitsState[i + realShift]
+            }
+            for (i in newBitsState.size - realShift..newBitsState.lastIndex) {
+                newBitsState[i] = SysBit.ZERO
+            }
+            return SysUnsigned(newBitsState)
+        }
+        return SysUnsigned(width, value shl realShift, false, positiveMask, negativeMask)
+    }
+
+    /** Cyclic shift right*/
+    override infix fun cshr(shift: Int): SysUnsigned {
+
+        if (shift < 0)
+            return this cshl -shift
+
+        val realShift = shift % width
+
+        if (realShift == 0)
+            return this;
+
+        return ((this ushr realShift)or(this shl -realShift))
+
+    }
+
+    /** Cyclic shift left*/
+    override infix fun cshl(shift: Int): SysUnsigned {
+
+        if (shift < 0)
+            return this cshr -shift
+        val realShift = shift % width
+
+        if (realShift == 0)
+            return this;
+
+        return ((this shl realShift)or(this ushr -realShift))
+    }
+
     /** Bitwise and*/
     override infix fun and(arg: SysInteger): SysUnsigned {
-        if (hasUndefined)
-            throw UnsupportedOperationException("Not implemented")
-
         if (arg.width > MAX_WIDTH)
             throw UnsupportedOperationException("Not implemented")
 
+        if (hasUndefined || arg.hasUndefined) {
+
+            val state = (if (hasUndefined) bitsState else Array(width, { i -> get(i) }))
+            val argState = (if (arg.hasUndefined) arg.bitsState else Array(arg.width, { i -> arg.get(i) }))
+            var resultState: Array<SysBit>
+            if (state.size > argState.size) {
+                resultState = state
+                for (i in argState.indices)
+                    resultState[i] = resultState[i]and argState[i]
+            } else {
+                resultState = argState
+                for (i in state.indices)
+                    resultState[i] = resultState[i]and state[i]
+            }
+
+            return SysUnsigned(resultState)
+        }
 
         if (arg.width > width)
             return SysUnsigned(arg.width, value and arg.value.toLong(), false,
@@ -156,11 +265,28 @@ private constructor(
 
     /** Bitwise or*/
     override infix fun or(arg: SysInteger): SysUnsigned {
-        if (hasUndefined)
-            throw UnsupportedOperationException("Not implemented")
 
         if (arg.width > MAX_WIDTH)
             throw UnsupportedOperationException("Not implemented")
+
+        if (hasUndefined || arg.hasUndefined) {
+
+            val state = (if (hasUndefined) bitsState else Array(width, { i -> get(i) }))
+            val argState = (if (arg.hasUndefined) arg.bitsState else Array(arg.width, { i -> arg.get(i) }))
+            var resultState: Array<SysBit>
+            if (state.size > argState.size) {
+                resultState = state
+                for (i in argState.indices)
+                    resultState[i] = resultState[i]or argState[i]
+            } else {
+                resultState = argState
+                for (i in state.indices)
+                    resultState[i] = resultState[i]or state[i]
+            }
+
+            return SysUnsigned(resultState)
+        }
+
 
 
         if (arg.width > width)
@@ -169,18 +295,32 @@ private constructor(
 
         return SysUnsigned(width, value or arg.value.toLong(), false,
                 positiveMask, negativeMask)
-
     }
 
     /** Bitwise xor*/
     override infix fun xor(arg: SysInteger): SysUnsigned {
 
-        if (hasUndefined)
-            throw UnsupportedOperationException("Not implemented")
 
         if (arg.width > MAX_WIDTH)
             throw UnsupportedOperationException("Not implemented")
 
+        if (hasUndefined || arg.hasUndefined) {
+
+            val state = (if (hasUndefined) bitsState else Array(width, { i -> get(i) }))
+            val argState = (if (arg.hasUndefined) arg.bitsState else Array(arg.width, { i -> arg.get(i) }))
+            var resultState: Array<SysBit>
+            if (state.size > argState.size) {
+                resultState = state
+                for (i in argState.indices)
+                    resultState[i] = resultState[i]xor  argState[i]
+            } else {
+                resultState = argState
+                for (i in state.indices)
+                    resultState[i] = resultState[i]xor state[i]
+            }
+
+            return SysUnsigned(resultState)
+        }
 
         if (arg.width > width)
             return SysUnsigned(arg.width, value xor  arg.value.toLong(), false,
@@ -192,48 +332,12 @@ private constructor(
 
     /**Bitwise inversion (not)*/
     override fun inv(): SysUnsigned {
-        return SysUnsigned(width, value.inv());
-    }
-
-
-    /** Bitwise logical shift right*/
-    override infix fun ushr(shift: Int): SysUnsigned {
-        if (shift == 0)
-            return this;
-        if (shift > width || shift < 0)
-            throw IllegalArgumentException()
-        val sysBitExpression = Array(width) { i -> this[i] }
-        var i = 0
-        while (i < sysBitExpression.size - shift) {
-            sysBitExpression[i] = sysBitExpression[i + shift]
-            i++
+        if (hasUndefined) {
+            val resultState = Array(bitsState.size, { i -> bitsState[i].not() })
+            return SysUnsigned(resultState)
         }
-        while (i < sysBitExpression.size) {
-            sysBitExpression[i] = SysBit.ZERO
-            i++
-        }
-        return Companion.valueOf(sysBitExpression);
-    }
-
-    /** Bitwise logical shift left*/
-    override infix fun shl(shift: Int): SysUnsigned {
-
-        if (shift == 0)
-            return this;
-        if (shift > width || shift < 0)
-            throw IllegalArgumentException()
-        val sysBitExpression = Array(width) { i -> this[i] }
-        var i = width - 1
-        while (i >= shift) {
-            sysBitExpression[i] = sysBitExpression[i - shift]
-            i--
-        }
-        while (i >= 0) {
-            sysBitExpression[i] = SysBit.ZERO
-            i--
-        }
-
-        return Companion.valueOf(sysBitExpression)
+        return SysUnsigned(width, value.inv(),
+                positiveMask = positiveMask, negativeMask = negativeMask);
     }
 
     override fun unaryMinus(): SysInteger {
@@ -283,63 +387,6 @@ private constructor(
         return value.compareTo(other.value.toLong())
     }
 
-    /** Cyclic shift right*/
-    override infix fun cshr(shift: Int): SysUnsigned {
-
-        if (shift < 0)
-            return this cshl -shift
-
-        val realShift = shift % width
-
-        if (realShift == 0)
-            return this;
-        val sysBitExpression = Array(width) { i -> this[i] }
-
-        val tempArray = Array(realShift, { SysBit.X })
-
-        for (i in 0..realShift - 1) {
-            tempArray[i] = sysBitExpression[sysBitExpression.size - realShift + i]
-        }
-        var i = sysBitExpression.size - 1
-        while (i >= realShift) {
-            sysBitExpression[i] = sysBitExpression[i - realShift]
-            i--
-        }
-        while (i >= 0) {
-            sysBitExpression[i] = tempArray[i]
-            i--
-        }
-        return Companion.valueOf(sysBitExpression)
-    }
-
-    /** Cyclic shift left*/
-    override infix fun cshl(shift: Int): SysUnsigned {
-
-        if (shift < 0)
-            return this cshr -shift
-        val realShift = shift % width
-
-        if (realShift == 0)
-            return this;
-        val sysBitExpression = Array(width) { i -> this[i] }
-
-        val tempArray = Array(realShift, { SysBit.X })
-
-        for (i in 0..realShift - 1) {
-            tempArray[i] = sysBitExpression[i]
-        }
-
-        var i = 0
-        while (i < sysBitExpression.size - shift) {
-            sysBitExpression[i] = sysBitExpression[i + shift]
-            i++
-        }
-        while (i < sysBitExpression.size) {
-            sysBitExpression[i] = tempArray[i - sysBitExpression.size + realShift]
-            i++
-        }
-        return Companion.valueOf(sysBitExpression)
-    }
 
     companion object : SysDataCompanion<SysUnsigned> {
 

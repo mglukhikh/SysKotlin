@@ -67,15 +67,6 @@ class SysBigInteger private constructor(
             return SysBigInteger(width, value.or(negativeMask), positiveMask, negativeMask)
     }
 
-    /** Adds arg to this integer, with result width is maximum of argument's widths */
-    override operator fun plus(arg: SysInteger): SysBigInteger {
-
-        val argv = arg.toSysBigInteger()
-        if (argv.width > width)
-            return truncate(argv.width, value + argv.value, argv.positiveMask, argv.negativeMask)
-
-        return truncate(width, value + argv.value, positiveMask, negativeMask)
-    }
 
     override operator fun plus(arg: Long) = this + valueOf(arg)
     override operator fun minus(arg: Long) = this - valueOf(arg)
@@ -93,6 +84,18 @@ class SysBigInteger private constructor(
 
     override fun power(exp: Int) = truncate(width, value.pow(exp), positiveMask, negativeMask)
 
+
+    /** Adds arg to this integer, with result width is maximum of argument's widths */
+    override operator fun plus(arg: SysInteger): SysBigInteger {
+        if (hasUndefined)
+            throw UnsupportedOperationException("Not implemented yet")
+        val argv = arg.toSysBigInteger()
+        if (argv.width > width)
+            return truncate(argv.width, value + argv.value, argv.positiveMask, argv.negativeMask)
+
+        return truncate(width, value + argv.value, positiveMask, negativeMask)
+    }
+
     /**Unary minus*/
     override operator fun unaryMinus(): SysBigInteger {
         return SysBigInteger(width, value.negate())
@@ -100,6 +103,8 @@ class SysBigInteger private constructor(
 
     /** Subtract arg from this integer*/
     override operator fun minus(arg: SysInteger): SysBigInteger {
+        if (hasUndefined)
+            throw UnsupportedOperationException("Not implemented yet")
         val argv = arg.toSysBigInteger()
         if (argv.width > width)
             return truncate(argv.width, value - argv.value, argv.positiveMask, argv.negativeMask)
@@ -109,6 +114,8 @@ class SysBigInteger private constructor(
 
     /** Integer division by divisor*/
     override operator fun div(arg: SysInteger): SysBigInteger {
+        if (hasUndefined)
+            throw UnsupportedOperationException("Not implemented yet")
         val argv = arg.toSysBigInteger()
         if (arg.value == BigInteger.ZERO) throw IllegalArgumentException("Division by zero")
         if (argv.width > width)
@@ -119,6 +126,8 @@ class SysBigInteger private constructor(
 
     /** Remainder of integer division*/
     override operator fun mod(arg: SysInteger): SysBigInteger {
+        if (hasUndefined)
+            throw UnsupportedOperationException("Not implemented yet")
         val argv = arg.toSysBigInteger()
         if (arg.value == BigInteger.ZERO) throw IllegalArgumentException("Division by zero")
         if (argv.width > width)
@@ -129,6 +138,8 @@ class SysBigInteger private constructor(
 
     /** Multiplies arg to this integer, with result width is sum of argument's width */
     override operator fun times(arg: SysInteger): SysBigInteger {
+        if (hasUndefined)
+            throw UnsupportedOperationException("Not implemented yet")
         val argv = arg.toSysBigInteger()
         if (argv.width > width)
             return truncate(argv.width, value * argv.value, argv.positiveMask, argv.negativeMask)
