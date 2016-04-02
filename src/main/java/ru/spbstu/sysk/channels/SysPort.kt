@@ -42,7 +42,7 @@ abstract class SysPort<IF : SysInterface> internal constructor(
     infix open fun bind(sysInterface: IF) {
         assert(scheduler.stopRequested) { "Impossible to bind the port while running the scheduler" }
         assert(!isBound) { "Port $name is already bound to $bound" }
-        assert(!sealed) { "Port $name is already sealed"}
+        assert(!sealed) { "Port $name is already sealed" }
         bound = sysInterface
         sysInterface.register(this)
     }
@@ -71,6 +71,34 @@ fun <IF : SysInterface> bind(vararg pairs: Pair<SysPort<IF>, IF>) {
 fun <IF : SysInterface> bindArrays(vararg pairs: Pair<Array<out SysPort<IF>>, Array<out IF>>) {
     for (pair in pairs) {
         pair.first.forEachIndexed { i, sysPort -> sysPort.bind(pair.second[i]) }
+    }
+}
+
+open class SysReadWritePort<T : SysData> internal constructor(
+        name: String, scheduler: SysScheduler, parent: SysObject? = null, signal: SysSignal<T>? = null,
+        private val defaultValue: T? = null
+) : SysPort<SysSignal<T>>(name, scheduler, parent, signal) {
+
+    var value: T
+        get() {
+            if (isBound) {
+                return bound!!.value
+            } else {
+                if (defaultValue == null) throw IllegalStateException("Port $name is not bound")
+                return defaultValue
+            }
+        }
+        set(value) {
+            if (!sealed) {
+                if (!isBound) throw IllegalStateException("Port $name is not bound")
+                bound!!.value = value
+            }
+        }
+
+    operator fun invoke() = value
+
+    operator fun invoke(value: T) {
+        this.value = value
     }
 }
 
@@ -145,7 +173,7 @@ class BitPortReader(
         override val inp: SysBitInput
 ) : PortReader<SysBit>(inp)
 
-open class PortWriter<T: SysData>(
+open class PortWriter<T : SysData>(
         open protected val out: SysOutput<T>
 ) : ReadWriteProperty<SysModule, T> {
     override fun getValue(thisRef: SysModule, property: KProperty<*>) = out.value

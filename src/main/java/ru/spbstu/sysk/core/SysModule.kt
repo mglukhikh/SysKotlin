@@ -57,6 +57,9 @@ open class SysModule internal constructor(
         return this
     }
 
+    protected fun <T : SysData> port(name: String, defaultValue: T? = null, signal: SysSignal<T>? = null) =
+            SysReadWritePort(name, scheduler, this, signal, defaultValue)
+
     protected fun <T : SysData> input(name: String, defaultValue: T? = null, signalRead: SysSignalRead<T>? = null): SysInput<T> =
             SysInput(name, scheduler, this, signalRead, defaultValue)
 
@@ -83,15 +86,15 @@ open class SysModule internal constructor(
 
     protected inline fun <reified T : SysData> connector(
             name: String, writePort: SysOutput<T>, vararg readPorts: SysInput<T>
-    ) = Connector<T>(signal(name), writePort, *readPorts)
+    ) = Connector(signal(name), writePort, *readPorts)
 
     protected inline fun <reified T : SysData> connector(
             name: String, vararg readPorts: SysInput<T>
-    ) = Connector<T>(signal(name), null, *readPorts)
+    ) = Connector(signal(name), null, *readPorts)
 
     protected inline fun <reified T : SysData> signalReader(
             name: String, writePort: SysOutput<T>, vararg readPorts: SysInput<T>
-    ) = SignalReader<T>(signal(name), writePort, *readPorts)
+    ) = SignalReader(signal(name), writePort, *readPorts)
 
     protected fun bitSignalReader(
             name: String, writePort: SysOutput<SysBit>, vararg readPorts: SysBitInput
@@ -99,7 +102,7 @@ open class SysModule internal constructor(
 
     protected inline fun <reified T : SysData> signalWriter(
             name: String, vararg readPorts: SysInput<T>
-    ) = SignalWriter<T>(signal(name), *readPorts)
+    ) = SignalWriter(signal(name), *readPorts)
 
     protected fun bitSignalWriter(
             name: String, vararg readPort: SysBitInput
