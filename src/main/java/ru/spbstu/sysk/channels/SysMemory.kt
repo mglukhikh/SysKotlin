@@ -47,7 +47,7 @@ open class SysMemory<T : SysData>(
         }
     }
 
-    private fun lastAddress(): Long {
+    fun lastAddress(): Long {
         var result = 1
         for (i in 0..addrWidth-1) {
             result *= 2
