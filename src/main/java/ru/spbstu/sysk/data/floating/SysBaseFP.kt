@@ -56,3 +56,11 @@ abstract class SysBaseFP protected constructor(
         return "$value [$width]"
     }
 }
+
+fun float(value: Float) = SysFloat.valueOf(value)
+
+fun float(sign: SysBit, exponent: SysUnsigned, mantissa: SysUnsigned) = SysFloat(sign, exponent, mantissa)
+
+fun double(value: Double) = SysDouble.valueOf(value)
+
+fun double(sign: SysBit, exponent: SysUnsigned, mantissa: SysUnsigned) = SysDouble(sign, exponent, mantissa)

@@ -150,7 +150,19 @@ abstract class SysInteger protected constructor(
         result += 31 * result + negativeMask.hashCode()
         return result
     }
-
-
 }
+
+fun unsigned(width: Int, value: Int) = SysUnsigned.valueOf(width, value)
+
+fun unsigned(width: Int, value: Long) = SysUnsigned.valueOf(width, value)
+
+fun integer(value: Int) = SysInteger.valueOf(value.toLong())
+
+fun integer(value: Long) = SysInteger.valueOf(value)
+
+fun integer(width: Int, value: Int) = SysInteger(width, value)
+
+fun integer(width: Int, value: Long) = SysInteger(width, value)
+
+fun integer(bits: Array<SysBit>) = SysInteger(bits)
 
