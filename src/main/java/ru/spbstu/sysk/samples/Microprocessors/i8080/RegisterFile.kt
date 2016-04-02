@@ -31,7 +31,7 @@ class RegisterFile(parent: SysModule) : SysModule("RegisterFile", parent) {
     private val PC = unsigned(16, 0)
     private val SP = unsigned(16, 0)
 
-    val data = port<SysUnsigned>("data")
+    val data = bidirPort<SysUnsigned>("data")
     val address = input<SysUnsigned>("address")
     val command = input<SysUnsigned>("command")
 

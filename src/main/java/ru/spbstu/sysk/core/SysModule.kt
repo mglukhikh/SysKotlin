@@ -57,7 +57,7 @@ open class SysModule internal constructor(
         return this
     }
 
-    protected fun <T : SysData> port(name: String, defaultValue: T? = null, signal: SysSignal<T>? = null) =
+    protected fun <T : SysData> bidirPort(name: String, defaultValue: T? = null, signal: SysSignal<T>? = null) =
             SysReadWritePort(name, scheduler, this, signal, defaultValue)
 
     protected fun <T : SysData> input(name: String, defaultValue: T? = null, signalRead: SysSignalRead<T>? = null): SysInput<T> =

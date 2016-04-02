@@ -16,7 +16,7 @@ class RegisterFileTest : SysTopModule() {
     val command = signal("command", STORAGE)
     val address = signal<SysUnsigned>("address")
     val clk = clock("clk", 20(FS))
-    val dataPort = port<SysUnsigned>("data")
+    val dataPort = bidirPort<SysUnsigned>("data")
 
     init {
         RegFile.address bind address
