@@ -1,60 +1,50 @@
 package ru.spbstu.sysk.samples.microprocessors.i8080
 
 import ru.spbstu.sysk.core.SysModule
-import ru.spbstu.sysk.data.SysBit
-import ru.spbstu.sysk.data.SysBit.ZERO
-import ru.spbstu.sysk.data.integer.SysInteger
-import java.util.*
+import ru.spbstu.sysk.data.integer.SysUnsigned
+import ru.spbstu.sysk.data.integer.unsigned
 
-val A = SysInteger(5, 0)
-val Flag = SysInteger(5, 1)
-val B = SysInteger(5, 2)
-val C = SysInteger(5, 3)
-val D = SysInteger(5, 4)
-val E = SysInteger(5, 5)
-val H = SysInteger(5, 6)
-val L = SysInteger(5, 7)
-val PCF = SysInteger(5, 8)
-val PCS = SysInteger(5, 9)
-val SPF = SysInteger(5, 10)
-val SPS = SysInteger(5, 11)
+val A = unsigned(4, 0)
+val Flag = unsigned(4, 1)
+val B = unsigned(4, 2)
+val C = unsigned(4, 3)
+val D = unsigned(4, 4)
+val E = unsigned(4, 5)
+val H = unsigned(4, 6)
+val L = unsigned(4, 7)
+val PCF = unsigned(4, 8)
+val PCS = unsigned(4, 9)
+val SPF = unsigned(4, 10)
+val SPS = unsigned(4, 11)
 
-val STORAGE = SysInteger(3, 0)
-val PUSH = SysInteger(3, 1)
-val PULL = SysInteger(3, 2)
-val RESET = SysInteger(3, 3)
+val STORAGE = unsigned(2, 0)
+val WRITE = unsigned(2, 1)
+val READ = unsigned(2, 2)
+val RESET = unsigned(2, 3)
 
 class RegisterFile(parent: SysModule) : SysModule("RegisterFile", parent) {
 
-    private val PSW = ArrayList<SysBit>(16)
-    private val BC = ArrayList<SysBit>(16)
-    private val DE = ArrayList<SysBit>(16)
-    private val HL = ArrayList<SysBit>(16)
-    private val PC = ArrayList<SysBit>(16)
-    private val SP = ArrayList<SysBit>(16)
+    private val PSW = unsigned(16, 0)
+    private val BC = unsigned(16, 0)
+    private val DE = unsigned(16, 0)
+    private val HL = unsigned(16, 0)
+    private val PC = unsigned(16, 0)
+    private val SP = unsigned(16, 0)
 
-    val data = bitBusPort(8, "data")
-    val address = input<SysInteger>("address")
-    val command = input<SysInteger>("command")
+    val data = port<SysUnsigned>("data")
+    val address = input<SysUnsigned>("address")
+    val command = input<SysUnsigned>("command")
 
     val clk = bitInput("clk")
 
     init {
-        for (i in 0..15) {
-            PSW.add(ZERO)
-            BC.add(ZERO)
-            DE.add(ZERO)
-            HL.add(ZERO)
-            PC.add(ZERO)
-            SP.add(ZERO)
-        }
-
         stateFunction(clk, true) {
             infiniteState {
                 when (command()) {
-                    STORAGE -> data.disable()
-                    PUSH -> push(address())
-                    PULL -> pull(address())
+                    STORAGE -> {
+                    }
+                    WRITE -> write(address())
+                    READ -> read(address())
                     RESET -> reset()
                 }
             }
@@ -62,55 +52,55 @@ class RegisterFile(parent: SysModule) : SysModule("RegisterFile", parent) {
     }
 
     private fun reset() {
-        for (i in 0..15) {
-            PSW[i] = ZERO
-            BC[i] = ZERO
-            DE[i] = ZERO
-            HL[i] = ZERO
-            PC[i] = ZERO
-            SP[i] = ZERO
-        }
     }
 
-    private fun pull(address: SysInteger) {
+    private fun read(address: SysUnsigned) {
         when (address) {
-            A -> pull(PSW, true)
-            Flag -> pull(PSW, false)
-            B -> pull(BC, true)
-            C -> pull(BC, false)
-            D -> pull(DE, true)
-            E -> pull(DE, false)
-            H -> pull(HL, true)
-            L -> pull(HL, false)
-            PCF -> pull(PC, true)
-            PCS -> pull(PC, false)
-            SPF -> pull(SP, true)
-            SPS -> pull(SP, false)
+            A -> data(PSW[7, 0])
+            Flag -> data(PSW[15, 8])
+            B -> data(BC[7, 0])
+            C -> data(BC[15, 8])
+            D -> data(DE[7, 0])
+            E -> data(DE[15, 8])
+            H -> data(HL[7, 0])
+            L -> data(HL[15, 8])
+            PCF -> data(PC[7, 0])
+            PCS -> data(PC[15, 8])
+            SPF -> data(SP[7, 0])
+            SPS -> data(SP[15, 8])
         }
     }
 
-    private fun pull(register: ArrayList<SysBit>, first: Boolean) {
-        for (i in 0..7) data(register[if (first) i else i + 8], i)
-    }
-
-    private fun push(address: SysInteger) {
+    private fun write(address: SysUnsigned) {
         when (address) {
-            A -> push(PSW, true)
-            Flag -> push(PSW, false)
-            B -> push(BC, true)
-            C -> push(BC, false)
-            D -> push(DE, true)
-            E -> push(DE, false)
-            H -> push(HL, true)
-            L -> push(HL, false)
-            PCF -> push(PC, true)
-            PCS -> push(PC, false)
-            SPF -> push(SP, true)
-            SPS -> push(SP, false)
+            A -> PSW.set(7, 0, data())
+            Flag -> PSW.set(15, 8, data())
+            B -> BC.set(7, 0, data())
+            C -> BC.set(15, 8, data())
+            D -> DE.set(7, 0, data())
+            E -> DE.set(15, 8, data())
+            H -> HL.set(7, 0, data())
+            L -> HL.set(15, 8, data())
+            PCF -> PC.set(7, 0, data())
+            PCS -> PC.set(15, 8, data())
+            SPF -> SP.set(7, 0, data())
+            SPS -> SP.set(15, 8, data())
         }
     }
+}
 
-    private fun push(register: ArrayList<SysBit>, first: Boolean) {
-        for (i in 0..7) register[if (first) i else i + 8] = data[i]
-    }
+// Slow?
+internal fun SysUnsigned.set(i: Int, bit: Boolean): SysUnsigned {
+    if (i < 0 || i >= width) throw IndexOutOfBoundsException()
+    if (this[i].one == bit) return this
+    val mask = unsigned(width, 1 shl i)
+    return this xor mask
+}
+
+internal fun SysUnsigned.set(j: Int, i: Int, bits: SysUnsigned): SysUnsigned {
+    if (j < i) throw IllegalArgumentException()
+    if (j >= width || i < 0) throw IndexOutOfBoundsException()
+    var temp = this
+    for (it in i..j) temp = temp.set(it, bits[it - i].one)
+    return temp
 }

@@ -5,17 +5,18 @@ import ru.spbstu.sysk.core.SysTopModule
 import ru.spbstu.sysk.core.TimeUnit.FS
 import ru.spbstu.sysk.core.TimeUnit.S
 import ru.spbstu.sysk.core.invoke
-import ru.spbstu.sysk.data.integer.SysInteger
+import ru.spbstu.sysk.data.integer.SysUnsigned
+import ru.spbstu.sysk.data.integer.unsigned
 
 class RegisterFileTest : SysTopModule() {
 
     val RegFile = RegisterFile(this)
 
-    val data = bitBus(8, "data")
+    val data = signal<SysUnsigned>("data")
     val command = signal("command", STORAGE)
-    val address = signal<SysInteger>("address")
+    val address = signal<SysUnsigned>("address")
     val clk = clock("clk", 20(FS))
-    val dataPort = bitBusPort(8, "data")
+    val dataPort = port<SysUnsigned>("data")
 
     init {
         RegFile.address bind address
@@ -26,30 +27,33 @@ class RegisterFileTest : SysTopModule() {
 
         stateFunction(clk, false) {
             state {
-                dataPort(SysInteger(8, 127))
-                command(PUSH)
+                dataPort(unsigned(8, 255))
+                command(WRITE)
                 address(B)
             }
             state {
-                dataPort(SysInteger(8, -127))
-                command(PUSH)
+                dataPort(unsigned(8, 10))
+                command(WRITE)
                 address(E)
             }
             state {
-                dataPort.disable()
+                println(dataPort())
                 command(STORAGE)
             }
             state {
-                command(PULL)
+                println(dataPort())
+                command(READ)
                 address(B)
             }
             state {
-                assert(dataPort() == SysInteger(8, 127))
-                command(PULL)
+                println(dataPort())
+//                assert(dataPort() == unsigned(8, 255))
+                command(READ)
                 address(E)
             }
             state {
-                assert(dataPort() == SysInteger(8, -127))
+                println(dataPort())
+//                assert(dataPort() == unsigned(8, 10))
                 command(STORAGE)
             }
             state {
@@ -61,3 +65,4 @@ class RegisterFileTest : SysTopModule() {
     @Test
     fun show() = start(1(S))
 }
+
