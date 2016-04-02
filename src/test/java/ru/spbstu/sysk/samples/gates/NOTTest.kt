@@ -1,4 +1,4 @@
-package ru.spbstu.sysk.generics.logic_gates
+package ru.spbstu.sysk.samples.gates
 
 import org.junit.Test
 import ru.spbstu.sysk.core.SysTopModule
