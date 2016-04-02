@@ -6,7 +6,7 @@ import ru.spbstu.sysk.data.SysData
 
 open class SysUnaryModule<Input : SysData, Output : SysData>(
         operation: (Input) -> Output, name: String, parent: SysModule
-): SysModule(name, parent) {
+) : SysModule(name, parent) {
 
     protected open fun createInput(name: String) = input<Input>("x")
 
@@ -23,16 +23,14 @@ open class SysUnaryModule<Input : SysData, Output : SysData>(
 
 open class SysUnaryBitModule<Output : SysData>(
         operation: (SysBit) -> Output, name: String, parent: SysModule
-): SysUnaryModule<SysBit, Output>(operation, name, parent) {
+) : SysUnaryModule<SysBit, Output>(operation, name, parent) {
 
     override fun createInput(name: String) = bitInput(name)
 }
 
-class NOT(name: String, parent: SysModule): SysUnaryBitModule<SysBit>({ !it }, name, parent)
-
 open class SysBinaryModule<Input1 : SysData, Input2 : SysData, Output : SysData>(
         operation: (Input1, Input2) -> Output, name: String, parent: SysModule
-): SysModule(name, parent) {
+) : SysModule(name, parent) {
 
     protected open fun createInput1(name: String) = input<Input1>(name)
 
@@ -53,27 +51,9 @@ open class SysBinaryModule<Input1 : SysData, Input2 : SysData, Output : SysData>
 
 open class SysBinaryBitModule<Output : SysData>(
         operation: (SysBit, SysBit) -> Output, name: String, parent: SysModule
-): SysBinaryModule<SysBit, SysBit, Output>(operation, name, parent) {
+) : SysBinaryModule<SysBit, SysBit, Output>(operation, name, parent) {
 
     override fun createInput1(name: String) = bitInput(name)
 
     override fun createInput2(name: String) = bitInput(name)
 }
-
-class AND(name: String, parent: SysModule):
-        SysBinaryBitModule<SysBit>({ x1, x2 -> x1 and x2 }, name, parent)
-
-class NAND(name: String, parent: SysModule):
-        SysBinaryBitModule<SysBit>({ x1, x2 -> !(x1 and x2) }, name, parent)
-
-class OR(name: String, parent: SysModule):
-        SysBinaryBitModule<SysBit>({ x1, x2 -> x1 or x2 }, name, parent)
-
-class NOR(name: String, parent: SysModule):
-        SysBinaryBitModule<SysBit>({ x1, x2 -> !(x1 or x2) }, name, parent)
-
-class XOR(name: String, parent: SysModule):
-        SysBinaryBitModule<SysBit>({ x1, x2 -> x1 xor x2 }, name, parent)
-
-class NXOR(name: String, parent: SysModule):
-        SysBinaryBitModule<SysBit>({ x1, x2 -> !(x1 xor x2) }, name, parent)

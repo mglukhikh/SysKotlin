@@ -1,4 +1,4 @@
-package ru.spbstu.sysk.samples
+package ru.spbstu.sysk.samples.triggers
 
 import ru.spbstu.sysk.core.SysModule
 import ru.spbstu.sysk.data.SysBit
@@ -8,7 +8,7 @@ class PReg (name: String, digPerWord: Int, parent: SysModule): SysModule(name, p
     val d = Array(digPerWord, {i -> bitInput("d" + i.toString())})
     val clk = bitInput("clk")
 
-    private val state = Array(digPerWord, {i -> SysBit.X})
+    private val state = Array(digPerWord, {i -> SysBit.X })
     val q = Array(digPerWord, {i -> output<SysBit>("q" + i.toString())})
 
     init {

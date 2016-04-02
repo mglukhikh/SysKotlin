@@ -5,6 +5,9 @@ import ru.spbstu.sysk.core.SysTopModule
 import ru.spbstu.sysk.data.SysBit.*
 import ru.spbstu.sysk.channels.SysBitInput
 import ru.spbstu.sysk.channels.bind
+import ru.spbstu.sysk.samples.AND
+import ru.spbstu.sysk.samples.NOT
+import ru.spbstu.sysk.samples.OR
 
 class SysSimpleFunctionTest {
 

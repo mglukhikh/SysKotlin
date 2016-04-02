@@ -1,12 +1,13 @@
-package ru.spbstu.sysk.samples
+package ru.spbstu.sysk.samples.triggers
 
 import ru.spbstu.sysk.core.SysModule
 import ru.spbstu.sysk.data.SysBit
 import ru.spbstu.sysk.data.SysBit.*
 
-class TFF(name: String, parent: SysModule) : SysModule(name, parent) {
+class JKFF(name: String, parent: SysModule) : SysModule(name, parent) {
 
-    val t = bitInput("t")
+    val j = bitInput("j")
+    val k = bitInput("k")
     val clk = bitInput("clk")
 
     private var state = ZERO
@@ -14,15 +15,9 @@ class TFF(name: String, parent: SysModule) : SysModule(name, parent) {
 
     init {
         function(clk, initialize = false) {
-
-            if (t.one) {
-                if (state.one)
-                    state = ZERO
-                else
-                    state = ONE
-            }
+            if (j.one && state.zero) state = ONE
+            else if (k.one && state.one) state = ZERO
             q(state)
         }
     }
 }
-

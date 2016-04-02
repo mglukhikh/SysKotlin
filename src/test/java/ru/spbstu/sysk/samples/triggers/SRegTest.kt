@@ -1,4 +1,4 @@
-package ru.spbstu.sysk.samples
+package ru.spbstu.sysk.samples.triggers
 
 import org.junit.Test
 import ru.spbstu.sysk.core.*

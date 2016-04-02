@@ -1,4 +1,4 @@
-package ru.spbstu.sysk.samples
+package ru.spbstu.sysk.samples.triggers
 
 import org.junit.Test
 import ru.spbstu.sysk.core.*
@@ -7,18 +7,18 @@ import ru.spbstu.sysk.data.SysBit
 import ru.spbstu.sysk.data.SysBit.*
 import ru.spbstu.sysk.channels.SysBitInput
 import ru.spbstu.sysk.channels.bind
-import ru.spbstu.sysk.generics.NAND
+import ru.spbstu.sysk.samples.NAND
 
 class DFFTest {
 
-    private class Testbench(name: String, parent: SysModule): SysModule(name, parent) {
+    private class Testbench(name: String, parent: SysModule) : SysModule(name, parent) {
 
         val d = output<SysBit>("d")
         private var dval by portWriter(d)
 
         val clk = bitInput("clk")
 
-        val q   = bitInput("q")
+        val q = bitInput("q")
         private val qval by bitPortReader(q)
 
         private var counter = 0

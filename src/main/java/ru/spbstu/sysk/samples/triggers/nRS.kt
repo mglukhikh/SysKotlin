@@ -2,7 +2,7 @@ package ru.spbstu.sysk.samples.triggers
 
 import ru.spbstu.sysk.core.SysModule
 import ru.spbstu.sysk.data.SysBit
-import ru.spbstu.sysk.generics.NAND
+import ru.spbstu.sysk.samples.NAND
 
 class nRS(name: String, parent: SysModule) : SysModule(name, parent) {
 

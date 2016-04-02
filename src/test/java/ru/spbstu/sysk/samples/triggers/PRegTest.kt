@@ -1,4 +1,4 @@
-package ru.spbstu.sysk.samples
+package ru.spbstu.sysk.samples.triggers
 
 import org.junit.Test
 import ru.spbstu.sysk.core.*
@@ -27,7 +27,7 @@ class PRegTest {
             function(clk) {
                 if (it is SysWait.Initialize) {
                     while (i < digPerWord) {
-                        d[i](SysBit.X)
+                        d[i](X)
                         i += 1
                     }
                 } else {

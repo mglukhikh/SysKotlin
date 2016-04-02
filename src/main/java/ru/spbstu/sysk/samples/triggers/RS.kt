@@ -2,7 +2,7 @@ package ru.spbstu.sysk.samples.triggers
 
 import ru.spbstu.sysk.core.SysModule
 import ru.spbstu.sysk.data.SysBit
-import ru.spbstu.sysk.generics.NOR
+import ru.spbstu.sysk.samples.NOR
 
 class RS(name: String, parent: SysModule) : SysModule(name, parent) {
 
