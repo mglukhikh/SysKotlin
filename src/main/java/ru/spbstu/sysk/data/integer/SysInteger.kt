@@ -44,6 +44,8 @@ abstract class SysInteger protected constructor(
 
     abstract operator fun get(i: Int): SysBit
     abstract operator fun get(j: Int, i: Int): SysInteger
+    abstract operator fun set(i: Int, bit: SysBit): SysInteger
+    abstract operator fun set(j: Int, i: Int, bits: Array<SysBit>): SysInteger
 
     abstract fun inv(): SysInteger
     abstract infix fun and(arg: SysInteger): SysInteger
@@ -60,6 +62,22 @@ abstract class SysInteger protected constructor(
     abstract fun toSysBigInteger(): SysBigInteger
     abstract fun toInt(): Int
     abstract fun toLong(): Long
+
+    abstract fun bitRepresentation(): Array<SysBit>
+
+    fun toBitString(): String {
+        val builder = StringBuilder()
+        val bits = bitRepresentation()
+        for (i in bits.indices) {
+            when (bits[i]) {
+                SysBit.X -> builder.append("X")
+                SysBit.Z -> builder.append("Z")
+                SysBit.ONE -> builder.append("1")
+                SysBit.ZERO -> builder.append("0")
+            }
+        }
+        return builder.toString()
+    }
 
     override abstract fun compareTo(other: SysInteger): Int
 

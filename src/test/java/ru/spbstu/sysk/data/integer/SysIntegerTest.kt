@@ -31,6 +31,7 @@ class SysIntegerTest {
         //assert(n[10] == X);
         assert((m + n).equals(SysLongInteger(32, 0)));
         //assert((m + n)[10] == X)
+        // println(x.toBitString())
     }
 
     @Test

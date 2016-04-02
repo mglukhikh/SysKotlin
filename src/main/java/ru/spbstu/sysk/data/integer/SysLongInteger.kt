@@ -397,6 +397,60 @@ class SysLongInteger private constructor(
         return truncate(resWidth, result, positiveValues[resWidth], negativeValues[resWidth])
     }
 
+    override fun set(j: Int, i: Int, bits: Array<SysBit>): SysInteger {
+        if (j < i) throw IllegalArgumentException()
+        if (j >= width || i < 0) throw IndexOutOfBoundsException()
+        if ((j - i) != bits.size) throw IllegalArgumentException()
+
+        if (hasUndefined) {
+            val newState = bitsState.copyOf()
+            for (a in 0..bits.lastIndex)
+                newState[i + a] = bits[a]
+            return SysLongInteger(newState)
+        }
+        if (bits.contains(SysBit.X)) {
+            val newState = Array(width, { i -> get(i) })
+            for (a in 0..bits.lastIndex)
+                newState[i + a] = bits[a]
+            return SysLongInteger(newState)
+        }
+        var newValue = value
+        for (a in 0..j - i)
+            if (bits[a] == SysBit.ONE) {
+                newValue = newValue or (1L shl (i + a))
+            } else {
+                newValue = newValue and (-1L xor (1L shl (i + a)))
+            }
+        return SysLongInteger(width, newValue, positiveMask, negativeMask)
+    }
+
+    override fun set(i: Int, bit: SysBit): SysLongInteger {
+        if (i < 0 || i >= width) throw IndexOutOfBoundsException()
+        if (hasUndefined) {
+            val newState = bitsState.copyOf()
+            newState[i] = bit
+            return SysLongInteger(newState)
+        }
+        if (bit == SysBit.X) {
+            val newState = Array(width, { i -> get(i) })
+            newState[i] = bit
+            return SysLongInteger(newState)
+        }
+        var newValue = value
+        if (bit == SysBit.ONE) {
+            newValue = newValue or (1L shl i)
+        } else {
+            newValue = newValue and (-1L xor (1L shl i))
+        }
+        return SysLongInteger(width, newValue, positiveMask, negativeMask)
+    }
+
+    override fun bitRepresentation(): Array<SysBit> {
+        if (hasUndefined)
+            return bitsState
+        return Array(width, { i -> get(i) })
+    }
+
     override fun toSysLongInteger() = this
 
     override fun toSysBigInteger() = SysBigInteger(width, value)
@@ -443,6 +497,7 @@ class SysLongInteger private constructor(
                 }
             return value
         }
+
 
 
         //        private fun maskBySWSArray(arr: Array<SysBit>): Array<Boolean> {

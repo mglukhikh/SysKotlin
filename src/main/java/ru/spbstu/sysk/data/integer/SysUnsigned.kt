@@ -372,6 +372,61 @@ private constructor(
 
     override fun shr(shift: Int) = this ushr shift
 
+    override fun set(j: Int, i: Int, bits: Array<SysBit>): SysUnsigned {
+        if (j < i) throw IllegalArgumentException()
+        if (j >= width || i < 0) throw IndexOutOfBoundsException()
+        if ((j - i) != bits.size) throw IllegalArgumentException()
+
+        if (hasUndefined) {
+            val newState = bitsState.copyOf()
+            for (a in 0..bits.lastIndex)
+                newState[i + a] = bits[a]
+            return SysUnsigned(newState)
+        }
+        if (bits.contains(SysBit.X)) {
+            val newState = Array(width, { i -> get(i) })
+            for (a in 0..bits.lastIndex)
+                newState[i + a] = bits[a]
+            return SysUnsigned(newState)
+        }
+        var newValue = value
+        for (a in 0..j - i)
+            if (bits[a] == SysBit.ONE) {
+                newValue = newValue or (1L shl (i + a))
+            } else {
+                newValue = newValue and ((1L shl i).inv())
+            }
+        return SysUnsigned(width, newValue, positiveMask)
+    }
+
+    override fun set(i: Int, bit: SysBit): SysUnsigned {
+        if (i < 0 || i >= width) throw IndexOutOfBoundsException()
+        if (hasUndefined) {
+            val newState = bitsState.copyOf()
+            newState[i] = bit
+            return SysUnsigned(newState)
+        }
+        if (bit == SysBit.X) {
+            val newState = Array(width, { i -> get(i) })
+            newState[i] = bit
+            return SysUnsigned(newState)
+        }
+        var newValue = value
+        if (bit == SysBit.ONE) {
+            newValue = newValue or (1L shl i)
+        } else {
+            newValue = newValue and ((1L shl i).inv())
+        }
+        return SysUnsigned(width, newValue, positiveMask)
+    }
+
+    override fun bitRepresentation(): Array<SysBit> {
+        if (hasUndefined)
+            return bitsState
+        return Array(width, { i -> get(i) })
+    }
+
+
     override fun toSysLongInteger() = SysLongInteger.valueOf(value)
 
     override fun toSysBigInteger() = SysBigInteger.valueOf(value)

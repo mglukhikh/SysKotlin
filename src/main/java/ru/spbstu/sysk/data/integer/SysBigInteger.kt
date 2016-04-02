@@ -268,6 +268,59 @@ class SysBigInteger private constructor(
         return truncate(resWidth, result, getMaxValue(resWidth), getMinValue(resWidth))
     }
 
+    override fun bitRepresentation(): Array<SysBit> {
+        if (hasUndefined)
+            return bitsState
+        return Array(width, { i -> get(i) })
+    }
+
+    override fun set(i: Int, bit: SysBit): SysBigInteger {
+        if (i < 0 || i >= width) throw IndexOutOfBoundsException()
+        if (hasUndefined) {
+            val newState = bitsState.copyOf()
+            newState[i] = bit
+            return SysBigInteger(newState)
+        }
+        if (bit == SysBit.X) {
+            val newState = Array(width, { i -> get(i) })
+            newState[i] = bit
+            return SysBigInteger(newState)
+        }
+        var newValue = value
+        if (bit == SysBit.ONE) {
+            newValue = newValue.setBit(i)
+        } else {
+            newValue = newValue.clearBit(i)
+        }
+        return SysBigInteger(width, newValue, positiveMask, negativeMask)
+    }
+
+    override fun set(j: Int, i: Int, bits: Array<SysBit>): SysBigInteger {
+        if (j < i) throw IllegalArgumentException()
+        if (j >= width || i < 0) throw IndexOutOfBoundsException()
+        if ((j - i) != bits.size) throw IllegalArgumentException()
+
+        if (hasUndefined) {
+            val newState = bitsState.copyOf()
+            for (a in 0..bits.lastIndex)
+                newState[i + a] = bits[a]
+            return SysBigInteger(newState)
+        }
+        if (bits.contains(SysBit.X)) {
+            val newState = Array(width, { i -> get(i) })
+            for (a in 0..bits.lastIndex)
+                newState[i + a] = bits[a]
+            return SysBigInteger(newState)
+        }
+        var newValue = value
+        for (a in 0..j - i)
+            if (bits[a] == SysBit.ONE) {
+                newValue = newValue.setBit(i + a)
+            } else {
+                newValue = newValue.clearBit(i + a)
+            }
+        return SysBigInteger(width, newValue, positiveMask, negativeMask)
+    }
 
     /** Bitwise logical shift right*/
     override infix fun ushr(shift: Int): SysBigInteger {
