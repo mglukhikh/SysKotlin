@@ -63,11 +63,11 @@ abstract class SysInteger protected constructor(
     abstract fun toInt(): Int
     abstract fun toLong(): Long
 
-    abstract fun bitRepresentation(): Array<SysBit>
+    abstract fun bits(): Array<SysBit>
 
     fun toBitString(): String {
         val builder = StringBuilder()
-        val bits = bitRepresentation()
+        val bits = bits()
         for (i in bits.indices) {
             when (bits[i]) {
                 SysBit.X -> builder.append("X")
@@ -160,9 +160,8 @@ fun integer(value: Int) = SysInteger.valueOf(value.toLong())
 
 fun integer(value: Long) = SysInteger.valueOf(value)
 
-fun integer(width: Int, value: Int) = SysInteger(width, value)
+fun integer(width: Int, value: Int) = SysInteger.valueOf(width, value)
 
-fun integer(width: Int, value: Long) = SysInteger(width, value)
+fun integer(width: Int, value: Long) = SysInteger.valueOf(width, value)
 
-fun integer(bits: Array<SysBit>) = SysInteger(bits)
-
+fun integer(bits: Array<SysBit>) = SysInteger.valueOf(bits)

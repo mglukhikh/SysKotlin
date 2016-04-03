@@ -4,8 +4,9 @@ import org.junit.Test
 import ru.spbstu.sysk.channels.bind
 import ru.spbstu.sysk.core.*
 import ru.spbstu.sysk.core.TimeUnit.*
-import ru.spbstu.sysk.data.*
+import ru.spbstu.sysk.data.SysBit
 import ru.spbstu.sysk.data.integer.SysInteger
+import ru.spbstu.sysk.data.integer.SysLongInteger
 import java.util.*
 
 internal val CAPACITY_DATA = 32
@@ -99,24 +100,24 @@ internal class RAM constructor(
 
     private val write: (SysWait) -> SysWait = {
         val data = SysInteger(Array(CAPACITY_DATA, { dataPort[it] }))
-        val address = SysInteger(Array(CAPACITY_ADDRESS, { addressPort[it] }))
-//        if ((address.value > firstAddress) && (address.value < (firstAddress + capacity))) {
-//            memory[address.value.toInt() - firstAddress] = data
-//        }
+        val address = SysLongInteger(Array(CAPACITY_ADDRESS, { addressPort[it] }))
+        if ((address.value > firstAddress) && (address.value < (firstAddress + capacity))) {
+            memory[address.value.toInt() - firstAddress] = data
+        }
         startWrite
     }
 
     private val read: (SysWait) -> SysWait = {
-        val address = SysInteger(Array(CAPACITY_ADDRESS, { addressPort[it] }))
-//        if ((address.value >= firstAddress) && (address.value < (firstAddress + capacity))) {
-//            for (i in 0..(CAPACITY_DATA - 1))
-//                dataPort(memory[address.value.toInt() - firstAddress][i], i)
-//        }
+        val address = SysLongInteger(Array(CAPACITY_ADDRESS, { addressPort[it] }))
+        if ((address.value >= firstAddress) && (address.value < (firstAddress + capacity))) {
+            for (i in 0..(CAPACITY_DATA - 1))
+                dataPort(memory[address.value.toInt() - firstAddress][i], i)
+        }
         startRead
     }
 
     private val print: (SysWait) -> SysWait = {
-        val address = SysInteger(Array(CAPACITY_ADDRESS, { addressPort[it] }))
+        val address = SysLongInteger(Array(CAPACITY_ADDRESS, { addressPort[it] }))
         if (address.value.toInt() >= firstAddress && address.value.toInt() < firstAddress + capacity) {
             println("$this.value: ${memory[address.value.toInt() - firstAddress]}")
             println("$this.address: $address")

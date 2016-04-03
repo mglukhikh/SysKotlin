@@ -375,7 +375,7 @@ private constructor(
     override fun set(j: Int, i: Int, bits: Array<SysBit>): SysUnsigned {
         if (j < i) throw IllegalArgumentException()
         if (j >= width || i < 0) throw IndexOutOfBoundsException()
-        if ((j - i) != bits.size) throw IllegalArgumentException()
+        if ((j - i + 1) != bits.size) throw IllegalArgumentException()
 
         if (hasUndefined) {
             val newState = bitsState.copyOf()
@@ -420,7 +420,7 @@ private constructor(
         return SysUnsigned(width, newValue, positiveMask)
     }
 
-    override fun bitRepresentation(): Array<SysBit> {
+    override fun bits(): Array<SysBit> {
         if (hasUndefined)
             return bitsState
         return Array(width, { i -> get(i) })

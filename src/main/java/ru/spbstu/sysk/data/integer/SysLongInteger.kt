@@ -445,7 +445,7 @@ class SysLongInteger private constructor(
         return SysLongInteger(width, newValue, positiveMask, negativeMask)
     }
 
-    override fun bitRepresentation(): Array<SysBit> {
+    override fun bits(): Array<SysBit> {
         if (hasUndefined)
             return bitsState
         return Array(width, { i -> get(i) })

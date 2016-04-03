@@ -268,7 +268,7 @@ class SysBigInteger private constructor(
         return truncate(resWidth, result, getMaxValue(resWidth), getMinValue(resWidth))
     }
 
-    override fun bitRepresentation(): Array<SysBit> {
+    override fun bits(): Array<SysBit> {
         if (hasUndefined)
             return bitsState
         return Array(width, { i -> get(i) })
