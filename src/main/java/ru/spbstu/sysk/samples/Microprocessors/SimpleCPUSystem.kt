@@ -5,6 +5,7 @@ import ru.spbstu.sysk.channels.bind
 import ru.spbstu.sysk.core.*
 import ru.spbstu.sysk.core.TimeUnit.*
 import ru.spbstu.sysk.data.*
+import ru.spbstu.sysk.data.integer.SysInteger
 import java.util.*
 
 internal val CAPACITY_DATA = 32
@@ -99,18 +100,18 @@ internal class RAM constructor(
     private val write: (SysWait) -> SysWait = {
         val data = SysInteger(Array(CAPACITY_DATA, { dataPort[it] }))
         val address = SysInteger(Array(CAPACITY_ADDRESS, { addressPort[it] }))
-        if ((address.value > firstAddress) && (address.value < (firstAddress + capacity))) {
-            memory[address.value.toInt() - firstAddress] = data
-        }
+//        if ((address.value > firstAddress) && (address.value < (firstAddress + capacity))) {
+//            memory[address.value.toInt() - firstAddress] = data
+//        }
         startWrite
     }
 
     private val read: (SysWait) -> SysWait = {
         val address = SysInteger(Array(CAPACITY_ADDRESS, { addressPort[it] }))
-        if ((address.value >= firstAddress) && (address.value < (firstAddress + capacity))) {
-            for (i in 0..(CAPACITY_DATA - 1))
-                dataPort(memory[address.value.toInt() - firstAddress][i], i)
-        }
+//        if ((address.value >= firstAddress) && (address.value < (firstAddress + capacity))) {
+//            for (i in 0..(CAPACITY_DATA - 1))
+//                dataPort(memory[address.value.toInt() - firstAddress][i], i)
+//        }
         startRead
     }
 
