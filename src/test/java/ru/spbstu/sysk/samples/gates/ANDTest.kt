@@ -59,9 +59,7 @@ class ANDTest : SysTopModule() {
             state {
                 assert(x1().zero && x2().x && y().zero) {"Fail: ANDTest.state.9"}
             }
-            state {
-                scheduler.stop()
-            }
+            stop(scheduler)
         }
     }
 

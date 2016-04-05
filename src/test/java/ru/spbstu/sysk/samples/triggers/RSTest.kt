@@ -92,9 +92,7 @@ class RSTest : SysTopModule() {
             loop(i) {
                 state(rndJump)
             }
-            state {
-                scheduler.stop()
-            }
+            stop(scheduler)
         }
     }
 

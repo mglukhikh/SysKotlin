@@ -59,9 +59,7 @@ class NORTest : SysTopModule() {
             state {
                 assert(x1().zero && x2().x && y().x) {"Fail: NORTest.state.9"}
             }
-            state {
-                scheduler.stop()
-            }
+            stop(scheduler)
         }
     }
 

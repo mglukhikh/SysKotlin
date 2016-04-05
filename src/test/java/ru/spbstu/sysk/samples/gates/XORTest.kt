@@ -59,9 +59,7 @@ class XORTest : SysTopModule() {
             state {
                 assert(x1().zero && x2().x && y().x) {"Fail: XORTest.state.9"}
             }
-            state {
-                scheduler.stop()
-            }
+            stop(scheduler)
         }
     }
 

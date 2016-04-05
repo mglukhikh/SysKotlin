@@ -36,9 +36,7 @@ class NOTTest : SysTopModule() {
             state {
                 assert(x().x && y().x) {"Fail: NOTTest.state.4"}
             }
-            state {
-                scheduler.stop()
-            }
+            stop(scheduler)
         }
     }
 

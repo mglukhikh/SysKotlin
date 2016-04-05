@@ -59,9 +59,7 @@ class NXORTest : SysTopModule() {
             state {
                 assert(x1().zero && x2().x && y().x) {"Fail: NXORTest.state.9"}
             }
-            state {
-                scheduler.stop()
-            }
+            stop(scheduler)
         }
     }
 

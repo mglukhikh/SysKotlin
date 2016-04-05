@@ -52,9 +52,7 @@ class RegisterFileTest : SysTopModule() {
                 assert(data() == unsigned(8, 10))
                 command(COMMAND.STORAGE)
             }
-            state {
-                scheduler.stop()
-            }
+            stop(scheduler)
         }
     }
 

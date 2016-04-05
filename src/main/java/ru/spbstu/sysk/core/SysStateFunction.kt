@@ -21,6 +21,14 @@ interface StateContainer {
 
     fun wait(): SysWait
 
+    fun stop(scheduler: SysScheduler) {
+        val result = State.Single {
+            scheduler.stop()
+            wait()
+        }
+        states.add(result)
+    }
+
     fun state(f: () -> Unit) {
         val result = State.Single {
             f()
@@ -30,12 +38,14 @@ interface StateContainer {
     }
 
     fun sleep(number: Int) {
-        if (number <= 0) {
-            throw IllegalArgumentException("Impossible to sleep $number cycles.")
-        }
+        if (number < 0) throw IllegalArgumentException("Impossible to sleep $number cycles.")
         var memory = number
         val result = State.Function("sleep", { true }) {
-            memory--
+            if (number == 0){
+                if (++state < states.size) this.run(wait())
+                --state
+            }
+            --memory
             if (memory > 0) state--
             else memory = number
             wait()

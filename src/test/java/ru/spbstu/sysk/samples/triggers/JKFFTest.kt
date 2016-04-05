@@ -53,9 +53,7 @@ class JKFFTest {
                         k(ZERO)
                     }
                 }
-                state {
-                    scheduler.stop()
-                }
+                stop(scheduler)
             }
         }
     }

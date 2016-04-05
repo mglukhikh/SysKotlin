@@ -54,9 +54,7 @@ class SysMemoryTest {
                         }
                     }
                 }
-                state {
-                    scheduler.stop()
-                }
+                stop(scheduler)
             }
         }
     }

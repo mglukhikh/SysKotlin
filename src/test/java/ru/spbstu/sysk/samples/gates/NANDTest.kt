@@ -59,9 +59,7 @@ class NANDTest : SysTopModule() {
             state {
                 assert(x1().zero && x2().x && y().one) {"Fail: ORTest.state.9"}
             }
-            state {
-                scheduler.stop()
-            }
+            stop(scheduler)
         }
     }
 
