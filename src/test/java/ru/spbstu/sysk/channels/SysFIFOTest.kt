@@ -7,7 +7,7 @@ import ru.spbstu.sysk.core.TimeUnit.*
 import ru.spbstu.sysk.data.SysBit
 import ru.spbstu.sysk.data.SysBit.*
 
-class FifoTest : SysTopModule() {
+class SysFifoTest : SysTopModule() {
 
     @Test
     fun bitFifo() {

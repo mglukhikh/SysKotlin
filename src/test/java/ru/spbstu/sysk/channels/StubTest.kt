@@ -7,9 +7,8 @@ import ru.spbstu.sysk.core.SysWait
 import ru.spbstu.sysk.data.SysBit
 import ru.spbstu.sysk.data.integer.SysInteger
 
-private const val EXPONENT = 3
 
-class StubTest {
+class StubTest : SysTopModule() {
 
     internal class Involuator(
             name: String, parent: SysModule)
@@ -65,25 +64,25 @@ class StubTest {
         }
     }
 
-    internal object TopModule : SysTopModule() {
-        init {
-            val involuator = Involuator("involuator", this)
-            val tester = Tester(10, "Tester", this)
-            val clk = clock("clk", SysWait.Time(1), SysBit.ZERO)
-            val expWire = signal<SysInteger>("exp")
-            val resultWire = signal<SysInteger>("result")
-            involuator.clk.bind(clk)
-            tester.clk.bind(clk)
-            involuator.exp.bind(expWire)
-            tester.exp.bind(expWire)
-            involuator.result.bind(resultWire)
-            tester.result.bind(resultWire)
-            involuator.pow.bind(signalStub("pow", SysInteger(32, EXPONENT)))
-        }
+    init {
+        val involuator = Involuator("involuator", this)
+        val tester = Tester(10, "Tester", this)
+        val clk = clock("clk", SysWait.Time(1), SysBit.ZERO)
+        val expWire = signal<SysInteger>("exp")
+        val resultWire = signal<SysInteger>("result")
+        involuator.clk.bind(clk)
+        tester.clk.bind(clk)
+        involuator.exp.bind(expWire)
+        tester.exp.bind(expWire)
+        involuator.result.bind(resultWire)
+        tester.result.bind(resultWire)
+        involuator.pow.bind(signalStub("pow", SysInteger(32, EXPONENT)))
     }
 
     @Test
-    fun show() {
-        TopModule.start()
+    fun show() = start()
+
+    companion object {
+        val EXPONENT = 3
     }
 }

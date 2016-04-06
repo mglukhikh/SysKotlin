@@ -3,44 +3,18 @@ package ru.spbstu.sysk.samples.microprocessors.i8080
 import ru.spbstu.sysk.core.SysModule
 import ru.spbstu.sysk.data.SysBit
 import ru.spbstu.sysk.data.integer.*
+import ru.spbstu.sysk.samples.microprocessors.i8080.MainConstants.COMMAND
+import ru.spbstu.sysk.samples.microprocessors.i8080.MainConstants.REGISTER
 
-object REGISTER {
-    val A = unsigned(4, 0)
-    val Flag = unsigned(4, 1)
-    val B = unsigned(4, 2)
-    val C = unsigned(4, 3)
-    val D = unsigned(4, 4)
-    val E = unsigned(4, 5)
-    val H = unsigned(4, 6)
-    val L = unsigned(4, 7)
 
-    val PSW = unsigned(4, 0)
-    val BC = unsigned(4, 2)
-    val DE = unsigned(4, 4)
-    val HL = unsigned(4, 6)
-    val PC = unsigned(4, 8)
-    val SP = unsigned(4, 10)
-}
+class RegisterFile constructor(val capacityData: Int, val capacityAddress: Int, parent: SysModule) : SysModule("RegisterFile", parent) {
 
-object COMMAND {
-    val STORAGE = unsigned(3, 0)
-    val WRITE = unsigned(3, 1)
-    val READ = unsigned(3, 2)
-    val INC = unsigned(3, 3)
-    val DEC = unsigned(3, 4)
-    val SHL = unsigned(3, 5)
-    val SHR = unsigned(3, 6)
-    val RESET = unsigned(3, 7)
-}
-
-class RegisterFile constructor(val capacity: Int, parent: SysModule) : SysModule("RegisterFile", parent) {
-
-    private var PSW = unsigned(capacity * 2, 0)
-    private var BC = unsigned(capacity * 2, 0)
-    private var DE = unsigned(capacity * 2, 0)
-    private var HL = unsigned(capacity * 2, 0)
-    private var PC = unsigned(capacity * 2, 0)
-    private var SP = unsigned(capacity * 2, 0)
+    private var PSW = unsigned(capacityData * 2, 0)
+    private var BC = unsigned(capacityData * 2, 0)
+    private var DE = unsigned(capacityData * 2, 0)
+    private var HL = unsigned(capacityData * 2, 0)
+    private var PC = unsigned(capacityData * 2, 0)
+    private var SP = unsigned(capacityData * 2, 0)
 
     val data = bidirPort<SysUnsigned>("data")
     val address = bidirPort<SysUnsigned>("address")
@@ -111,42 +85,43 @@ class RegisterFile constructor(val capacity: Int, parent: SysModule) : SysModule
     }
 
     private fun reset() {
-        PSW = unsigned(capacity * 2, 0)
-        BC = unsigned(capacity * 2, 0)
-        DE = unsigned(capacity * 2, 0)
-        HL = unsigned(capacity * 2, 0)
-        PC = unsigned(capacity * 2, 0)
-        SP = unsigned(capacity * 2, 0)
+        PSW = unsigned(capacityData * 2, 0)
+        BC = unsigned(capacityData * 2, 0)
+        DE = unsigned(capacityData * 2, 0)
+        HL = unsigned(capacityData * 2, 0)
+        PC = unsigned(capacityData * 2, 0)
+        SP = unsigned(capacityData * 2, 0)
     }
 
     private fun read(register: SysUnsigned) {
         when (register) {
-            REGISTER.A -> data(PSW[capacity - 1, 0])
-            REGISTER.Flag -> data(PSW[capacity * 2 - 1, capacity])
-            REGISTER.B -> data(BC[capacity - 1, 0])
-            REGISTER.C -> data(BC[capacity * 2 - 1, capacity])
-            REGISTER.D -> data(DE[capacity - 1, 0])
-            REGISTER.E -> data(DE[capacity * 2 - 1, capacity])
-            REGISTER.H -> data(HL[capacity - 1, 0])
-            REGISTER.L -> data(HL[capacity * 2 - 1, capacity])
+            REGISTER.A -> data(PSW[capacityData - 1, 0])
+            REGISTER.Flag -> data(PSW[capacityData * 2 - 1, capacityData])
+            REGISTER.B -> data(BC[capacityData - 1, 0])
+            REGISTER.C -> data(BC[capacityData * 2 - 1, capacityData])
+            REGISTER.D -> data(DE[capacityData - 1, 0])
+            REGISTER.E -> data(DE[capacityData * 2 - 1, capacityData])
+            REGISTER.H -> data(HL[capacityData - 1, 0])
+            REGISTER.L -> data(HL[capacityData * 2 - 1, capacityData])
             REGISTER.PC -> address(PC)
             REGISTER.SP -> address(SP)
         }
     }
 
     private fun write(register: SysUnsigned) {
-        if (data().width != capacity) throw IllegalArgumentException("${data().width}")
+        if (data().width != capacityData) throw IllegalArgumentException("${data().width}")
+        if (address().width != capacityAddress) throw IllegalArgumentException("${address().width}")
         when (register) {
-            REGISTER.A -> PSW = PSW.set(capacity - 1, 0, data())
-            REGISTER.Flag -> PSW = PSW.set(capacity * 2 - 1, capacity, data())
-            REGISTER.B -> BC = BC.set(capacity - 1, 0, data())
-            REGISTER.C -> BC = BC.set(capacity * 2 - 1, capacity, data())
-            REGISTER.D -> DE = DE.set(capacity - 1, 0, data())
-            REGISTER.E -> DE = DE.set(capacity * 2 - 1, capacity, data())
-            REGISTER.H -> HL = HL.set(capacity - 1, 0, data())
-            REGISTER.L -> HL = HL.set(capacity * 2 - 1, capacity, data())
-            REGISTER.PC -> PC = address()[capacity * 2 - 1, 0]
-            REGISTER.SP -> SP = address()[capacity * 2 - 1, 0]
+            REGISTER.A -> PSW = PSW.set(capacityData - 1, 0, data())
+            REGISTER.Flag -> PSW = PSW.set(capacityData * 2 - 1, capacityData, data())
+            REGISTER.B -> BC = BC.set(capacityData - 1, 0, data())
+            REGISTER.C -> BC = BC.set(capacityData * 2 - 1, capacityData, data())
+            REGISTER.D -> DE = DE.set(capacityData - 1, 0, data())
+            REGISTER.E -> DE = DE.set(capacityData * 2 - 1, capacityData, data())
+            REGISTER.H -> HL = HL.set(capacityData - 1, 0, data())
+            REGISTER.L -> HL = HL.set(capacityData * 2 - 1, capacityData, data())
+            REGISTER.PC -> PC = address()[capacityData * 2 - 1, 0]
+            REGISTER.SP -> SP = address()[capacityData * 2 - 1, 0]
         }
     }
 }

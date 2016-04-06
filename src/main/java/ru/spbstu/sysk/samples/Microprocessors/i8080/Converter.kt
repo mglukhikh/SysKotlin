@@ -6,7 +6,7 @@ import ru.spbstu.sysk.data.SysBit
 import ru.spbstu.sysk.data.integer.SysInteger
 import ru.spbstu.sysk.data.integer.integer
 
-class SysConverter constructor(val capacity: Int, name: String, parent: SysModule) : SysModule(name, parent) {
+class Converter constructor(capacity: Int, name: String, parent: SysModule) : SysModule(name, parent) {
 
     val signalPort = bidirPort<SysInteger>("signal")
     val signalsPort = Array(capacity, { bidirPort<SysBit>("signal.$it") })

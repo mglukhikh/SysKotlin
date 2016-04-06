@@ -7,15 +7,17 @@ import ru.spbstu.sysk.core.invoke
 import ru.spbstu.sysk.data.integer.SysUnsigned
 import ru.spbstu.sysk.data.integer.integer
 import ru.spbstu.sysk.data.integer.unsigned
+import ru.spbstu.sysk.samples.microprocessors.i8080.MainConstants.COMMAND
+import ru.spbstu.sysk.samples.microprocessors.i8080.MainConstants.REGISTER
 
 class RegisterFileTest : SysTopModule() {
 
-    val RegFile = RegisterFile(8, this)
+    val RegFile = RegisterFile(8, 16, this)
 
     val data = signal<SysUnsigned>("data")
     val command = signal("command", COMMAND.STORAGE)
-    val register = signal<SysUnsigned>("register")
-    val address = signal<SysUnsigned>("address")
+    val register = signal<SysUnsigned>("register", unsigned(8, 0))
+    val address = signal<SysUnsigned>("address", unsigned(16, 0))
     val clk = clock("clk", 2(FS))
 
     init {
