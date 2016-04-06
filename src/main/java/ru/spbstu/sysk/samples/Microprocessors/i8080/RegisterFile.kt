@@ -28,7 +28,9 @@ object COMMAND {
     val READ = unsigned(3, 2)
     val INC = unsigned(3, 3)
     val DEC = unsigned(3, 4)
-    val RESET = unsigned(3, 5)
+    val SHL = unsigned(3, 5)
+    val SHR = unsigned(3, 6)
+    val RESET = unsigned(3, 7)
 }
 
 class RegisterFile constructor(val capacity: Int, parent: SysModule) : SysModule("RegisterFile", parent) {
@@ -51,14 +53,38 @@ class RegisterFile constructor(val capacity: Int, parent: SysModule) : SysModule
         stateFunction(clk, true) {
             infiniteState {
                 when (command()) {
+                    COMMAND.STORAGE -> {}
                     COMMAND.WRITE -> write(register())
                     COMMAND.READ -> read(register())
-                    COMMAND.RESET -> reset()
                     COMMAND.INC -> inc(register())
                     COMMAND.DEC -> dec(register())
-                    COMMAND.STORAGE -> {}
+                    COMMAND.SHL -> shl(register())
+                    COMMAND.SHR -> shr(register())
+                    COMMAND.RESET -> reset()
                 }
             }
+        }
+    }
+
+    private fun shl(register: SysUnsigned) {
+        when (register) {
+            REGISTER.PSW -> PSW shl 1
+            REGISTER.BC -> BC shl 1
+            REGISTER.DE -> DE shl 1
+            REGISTER.HL -> HL shl 1
+            REGISTER.PC -> PC shl 1
+            REGISTER.SP -> SP shl 1
+        }
+    }
+
+    private fun shr(register: SysUnsigned) {
+        when (register) {
+            REGISTER.PSW -> PSW shr 1
+            REGISTER.BC -> BC shr 1
+            REGISTER.DE -> DE shr 1
+            REGISTER.HL -> HL shr 1
+            REGISTER.PC -> PC shr 1
+            REGISTER.SP -> SP shr 1
         }
     }
 
