@@ -4,6 +4,7 @@ import ru.spbstu.sysk.data.SysData
 import ru.spbstu.sysk.data.SysDataCompanion
 
 enum class Opcode : SysData {
+    UNDEFINED,
     NOP,
     PUSH,
     POP,
@@ -13,6 +14,6 @@ enum class Opcode : SysData {
     DIV;
 
     companion object : SysDataCompanion<Opcode> {
-        override val undefined = NOP
+        override val undefined = UNDEFINED
     }
 }
