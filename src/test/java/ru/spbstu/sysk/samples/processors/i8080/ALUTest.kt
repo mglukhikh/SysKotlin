@@ -1,11 +1,12 @@
-package ru.spbstu.sysk.samples.microprocessors.i8080
+package ru.spbstu.sysk.samples.processors.i8080
 
 import org.junit.Test
 import ru.spbstu.sysk.core.SysTopModule
 import ru.spbstu.sysk.core.TimeUnit.*
 import ru.spbstu.sysk.core.invoke
 import ru.spbstu.sysk.data.integer.integer
-import ru.spbstu.sysk.samples.microprocessors.i8080.MainConstants.OPERATION
+import ru.spbstu.sysk.samples.microprocessors.i8080.ArithmeticLogicUnit
+import ru.spbstu.sysk.samples.processors.i8080.MainConstants.OPERATION
 
 class ALUTest : SysTopModule() {
 

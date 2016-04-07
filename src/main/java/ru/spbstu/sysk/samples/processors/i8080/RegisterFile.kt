@@ -1,10 +1,10 @@
-package ru.spbstu.sysk.samples.microprocessors.i8080
+package ru.spbstu.sysk.samples.processors.i8080
 
 import ru.spbstu.sysk.core.SysModule
 import ru.spbstu.sysk.data.SysBit
 import ru.spbstu.sysk.data.integer.*
-import ru.spbstu.sysk.samples.microprocessors.i8080.MainConstants.COMMAND
-import ru.spbstu.sysk.samples.microprocessors.i8080.MainConstants.REGISTER
+import ru.spbstu.sysk.samples.processors.i8080.MainConstants.COMMAND
+import ru.spbstu.sysk.samples.processors.i8080.MainConstants.REGISTER
 
 
 class RegisterFile constructor(val capacityData: Int, val capacityAddress: Int, parent: SysModule) : SysModule("RegisterFile", parent) {

@@ -4,7 +4,7 @@ import ru.spbstu.sysk.core.SysModule
 import ru.spbstu.sysk.data.integer.SysInteger
 import ru.spbstu.sysk.data.integer.SysLongInteger
 import ru.spbstu.sysk.data.integer.SysUnsigned
-import ru.spbstu.sysk.samples.microprocessors.i8080.MainConstants.OPERATION
+import ru.spbstu.sysk.samples.processors.i8080.MainConstants.OPERATION
 
 class ArithmeticLogicUnit(capacityData: Int, name: String, parent: SysModule) : SysModule(name, parent) {
 

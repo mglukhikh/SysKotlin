@@ -1,4 +1,4 @@
-package ru.spbstu.sysk.samples.microprocessors.i8080
+package ru.spbstu.sysk.samples.processors.i8080
 
 import ru.spbstu.sysk.core.SysModule
 import ru.spbstu.sysk.core.SysWait

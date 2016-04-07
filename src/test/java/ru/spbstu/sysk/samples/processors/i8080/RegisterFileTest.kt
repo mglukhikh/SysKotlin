@@ -1,4 +1,4 @@
-package ru.spbstu.sysk.samples.microprocessors.i8080
+package ru.spbstu.sysk.samples.processors.i8080
 
 import org.junit.Test
 import ru.spbstu.sysk.core.SysTopModule
@@ -7,8 +7,11 @@ import ru.spbstu.sysk.core.invoke
 import ru.spbstu.sysk.data.integer.SysUnsigned
 import ru.spbstu.sysk.data.integer.integer
 import ru.spbstu.sysk.data.integer.unsigned
-import ru.spbstu.sysk.samples.microprocessors.i8080.MainConstants.COMMAND
-import ru.spbstu.sysk.samples.microprocessors.i8080.MainConstants.REGISTER
+import ru.spbstu.sysk.samples.processors.i8080.MainConstants.COMMAND
+import ru.spbstu.sysk.samples.processors.i8080.MainConstants.REGISTER
+import ru.spbstu.sysk.samples.processors.i8080.RegisterFile
+import ru.spbstu.sysk.samples.processors.i8080.sets
+import java.lang.Long
 
 class RegisterFileTest : SysTopModule() {
 

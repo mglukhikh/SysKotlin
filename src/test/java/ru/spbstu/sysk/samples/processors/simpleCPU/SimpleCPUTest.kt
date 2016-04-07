@@ -1,4 +1,4 @@
-package ru.spbstu.sysk.samples.microprocessors.simpleCPU;
+package ru.spbstu.sysk.samples.processors.simpleCPU;
 
 import org.junit.Test
 import ru.spbstu.sysk.channels.bind
@@ -6,8 +6,10 @@ import ru.spbstu.sysk.core.SysTopModule
 import ru.spbstu.sysk.core.invoke
 import ru.spbstu.sysk.data.integer.SysInteger
 import ru.spbstu.sysk.core.TimeUnit.*
-import ru.spbstu.sysk.samples.microprocessors.simpleCPU.MainConstants.CAPACITY
-import ru.spbstu.sysk.samples.microprocessors.simpleCPU.MainConstants.COMMAND
+import ru.spbstu.sysk.samples.processors.simpleCPU.CPU
+import ru.spbstu.sysk.samples.processors.simpleCPU.MainConstants.CAPACITY
+import ru.spbstu.sysk.samples.processors.simpleCPU.MainConstants.COMMAND
+import ru.spbstu.sysk.samples.processors.simpleCPU.RAM
 import java.util.*
 
 class SimpleCPUTest : SysTopModule() {

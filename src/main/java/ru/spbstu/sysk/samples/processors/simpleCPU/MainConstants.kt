@@ -1,4 +1,4 @@
-package ru.spbstu.sysk.samples.microprocessors.simpleCPU
+package ru.spbstu.sysk.samples.processors.simpleCPU
 
 import ru.spbstu.sysk.data.integer.SysInteger
 
