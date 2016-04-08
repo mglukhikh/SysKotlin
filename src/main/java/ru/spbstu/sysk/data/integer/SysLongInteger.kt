@@ -278,7 +278,7 @@ class SysLongInteger private constructor(
 
             val state = (if (hasUndefined) bitsState else Array(width, { i -> get(i) }))
             val argState = (if (arg.hasUndefined) arg.bitsState else Array(arg.width, { i -> arg.get(i) }))
-            var resultState: Array<SysBit>
+            val resultState: Array<SysBit>
             if (state.size > argState.size) {
                 resultState = state
                 for (i in argState.indices)
@@ -310,7 +310,7 @@ class SysLongInteger private constructor(
 
             val state = (if (hasUndefined) bitsState else Array(width, { i -> get(i) }))
             val argState = (if (arg.hasUndefined) arg.bitsState else Array(arg.width, { i -> arg.get(i) }))
-            var resultState: Array<SysBit>
+            val resultState: Array<SysBit>
             if (state.size > argState.size) {
                 resultState = state
                 for (i in argState.indices)
@@ -345,7 +345,7 @@ class SysLongInteger private constructor(
 
             val state = (if (hasUndefined) bitsState else Array(width, { i -> get(i) }))
             val argState = (if (arg.hasUndefined) arg.bitsState else Array(arg.width, { i -> arg.get(i) }))
-            var resultState: Array<SysBit>
+            val resultState: Array<SysBit>
             if (state.size > argState.size) {
                 resultState = state
                 for (i in argState.indices)
@@ -392,7 +392,7 @@ class SysLongInteger private constructor(
     override operator fun get(j: Int, i: Int): SysLongInteger {
         if (j < i) throw IllegalArgumentException()
         if (j >= width || i < 0) throw IndexOutOfBoundsException()
-        var result = value shr i
+        val result = value shr i
         val resWidth = j - i + 1
         return truncate(resWidth, result, positiveValues[resWidth], negativeValues[resWidth])
     }
