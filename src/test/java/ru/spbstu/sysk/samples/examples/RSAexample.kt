@@ -57,9 +57,9 @@ class RSAexample {
     fun euclid(arg: EuclidData): EuclidData {
         // println("arg $arg"
         if ( arg.b.value != BigInteger.ZERO ) {
-            var aa: SysBigInteger = arg.b
-            var bb: SysBigInteger = arg.a % arg.b
-            var tempResult = euclid(EuclidData(aa, bb, arg.d, arg.x, arg.y))
+            val aa: SysBigInteger = arg.b
+            val bb: SysBigInteger = arg.a % arg.b
+            val tempResult = euclid(EuclidData(aa, bb, arg.d, arg.x, arg.y))
             // println("temp $tempResult")
             //var tmp = x;
             //x = y
@@ -77,13 +77,13 @@ class RSAexample {
     // relatively prime. Recall that x is a multiplicative inverse of a,
     // modulo n, if a * x = 1 ( mod n ).
     fun inverse(a: SysBigInteger, n: SysBigInteger): SysBigInteger {
-        var d = SysBigInteger(NBITS, BigInteger.ZERO)
-        var x = SysBigInteger(NBITS, BigInteger.ZERO)
-        var y = SysBigInteger(NBITS, BigInteger.ZERO)
-        var result = euclid(EuclidData(a, n, d, x, y))
+        val d = SysBigInteger(NBITS, BigInteger.ZERO)
+        val x = SysBigInteger(NBITS, BigInteger.ZERO)
+        val y = SysBigInteger(NBITS, BigInteger.ZERO)
+        val result = euclid(EuclidData(a, n, d, x, y))
         assert(result.d.value == BigInteger.ONE) { d };
         //check this!
-        var temp = result.x % n;
+        val temp = result.x % n;
 
         return positiveRemainder(temp, n);
     }
@@ -151,7 +151,7 @@ class RSAexample {
 
 
         // Cipher and decipher a randomly generated message msg.
-        var msgStr = CharArray(HALF_STR_SIZE)
+        val msgStr = CharArray(HALF_STR_SIZE)
         randBitStr(msgStr, HALF_STR_SIZE);
         var msg = SysBigInteger(NBITS, BigInteger(String(msgStr), 2))
 

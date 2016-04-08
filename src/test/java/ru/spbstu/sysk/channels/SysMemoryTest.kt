@@ -65,7 +65,7 @@ class SysMemoryTest {
     }
 
     private class LoadTester : SysTopModule("tester") {
-        val m = memory<SysBit>("memory", 8, SysBit.X)
+        val m = memory("memory", 8, SysBit.X)
 
         val clk = clock("clk", 20(NS))
 

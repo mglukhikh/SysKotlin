@@ -30,8 +30,8 @@ class SysFloat private constructor(
             val bits: Int = java.lang.Float.floatToIntBits(arg)
             val signBit = (bits and (1 shl 31)) != 0
             val exponentBits = bits and 0x7ff00000;
-            var mantis = (bits and 0x007fffff)
-            var exponent = (exponentBits shr 23)
+            val mantis = (bits and 0x007fffff)
+            val exponent = (exponentBits shr 23)
             val sign: SysBit
             if (signBit)
                 sign = SysBit.ONE
@@ -41,7 +41,7 @@ class SysFloat private constructor(
         }
 
         private fun valueByBits(sign: SysBit, exponent: SysUnsigned, mantissa: SysUnsigned): Float {
-            var mantis = mantissa.value.toInt()
+            val mantis = mantissa.value.toInt()
 
             var result = mantis.toInt() or ((exponent.value.toInt())shl 23)
             if (sign == SysBit.ONE)

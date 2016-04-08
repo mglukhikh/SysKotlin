@@ -150,7 +150,7 @@ interface StateContainer {
         states.add(reset)
         labelInternal(begin)
         case({
-            var cond = iterator.hasNext()
+            val cond = iterator.hasNext()
             if (cond) iterator.next()
             !cond
         }) { jumpInternal(end) }

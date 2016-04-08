@@ -154,7 +154,7 @@ class SysBigInteger private constructor(
         if (hasUndefined || arg.hasUndefined) {
 
             val state = (if (hasUndefined) bitsState else Array(width, { i -> get(i) }))
-            val argState = (if (arg.hasUndefined) arg.bitsState else Array(arg.width, { i -> arg.get(i) }))
+            val argState = (if (arg.hasUndefined) arg.bitsState else Array(arg.width, { i -> arg[i] }))
             var resultState: Array<SysBit>
             if (state.size > argState.size) {
                 resultState = state

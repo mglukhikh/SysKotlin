@@ -31,8 +31,8 @@ class SysDouble private constructor(
 
             val signBit = (bits and (1L shl 63)) != 0L
             val exponentBits = bits and 0x7ff0000000000000L;
-            var mantis = (bits and 0x000fffffffffffffL)//or 0x0010000000000000L
-            var exponent = (exponentBits shr 52).toInt()
+            val mantis = (bits and 0x000fffffffffffffL)//or 0x0010000000000000L
+            val exponent = (exponentBits shr 52).toInt()
             val sign: SysBit
             if (signBit)
                 sign = SysBit.ONE
@@ -42,7 +42,7 @@ class SysDouble private constructor(
         }
 
         private fun valueByBits(sign: SysBit, exponent: SysUnsigned, mantissa: SysUnsigned): Double {
-            var mantis = mantissa.value
+            val mantis = mantissa.value
 
             var result = mantis or ((exponent.value)shl 52)
             if (sign == SysBit.ONE)

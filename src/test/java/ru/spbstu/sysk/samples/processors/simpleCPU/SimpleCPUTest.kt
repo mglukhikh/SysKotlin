@@ -3,19 +3,17 @@ package ru.spbstu.sysk.samples.processors.simpleCPU;
 import org.junit.Test
 import ru.spbstu.sysk.channels.bind
 import ru.spbstu.sysk.core.SysTopModule
+import ru.spbstu.sysk.core.TimeUnit.S
 import ru.spbstu.sysk.core.invoke
 import ru.spbstu.sysk.data.integer.SysInteger
-import ru.spbstu.sysk.core.TimeUnit.*
-import ru.spbstu.sysk.samples.processors.simpleCPU.CPU
 import ru.spbstu.sysk.samples.processors.simpleCPU.MainConstants.CAPACITY
 import ru.spbstu.sysk.samples.processors.simpleCPU.MainConstants.COMMAND
-import ru.spbstu.sysk.samples.processors.simpleCPU.RAM
 import java.util.*
 
 class SimpleCPUTest : SysTopModule() {
 
     init {
-        var commands: Queue<CPU.Command> = LinkedList()
+        val commands: Queue<CPU.Command> = LinkedList()
         commands.add(CPU.Command(COMMAND.PRINT))
         commands.add(CPU.Command(COMMAND.PUSH, SysInteger(CAPACITY.ADDRESS, 16)))
         commands.add(CPU.Command(COMMAND.NEXT))

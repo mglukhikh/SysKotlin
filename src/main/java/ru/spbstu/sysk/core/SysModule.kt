@@ -66,14 +66,14 @@ open class SysModule internal constructor(
     protected fun bitInput(name: String, signalRead: SysBitRead? = null): SysBitInput =
             SysBitInput(name, scheduler, this, signalRead)
 
-    protected fun <T : SysData> portReader(input: SysInput<T>) = PortReader<T>(input)
+    protected fun <T : SysData> portReader(input: SysInput<T>) = PortReader(input)
 
     protected fun bitPortReader(bitInput: SysBitInput) = BitPortReader(bitInput)
 
     protected fun <T : SysData> output(name: String, signalWrite: SysSignalWrite<T>? = null): SysOutput<T> =
             SysOutput(name, scheduler, this, signalWrite)
 
-    protected fun <T : SysData> portWriter(output: SysOutput<T>) = PortWriter<T>(output)
+    protected fun <T : SysData> portWriter(output: SysOutput<T>) = PortWriter(output)
 
     protected fun <T : SysData> signalStub(name: String, value: T): SysSignalStub<T> =
             SysSignalStub(name, value, scheduler, this)
@@ -124,13 +124,13 @@ open class SysModule internal constructor(
             SysIntegerMemory(name, addrWidth, dataWidth, this)
 
     protected fun <T : SysData> fifoOutput(name: String, fifo: SysFifo<T>? = null) =
-            SysFifoOutput<T>(name, scheduler, this, fifo)
+            SysFifoOutput(name, scheduler, this, fifo)
 
     protected fun <T : SysData> fifoInput(name: String, fifo: SysFifo<T>? = null) =
-            SysFifoInput<T>(name, scheduler, this, fifo)
+            SysFifoInput(name, scheduler, this, fifo)
 
     protected fun <T : SysData> fifo(capacity: Int, name: String, startValue: T) =
-            SysFifo<T>(capacity, name, startValue, scheduler, this)
+            SysFifo(capacity, name, startValue, scheduler, this)
 
     protected inline fun <reified T : SysData> fifo(capacity: Int, name: String) =
             fifo(capacity, name, undefined<T>())
@@ -139,7 +139,7 @@ open class SysModule internal constructor(
             SysBitFifo(capacity, name, scheduler, this)
 
     protected fun <T : SysData> synchronousFifo(capacity: Int, name: String, startValue: T, positive: Boolean) =
-            SysSynchronousFifo<T>(capacity, name, startValue, positive, scheduler, this)
+            SysSynchronousFifo(capacity, name, startValue, positive, scheduler, this)
 
     protected inline fun <reified T : SysData> synchronousFifo(capacity: Int, name: String, positive: Boolean) =
             synchronousFifo(capacity, name, undefined<T>(), positive)

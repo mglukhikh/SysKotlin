@@ -9,9 +9,6 @@ import ru.spbstu.sysk.data.integer.integer
 import ru.spbstu.sysk.data.integer.unsigned
 import ru.spbstu.sysk.samples.processors.i8080.MainConstants.COMMAND
 import ru.spbstu.sysk.samples.processors.i8080.MainConstants.REGISTER
-import ru.spbstu.sysk.samples.processors.i8080.RegisterFile
-import ru.spbstu.sysk.samples.processors.i8080.sets
-import java.lang.Long
 
 class RegisterFileTest : SysTopModule() {
 
@@ -19,8 +16,8 @@ class RegisterFileTest : SysTopModule() {
 
     val data = signal<SysUnsigned>("data")
     val command = signal("command", COMMAND.STORAGE)
-    val register = signal<SysUnsigned>("register", unsigned(8, 0))
-    val address = signal<SysUnsigned>("address", unsigned(16, 0))
+    val register = signal("register", unsigned(8, 0))
+    val address = signal("address", unsigned(16, 0))
     val clk = clock("clk", 2(FS))
 
     init {
