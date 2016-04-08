@@ -5,7 +5,7 @@ import kotlin.reflect.companionObjectInstance
 
 interface SysData
 
-interface SysDataCompanion<T : SysData> {
+interface SysDataCompanion<out T : SysData> {
     val undefined: T
 }
 

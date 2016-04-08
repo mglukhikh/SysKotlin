@@ -11,7 +11,7 @@ import ru.spbstu.sysk.samples.stack.Opcode.*
 class Machine(
         name: String,
         private val addrWidth: Int,
-        private val dataWidth: Int,
+        dataWidth: Int,
         parent: SysModule
 ) : SysModule(name, parent) {
 

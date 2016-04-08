@@ -7,13 +7,13 @@ import ru.spbstu.sysk.data.*
 import java.util.*
 
 abstract class SysBus<T : SysData> internal constructor(
-        val capacity: Int, startValues: Array<T>, name: String, private val scheduler: SysScheduler,
+        val capacity: Int, startValues: Array<T>, name: String, scheduler: SysScheduler,
         parent: SysObject? = null
 ) : SysInterface, SysObject(name, parent) {
 
     protected val signals: MutableList<SysSignal<T>> = ArrayList()
 
-    protected final val changeEvent = SysWait.Event("changeEvent", scheduler)
+    protected val changeEvent = SysWait.Event("changeEvent", scheduler)
 
     override val defaultEvent: SysWait.Event
         get() = changeEvent
@@ -110,7 +110,7 @@ open class SysPriorityBus<T : SysData> internal constructor(
     }
 }
 
-class SysPriorityValue<T : SysData>(val priority: Int, val value: T) : SysData {
+class SysPriorityValue<out T : SysData>(val priority: Int, val value: T) : SysData {
     operator fun invoke() = value
 }
 

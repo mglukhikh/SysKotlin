@@ -11,8 +11,8 @@ import ru.spbstu.sysk.samples.processors.simpleCPU.RAM
 
 /** This class not describes the operation of the real CPU. He only needed for the test. */
 internal class CPU constructor(
-        protected val commands: Queue<Command> = LinkedList<CPU.Command>(),
-        private val A: Long, private val B: Long, name: String, parent: SysModule
+        commands: Queue<Command> = LinkedList<CPU.Command>(),
+        A: Long, B: Long, name: String, parent: SysModule
 ) : SysModule(name, parent) {
 
     internal data class Command constructor(val name: SysInteger, val arg: SysInteger? = null)

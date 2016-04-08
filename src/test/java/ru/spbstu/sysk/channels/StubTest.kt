@@ -34,7 +34,7 @@ class StubTest : SysTopModule() {
     }
 
     internal class Tester(
-            private var qCycles: Int, name: String, parent: SysModule)
+            qCycles: Int, name: String, parent: SysModule)
     : SysModule(name, parent) {
 
         val clk = bitInput("clk", null)
