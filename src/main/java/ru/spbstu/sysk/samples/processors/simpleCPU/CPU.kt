@@ -7,7 +7,6 @@ import ru.spbstu.sysk.data.integer.SysInteger
 import java.util.*
 import ru.spbstu.sysk.samples.processors.simpleCPU.MainConstants.CAPACITY
 import ru.spbstu.sysk.samples.processors.simpleCPU.MainConstants.COMMAND
-import ru.spbstu.sysk.samples.processors.simpleCPU.RAM
 
 /** This class not describes the operation of the real CPU. He only needed for the test. */
 internal class CPU constructor(

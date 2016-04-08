@@ -7,11 +7,10 @@ import ru.spbstu.sysk.data.integer.SysInteger
 import ru.spbstu.sysk.data.integer.SysLongInteger
 import ru.spbstu.sysk.samples.processors.simpleCPU.MainConstants.CAPACITY
 import ru.spbstu.sysk.samples.processors.simpleCPU.MainConstants.COMMAND
-import ru.spbstu.sysk.samples.processors.simpleCPU.CPU
 
 /** This class not describes the operation of the real RAM. He only needed for the test. */
 internal class RAM constructor(
-        val capacity: Int, val firstAddress: Int, name: String, parent: SysModule
+        val capacity: Int, firstAddress: Int, name: String, parent: SysModule
 )
 : SysModule(name, parent) {
 

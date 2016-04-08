@@ -8,7 +8,7 @@ import ru.spbstu.sysk.data.SysData
 open class SysUnaryMoore<Input : SysData, State, Output : SysData>(
         transition: (State, Input) -> State,
         result: (State) -> Output,
-        private var state: State,
+        private var unaryState: State,
         name: String,
         parent: SysModule
 ): SysModule(name, parent) {
@@ -24,12 +24,12 @@ open class SysUnaryMoore<Input : SysData, State, Output : SysData>(
     init {
         stateFunction(clk) {
             init {
-                y(result(this@SysUnaryMoore.state))
+                y(result(unaryState))
             }
             infiniteState {
                 // First calculate state, then output, one tick delay is provided by clock sensitivity
-                this@SysUnaryMoore.state = transition(this@SysUnaryMoore.state, x())
-                y(result(this@SysUnaryMoore.state))
+                unaryState = transition(unaryState, x())
+                y(result(unaryState))
             }
         }
     }

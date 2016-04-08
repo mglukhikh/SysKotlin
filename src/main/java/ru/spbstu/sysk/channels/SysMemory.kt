@@ -8,9 +8,9 @@ import ru.spbstu.sysk.data.integer.SysUnsigned
 open class SysMemory<T : SysData>(
         name: String,
         private val addrWidth: Int,
-        private val defaultValue: T,
+        defaultValue: T,
         parent: SysModule,
-        private val correct: (T) -> Boolean = { true }
+        correct: (T) -> Boolean = { true }
 ) : SysModule(name, parent) {
 
     private val storage = hashMapOf<Long, T>()

@@ -10,7 +10,7 @@ interface SysInterface {
     val defaultEvent: SysWait.Event
 }
 
-interface SysSignalRead<T : SysData>: SysInterface {
+interface SysSignalRead<out T : SysData>: SysInterface {
 
     val value: T
         get() = read()
