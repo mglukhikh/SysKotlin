@@ -9,12 +9,12 @@ import java.util.*
 abstract class SysInteger protected constructor(
         val width: Int,
         open val value: Number,
-        protected val hasUndefined: Boolean,
-        protected open val positiveMask: Number,
-        protected open val negativeMask: Number
+        internal val hasUndefined: Boolean,
+        internal open val positiveMask: Number,
+        internal open val negativeMask: Number
 ) : SysData, Comparable<SysInteger> {
 
-    protected abstract var bitsState: Array<SysBit>
+    internal abstract var bitsState: Array<SysBit>
 
     abstract fun extend(width: Int): SysInteger
     abstract fun truncate(width: Int): SysInteger
