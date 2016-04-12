@@ -9,12 +9,11 @@ class Gateway constructor(
         parent: SysModule
 ) : SysModule("Gateway", parent) {
 
+    private var store = unsigned(capacity, 0)
+
     val front = bidirPort<SysUnsigned>("front")
     val back = bidirPort<SysUnsigned>("back")
     val command = bidirPort<COMMAND>("command")
-
-    private var store = unsigned(capacity, 0)
-
     val en = bitInput("en")
     val clk = bitInput("clk")
 

@@ -1,7 +1,7 @@
 package ru.spbstu.sysk.samples.processors.i8080
 
 import ru.spbstu.sysk.core.SysModule
-import ru.spbstu.sysk.data.integer.SysInteger
+import ru.spbstu.sysk.data.integer.SysUnsigned
 
 class ArithmeticLogicUnit(
         capacityData: Int,
@@ -9,9 +9,9 @@ class ArithmeticLogicUnit(
         parent: SysModule
 ) : SysModule("ArithmeticLogicUnit", parent) {
 
-    val A = input<SysInteger>("A")
-    val B = input<SysInteger>("B")
-    val C = output<SysInteger>("C")
+    val A = input<SysUnsigned>("A")
+    val B = input<SysUnsigned>("B")
+    val out = output<SysUnsigned>("out")
     val operation = input<COMMAND>("command")
 
     init {
@@ -20,13 +20,13 @@ class ArithmeticLogicUnit(
             if (B().width != capacityData) throw IllegalArgumentException()
             if (operation().width != capacityOperation) throw IllegalArgumentException()
             when (operation()) {
-                COMMAND.ADD -> C(A() + B())
-                COMMAND.SUB -> C(A() - B())
-                COMMAND.MUL -> C(A() * B())
-                COMMAND.DIV -> C(A() / B())
-                COMMAND.REM -> C(A() % B())
-                COMMAND.SHL -> C(A() shl (B()).toInt())
-                COMMAND.SHR -> C(A() shr (B()).toInt())
+                COMMAND.ADD -> out(A() + B())
+                COMMAND.SUB -> out(A() - B())
+                COMMAND.MUL -> out(A() * B())
+                COMMAND.DIV -> out(A() / B())
+                COMMAND.REM -> out(A() % B())
+                COMMAND.SHL -> out(A() shl (B()).toInt())
+                COMMAND.SHR -> out(A() shr (B()).toInt())
                 else -> {}
             }
         }

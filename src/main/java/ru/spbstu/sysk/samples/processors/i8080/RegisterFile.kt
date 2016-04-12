@@ -5,7 +5,7 @@ import ru.spbstu.sysk.data.SysBit
 import ru.spbstu.sysk.data.integer.*
 
 class RegisterFile constructor(
-        val capacityData: Int,
+        private val capacityData: Int,
         capacityAddress: Int,
         capacityRegisterAddress: Int,
         capacityCommand: Int,

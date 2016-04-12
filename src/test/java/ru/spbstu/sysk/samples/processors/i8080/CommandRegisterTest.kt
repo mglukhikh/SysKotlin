@@ -22,7 +22,8 @@ class CommandRegisterTest : SysTopModule() {
         CR.address bind address
         CR.clk bind clk
         CR.command bind command
-        CR.data bind data
+        CR.inp bind data
+        CR.out bind data
         CR.en bind en
 
         val i = iterator(0..11)

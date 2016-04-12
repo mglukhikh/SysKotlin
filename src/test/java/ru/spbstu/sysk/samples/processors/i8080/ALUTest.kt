@@ -4,54 +4,53 @@ import org.junit.Test
 import ru.spbstu.sysk.core.SysTopModule
 import ru.spbstu.sysk.core.TimeUnit.*
 import ru.spbstu.sysk.core.invoke
-import ru.spbstu.sysk.data.integer.integer
+import ru.spbstu.sysk.data.integer.unsigned
 
 class ALUTest : SysTopModule() {
 
     val ALU = ArithmeticLogicUnit(CAPACITY.DATA, CAPACITY.COMMAND, this)
 
     val operation = signal("command", COMMAND.ADD)
-    val a = signal("a", integer(CAPACITY.DATA, 0))
-    val b = signal("b", integer(CAPACITY.DATA, 0))
-    val c = signal("c", integer(CAPACITY.DATA, 0))
+    val a = signal("a", unsigned(CAPACITY.DATA, 0))
+    val b = signal("b", unsigned(CAPACITY.DATA, 0))
+    val out = signal("out", unsigned(CAPACITY.DATA, 0))
     val clk = clock("clock", 20(FS))
 
     init {
         ALU.operation bind operation
         ALU.A bind a
         ALU.B bind b
-        ALU.C bind c
-
+        ALU.out bind out
 
         stateFunction(clk) {
             state {
-                a(integer(CAPACITY.DATA, 30))
-                b(integer(CAPACITY.DATA, -128))
+                a(unsigned(CAPACITY.DATA, 30))
+                b(unsigned(CAPACITY.DATA, 100))
             }
             state {
-                println(c())
-                a(integer(CAPACITY.DATA, 50))
-                b(integer(CAPACITY.DATA, -70))
+                assert(out() == unsigned(CAPACITY.DATA, 130))
+                a(unsigned(CAPACITY.DATA, 50))
+                b(unsigned(CAPACITY.DATA, 70))
             }
             state {
-                println(c())
-                a(integer(CAPACITY.DATA, 5))
-                b(integer(CAPACITY.DATA, 7))
+                assert(out() == unsigned(CAPACITY.DATA, 120))
+                a(unsigned(CAPACITY.DATA, 5))
+                b(unsigned(CAPACITY.DATA, 7))
                 operation(COMMAND.MUL)
             }
             state {
-                println(c())
-                a(integer(CAPACITY.DATA, 13))
-                b(integer(CAPACITY.DATA, -3))
+                assert(out() == unsigned(CAPACITY.DATA, 35))
+                a(unsigned(CAPACITY.DATA, 13))
+                b(unsigned(CAPACITY.DATA, 3))
             }
             state {
-                println(c())
-                a(integer(CAPACITY.DATA, 13))
-                b(integer(CAPACITY.DATA, 3))
+                assert(out() == unsigned(CAPACITY.DATA, 39))
+                a(unsigned(CAPACITY.DATA, 13))
+                b(unsigned(CAPACITY.DATA, 3))
                 operation(COMMAND.SHL)
             }
             state {
-                println(c())
+                assert(out() == unsigned(CAPACITY.DATA, 104))
             }
             stop(scheduler)
         }
