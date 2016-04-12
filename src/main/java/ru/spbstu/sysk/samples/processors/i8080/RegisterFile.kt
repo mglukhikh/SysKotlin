@@ -3,8 +3,6 @@ package ru.spbstu.sysk.samples.processors.i8080
 import ru.spbstu.sysk.core.SysModule
 import ru.spbstu.sysk.data.SysBit
 import ru.spbstu.sysk.data.integer.*
-import ru.spbstu.sysk.samples.processors.i8080.MainConstants.COMMAND
-import ru.spbstu.sysk.samples.processors.i8080.MainConstants.REGISTER
 
 class RegisterFile constructor(
         val capacityData: Int,
@@ -23,8 +21,8 @@ class RegisterFile constructor(
 
     val data = bidirPort<SysUnsigned>("data")
     val address = bidirPort<SysUnsigned>("address")
-    val register = input<SysUnsigned>("register")
-    val command = input<SysUnsigned>("command")
+    val register = input<REGISTER>("register")
+    val command = input<COMMAND>("command")
 
     val en = bitInput("en")
     val clk = bitInput("clk")
@@ -44,12 +42,13 @@ class RegisterFile constructor(
                     COMMAND.SHL -> shl(register())
                     COMMAND.SHR -> shr(register())
                     COMMAND.RESET -> reset()
+                    else -> {}
                 }
             }
         }
     }
 
-    private fun shl(register: SysUnsigned) {
+    private fun shl(register: REGISTER) {
         when (register) {
             REGISTER.PSW -> PSW shl 1
             REGISTER.BC -> BC shl 1
@@ -57,10 +56,11 @@ class RegisterFile constructor(
             REGISTER.HL -> HL shl 1
             REGISTER.PC -> PC shl 1
             REGISTER.SP -> SP shl 1
+            else -> {}
         }
     }
 
-    private fun shr(register: SysUnsigned) {
+    private fun shr(register: REGISTER) {
         when (register) {
             REGISTER.PSW -> PSW shr 1
             REGISTER.BC -> BC shr 1
@@ -68,10 +68,11 @@ class RegisterFile constructor(
             REGISTER.HL -> HL shr 1
             REGISTER.PC -> PC shr 1
             REGISTER.SP -> SP shr 1
+            else -> {}
         }
     }
 
-    private fun inc(register: SysUnsigned) {
+    private fun inc(register: REGISTER) {
         when (register) {
             REGISTER.PSW -> ++PSW
             REGISTER.BC -> ++BC
@@ -79,10 +80,11 @@ class RegisterFile constructor(
             REGISTER.HL -> ++HL
             REGISTER.PC -> ++PC
             REGISTER.SP -> ++SP
+            else -> {}
         }
     }
 
-    private fun dec(register: SysUnsigned) {
+    private fun dec(register: REGISTER) {
         when (register) {
             REGISTER.PSW -> --PSW
             REGISTER.BC -> --BC
@@ -90,6 +92,7 @@ class RegisterFile constructor(
             REGISTER.HL -> --HL
             REGISTER.PC -> --PC
             REGISTER.SP -> --SP
+            else -> {}
         }
     }
 
@@ -102,7 +105,7 @@ class RegisterFile constructor(
         SP = unsigned(capacityData * 2, 0)
     }
 
-    private fun read(register: SysUnsigned) {
+    private fun read(register: REGISTER) {
         when (register) {
             REGISTER.A -> data(PSW[capacityData - 1, 0])
             REGISTER.Flag -> data(PSW[capacityData * 2 - 1, capacityData])
@@ -114,10 +117,11 @@ class RegisterFile constructor(
             REGISTER.L -> data(HL[capacityData * 2 - 1, capacityData])
             REGISTER.PC -> address(PC)
             REGISTER.SP -> address(SP)
+            else -> {}
         }
     }
 
-    private fun write(register: SysUnsigned) {
+    private fun write(register: REGISTER) {
         when (register) {
             REGISTER.A -> PSW = PSW.set(capacityData - 1, 0, data())
             REGISTER.Flag -> PSW = PSW.set(capacityData * 2 - 1, capacityData, data())
@@ -129,6 +133,7 @@ class RegisterFile constructor(
             REGISTER.L -> HL = HL.set(capacityData * 2 - 1, capacityData, data())
             REGISTER.PC -> PC = address()[capacityData * 2 - 1, 0]
             REGISTER.SP -> SP = address()[capacityData * 2 - 1, 0]
+            else -> {}
         }
     }
 }

@@ -8,9 +8,6 @@ import ru.spbstu.sysk.core.invoke
 import ru.spbstu.sysk.data.SysBit
 import ru.spbstu.sysk.data.integer.integer
 import ru.spbstu.sysk.data.integer.unsigned
-import ru.spbstu.sysk.samples.processors.i8080.MainConstants.COMMAND
-import ru.spbstu.sysk.samples.processors.i8080.MainConstants.REGISTER
-import ru.spbstu.sysk.samples.processors.i8080.MainConstants.CAPACITY
 
 class RegisterFileTest : SysTopModule() {
 

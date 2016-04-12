@@ -3,7 +3,6 @@ package ru.spbstu.sysk.samples.processors.i8080
 import ru.spbstu.sysk.core.SysModule
 import ru.spbstu.sysk.data.integer.SysUnsigned
 import ru.spbstu.sysk.data.integer.unsigned
-import ru.spbstu.sysk.samples.processors.i8080.MainConstants.COMMAND
 
 class CommandRegister constructor(
         val capacityData: Int,
@@ -17,7 +16,7 @@ class CommandRegister constructor(
 
     val data = bidirPort<SysUnsigned>("data")
     val address = input<SysUnsigned>("address")
-    val command = input<SysUnsigned>("command")
+    val command = input<COMMAND>("command")
 
     val en = bitInput("en")
     val clk = bitInput("clk")
@@ -32,10 +31,13 @@ class CommandRegister constructor(
                     COMMAND.WRITE -> memory[address().toInt()] = data()
                     COMMAND.READ -> data(memory[address().toInt()])
                     COMMAND.RESET -> reset()
+                    else -> { }
                 }
             }
         }
     }
 
-    private fun reset() { memory = Array(maxAddress + 1, { unsigned(capacityData, 0) }) }
+    private fun reset() {
+        memory = Array(maxAddress + 1, { unsigned(capacityData, 0) })
+    }
 }

@@ -2,8 +2,6 @@ package ru.spbstu.sysk.samples.processors.i8080
 
 import ru.spbstu.sysk.core.SysModule
 import ru.spbstu.sysk.data.integer.SysInteger
-import ru.spbstu.sysk.data.integer.SysUnsigned
-import ru.spbstu.sysk.samples.processors.i8080.MainConstants.COMMAND
 
 class ArithmeticLogicUnit(
         capacityData: Int,
@@ -14,7 +12,7 @@ class ArithmeticLogicUnit(
     val A = input<SysInteger>("A")
     val B = input<SysInteger>("B")
     val C = output<SysInteger>("C")
-    val operation = input<SysUnsigned>("command")
+    val operation = input<COMMAND>("command")
 
     init {
         function(A.defaultEvent or B.defaultEvent or operation.defaultEvent) {
@@ -29,6 +27,7 @@ class ArithmeticLogicUnit(
                 COMMAND.REM -> C(A() % B())
                 COMMAND.SHL -> C(A() shl (B()).toInt())
                 COMMAND.SHR -> C(A() shr (B()).toInt())
+                else -> {}
             }
         }
     }

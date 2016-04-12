@@ -3,7 +3,6 @@ package ru.spbstu.sysk.samples.processors.i8080
 import ru.spbstu.sysk.core.SysModule
 import ru.spbstu.sysk.data.integer.SysUnsigned
 import ru.spbstu.sysk.data.integer.unsigned
-import ru.spbstu.sysk.samples.processors.i8080.MainConstants.COMMAND
 
 class Gateway constructor(
         capacity: Int,
@@ -12,7 +11,7 @@ class Gateway constructor(
 
     val front = bidirPort<SysUnsigned>("front")
     val back = bidirPort<SysUnsigned>("back")
-    val command = bidirPort<SysUnsigned>("command")
+    val command = bidirPort<COMMAND>("command")
 
     private var store = unsigned(capacity, 0)
 
@@ -29,6 +28,7 @@ class Gateway constructor(
                     COMMAND.READ_BACK -> store = back()
                     COMMAND.WRITE_FRONT -> front(store)
                     COMMAND.WRITE_BACK -> back(store)
+                    else -> {}
                 }
             }
         }

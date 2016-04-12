@@ -5,8 +5,6 @@ import ru.spbstu.sysk.core.SysTopModule
 import ru.spbstu.sysk.core.TimeUnit.*
 import ru.spbstu.sysk.core.invoke
 import ru.spbstu.sysk.data.integer.integer
-import ru.spbstu.sysk.samples.processors.i8080.MainConstants.COMMAND
-import ru.spbstu.sysk.samples.processors.i8080.MainConstants.CAPACITY
 
 class ALUTest : SysTopModule() {
 
