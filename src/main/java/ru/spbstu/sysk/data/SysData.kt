@@ -27,18 +27,9 @@ inline fun <reified T : SysData> undefined(): T {
     val kClass = T::class
     @Suppress("UNCHECKED_CAST")
     val undefined = UndefinedCollection.undefined(kClass)
-            ?: kClass.constructors.firstOrNull { it.parameters.isEmpty() }?.call()
             ?: (kClass.companionObjectInstance as? SysDataCompanion<T>)?.undefined
+            ?: kClass.constructors.firstOrNull { it.parameters.isEmpty() }?.call()
             ?: throw AssertionError("$kClass has no registered undefined or default constructor")
     UndefinedCollection.register(kClass, undefined)
     return undefined
-}
-
-class SysReference<T : Any>(var value: T? = null) {
-
-    operator fun invoke() = value
-
-    operator fun invoke(value: T?) {
-        this.value = value
-    }
 }

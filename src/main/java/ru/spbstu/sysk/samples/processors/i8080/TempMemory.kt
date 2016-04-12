@@ -18,7 +18,7 @@ class TempMemory(
 
     init {
         stateFunction(clk) {
-            infiniteLoop {
+            infiniteState {
                 if (inp().width != capacityData) throw IllegalArgumentException()
                 if (en().one) {
                     out(memory)

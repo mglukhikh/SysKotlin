@@ -42,7 +42,7 @@ enum class COMMAND : SysData {
 
     companion object : SysDataCompanion<COMMAND> {
         override val undefined: COMMAND
-            get() = COMMAND.UNDEFINED
+            get() = UNDEFINED
     }
 }
 
@@ -64,12 +64,13 @@ enum class REGISTER : SysData {
 
     companion object : SysDataCompanion<REGISTER> {
         override val undefined: REGISTER
-            get() = REGISTER.UNDEFINED
+            get() = UNDEFINED
     }
 }
 
 enum class OPERATION private constructor(val id: Int) : SysData {
 
+    UNDEFINED(0x0),
     ADD_A(0x87),
     ADD_B(0x80),
     ADD_C(0x81),
@@ -320,9 +321,12 @@ enum class OPERATION private constructor(val id: Int) : SysData {
         opcodes.put(id, this)
     }
 
-    companion object {
+    companion object : SysDataCompanion<OPERATION> {
         private val opcodes = HashMap<Int, OPERATION>()
 
         operator fun get(id: Int) = opcodes[id]
+
+        override val undefined: OPERATION
+            get() = UNDEFINED
     }
 }
