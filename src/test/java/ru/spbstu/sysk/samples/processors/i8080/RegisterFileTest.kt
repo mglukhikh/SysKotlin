@@ -3,56 +3,62 @@ package ru.spbstu.sysk.samples.processors.i8080
 import org.junit.Test
 import ru.spbstu.sysk.core.SysTopModule
 import ru.spbstu.sysk.core.TimeUnit.*
+import ru.spbstu.sysk.data.SysBit.*
 import ru.spbstu.sysk.core.invoke
-import ru.spbstu.sysk.data.integer.SysUnsigned
+import ru.spbstu.sysk.data.SysBit
 import ru.spbstu.sysk.data.integer.integer
 import ru.spbstu.sysk.data.integer.unsigned
 import ru.spbstu.sysk.samples.processors.i8080.MainConstants.COMMAND
 import ru.spbstu.sysk.samples.processors.i8080.MainConstants.REGISTER
+import ru.spbstu.sysk.samples.processors.i8080.MainConstants.CAPACITY
 
 class RegisterFileTest : SysTopModule() {
 
-    val RegFile = RegisterFile(8, 16, this)
+    val RF = RegisterFile(CAPACITY.DATA, CAPACITY.ADDRESS, CAPACITY.REGISTER, CAPACITY.COMMAND, this)
 
-    val data = signal<SysUnsigned>("data")
-    val command = signal("command", COMMAND.STORAGE)
-    val register = signal("register", unsigned(8, 0))
-    val address = signal("address", unsigned(16, 0))
+    val data = signal("data", unsigned(CAPACITY.DATA, 0))
+    val command = signal("command", COMMAND.UNDEFINED)
+    val register = signal("register", REGISTER.UNDEFINED)
+    val address = signal("address", unsigned(CAPACITY.ADDRESS, 0))
+    val en = signal<SysBit>("en")
     val clk = clock("clk", 2(FS))
 
     init {
-        RegFile.register bind register
-        RegFile.address bind address
-        RegFile.clk bind clk
-        RegFile.command bind command
-        RegFile.data bind data
+        RF.register bind register
+        RF.address bind address
+        RF.clk bind clk
+        RF.command bind command
+        RF.data bind data
+        RF.en bind en
 
         stateFunction(clk, false) {
             state {
-                data(unsigned(8, 255))
+                data(unsigned(CAPACITY.DATA, 255))
                 command(COMMAND.WRITE)
                 register(REGISTER.B)
+                en(ONE)
             }
             state {
-                data(unsigned(8, 10))
+                data(unsigned(CAPACITY.DATA, 10))
                 command(COMMAND.WRITE)
                 register(REGISTER.E)
             }
             state {
-                command(COMMAND.STORAGE)
+                en(ZERO)
             }
             state {
                 command(COMMAND.READ)
                 register(REGISTER.B)
+                en(ONE)
             }
             state {
-                assert(data() == unsigned(8, 255))
+                assert(data() == unsigned(CAPACITY.DATA, 255))
                 command(COMMAND.READ)
                 register(REGISTER.E)
             }
             state {
-                assert(data() == unsigned(8, 10))
-                command(COMMAND.STORAGE)
+                assert(data() == unsigned(CAPACITY.DATA, 10))
+                en(ZERO)
             }
             stop(scheduler)
         }

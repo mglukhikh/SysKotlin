@@ -6,8 +6,13 @@ import ru.spbstu.sysk.data.integer.*
 import ru.spbstu.sysk.samples.processors.i8080.MainConstants.COMMAND
 import ru.spbstu.sysk.samples.processors.i8080.MainConstants.REGISTER
 
-
-class RegisterFile constructor(val capacityData: Int, val capacityAddress: Int, parent: SysModule) : SysModule("RegisterFile", parent) {
+class RegisterFile constructor(
+        val capacityData: Int,
+        capacityAddress: Int,
+        capacityRegisterAddress: Int,
+        capacityCommand: Int,
+        parent: SysModule
+) : SysModule("RegisterFile", parent) {
 
     private var PSW = unsigned(capacityData * 2, 0)
     private var BC = unsigned(capacityData * 2, 0)
@@ -21,13 +26,17 @@ class RegisterFile constructor(val capacityData: Int, val capacityAddress: Int, 
     val register = input<SysUnsigned>("register")
     val command = input<SysUnsigned>("command")
 
+    val en = bitInput("en")
     val clk = bitInput("clk")
 
     init {
-        stateFunction(clk, true) {
+        stateFunction(clk) {
             infiniteState {
-                when (command()) {
-                    COMMAND.STORAGE -> {}
+                if (command().width != capacityCommand) throw IllegalArgumentException()
+                if (register().width != capacityRegisterAddress) throw IllegalArgumentException()
+                if (data().width != capacityData) throw IllegalArgumentException()
+                if (address().width != capacityAddress) throw IllegalArgumentException()
+                if (en().one) when (command()) {
                     COMMAND.WRITE -> write(register())
                     COMMAND.READ -> read(register())
                     COMMAND.INC -> inc(register())
@@ -109,8 +118,6 @@ class RegisterFile constructor(val capacityData: Int, val capacityAddress: Int, 
     }
 
     private fun write(register: SysUnsigned) {
-        if (data().width != capacityData) throw IllegalArgumentException("${data().width}")
-        if (address().width != capacityAddress) throw IllegalArgumentException("${address().width}")
         when (register) {
             REGISTER.A -> PSW = PSW.set(capacityData - 1, 0, data())
             REGISTER.Flag -> PSW = PSW.set(capacityData * 2 - 1, capacityData, data())

@@ -5,18 +5,17 @@ import ru.spbstu.sysk.core.SysTopModule
 import ru.spbstu.sysk.core.TimeUnit.*
 import ru.spbstu.sysk.core.invoke
 import ru.spbstu.sysk.data.integer.integer
-import ru.spbstu.sysk.samples.processors.i8080.MainConstants.OPERATION
+import ru.spbstu.sysk.samples.processors.i8080.MainConstants.COMMAND
+import ru.spbstu.sysk.samples.processors.i8080.MainConstants.CAPACITY
 
 class ALUTest : SysTopModule() {
 
-    val CAPACITY = 8
+    val ALU = ArithmeticLogicUnit(CAPACITY.DATA, CAPACITY.COMMAND, this)
 
-    val ALU = ArithmeticLogicUnit(CAPACITY, "ALU", this)
-
-    val operation = signal("command", OPERATION.ADD)
-    val a = signal("a", integer(CAPACITY, 0))
-    val b = signal("b", integer(CAPACITY, 0))
-    val c = signal("c", integer(CAPACITY, 0))
+    val operation = signal("command", COMMAND.ADD)
+    val a = signal("a", integer(CAPACITY.DATA, 0))
+    val b = signal("b", integer(CAPACITY.DATA, 0))
+    val c = signal("c", integer(CAPACITY.DATA, 0))
     val clk = clock("clock", 20(FS))
 
     init {
@@ -28,30 +27,30 @@ class ALUTest : SysTopModule() {
 
         stateFunction(clk) {
             state {
-                a(integer(CAPACITY, 30))
-                b(integer(CAPACITY, -128))
+                a(integer(CAPACITY.DATA, 30))
+                b(integer(CAPACITY.DATA, -128))
             }
             state {
                 println(c())
-                a(integer(CAPACITY, 50))
-                b(integer(CAPACITY, -70))
+                a(integer(CAPACITY.DATA, 50))
+                b(integer(CAPACITY.DATA, -70))
             }
             state {
                 println(c())
-                a(integer(CAPACITY, 5))
-                b(integer(CAPACITY, 7))
-                operation(OPERATION.MUL)
+                a(integer(CAPACITY.DATA, 5))
+                b(integer(CAPACITY.DATA, 7))
+                operation(COMMAND.MUL)
             }
             state {
                 println(c())
-                a(integer(CAPACITY, 13))
-                b(integer(CAPACITY, -3))
+                a(integer(CAPACITY.DATA, 13))
+                b(integer(CAPACITY.DATA, -3))
             }
             state {
                 println(c())
-                a(integer(CAPACITY, 13))
-                b(integer(CAPACITY, 3))
-                operation(OPERATION.SHL)
+                a(integer(CAPACITY.DATA, 13))
+                b(integer(CAPACITY.DATA, 3))
+                operation(COMMAND.SHL)
             }
             state {
                 println(c())

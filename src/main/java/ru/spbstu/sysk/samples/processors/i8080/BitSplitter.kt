@@ -6,7 +6,10 @@ import ru.spbstu.sysk.data.SysBit
 import ru.spbstu.sysk.data.integer.SysInteger
 import ru.spbstu.sysk.data.integer.integer
 
-class BitSplitter constructor(capacity: Int, name: String, parent: SysModule) : SysModule(name, parent) {
+class BitSplitter constructor(
+        capacity: Int,
+        parent: SysModule
+) : SysModule("BitSplitter", parent) {
 
     val integerPort = bidirPort<SysInteger>("signal")
     val bitPorts = Array(capacity, { bidirPort<SysBit>("signal.$it") })

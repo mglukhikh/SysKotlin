@@ -2,11 +2,14 @@ package ru.spbstu.sysk.samples.processors.i8080
 
 import ru.spbstu.sysk.core.SysModule
 import ru.spbstu.sysk.data.integer.SysInteger
-import ru.spbstu.sysk.data.integer.SysLongInteger
 import ru.spbstu.sysk.data.integer.SysUnsigned
-import ru.spbstu.sysk.samples.processors.i8080.MainConstants.OPERATION
+import ru.spbstu.sysk.samples.processors.i8080.MainConstants.COMMAND
 
-class ArithmeticLogicUnit(capacityData: Int, name: String, parent: SysModule) : SysModule(name, parent) {
+class ArithmeticLogicUnit(
+        capacityData: Int,
+        capacityOperation: Int,
+        parent: SysModule
+) : SysModule("ArithmeticLogicUnit", parent) {
 
     val A = input<SysInteger>("A")
     val B = input<SysInteger>("B")
@@ -15,15 +18,17 @@ class ArithmeticLogicUnit(capacityData: Int, name: String, parent: SysModule) : 
 
     init {
         function(A.defaultEvent or B.defaultEvent or operation.defaultEvent) {
-            if (A().width != capacityData || B().width != capacityData) throw IllegalArgumentException()
+            if (A().width != capacityData) throw IllegalArgumentException()
+            if (B().width != capacityData) throw IllegalArgumentException()
+            if (operation().width != capacityOperation) throw IllegalArgumentException()
             when (operation()) {
-                OPERATION.ADD -> C(A() as SysLongInteger + B() as SysLongInteger)
-                OPERATION.SUB -> C(A() as SysLongInteger - B() as SysLongInteger)
-                OPERATION.MUL -> C(A() as SysLongInteger * B() as SysLongInteger)
-                OPERATION.DIV -> C(A() as SysLongInteger / B() as SysLongInteger)
-                OPERATION.REM -> C(A() as SysLongInteger % B() as SysLongInteger)
-                OPERATION.SHL -> C(A() as SysLongInteger shl (B() as SysLongInteger).toInt())
-                OPERATION.SHR -> C(A() as SysLongInteger shr (B() as SysLongInteger).toInt())
+                COMMAND.ADD -> C(A() + B())
+                COMMAND.SUB -> C(A() - B())
+                COMMAND.MUL -> C(A() * B())
+                COMMAND.DIV -> C(A() / B())
+                COMMAND.REM -> C(A() % B())
+                COMMAND.SHL -> C(A() shl (B()).toInt())
+                COMMAND.SHR -> C(A() shr (B()).toInt())
             }
         }
     }
