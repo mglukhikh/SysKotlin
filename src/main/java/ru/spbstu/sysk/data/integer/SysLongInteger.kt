@@ -397,10 +397,18 @@ class SysLongInteger private constructor(
         return truncate(resWidth, result, positiveValues[resWidth], negativeValues[resWidth])
     }
 
-    override fun set(j: Int, i: Int, bits: Array<SysBit>): SysInteger {
+
+    override fun set(j: Int, i: Int, arg: SysInteger): SysLongInteger {
         if (j < i) throw IllegalArgumentException()
         if (j >= width || i < 0) throw IndexOutOfBoundsException()
-        if ((j - i) != bits.size) throw IllegalArgumentException()
+        if ((j - i + 1) != arg.width) throw IllegalArgumentException()
+        return set(j, i, arg.bits())
+    }
+
+    override fun set(j: Int, i: Int, bits: Array<SysBit>): SysLongInteger {
+        if (j < i) throw IllegalArgumentException()
+        if (j >= width || i < 0) throw IndexOutOfBoundsException()
+        if ((j - i + 1) != bits.size) throw IllegalArgumentException()
 
         if (hasUndefined) {
             val newState = bitsState.copyOf()

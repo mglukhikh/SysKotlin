@@ -394,9 +394,13 @@ private constructor(
             if (bits[a] == SysBit.ONE) {
                 newValue = newValue or (1L shl (i + a))
             } else {
-                newValue = newValue and ((1L shl i).inv())
+                newValue = newValue and ((1L shl (i + a)).inv())
             }
         return SysUnsigned(width, newValue, positiveMask)
+    }
+
+    override fun set(j: Int, i: Int, arg: SysInteger): SysUnsigned {
+        return set(j, i, arg.bits())
     }
 
     override fun set(i: Int, bit: SysBit): SysUnsigned {

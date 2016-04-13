@@ -46,6 +46,7 @@ abstract class SysInteger protected constructor(
     abstract operator fun get(j: Int, i: Int): SysInteger
     abstract operator fun set(i: Int, bit: SysBit): SysInteger
     abstract operator fun set(j: Int, i: Int, bits: Array<SysBit>): SysInteger
+    abstract operator fun set(j: Int, i: Int, arg: SysInteger): SysInteger
 
     abstract fun inv(): SysInteger
     abstract infix fun and(arg: SysInteger): SysInteger

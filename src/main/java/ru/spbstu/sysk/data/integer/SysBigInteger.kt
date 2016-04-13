@@ -274,6 +274,10 @@ class SysBigInteger private constructor(
         return Array(width, { i -> get(i) })
     }
 
+    override fun set(j: Int, i: Int, arg: SysInteger): SysBigInteger {
+        return set(j, i, arg.bits())
+    }
+
     override fun set(i: Int, bit: SysBit): SysBigInteger {
         if (i < 0 || i >= width) throw IndexOutOfBoundsException()
         if (hasUndefined) {
@@ -298,7 +302,7 @@ class SysBigInteger private constructor(
     override fun set(j: Int, i: Int, bits: Array<SysBit>): SysBigInteger {
         if (j < i) throw IllegalArgumentException()
         if (j >= width || i < 0) throw IndexOutOfBoundsException()
-        if ((j - i) != bits.size) throw IllegalArgumentException()
+        if ((j - i + 1) != bits.size) throw IllegalArgumentException()
 
         if (hasUndefined) {
             val newState = bitsState.copyOf()
@@ -445,6 +449,8 @@ class SysBigInteger private constructor(
     companion object : SysDataCompanion<SysBigInteger> {
 
         //fun uninitialized(width: Int) = SysBigInteger(width.toShort())
+
+        fun valueOf(arg: Array<SysBit>) = SysBigInteger(arg)
 
         fun valueOf(value: Long) = SysBigInteger(BigInteger.valueOf(value))
 
