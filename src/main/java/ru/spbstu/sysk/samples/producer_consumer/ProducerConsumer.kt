@@ -1,14 +1,18 @@
 package ru.spbstu.sysk.samples.producer_consumer
 
+import org.junit.Ignore
 import org.junit.Test
 import ru.spbstu.sysk.channels.SysFifo
 import ru.spbstu.sysk.channels.bind
 import ru.spbstu.sysk.core.SysModule
 import ru.spbstu.sysk.core.SysTopModule
 import ru.spbstu.sysk.core.SysWait
-import ru.spbstu.sysk.core.TimeUnit.*
+import ru.spbstu.sysk.core.TimeUnit.S
 import ru.spbstu.sysk.core.invoke
-import ru.spbstu.sysk.data.*
+import ru.spbstu.sysk.data.SysBit
+import ru.spbstu.sysk.data.SysData
+import ru.spbstu.sysk.data.SysDataCompanion
+import ru.spbstu.sysk.data.undefined
 
 private const val QEMITS: Long = 100000000
 private const val CUTOFF: Long = 1000000
@@ -25,6 +29,7 @@ class ProducerConsumer : SysTopModule() {
         bind(consumer.input to fifo, producer.output to fifo)
     }
 
+    @Ignore
     @Test
     fun show() = start(1(S))
     // 8s 149ms

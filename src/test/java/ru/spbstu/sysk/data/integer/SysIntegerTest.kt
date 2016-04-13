@@ -1,12 +1,10 @@
 package ru.spbstu.sysk.data.integer
 
+import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
-import org.junit.Ignore
 import org.junit.Test
 import ru.spbstu.sysk.data.SysBit.*
 import java.util.*
-import kotlin.reflect.declaredFunctions
-import kotlin.reflect.jvm.isAccessible
 
 class SysIntegerTest {
 
@@ -130,25 +128,56 @@ class SysIntegerTest {
 
     }
 
-    @Ignore("Ignored because of refactoring")
     @Test
     fun testMinMaxValues() {
         val rcv = SysLongInteger(8, 0)
 
-        val methods = SysLongInteger::class.declaredFunctions.groupBy { it.name }
-
-        val minValue_ = methods["minValue"]?.get(0)
-        minValue_?.isAccessible = true
-
-        val minValue = minValue_?.call(rcv)
+        val minValue = rcv.negativeMask
         assertEquals(-128L, minValue)
-        val maxValue_ = methods["maxValue"]?.get(0)
-        maxValue_?.isAccessible = true
 
-        val maxValue = maxValue_?.call(rcv)
+        val maxValue = rcv.positiveMask
         assertEquals(127L, maxValue)
 
     }
+
+
+    @Test
+    fun testSet() {
+
+        val src = arrayOf(ZERO, ZERO, ZERO, ONE, ZERO, ONE, ZERO, ONE, ZERO)
+        val x = SysLongInteger(src)
+        assertArrayEquals(src, x.bits())
+
+        val singleSetOne = arrayOf(ZERO, ZERO, ZERO, ONE, ZERO, ZERO, ZERO, ONE, ZERO)
+        val singleSetTwo = arrayOf(ZERO, ZERO, ZERO, ONE, ONE, ONE, ZERO, ONE, ZERO)
+        val singleSetThree = arrayOf(ZERO, ZERO, ZERO, ONE, ZERO, ONE, ZERO, ONE, ZERO)
+
+
+        val first = x.set(5, ZERO)
+        val second = x.set(4, ONE)
+        val third = x.set(2, ZERO)
+
+        assertArrayEquals(singleSetOne, first.bits())
+        assertArrayEquals(singleSetTwo, second.bits())
+        assertArrayEquals(singleSetThree, third.bits())
+
+
+        val manySetOne = arrayOf(ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ONE, ZERO)
+        val manySetTwo = arrayOf(ZERO, ZERO, ONE, ZERO, ZERO, ONE, ONE, ONE, ZERO)
+        val manySetThree = arrayOf(ZERO, ZERO, ONE, ZERO, ONE, ONE, ONE, ONE, ZERO)
+
+
+        val y = x.set(5, 2, arrayOf(ZERO, ZERO, ZERO, ZERO))
+        val z = x.set(6, 2, arrayOf(ONE, ZERO, ZERO, ONE, ONE))
+        val c = SysLongInteger(arrayOf(ONE, ZERO, ONE, ONE, ONE))
+        val d = x.set(6, 2, c)
+
+        assertArrayEquals(manySetOne, y.bits())
+        assertArrayEquals(manySetTwo, z.bits())
+        assertArrayEquals(manySetThree, d.bits())
+
+    }
+
 
     @Test
     fun boundTest() {
