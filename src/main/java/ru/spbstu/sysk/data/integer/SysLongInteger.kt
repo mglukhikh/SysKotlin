@@ -419,7 +419,7 @@ class SysLongInteger private constructor(
             if (bits[a] == SysBit.ONE) {
                 newValue = newValue or (1L shl (i + a))
             } else {
-                newValue = newValue and (-1L xor (1L shl (i + a)))
+                newValue = newValue and ((1L shl (i + a)).inv())
             }
         return SysLongInteger(width, newValue, positiveMask, negativeMask)
     }
@@ -440,7 +440,7 @@ class SysLongInteger private constructor(
         if (bit == SysBit.ONE) {
             newValue = newValue or (1L shl i)
         } else {
-            newValue = newValue and (-1L xor (1L shl i))
+            newValue = newValue and ((1L shl i).inv())
         }
         return SysLongInteger(width, newValue, positiveMask, negativeMask)
     }
