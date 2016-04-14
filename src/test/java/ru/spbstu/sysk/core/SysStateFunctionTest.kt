@@ -165,7 +165,7 @@ class SysStateFunctionTest {
                         println("before IF-Else\n")
                         check(SysInteger.valueOf(2))
                     }
-                    case ({ switch }) {
+                    case { switch }.then {
                         state {
                             println("If-1\n")
                             check(SysInteger.valueOf(3))
@@ -202,7 +202,7 @@ class SysStateFunctionTest {
                         check(SysInteger.valueOf(10))
                     }
                 }
-                state() {
+                state {
                     println("end\n")
                     check(SysInteger.valueOf(11))
                     scheduler.stop()

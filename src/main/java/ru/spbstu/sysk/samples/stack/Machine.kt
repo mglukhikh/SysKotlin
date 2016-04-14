@@ -47,49 +47,41 @@ class Machine(
                 stackAddr = address
             }
             infiniteLoop {
-                case({ opcode() == NOP }) {
-                    state {
-                        stackWr = ZERO
-                        stackAddr = address
-                    }
+                case{ opcode() == NOP }.state {
+                    stackWr = ZERO
+                    stackAddr = address
                 }
-                case({ opcode() == UNDEFINED }) {
-                    state {
-                        stackWr = ZERO
-                        stackAddr = address
-                        dout(undefined)
-                        top = undefined
-                        second = undefined
-                    }
+                case{ opcode() == UNDEFINED }.state {
+                    stackWr = ZERO
+                    stackAddr = address
+                    dout(undefined)
+                    top = undefined
+                    second = undefined
                 }
-                case({ opcode() == PUSH }) {
-                    state {
-                        top = din()
-                        second = top
-                        stackIn = second
-                        stackWr = if (size >= 0) ONE else ZERO
-                        stackAddr = address
-                        dout(din())
-                        if (size < limit) size++
-                    }
+                case{ opcode() == PUSH }.state {
+                    top = din()
+                    second = top
+                    stackIn = second
+                    stackWr = if (size >= 0) ONE else ZERO
+                    stackAddr = address
+                    dout(din())
+                    if (size < limit) size++
                 }
-                otherwise {
-                    state {
-                        val result = when (opcode()) {
-                            PLUS -> top + second
-                            MINUS -> second - top
-                            TIMES -> top * second
-                            DIV -> second / top
-                            POP -> second
-                            else -> undefined
-                        }
-                        top = result
-                        dout(result)
-                        stackAddr = address
-                        stackWr = ZERO
-                        second = stackOut
-                        if (size > -2) size--
+                otherwise.state {
+                    val result = when (opcode()) {
+                        PLUS -> top + second
+                        MINUS -> second - top
+                        TIMES -> top * second
+                        DIV -> second / top
+                        POP -> second
+                        else -> undefined
                     }
+                    top = result
+                    dout(result)
+                    stackAddr = address
+                    stackWr = ZERO
+                    second = stackOut
+                    if (size > -2) size--
                 }
             }
         }

@@ -70,6 +70,14 @@ interface StateContainer {
         states.add(result)
     }
 
+    class CaseSelector internal constructor(val container: StateContainer, val condition: () -> Boolean) {
+        fun then(init: StateContainer.() -> Unit) = container.case(condition, init)
+
+        fun state(f: () -> Unit) = container.case(condition) { state(f) }
+    }
+
+    fun case(condition: () -> Boolean = { true }) = CaseSelector(this, condition)
+
     fun case(condition: () -> Boolean, init: StateContainer.() -> Unit) {
         val current = this.states.size
         this.init()
@@ -85,19 +93,10 @@ interface StateContainer {
         states.add(current, func)
     }
 
-    fun otherwise(init: StateContainer.() -> Unit) {
-        val current = this.states.size
-        this.init()
-        val delta = this.states.size - current
-        val func = State.OtherwiseFunction {
-            val cond = (states[state] as? State.OtherwiseFunction)?.args as? Boolean
-                    ?: throw AssertionError("Block 'case' expected before 'otherwise'")
-            if (cond) state += delta
-            if (++state < states.size) this.run(wait())
-            wait()
-        }
-        states.add(current, func)
-    }
+    fun otherwise(init: StateContainer.() -> Unit) = case({ true }, init)
+
+    val otherwise: CaseSelector
+        get() = case()
 
     fun continueLoop() {
         states.add(State.LoopJumpFunction("continue"))
