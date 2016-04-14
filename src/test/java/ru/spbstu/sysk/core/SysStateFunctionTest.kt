@@ -4,6 +4,7 @@ import org.junit.Test
 import ru.spbstu.sysk.channels.bind
 import ru.spbstu.sysk.data.SysBit
 import ru.spbstu.sysk.data.integer.SysInteger
+import ru.spbstu.sysk.data.integer.integer
 
 class SysStateFunctionTest {
 
@@ -30,24 +31,24 @@ class SysStateFunctionTest {
                             switch = !switch
                             println("i: ${i.it} j: ${j.it}")
                             println("1: start loop")
-                            put(SysInteger.valueOf(1))
+                            put(integer(1))
                         }
                         state {
                             println("1: before IF-Else")
-                            put(SysInteger.valueOf(2))
+                            put(integer(2))
                         }
-                        case ({ switch }) {
+                        case { switch }.then {
                             state {
                                 println("1: If-1")
-                                put(SysInteger.valueOf(3))
+                                put(integer(3))
                             }
                             state {
                                 println("1: If-2")
-                                put(SysInteger.valueOf(4))
+                                put(integer(4))
                             }
                             state {
                                 println("1: If-3")
-                                put(SysInteger.valueOf(5))
+                                put(integer(5))
                             }
                         }
                         case ({ !switch }) {
@@ -57,18 +58,18 @@ class SysStateFunctionTest {
                         }
                         state {
                             println("1: after IF-Else")
-                            put(SysInteger.valueOf(9))
+                            put(integer(9))
                         }
                         state {
                             println("1: end loop")
-                            put(SysInteger.valueOf(10))
+                            put(integer(10))
                         }
                     }
                 }
                 label("end")
                 state() {
                     println("1: end")
-                    put(SysInteger.valueOf(11))
+                    put(integer(11))
                 }
             }
         }
@@ -90,28 +91,28 @@ class SysStateFunctionTest {
                     var switch = false
                     state {
                         println("2: start loop")
-                        put(SysInteger.valueOf(1))
+                        put(integer(1))
                     }
                     state {
                         switch = !switch
                         println("2: before IF-Else")
-                        put(SysInteger.valueOf(2))
+                        put(integer(2))
                     }
-                    case ({ switch }) {
+                    case { switch }.then {
                         state {
                             println("2: If-1")
-                            put(SysInteger.valueOf(3))
+                            put(integer(3))
                         }
                         state {
                             println("2: If-2")
-                            put(SysInteger.valueOf(4))
+                            put(integer(4))
                         }
                         state {
                             println("2: If-3")
-                            put(SysInteger.valueOf(5))
+                            put(integer(5))
                         }
                     }
-                    case ({ !switch }) {
+                    case { !switch }.then {
                         sleep(3)
                     }
                     otherwise {
@@ -121,16 +122,16 @@ class SysStateFunctionTest {
                     }
                     state {
                         println("2: after IF-Else")
-                        put(SysInteger.valueOf(9))
+                        put(integer(9))
                     }
                     state {
                         println("2: end loop")
-                        put(SysInteger.valueOf(10))
+                        put(integer(10))
                     }
                 }
                 state() {
                     println("2: end")
-                    put(SysInteger.valueOf(11))
+                    put(integer(11))
                 }
             }
         }
@@ -158,53 +159,53 @@ class SysStateFunctionTest {
                     var switch = false
                     state {
                         println("start loop\n")
-                        check(SysInteger.valueOf(1))
+                        check(integer(1))
                     }
                     state {
                         switch = !switch
                         println("before IF-Else\n")
-                        check(SysInteger.valueOf(2))
+                        check(integer(2))
                     }
                     case { switch }.then {
                         state {
                             println("If-1\n")
-                            check(SysInteger.valueOf(3))
+                            check(integer(3))
                         }
                         state {
                             println("If-2\n")
-                            check(SysInteger.valueOf(4))
+                            check(integer(4))
                         }
                         state {
                             println("If-3\n")
-                            check(SysInteger.valueOf(5))
+                            check(integer(5))
                         }
                     }
                     otherwise {
                         state {
                             println("Else-1\n")
-                            check(SysInteger.valueOf(6))
+                            check(integer(6))
                         }
                         state {
                             println("Else-2\n")
-                            check(SysInteger.valueOf(7))
+                            check(integer(7))
                         }
                         state {
                             println("Else-3\n")
-                            check(SysInteger.valueOf(8))
+                            check(integer(8))
                         }
                     }
                     state {
                         println("after IF-Else\n")
-                        check(SysInteger.valueOf(9))
+                        check(integer(9))
                     }
                     state {
                         println("end loop\n")
-                        check(SysInteger.valueOf(10))
+                        check(integer(10))
                     }
                 }
                 state {
                     println("end\n")
-                    check(SysInteger.valueOf(11))
+                    check(integer(11))
                     scheduler.stop()
                 }
             }
