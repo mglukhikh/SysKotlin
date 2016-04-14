@@ -10,10 +10,10 @@ import ru.spbstu.sysk.data.integer.integer
 
 class MachineTest {
 
-    private class MachineTester : SysTopModule("tester") {
-
-        private val addrWidth = 8
-        private val dataWidth = 8
+    private abstract class AbstractMachineTester(
+            protected val addrWidth: Int = 8,
+            protected val dataWidth: Int = 8
+    ) : SysTopModule("tester") {
 
         val m = Machine("machine", addrWidth, dataWidth, this)
 
@@ -46,8 +46,30 @@ class MachineTest {
         }
     }
 
+    private class MachineTester1 : AbstractMachineTester() {
+        init {
+            stateFunction(clk) {
+                init {
+                    mInput = integer(dataWidth, 0)
+                    mOpcode = Opcode.NOP
+                }
+                state {
+                    mInput = integer(dataWidth, 42)
+                    mOpcode = Opcode.PUSH
+                }
+                state {
+                    mOpcode = Opcode.POP
+                }
+                state {
+                    assertEquals(integer(dataWidth, 42), mOutput)
+                    scheduler.stop()
+                }
+            }
+        }
+    }
+
     @Test
-    fun tester() {
-        MachineTester().start()
+    fun tester1() {
+        MachineTester1().start()
     }
 }
