@@ -26,6 +26,8 @@ enum class COMMAND : SysData {
     SET_A,
     SET_B,
     SET_CURRENT,
+    READ,
+    WRITE,
     RESET,
 
     READ_FRONT,
@@ -72,6 +74,8 @@ enum class REGISTER : SysData {
             get() = UNDEFINED
     }
 }
+
+internal val opcodes = HashMap<Int, OPERATION>()
 
 enum class OPERATION private constructor(val id: Int) : SysData {
 
@@ -327,7 +331,6 @@ enum class OPERATION private constructor(val id: Int) : SysData {
     }
 
     companion object : SysDataCompanion<OPERATION> {
-        private val opcodes = HashMap<Int, OPERATION>()
 
         operator fun get(id: Int) = opcodes[id]
 

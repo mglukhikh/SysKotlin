@@ -22,7 +22,7 @@ class ALUTest : SysTopModule() {
         ALU.B bind b
         ALU.out bind out
 
-        stateFunction(clk) {
+        stateFunction(clk, false) {
             state {
                 a(unsigned(CAPACITY.DATA, 30))
                 b(unsigned(CAPACITY.DATA, 100))
