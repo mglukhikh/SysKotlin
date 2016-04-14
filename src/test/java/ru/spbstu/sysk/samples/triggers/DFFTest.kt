@@ -78,8 +78,8 @@ class DFFTest {
         val clk = clock("clk", 20(NS))
 
         init {
-            connector("d", tb.d, ff.d)
-            connector("q", ff.q, tb.q)
+            bitConnector("d", tb.d, ff.d)
+            bitConnector("q", ff.q, tb.q)
             bind(ff.clk to clk, tb.clk to clk)
         }
     }
@@ -100,7 +100,7 @@ class DFFTest {
         var swapOrOne by bitSignalWriter("en", andNot.x2 as SysBitInput)
 
         init {
-            connector("d", andNot.y, ff.d)
+            bitConnector("d", andNot.y, ff.d)
             bind(ff.clk to clk)
 
             stateFunction(clk) {

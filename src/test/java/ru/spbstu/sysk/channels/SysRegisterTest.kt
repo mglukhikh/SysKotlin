@@ -15,7 +15,7 @@ class SysRegisterTest {
 
         val clk = clock("clk", 20(NS))
 
-        var en by signalWriter("aen", a.en)
+        var en by bitSignalWriter("aen", a.en)
         var d by signalWriter("ad", a.d)
         val q by signalReader("aq", a.q)
 
@@ -55,8 +55,8 @@ class SysRegisterTest {
 
         val clk = clock("clk", 20(NS))
 
-        var aen by signalWriter("aen", a.en)
-        var ben by signalWriter("ben", b.en)
+        var aen by bitSignalWriter("aen", a.en)
+        var ben by bitSignalWriter("ben", b.en)
 
         var ad by signalWriter("ad", a.d)
         var bd by signalWriter("bd", b.d)

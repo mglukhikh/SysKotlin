@@ -73,10 +73,10 @@ class RSFFTest {
     }
 
     private class Top : SysTopModule("top", SysScheduler()) {
-        val r = signal("r", X)
-        val s = signal("s", X)
+        val r = bitSignal("r", X)
+        val s = bitSignal("s", X)
 
-        val q = signal("q", X)
+        val q = bitSignal("q", X)
         val clk = clock("clk", 20(NS))
 
         val ff = RSFF("my", this)

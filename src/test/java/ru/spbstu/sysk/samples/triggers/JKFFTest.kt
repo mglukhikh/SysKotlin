@@ -59,9 +59,9 @@ class JKFFTest {
     }
 
     private class Top: SysTopModule("top", SysScheduler()) {
-        val j = signal("j", ZERO)
-        val k = signal("k", ZERO)
-        val q = signal("q", ZERO)
+        val j = bitSignal("j", ZERO)
+        val k = bitSignal("k", ZERO)
+        val q = bitSignal("q", ZERO)
         val clk = clock("clk", 20(NS))
 
         val ff = JKFF("my", this)

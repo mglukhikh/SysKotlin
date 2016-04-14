@@ -63,10 +63,10 @@ class TFFTest {
     }
 
     private class Top : SysTopModule("top", SysScheduler()) {
-        val t = signal("t", ZERO)
+        val t = bitSignal("t", ZERO)
 
         val clk = clock("clk", 20(NS))
-        val q = signal("q", ZERO)
+        val q = bitSignal("q", ZERO)
 
         val ff = TFF("my", this)
         private val tb = Testbench("your", this)

@@ -1,6 +1,7 @@
 package ru.spbstu.sysk.generics
 
 import org.junit.Test
+import ru.spbstu.sysk.channels.SysBitInput
 import ru.spbstu.sysk.core.*
 import ru.spbstu.sysk.core.TimeUnit.*
 import ru.spbstu.sysk.data.SysBit.*
@@ -11,8 +12,8 @@ class SysSimpleAutomataTest {
     class SysLatchStagedTester : SysTopModule() {
         val dut = LatchTriggerMoore("latch", this)
 
-        var x by signalWriter("x", dut.x)
-        val y by signalReader("y", dut.y)
+        var x by bitSignalWriter("x", dut.x as SysBitInput)
+        val y by bitSignalReader("y", dut.y)
 
         val clk = clock("clk", 20(NS))
 
@@ -64,8 +65,8 @@ class SysSimpleAutomataTest {
 
         val dut = LatchTriggerMoore("latch", this)
 
-        var x by signalWriter("x", dut.x)
-        val y by signalReader("y", dut.y)
+        var x by bitSignalWriter("x", dut.x as SysBitInput)
+        val y by bitSignalReader("y", dut.y)
 
         val clk = clock("clk", 20(NS))
 
@@ -121,8 +122,8 @@ class SysSimpleAutomataTest {
 
         val dut = CountTriggerMoore("count", this)
 
-        var x by signalWriter("x", dut.x)
-        val y by signalReader("y", dut.y)
+        var x by bitSignalWriter("x", dut.x as SysBitInput)
+        val y by bitSignalReader("y", dut.y)
 
         val clk = clock("clk", 20(NS))
 

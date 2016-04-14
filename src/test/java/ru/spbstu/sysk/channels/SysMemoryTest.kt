@@ -15,8 +15,8 @@ class SysMemoryTest {
 
         val clk = clock("clk", 20(NS))
 
-        var en by signalWriter("men", m.en)
-        var wr by signalWriter("mwr", m.wr)
+        var en by bitSignalWriter("men", m.en)
+        var wr by bitSignalWriter("mwr", m.wr)
         var d by signalWriter("md", m.din)
         val q by signalReader("mq", m.dout)
         var addr by signalWriter("maddr", m.addr)
@@ -69,8 +69,8 @@ class SysMemoryTest {
 
         val clk = clock("clk", 20(NS))
 
-        var en by signalWriter("men", m.en)
-        var wr by signalWriter("mwr", m.wr)
+        var en by bitSignalWriter("men", m.en)
+        var wr by bitSignalWriter("mwr", m.wr)
         val q by bitSignalReader("mq", m.dout)
         var addr by signalWriter("maddr", m.addr)
 

@@ -115,10 +115,10 @@ class PRegTest {
 
     private class Top : SysTopModule("top", SysScheduler()) {
         val digPerWord = 64
-        val d = Array(digPerWord, {i -> signal<SysBit>("d" + i.toString())})
+        val d = Array(digPerWord, {i -> bitSignal("d" + i.toString())})
 
         val clk = clock("clk", 20(NS))
-        val q = Array(digPerWord, {i -> signal<SysBit>("q" + i.toString())})
+        val q = Array(digPerWord, {i -> bitSignal("q" + i.toString())})
 
         val ff = PReg("my", digPerWord, this)
         private val tb = Testbench("your", digPerWord, this)
