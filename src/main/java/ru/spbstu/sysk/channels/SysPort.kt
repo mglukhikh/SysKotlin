@@ -45,7 +45,7 @@ abstract class SysPort<IF : SysInterface> internal constructor(
         assert(!sealed) { "Port $name is already sealed" }
     }
 
-    fun bind(port: SysPort<IF>) {
+    infix fun bind(port: SysPort<IF>) {
         port.bound()?.let { bind(it) }
         if (bound == null) {
             bindCheck()
@@ -90,7 +90,7 @@ open class SysReadWritePort<T : SysData> internal constructor(
     var value: T
         get() {
             if (isBound) {
-                return bound!!.value
+                return bound()!!.value
             } else {
                 if (defaultValue == null) throw IllegalStateException("Port $name is not bound")
                 return defaultValue
@@ -99,7 +99,7 @@ open class SysReadWritePort<T : SysData> internal constructor(
         set(value) {
             if (!sealed) {
                 if (!isBound) throw IllegalStateException("Port $name is not bound")
-                bound!!.value = value
+                bound()!!.value = value
             }
         }
 
@@ -117,7 +117,7 @@ open class SysInput<T : SysData> internal constructor(
     val value: T
         get() {
             if (isBound) {
-                return bound!!.value
+                return bound()!!.value
             } else {
                 if (defaultValue == null) throw IllegalStateException("Port $name is not bound")
                 return defaultValue
@@ -153,7 +153,7 @@ class SysBitInput internal constructor(
         get() = value.x
 
     override fun bound() = super.bound()?.let {
-        (it as? SysBitRead) ?: throw AssertionError("Port $name is bound to $it which is not a bit read interface")
+        (it as? SysBitRead) ?: throw AssertionError("Port $name is bound to $it : ${it.javaClass} which is not a bit read interface")
     }
 }
 
@@ -166,7 +166,7 @@ open class SysOutput<T : SysData> internal constructor(
         set(value) {
             if (!sealed) {
                 if (!isBound) throw IllegalStateException("Port $name is not bound")
-                bound!!.value = value
+                bound()!!.value = value
             }
         }
 
