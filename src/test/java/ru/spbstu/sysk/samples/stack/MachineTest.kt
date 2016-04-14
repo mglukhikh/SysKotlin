@@ -40,6 +40,7 @@ class MachineTest {
                 }
                 state {
                     assertEquals(integer(dataWidth, 42), mOutput)
+                    scheduler.stop()
                 }
             }
         }

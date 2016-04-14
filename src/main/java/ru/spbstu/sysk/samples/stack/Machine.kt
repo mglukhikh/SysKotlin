@@ -30,14 +30,14 @@ class Machine(
     val opcode = input<Opcode>("opcode")
     val clk = bitInput("clk")
 
-    private var stackEn by signalWriter("en", stack.en)
-    private var stackWr by signalWriter("wr", stack.wr)
+    private var stackEn by bitSignalWriter("en", stack.en)
+    private var stackWr by bitSignalWriter("wr", stack.wr)
     private var stackIn by signalWriter("in", stack.din)
     private var stackAddr by signalWriter("addr", stack.addr)
     private val stackOut by signalReader("out", stack.dout)
 
     init {
-        clk.bind(stack.clk)
+        stack.clk.bind(clk)
 
         stateFunction(clk) {
             init {
@@ -48,40 +48,48 @@ class Machine(
             }
             infiniteLoop {
                 case({ opcode() == NOP }) {
-                    stackWr = ZERO
-                    stackAddr = address
+                    state {
+                        stackWr = ZERO
+                        stackAddr = address
+                    }
                 }
                 case({ opcode() == UNDEFINED }) {
-                    stackWr = ZERO
-                    stackAddr = address
-                    dout(undefined)
-                    top = undefined
-                    second = undefined
+                    state {
+                        stackWr = ZERO
+                        stackAddr = address
+                        dout(undefined)
+                        top = undefined
+                        second = undefined
+                    }
                 }
                 case({ opcode() == PUSH }) {
-                    top = din()
-                    second = top
-                    stackIn = second
-                    stackWr = if (size >= 0) ONE else ZERO
-                    stackAddr = address
-                    dout(din())
-                    if (size < limit) size++
+                    state {
+                        top = din()
+                        second = top
+                        stackIn = second
+                        stackWr = if (size >= 0) ONE else ZERO
+                        stackAddr = address
+                        dout(din())
+                        if (size < limit) size++
+                    }
                 }
                 otherwise {
-                    val result = when (opcode()) {
-                        PLUS -> top + second
-                        MINUS -> second - top
-                        TIMES -> top * second
-                        DIV -> second / top
-                        POP -> second
-                        else -> undefined
+                    state {
+                        val result = when (opcode()) {
+                            PLUS -> top + second
+                            MINUS -> second - top
+                            TIMES -> top * second
+                            DIV -> second / top
+                            POP -> second
+                            else -> undefined
+                        }
+                        top = result
+                        dout(result)
+                        stackAddr = address
+                        stackWr = ZERO
+                        second = stackOut
+                        if (size > -2) size--
                     }
-                    top = result
-                    dout(result)
-                    stackAddr = address
-                    stackWr = ZERO
-                    second = stackOut
-                    if (size > -2) size--
                 }
             }
         }
