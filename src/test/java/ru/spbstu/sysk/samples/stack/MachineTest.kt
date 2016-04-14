@@ -7,6 +7,7 @@ import ru.spbstu.sysk.core.SysTopModule
 import ru.spbstu.sysk.core.TimeUnit
 import ru.spbstu.sysk.core.invoke
 import ru.spbstu.sysk.data.integer.integer
+import ru.spbstu.sysk.samples.stack.Opcode.*
 
 class MachineTest {
 
@@ -25,24 +26,6 @@ class MachineTest {
 
         init {
             bind(m.clk to clk)
-
-            stateFunction(clk) {
-                init {
-                    mInput = integer(dataWidth, 0)
-                    mOpcode = Opcode.NOP
-                }
-                state {
-                    mInput = integer(dataWidth, 42)
-                    mOpcode = Opcode.PUSH
-                }
-                state {
-                    mOpcode = Opcode.POP
-                }
-                state {
-                    assertEquals(integer(dataWidth, 42), mOutput)
-                    scheduler.stop()
-                }
-            }
         }
     }
 
@@ -51,14 +34,14 @@ class MachineTest {
             stateFunction(clk) {
                 init {
                     mInput = integer(dataWidth, 0)
-                    mOpcode = Opcode.NOP
+                    mOpcode = NOP
                 }
                 state {
                     mInput = integer(dataWidth, 42)
-                    mOpcode = Opcode.PUSH
+                    mOpcode = PUSH
                 }
                 state {
-                    mOpcode = Opcode.POP
+                    mOpcode = POP
                 }
                 state {
                     assertEquals(integer(dataWidth, 42), mOutput)
