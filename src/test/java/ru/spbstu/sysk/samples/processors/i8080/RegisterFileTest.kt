@@ -5,7 +5,6 @@ import ru.spbstu.sysk.core.SysTopModule
 import ru.spbstu.sysk.core.TimeUnit.*
 import ru.spbstu.sysk.data.SysBit.*
 import ru.spbstu.sysk.core.invoke
-import ru.spbstu.sysk.data.SysBit
 import ru.spbstu.sysk.data.integer.integer
 import ru.spbstu.sysk.data.integer.unsigned
 
@@ -14,6 +13,9 @@ class RegisterFileTest : SysTopModule() {
     val RF = RegisterFile(CAPACITY.DATA, CAPACITY.ADDRESS, CAPACITY.REGISTER, CAPACITY.COMMAND, this)
 
     val data = signal("data", unsigned(CAPACITY.DATA, 0))
+    val inp = signal("inp", unsigned(CAPACITY.DATA, 0))
+    val out = signal("out", unsigned(CAPACITY.DATA, 0))
+    val b = signal("b", unsigned(CAPACITY.DATA, 0))
     val command = signal("command", COMMAND.UNDEFINED)
     val register = signal("register", REGISTER.UNDEFINED)
     val address = signal("address", unsigned(CAPACITY.ADDRESS, 0))
@@ -26,31 +28,54 @@ class RegisterFileTest : SysTopModule() {
         RF.clk bind clk
         RF.command bind command
         RF.data bind data
+        RF.inp bind inp
+        RF.out bind out
+        RF.B bind b
         RF.en bind en
 
         stateFunction(clk, false) {
             state {
                 data(unsigned(CAPACITY.DATA, 255))
-                command(COMMAND.WRITE)
+                command(COMMAND.WRITE_DATA)
                 register(REGISTER.B)
                 en(ONE)
             }
             state {
                 data(unsigned(CAPACITY.DATA, 10))
-                command(COMMAND.WRITE)
+                command(COMMAND.WRITE_DATA)
                 register(REGISTER.E)
             }
             state {
+                command(COMMAND.SET_CURRENT)
+                register(REGISTER.A)
+            }
+            state {
+                command(COMMAND.SET_A)
+                register(REGISTER.B)
+            }
+            state {
+                command(COMMAND.SET_B)
+                register(REGISTER.E)
+            }
+            state {
+                inp(out() + b())
+            }
+            state {
+                command(COMMAND.READ_DATA)
+                register(REGISTER.A)
+            }
+            state {
+                assert(data() == unsigned(CAPACITY.DATA, 9))
                 en(ZERO)
             }
             state {
-                command(COMMAND.READ)
+                command(COMMAND.READ_DATA)
                 register(REGISTER.B)
                 en(ONE)
             }
             state {
                 assert(data() == unsigned(CAPACITY.DATA, 255))
-                command(COMMAND.READ)
+                command(COMMAND.READ_DATA)
                 register(REGISTER.E)
             }
             state {

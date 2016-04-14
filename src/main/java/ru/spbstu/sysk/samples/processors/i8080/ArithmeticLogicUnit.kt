@@ -5,7 +5,7 @@ import ru.spbstu.sysk.data.integer.SysUnsigned
 
 class ArithmeticLogicUnit(
         capacityData: Int,
-        capacityOperation: Int,
+        capacityCommand: Int,
         parent: SysModule
 ) : SysModule("ArithmeticLogicUnit", parent) {
 
@@ -18,7 +18,7 @@ class ArithmeticLogicUnit(
         function(A.defaultEvent or B.defaultEvent or operation.defaultEvent) {
             if (A().width != capacityData) throw IllegalArgumentException()
             if (B().width != capacityData) throw IllegalArgumentException()
-            if (operation().width != capacityOperation) throw IllegalArgumentException()
+            if (operation().width != capacityCommand) throw IllegalArgumentException()
             when (operation()) {
                 COMMAND.ADD -> out(A() + B())
                 COMMAND.SUB -> out(A() - B())

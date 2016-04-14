@@ -19,8 +19,13 @@ object VALUE {
 enum class COMMAND : SysData {
 
     UNDEFINED,
-    WRITE,
-    READ,
+    WRITE_ADDRESS,
+    WRITE_DATA,
+    READ_ADDRESS,
+    READ_DATA,
+    SET_A,
+    SET_B,
+    SET_CURRENT,
     RESET,
 
     READ_FRONT,
