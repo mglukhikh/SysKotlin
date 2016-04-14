@@ -116,11 +116,14 @@ class SysScheduler {
                 else -> SysWait.Time.INFINITY
             }
 
-    var stopRequested = true
+    var stopped = true
         private set
+
+    private var stopRequested = true
 
     fun start(endTime: SysWait.Time = SysWait.Time.INFINITY) {
         stopRequested = false
+        stopped = false
         ports.forEach { assert(it.isBound || it.sealed) { "Port $it: is not bounded and not sealed." } }
         if (currentTime >= endTime) return
         var happenedEvents: Set<SysWait> = if (currentTime.femtoSeconds == 0L) setOf(SysWait.Initialize) else setOf()
@@ -129,7 +132,7 @@ class SysScheduler {
             var globalClosestTime = SysWait.Time.INFINITY
             var functionActivated = false
             var sensitivities: SysWait
-            var neverCalledFunctions: MutableList<SysFunction> = ArrayList()
+            val neverCalledFunctions: MutableList<SysFunction> = ArrayList()
             if (!initialize) resetEvents()
             else initialize = false
             functions += newFunctions
@@ -160,6 +163,7 @@ class SysScheduler {
             }
             happenedEvents = events.entries.filter { it.value <= currentTime }.map { it.key }.toSet()
         }
+        stopped = true
     }
 
     fun stop() {

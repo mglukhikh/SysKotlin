@@ -30,7 +30,7 @@ abstract class SysPort<IF : SysInterface> internal constructor(
         private set
 
     fun seal() {
-        assert(scheduler.stopRequested) { "Impossible to seal the port while running the scheduler" }
+        assert(scheduler.stopped) { "Impossible to seal the port while running the scheduler" }
         assert(!isBound) { "Port $name is already bound to $bound" }
         sealed = true
     }
@@ -40,7 +40,7 @@ abstract class SysPort<IF : SysInterface> internal constructor(
     }
 
     private fun bindCheck() {
-        assert(scheduler.stopRequested) { "Impossible to bind the port while running the scheduler" }
+        assert(scheduler.stopped) { "Impossible to bind the port while running the scheduler" }
         assert(!isBound) { "Port $name is already bound to ${bound()}" }
         assert(!sealed) { "Port $name is already sealed" }
     }
