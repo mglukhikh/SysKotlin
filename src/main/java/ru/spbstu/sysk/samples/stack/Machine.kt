@@ -26,7 +26,7 @@ class Machine(
     private val limit = stack.lastAddress()
 
     val din = input<SysInteger>("din")
-    val dout = output<SysInteger>("din")
+    val dout = output<SysInteger>("dout")
     val opcode = input<Opcode>("opcode")
     val clk = bitInput("clk")
 
