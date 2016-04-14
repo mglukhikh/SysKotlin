@@ -17,7 +17,7 @@ class RegisterFileTest : SysTopModule() {
     val command = signal("command", COMMAND.UNDEFINED)
     val register = signal("register", REGISTER.UNDEFINED)
     val address = signal("address", unsigned(CAPACITY.ADDRESS, 0))
-    val en = signal<SysBit>("en")
+    val en = bitSignal("en")
     val clk = clock("clk", 2(FS))
 
     init {
