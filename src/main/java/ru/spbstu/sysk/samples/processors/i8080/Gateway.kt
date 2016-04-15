@@ -13,7 +13,7 @@ class Gateway constructor(
 
     val front = bidirPort<SysUnsigned>("front")
     val back = bidirPort<SysUnsigned>("back")
-    val command = bidirPort<COMMAND>("command")
+    val command = input<COMMAND>("command")
     val en = bitInput("en")
     val clk = bitInput("clk")
 
