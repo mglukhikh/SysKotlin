@@ -73,7 +73,7 @@ interface StateContainer {
     class CaseSelector internal constructor(val container: StateContainer, val condition: () -> Boolean) {
         fun then(init: StateContainer.() -> Unit) = container.case(condition, init)
 
-        fun state(f: () -> Unit) = container.case(condition) { state(f) }
+        fun state(f: () -> Unit): Unit = container.case(condition) { state(f) }
     }
 
     fun case(condition: () -> Boolean = { true }) = CaseSelector(this, condition)
