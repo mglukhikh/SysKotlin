@@ -19,7 +19,7 @@ class Gateway constructor(
 
     init {
         stateFunction(clk) {
-            infiniteState {
+            infinite.state {
                 if (front().width != capacity) throw IllegalArgumentException()
                 if (back().width != capacity) throw IllegalArgumentException()
                 if (en().one) when (command()) {

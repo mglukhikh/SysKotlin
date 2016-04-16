@@ -26,7 +26,7 @@ open class SysUnaryMoore<Input : SysData, State, Output : SysData>(
             init {
                 y(result(unaryState))
             }
-            infiniteState {
+            infinite.state {
                 // First calculate state, then output, one tick delay is provided by clock sensitivity
                 unaryState = transition(unaryState, x())
                 y(result(unaryState))

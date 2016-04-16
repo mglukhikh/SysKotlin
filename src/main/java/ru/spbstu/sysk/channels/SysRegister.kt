@@ -24,7 +24,7 @@ class SysRegister <T : SysData> (name: String, defValue: T, parent: SysModule): 
             init {
                 qout = value
             }
-            infiniteState {
+            infinite.state {
                 if (en.one) {
                     qout = dinp
                     value = dinp

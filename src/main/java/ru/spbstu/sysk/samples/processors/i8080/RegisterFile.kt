@@ -35,7 +35,7 @@ class RegisterFile constructor(
 
     init {
         stateFunction(clk) {
-            infiniteState {
+            infinite.state {
                 if (command().width != capacityCommand) throw IllegalArgumentException()
                 if (register().width != capacityRegisterAddress) throw IllegalArgumentException()
                 if (data().width != capacityData) throw IllegalArgumentException()

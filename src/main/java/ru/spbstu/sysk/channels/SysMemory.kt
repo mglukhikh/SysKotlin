@@ -28,7 +28,7 @@ open class SysMemory<T : SysData>(
             init {
                 dout(defaultValue)
             }
-            infiniteState {
+            infinite.state {
                 assert(addr().width == addrWidth) {
                     "Inconsistent memory address: required width $addrWidth, got ${addr()}"
                 }

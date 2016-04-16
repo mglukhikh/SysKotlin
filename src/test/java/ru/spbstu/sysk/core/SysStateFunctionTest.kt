@@ -37,7 +37,7 @@ class SysStateFunctionTest {
                             println("1: before IF-Else")
                             put(integer(2))
                         }
-                        case { switch }.then {
+                        case { switch }.block {
                             state {
                                 println("1: If-1")
                                 put(integer(3))
@@ -98,7 +98,7 @@ class SysStateFunctionTest {
                         println("2: before IF-Else")
                         put(integer(2))
                     }
-                    case { switch }.then {
+                    case { switch }.block {
                         state {
                             println("2: If-1")
                             put(integer(3))
@@ -112,7 +112,7 @@ class SysStateFunctionTest {
                             put(integer(5))
                         }
                     }
-                    case { !switch }.then {
+                    case { !switch }.block {
                         sleep(3)
                     }
                     otherwise {
@@ -166,7 +166,7 @@ class SysStateFunctionTest {
                         println("before IF-Else\n")
                         check(integer(2))
                     }
-                    case { switch }.then {
+                    case { switch }.block {
                         state {
                             println("If-1\n")
                             check(integer(3))

@@ -47,18 +47,18 @@ class Machine(
                 stackAddr = address
             }
             infiniteLoop {
-                case{ opcode() == NOP }.state {
+                case { opcode() == NOP }.state {
                     stackWr = ZERO
                     stackAddr = address
                 }
-                case{ opcode() == UNDEFINED }.state {
+                case { opcode() == UNDEFINED }.state {
                     stackWr = ZERO
                     stackAddr = address
                     dout(undefined)
                     top = undefined
                     second = undefined
                 }
-                case{ opcode() == PUSH }.state {
+                case { opcode() == PUSH }.state {
                     top = din()
                     second = top
                     stackIn = second

@@ -21,7 +21,7 @@ class OperationFifo(
 
     init {
         stateFunction(clk) {
-            infiniteState {
+            infinite.state {
                 if (data().width != capacityData) throw IllegalArgumentException()
                 if (command().width != capacityCommand) throw IllegalArgumentException()
                 if (en().one) when (command()) {

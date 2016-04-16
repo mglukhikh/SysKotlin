@@ -8,6 +8,7 @@ sealed class Label {
 
         override fun hashCode() = name.hashCode()
     }
+
     class Internal internal constructor() : Label()
 }
 
@@ -41,7 +42,7 @@ interface StateContainer {
         if (number < 0) throw IllegalArgumentException("Impossible to sleep $number cycles.")
         var memory = number
         val result = State.Function("sleep", { true }) {
-            if (number == 0){
+            if (number == 0) {
                 if (++state < states.size) this.run(wait())
                 --state
             }
@@ -70,13 +71,7 @@ interface StateContainer {
         states.add(result)
     }
 
-    class CaseSelector internal constructor(val container: StateContainer, val condition: () -> Boolean) {
-        fun then(init: StateContainer.() -> Unit) = container.case(condition, init)
-
-        fun state(f: () -> Unit): Unit = container.case(condition) { state(f) }
-    }
-
-    fun case(condition: () -> Boolean = { true }) = CaseSelector(this, condition)
+    fun case(condition: () -> Boolean) = State.Block(this, { init -> case(condition, init) })
 
     fun case(condition: () -> Boolean, init: StateContainer.() -> Unit) {
         val current = this.states.size
@@ -93,10 +88,22 @@ interface StateContainer {
         states.add(current, func)
     }
 
-    fun otherwise(init: StateContainer.() -> Unit) = case({ true }, init)
+    val otherwise: State.Block
+        get() = State.Block(this, { init -> otherwise(init) })
 
-    val otherwise: CaseSelector
-        get() = case()
+    fun otherwise(init: StateContainer.() -> Unit) {
+        val current = this.states.size
+        this.init()
+        val delta = this.states.size - current
+        val func = State.OtherwiseFunction {
+            val cond = (states[state] as? State.OtherwiseFunction)?.args as? Boolean
+                    ?: throw AssertionError("Block 'case' expected before 'otherwise'")
+            if (cond) state += delta
+            if (++state < states.size) this.run(wait())
+            wait()
+        }
+        states.add(current, func)
+    }
 
     fun continueLoop() {
         states.add(State.LoopJumpFunction("continue"))
@@ -120,6 +127,10 @@ interface StateContainer {
             ++i
         }
     }
+
+    fun <T : Any> loop(progression: Iterable<T>) = State.Block(this, { init -> loop(progression, init) })
+
+    fun <T : Any> loop(iterator: ResetIterator<T>) = State.Block(this, { init -> loop(iterator, init) })
 
     private fun loop(condition: () -> Boolean, init: StateContainer.() -> Unit) {
         val begin = Label.Internal()
@@ -161,8 +172,11 @@ interface StateContainer {
         labelInternal(end)
     }
 
+    val infinite: State.Block
+        get() = State.Block(this, { init -> infiniteLoop(init) })
+
     fun infiniteLoop(init: StateContainer.() -> Unit) {
-        loop({true}, init)
+        loop({ true }, init)
     }
 
     fun infiniteState(f: () -> Unit) {
@@ -207,6 +221,13 @@ sealed class State {
     class OtherwiseFunction(f: (SysWait) -> SysWait) : CaseFunction("otherwise", f)
 
     open class CaseFunction(name: String, f: (SysWait) -> SysWait) : Function(name, { false }, f)
+
+    class Block(private val container: StateContainer, private val function: StateContainer.(StateContainer.() -> Unit) -> Unit) {
+
+        fun block(init: StateContainer.() -> Unit) = container.function(init)
+
+        fun state(f: () -> Unit) = container.function({ state(f) })
+    }
 
     open class Function internal constructor(
             val name: String,
