@@ -73,6 +73,9 @@ open class SysModule internal constructor(
     protected fun <T : SysData> output(name: String, signalWrite: SysSignalWrite<T>? = null): SysOutput<T> =
             SysOutput(name, scheduler, this, signalWrite)
 
+    protected fun bitOutput(name: String, signalWrite: SysSignalWrite<SysBit>? = null) =
+            output<SysBit>(name, signalWrite)
+
     protected fun <T : SysData> portWriter(output: SysOutput<T>) = PortWriter(output)
 
     protected fun <T : SysData> signalStub(name: String, value: T): SysSignalStub<T> =
