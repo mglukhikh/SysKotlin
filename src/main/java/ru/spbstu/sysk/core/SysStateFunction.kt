@@ -30,6 +30,22 @@ interface StateContainer {
         states.add(result)
     }
 
+    fun write(string: () -> String) {
+        val result = State.Single {
+            print(string())
+            wait()
+        }
+        states.add(result)
+    }
+
+    fun writeln(string: () -> String) {
+        val result = State.Single {
+            println(string())
+            wait()
+        }
+        states.add(result)
+    }
+
     fun state(f: () -> Unit) {
         val result = State.Single {
             f()
