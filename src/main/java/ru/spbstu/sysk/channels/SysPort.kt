@@ -76,6 +76,16 @@ fun <IF : SysInterface> bind(vararg pairs: Pair<SysPort<IF>, IF>) {
     }
 }
 
+data class PortPair<IF : SysInterface>(val first: SysPort<IF>, val second: SysPort<IF>)
+
+infix fun <IF: SysInterface> SysPort<IF>.to(other: SysPort<IF>) = PortPair(this, other)
+
+fun <IF : SysInterface> bind(vararg pairs: PortPair<IF>) {
+    for (pair in pairs) {
+        pair.first.bind(pair.second)
+    }
+}
+
 fun <IF : SysInterface> bindArrays(vararg pairs: Pair<Array<out SysPort<IF>>, Array<out IF>>) {
     for (pair in pairs) {
         pair.first.forEachIndexed { i, sysPort -> sysPort.bind(pair.second[i]) }
