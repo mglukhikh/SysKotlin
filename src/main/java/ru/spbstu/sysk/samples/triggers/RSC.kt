@@ -1,5 +1,7 @@
 package ru.spbstu.sysk.samples.triggers
 
+import ru.spbstu.sysk.channels.bind
+import ru.spbstu.sysk.channels.to
 import ru.spbstu.sysk.core.SysModule
 import ru.spbstu.sysk.samples.NAND
 
@@ -19,17 +21,10 @@ class RSC(name: String, parent: SysModule) : SysModule(name, parent) {
     private val s2 = bitSignal("s2")
 
     init {
-        u1.x1 bind S
-        u1.x2 bind C
-        u1.y bind s1
-
-        d1.x1 bind C
-        d1.x2 bind R
-        d1.y bind s2
-
-        nrs.nS bind s1
-        nrs.nR bind s2
-        nrs.Q bind Q
-        nrs.nQ bind nQ
+        bind(u1.x1 to S, d1.x1 to C)
+        bind(u1.x2 to C, d1.x2 to R)
+        bind(u1.y to s1, d1.y to s2)
+        bind(nrs.nS to s1, nrs.nR to s2)
+        bind(nrs.Q to Q, nrs.nQ to nQ)
     }
 }
