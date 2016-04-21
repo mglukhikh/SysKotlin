@@ -59,8 +59,8 @@ class Machine(
                     second = undefined
                 }
                 case { opcode() == PUSH }.state {
-                    top = din()
                     second = top
+                    top = din()
                     stackIn = second
                     stackWr = if (size >= 0) ONE else ZERO
                     stackAddr = address

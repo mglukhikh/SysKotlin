@@ -27,14 +27,18 @@ class MachineTest {
         init {
             bind(m.clk to clk)
         }
+
+        protected fun resetInput() {
+            mInput = integer(dataWidth, 0)
+            mOpcode = NOP
+        }
     }
 
     private class MachineTester1 : AbstractMachineTester() {
         init {
             stateFunction(clk) {
                 init {
-                    mInput = integer(dataWidth, 0)
-                    mOpcode = NOP
+                    resetInput()
                 }
                 state {
                     mInput = integer(dataWidth, 42)
@@ -54,5 +58,37 @@ class MachineTest {
     @Test
     fun tester1() {
         MachineTester1().start()
+    }
+
+    private class MachineTester2 : AbstractMachineTester() {
+        init {
+            stateFunction(clk) {
+                init {
+                    resetInput()
+                }
+                state {
+                    mInput = integer(dataWidth, 2)
+                    mOpcode = PUSH
+                }
+                state {
+                    mInput = integer(dataWidth, 3)
+                }
+                state {
+                    mOpcode = PLUS
+                }
+                state {
+                    mOpcode = POP
+                }
+                state {
+                    assertEquals(integer(dataWidth, 5), mOutput)
+                    scheduler.stop()
+                }
+            }
+        }
+    }
+
+    @Test
+    fun tester2() {
+        MachineTester2().start()
     }
 }
