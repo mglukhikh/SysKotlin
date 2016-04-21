@@ -165,4 +165,6 @@ fun integer(width: Int, value: Int) = SysInteger.valueOf(width, value)
 
 fun integer(width: Int, value: Long) = SysInteger.valueOf(width, value)
 
+fun integer(width: Int, value: Number) = SysInteger.valueOf(width, value.toLong())
+
 fun integer(bits: Array<SysBit>) = SysInteger.valueOf(bits)

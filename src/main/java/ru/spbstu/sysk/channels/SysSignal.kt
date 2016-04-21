@@ -3,6 +3,8 @@ package ru.spbstu.sysk.channels
 import ru.spbstu.sysk.core.*
 import ru.spbstu.sysk.data.SysBit
 import ru.spbstu.sysk.data.SysData
+import ru.spbstu.sysk.data.integer.SysInteger
+import ru.spbstu.sysk.data.integer.integer
 import kotlin.properties.ReadOnlyProperty
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
@@ -142,10 +144,24 @@ open class SignalReader<T : SysData>(
     override fun getValue(thisRef: SysModule, property: KProperty<*>) = s.value
 }
 
+open class NumberSignalReader(
+        s: SysSignal<SysInteger>, writePort: SysOutput<SysInteger>?, vararg readPorts: SysInput<SysInteger>
+) : Connector<SysInteger>(s, writePort, *readPorts), ReadOnlyProperty<SysModule, Number> {
+    override fun getValue(thisRef: SysModule, property: KProperty<*>) = s.value.value
+}
+
 class SignalWriter<T : SysData>(
         s: SysSignal<T>, vararg readPorts: SysInput<T>
 ) : SignalReader<T>(s, null, *readPorts), ReadWriteProperty<SysModule, T> {
     override fun setValue(thisRef: SysModule, property: KProperty<*>, value: T) {
         s.value = value
+    }
+}
+
+class NumberSignalWriter(
+        s: SysSignal<SysInteger>, val width: Int, vararg readPorts: SysInput<SysInteger>
+) : NumberSignalReader(s, null, *readPorts), ReadWriteProperty<SysModule, Number> {
+    override fun setValue(thisRef: SysModule, property: KProperty<*>, value: Number) {
+        s.value = integer(width, value)
     }
 }

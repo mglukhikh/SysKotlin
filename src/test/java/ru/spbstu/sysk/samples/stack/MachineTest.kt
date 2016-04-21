@@ -6,7 +6,6 @@ import ru.spbstu.sysk.channels.bind
 import ru.spbstu.sysk.core.SysTopModule
 import ru.spbstu.sysk.core.TimeUnit
 import ru.spbstu.sysk.core.invoke
-import ru.spbstu.sysk.data.integer.integer
 import ru.spbstu.sysk.samples.stack.Opcode.*
 
 class MachineTest {
@@ -20,8 +19,8 @@ class MachineTest {
 
         val clk = clock("clk", 20(TimeUnit.NS))
 
-        var mInput by signalWriter("mInput", m.din)
-        val mOutput by signalReader("mOutput", m.dout)
+        var mInput by numberSignalWriter("mInput", dataWidth, m.din)
+        val mOutput by numberSignalReader("mOutput", m.dout)
         var mOpcode by signalWriter("mOpcode", m.opcode)
 
         init {
@@ -29,7 +28,7 @@ class MachineTest {
         }
 
         protected fun resetInput() {
-            mInput = integer(dataWidth, 0)
+            mInput = 0
             mOpcode = NOP
         }
     }
@@ -41,14 +40,14 @@ class MachineTest {
                     resetInput()
                 }
                 state {
-                    mInput = integer(dataWidth, 42)
+                    mInput = 42
                     mOpcode = PUSH
                 }
                 state {
                     mOpcode = POP
                 }
                 state {
-                    assertEquals(integer(dataWidth, 42), mOutput)
+                    assertEquals(42L, mOutput)
                     scheduler.stop()
                 }
             }
@@ -67,11 +66,11 @@ class MachineTest {
                     resetInput()
                 }
                 state {
-                    mInput = integer(dataWidth, 2)
+                    mInput = 2
                     mOpcode = PUSH
                 }
                 state {
-                    mInput = integer(dataWidth, 3)
+                    mInput = 3
                 }
                 state {
                     mOpcode = PLUS
@@ -80,7 +79,7 @@ class MachineTest {
                     mOpcode = POP
                 }
                 state {
-                    assertEquals(integer(dataWidth, 5), mOutput)
+                    assertEquals(5L, mOutput)
                     scheduler.stop()
                 }
             }

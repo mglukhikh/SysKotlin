@@ -2,6 +2,7 @@ package ru.spbstu.sysk.core
 
 import ru.spbstu.sysk.channels.*
 import ru.spbstu.sysk.data.*
+import ru.spbstu.sysk.data.integer.SysInteger
 import java.util.*
 
 open class SysModule internal constructor(
@@ -111,13 +112,21 @@ open class SysModule internal constructor(
             name: String, writePort: SysOutput<SysBit>, vararg readPorts: SysBitInput
     ) = SignalReader(bitSignal(name), writePort, *readPorts)
 
+    protected fun numberSignalReader(
+            name: String, writePort: SysOutput<SysInteger>, vararg readPorts: SysInput<SysInteger>
+    ) = NumberSignalReader(signal(name), writePort, *readPorts)
+
     protected inline fun <reified T : SysData> signalWriter(
             name: String, vararg readPorts: SysInput<T>
     ) = SignalWriter(signal(name), *readPorts)
 
     protected fun bitSignalWriter(
-            name: String, vararg readPort: SysBitInput
-    ) = SignalWriter(bitSignal(name), *readPort)
+            name: String, vararg readPorts: SysBitInput
+    ) = SignalWriter(bitSignal(name), *readPorts)
+
+    protected fun numberSignalWriter(
+            name: String, width: Int, vararg readPorts: SysInput<SysInteger>
+    ) = NumberSignalWriter(signal(name), width, *readPorts)
 
     protected fun bitSignal(name: String, startValue: SysBit = SysBit.X) =
             SysBitSignal(name, scheduler, startValue, this)
