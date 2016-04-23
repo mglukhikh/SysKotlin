@@ -50,7 +50,7 @@ class Moore(parent: SysModule) : SysUnaryMoore<Input, State, SysBit>(
                 q3 -> X
             }
         },
-        unaryState = q3,
+        startState = q3,
         name = "State Machine",
         parent = parent
 )

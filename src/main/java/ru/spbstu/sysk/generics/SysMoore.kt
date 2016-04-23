@@ -8,7 +8,7 @@ import ru.spbstu.sysk.data.SysData
 open class SysUnaryMoore<Input : SysData, State, Output : SysData>(
         transition: (State, Input) -> State,
         result: (State) -> Output,
-        private var unaryState: State,
+        startState: State,
         name: String,
         parent: SysModule
 ): SysModule(name, parent) {
@@ -16,10 +16,10 @@ open class SysUnaryMoore<Input : SysData, State, Output : SysData>(
     protected open fun createInput(name: String) = input<Input>(name)
 
     val x = createInput("x")
-
     val clk = bitInput("clk")
-
     val y = output<Output>("y")
+
+    private var unaryState = startState
 
     init {
         stateFunction(clk) {
