@@ -82,11 +82,22 @@ open class SysModule internal constructor(
     protected fun <T : SysData> signalStub(name: String, value: T): SysSignalStub<T> =
             SysSignalStub(name, value, scheduler, this)
 
+    protected fun bitSignalStub(name: String, value: SysBit): SysBitSignalStub =
+            SysBitSignalStub(name, value, scheduler, this)
+
     protected inline fun <reified T : SysData> signal(name: String): SysSignal<T> =
             signal(name, undefined<T>())
 
     protected fun <T : SysData> signal(name: String, startValue: T): SysSignal<T> =
             SysSignal(name, startValue, scheduler, this)
+
+    protected fun <T : SysData> connector(
+            name: String, startValue: T, writePort: SysOutput<T>, vararg readPorts: SysInput<T>
+    ) = Connector(signal(name, startValue), writePort, *readPorts)
+
+    protected fun <T : SysData> connector(
+            name: String, startValue: T, vararg readPorts: SysInput<T>
+    ) = Connector(signal(name, startValue), null, *readPorts)
 
     protected inline fun <reified T : SysData> connector(
             name: String, writePort: SysOutput<T>, vararg readPorts: SysInput<T>

@@ -121,10 +121,20 @@ class SysClock internal constructor(
     }
 }
 
-class SysSignalStub<T: SysData> internal constructor(
+open class SysSignalStub<T: SysData> internal constructor(
         name: String, defaultValue: T, scheduler: SysScheduler, parent: SysObject? = null
 ) : SysSignal<T>(name, defaultValue, scheduler, parent) {
+
     override var value: T
+        get() = storedValue
+        set(value) = throw UnsupportedOperationException("Signal write is not supported for signal stub")
+}
+
+class SysBitSignalStub internal constructor(
+        name: String, defaultValue: SysBit = SysBit.X, scheduler: SysScheduler, parent: SysObject? = null
+) : SysBitSignal(name, scheduler, defaultValue, parent) {
+
+    override var value: SysBit
         get() = storedValue
         set(value) = throw UnsupportedOperationException("Signal write is not supported for signal stub")
 }
