@@ -2,6 +2,7 @@ package ru.spbstu.sysk.samples.processors.i8080
 
 import ru.spbstu.sysk.data.SysData
 import ru.spbstu.sysk.data.SysDataCompanion
+import ru.spbstu.sysk.data.integer.unsigned
 import java.util.*
 
 object CAPACITY {
@@ -29,11 +30,6 @@ enum class COMMAND : SysData {
     READ,
     WRITE,
     RESET,
-
-    READ_FRONT,
-    READ_BACK,
-    WRITE_FRONT,
-    WRITE_BACK,
 
     ADD,
     SUB,
@@ -79,7 +75,6 @@ internal val opcodes = HashMap<Int, OPERATION>()
 
 enum class OPERATION private constructor(val id: Int) : SysData {
 
-    UNDEFINED(0x0),
     ADD_A(0x87),
     ADD_B(0x80),
     ADD_C(0x81),
@@ -330,11 +325,13 @@ enum class OPERATION private constructor(val id: Int) : SysData {
         opcodes.put(id, this)
     }
 
+    fun toSysUnsigned() = unsigned(CAPACITY.DATA, id)
+
     companion object : SysDataCompanion<OPERATION> {
 
         operator fun get(id: Int) = opcodes[id]
 
         override val undefined: OPERATION
-            get() = UNDEFINED
+            get() = NOP
     }
 }

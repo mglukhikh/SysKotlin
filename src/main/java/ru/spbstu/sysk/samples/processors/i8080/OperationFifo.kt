@@ -24,8 +24,8 @@ class OperationFifo(
             infinite.state {
                 if (data().width != capacityData) throw IllegalArgumentException()
                 if (command().width != capacityCommand) throw IllegalArgumentException()
-                if (en().one) when (command()) {
-                    COMMAND.READ -> operation(operations.poll() ?: OPERATION.UNDEFINED)
+                if (en.one) when (command()) {
+                    COMMAND.READ -> operation(operations.poll() ?: OPERATION.NOP)
                     COMMAND.WRITE -> operations.add(OPERATION[data().toInt()]
                             ?: throw IllegalArgumentException("Operation: ${data()} is not identified"))
                     COMMAND.RESET -> operations = LinkedList<OPERATION>()

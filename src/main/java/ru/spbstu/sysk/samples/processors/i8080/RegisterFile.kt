@@ -40,7 +40,7 @@ class RegisterFile constructor(
                 if (register().width != capacityRegisterAddress) throw IllegalArgumentException()
                 if (data().width != capacityData) throw IllegalArgumentException()
                 if (address().width != capacityAddress) throw IllegalArgumentException()
-                if (en().one) when (command()) {
+                if (en.one) when (command()) {
                     COMMAND.WRITE_DATA -> write(data(), register())
                     COMMAND.WRITE_ADDRESS -> write(address(), register())
                     COMMAND.READ_DATA -> data(read(register()) ?: throw IllegalArgumentException("$register is not found"))

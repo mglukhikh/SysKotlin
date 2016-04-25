@@ -13,7 +13,7 @@ class OperationFifoTest : SysTopModule() {
 
     val data = signal("data", unsigned(CAPACITY.DATA, 0))
     val command = signal("command", COMMAND.UNDEFINED)
-    val operation = signal("operation", OPERATION.UNDEFINED)
+    val operation = signal("operation", OPERATION.NOP)
     val en = bitSignal("en")
     val clk = clock("clk", 2(FS))
 
@@ -48,10 +48,10 @@ class OperationFifoTest : SysTopModule() {
                 command(COMMAND.READ)
                 en(ONE)
             }
-            state{
+            state {
                 assert(operation() == OPERATION.MOV_A_A)
             }
-            state{
+            state {
                 assert(operation() == OPERATION.MOV_B_A)
             }
             stop(scheduler)
