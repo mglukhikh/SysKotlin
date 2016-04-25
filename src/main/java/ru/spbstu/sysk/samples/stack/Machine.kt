@@ -46,7 +46,7 @@ class Machine(
                 stackWr = ZERO
                 stackAddr = address
             }
-            infiniteLoop {
+            infinite.block {
                 case { opcode() == NOP }.state {
                     stackWr = ZERO
                     stackAddr = address

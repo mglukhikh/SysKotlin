@@ -16,9 +16,9 @@ interface StateContainer {
     val states: MutableList<State>
     val labels: MutableMap<Label, Int>
 
-    var state: Int
+    var currentState: Int
 
-    fun complete() = state >= states.size
+    fun complete() = currentState >= states.size
 
     fun wait(): SysWait
 
@@ -30,21 +30,8 @@ interface StateContainer {
         states.add(result)
     }
 
-    fun write(string: () -> String) {
-        val result = State.Single {
-            print(string())
-            wait()
-        }
-        states.add(result)
-    }
-
-    fun writeln(string: () -> String) {
-        val result = State.Single {
-            println(string())
-            wait()
-        }
-        states.add(result)
-    }
+    val state: State.Extends
+        get() = State.Extends(this)
 
     fun state(f: () -> Unit) {
         val result = State.Single {
@@ -59,11 +46,11 @@ interface StateContainer {
         var memory = number
         val result = State.Function("sleep", { true }) {
             if (number == 0) {
-                if (++state < states.size) this.run(wait())
-                --state
+                if (++currentState < states.size) this.run(wait())
+                --currentState
             }
             --memory
-            if (memory > 0) state--
+            if (memory > 0) currentState--
             else memory = number
             wait()
         }
@@ -80,8 +67,8 @@ interface StateContainer {
 
     private fun jumpInternal(label: Label) {
         val result = State.JumpFunction {
-            state = labels[label] ?: throw IllegalArgumentException("label: $label not found")
-            if (state < states.size) this.run(wait())
+            currentState = labels[label] ?: throw IllegalArgumentException("label: $label not found")
+            if (currentState < states.size) this.run(wait())
             wait()
         }
         states.add(result)
@@ -94,11 +81,11 @@ interface StateContainer {
         this.init()
         val delta = this.states.size - current
         val func = State.CaseFunction("if") {
-            val cond = condition() && !((states[state] as? State.CaseFunction)?.args as? Boolean ?: false)
-            val otherwise = states.elementAtOrNull(state + delta + 1) as? State.CaseFunction
+            val cond = condition() && !((states[currentState] as? State.CaseFunction)?.args as? Boolean ?: false)
+            val otherwise = states.elementAtOrNull(currentState + delta + 1) as? State.CaseFunction
             if (otherwise != null) otherwise.args = cond
-            if (!cond) state += delta
-            if (++state < states.size) this.run(wait())
+            if (!cond) currentState += delta
+            if (++currentState < states.size) this.run(wait())
             wait()
         }
         states.add(current, func)
@@ -112,10 +99,10 @@ interface StateContainer {
         this.init()
         val delta = this.states.size - current
         val func = State.OtherwiseFunction {
-            val cond = (states[state] as? State.OtherwiseFunction)?.args as? Boolean
+            val cond = (states[currentState] as? State.OtherwiseFunction)?.args as? Boolean
                     ?: throw AssertionError("Block 'case' expected before 'otherwise'")
-            if (cond) state += delta
-            if (++state < states.size) this.run(wait())
+            if (cond) currentState += delta
+            if (++currentState < states.size) this.run(wait())
             wait()
         }
         states.add(current, func)
@@ -135,8 +122,8 @@ interface StateContainer {
         while (i != end) {
             if ((self.states[i] as? State.LoopJumpFunction)?.name == name) {
                 self.states[i] = State.JumpFunction {
-                    self.state = self.labels[mark] ?: throw AssertionError()
-                    if (self.state < self.states.size) self.run(wait())
+                    self.currentState = self.labels[mark] ?: throw AssertionError()
+                    if (self.currentState < self.states.size) self.run(wait())
                     wait()
                 }
             }
@@ -170,7 +157,7 @@ interface StateContainer {
         val end = Label.Internal()
         val reset = State.Function("reset", { false }) {
             iterator.reset()
-            if (++state < states.size) this.run(wait())
+            if (++currentState < states.size) this.run(wait())
             wait()
         }
         states.add(reset)
@@ -189,25 +176,13 @@ interface StateContainer {
     }
 
     val infinite: State.Block
-        get() = State.Block(this, { init -> infiniteLoop(init) })
-
-    fun infiniteLoop(init: StateContainer.() -> Unit) {
-        loop({ true }, init)
-    }
-
-    fun infiniteState(f: () -> Unit) {
-        val result = State.Function("infinite", { false }) {
-            f()
-            wait()
-        }
-        states.add(result)
-    }
+        get() = State.Block(this, { init -> loop({ true }, init) })
 
     fun run(event: SysWait): SysWait {
         if (!complete()) {
-            states[state].let {
+            states[currentState].let {
                 val result = it.run(event)
-                if (it.complete()) state++
+                if (it.complete()) currentState++
                 return result
             }
         } else return SysWait.Never
@@ -245,6 +220,36 @@ sealed class State {
         fun state(f: () -> Unit) = container.function({ state(f) })
     }
 
+    class Extends(private val container: StateContainer) {
+
+        fun print(string: () -> String) {
+            val result = State.Single {
+                print(string())
+                container.wait()
+            }
+            container.states.add(result)
+        }
+
+        fun println(string: () -> String) {
+            val result = State.Single {
+                println(string())
+                container.wait()
+            }
+            container.states.add(result)
+        }
+
+        fun instance(f: () -> Unit) {
+            val result = State.Single {
+                f()
+                if (++container.currentState < container.states.size) container.run(container.wait())
+                --container.currentState
+                container.wait()
+            }
+            container.states.add(result)
+        }
+    }
+
+
     open class Function internal constructor(
             val name: String,
             private val comp: () -> Boolean,
@@ -277,7 +282,7 @@ class SysStateFunction private constructor(
 
     private fun init(event: SysWait): SysWait = initState?.run(event) ?: wait()
 
-    override var state = 0
+    override var currentState = 0
 
     override fun run(event: SysWait): SysWait {
         if (event == SysWait.Initialize) {

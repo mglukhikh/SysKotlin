@@ -25,7 +25,7 @@ class StubTest : SysTopModule() {
 
         init {
             stateFunction(clk, true) {
-                infiniteLoop {
+                infinite.block {
                     state(involution)
                     sleep(3)
                 }
@@ -55,7 +55,7 @@ class StubTest : SysTopModule() {
 
         init {
             stateFunction(clk, true) {
-                infiniteLoop {
+                infinite.block {
                     state(init)
                     sleep(4)
                     state(check)

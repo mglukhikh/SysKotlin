@@ -154,7 +154,7 @@ class SysStateFunctionTest {
         init {
             stateFunction(clk, false) {
                 var i = 0
-                infiniteLoop {
+                infinite.block {
                     case({ i++ > 11 }) { breakLoop() }
                     var switch = false
                     state {

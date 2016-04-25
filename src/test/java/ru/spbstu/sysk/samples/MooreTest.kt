@@ -24,21 +24,21 @@ class MooreTest : SysTopModule() {
                 println("${inp()} ${out()}")
                 inp(c)
             }
-            writeln { "${inp()} ${out()}" }
-            writeln { "${inp()} ${out()}" }
-            writeln { "${inp()} ${out()}" }
+            state.println { "${inp()} ${out()}" }
+            state.println { "${inp()} ${out()}" }
+            state.println { "${inp()} ${out()}" }
             state {
                 println("${inp()} ${out()}")
                 inp(b)
             }
-            writeln { "${inp()} ${out()}" }
-            writeln { "${inp()} ${out()}" }
+            state.println { "${inp()} ${out()}" }
+            state.println { "${inp()} ${out()}" }
             state {
                 println("${inp()} ${out()}")
                 inp(a)
             }
-            writeln { "${inp()} ${out()}" }
-            writeln { "${inp()} ${out()}" }
+            state.println { "${inp()} ${out()}" }
+            state.println { "${inp()} ${out()}" }
             stop(scheduler)
         }
     }
