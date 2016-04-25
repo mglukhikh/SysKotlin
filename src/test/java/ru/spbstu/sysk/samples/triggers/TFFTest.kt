@@ -3,7 +3,6 @@ package ru.spbstu.sysk.samples.triggers
 import org.junit.Test
 import ru.spbstu.sysk.core.*
 import ru.spbstu.sysk.core.TimeUnit.*
-import ru.spbstu.sysk.data.SysBit
 import ru.spbstu.sysk.data.SysBit.*
 import ru.spbstu.sysk.channels.bind
 
@@ -11,7 +10,7 @@ class TFFTest {
 
     private class Testbench(name: String, parent: SysModule): SysModule(name, parent) {
 
-        val t = output<SysBit>("t")
+        val t = bitOutput("t")
 
         val clk = bitInput("clk")
         val q   = bitInput("q")

@@ -3,7 +3,6 @@ package ru.spbstu.sysk.samples.triggers
 import org.junit.Test
 import ru.spbstu.sysk.core.*
 import ru.spbstu.sysk.core.TimeUnit.*
-import ru.spbstu.sysk.data.SysBit
 import ru.spbstu.sysk.data.SysBit.*
 import ru.spbstu.sysk.channels.bind
 
@@ -11,8 +10,8 @@ class SRegTest {
 
     private class Testbench(name: String, parent: SysModule): SysModule(name, parent) {
 
-        val d   = output<SysBit>("d")
-        val dir = output<SysBit>("dir")
+        val d   = bitOutput("d")
+        val dir = bitOutput("dir")
 
         val clk = bitInput("clk")
         val q   = bitInput("q")

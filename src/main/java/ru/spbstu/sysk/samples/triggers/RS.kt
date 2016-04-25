@@ -1,15 +1,14 @@
 package ru.spbstu.sysk.samples.triggers
 
 import ru.spbstu.sysk.core.SysModule
-import ru.spbstu.sysk.data.SysBit
 import ru.spbstu.sysk.samples.NOR
 
 class RS(name: String, parent: SysModule) : SysModule(name, parent) {
 
     val R = bitInput("r")
     val S = bitInput("s")
-    val Q = output<SysBit>("q")
-    val nQ = output<SysBit>("nq")
+    val Q = bitOutput("q")
+    val nQ = bitOutput("nq")
 
     private val u1 = NOR("u1", this)
     private val d1 = NOR("d1", this)

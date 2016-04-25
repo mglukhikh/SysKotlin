@@ -8,7 +8,7 @@ class SReg(name: String, digPerWord: Int, parent: SysModule) : SysModule(name, p
     val d = bitInput("d")
     val clk = bitInput("clk")
     val dir = bitInput("dir")  //right: e = 0, left: e = 1
-    val q = output<SysBit>("q")
+    val q = bitOutput("q")
 
     val trigQ = Array(digPerWord, { i -> SysBit.X })
     private val state = Array(digPerWord, { i -> SysBit.X })

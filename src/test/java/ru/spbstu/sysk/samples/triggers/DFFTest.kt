@@ -3,7 +3,6 @@ package ru.spbstu.sysk.samples.triggers
 import org.junit.Test
 import ru.spbstu.sysk.core.*
 import ru.spbstu.sysk.core.TimeUnit.*
-import ru.spbstu.sysk.data.SysBit
 import ru.spbstu.sysk.data.SysBit.*
 import ru.spbstu.sysk.channels.SysBitInput
 import ru.spbstu.sysk.channels.bind
@@ -13,7 +12,7 @@ class DFFTest {
 
     private class Testbench(name: String, parent: SysModule) : SysModule(name, parent) {
 
-        val d = output<SysBit>("d")
+        val d = bitOutput("d")
         private var dval by portWriter(d)
 
         val clk = bitInput("clk")

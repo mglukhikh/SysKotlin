@@ -1,7 +1,6 @@
 package ru.spbstu.sysk.samples.triggers
 
 import ru.spbstu.sysk.core.SysModule
-import ru.spbstu.sysk.data.SysBit
 import ru.spbstu.sysk.data.SysBit.*
 
 class JKFF(name: String, parent: SysModule) : SysModule(name, parent) {
@@ -11,7 +10,7 @@ class JKFF(name: String, parent: SysModule) : SysModule(name, parent) {
     val clk = bitInput("clk")
 
     private var state = ZERO
-    val q = output<SysBit>("q")
+    val q = bitOutput("q")
 
     init {
         function(clk, initialize = false) {

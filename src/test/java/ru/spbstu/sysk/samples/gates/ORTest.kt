@@ -24,40 +24,40 @@ class ORTest : SysTopModule() {
 
         stateFunction(clk) {
             state {
-                assert(x1().x && x2().x && y().x) { "Fail: ORTest.state.1" }
+                assert(x1.x && x2.x && y.x) { "Fail: ORTest.state.1" }
                 x1(ONE)
             }
             state {
-                assert(x1().one && x2().x && y().one) { "Fail: ORTest.state.2" }
+                assert(x1.one && x2.x && y.one) { "Fail: ORTest.state.2" }
                 x2(ONE)
             }
             state {
-                assert(x1().one && x2().one && y().one) { "Fail: ORTest.state.3" }
+                assert(x1.one && x2.one && y.one) { "Fail: ORTest.state.3" }
                 x1(ZERO)
             }
             state {
-                assert(x1().zero && x2().one && y().one) { "Fail: ORTest.state.4" }
+                assert(x1.zero && x2.one && y.one) { "Fail: ORTest.state.4" }
                 x2(ZERO)
             }
             state {
-                assert(x1().zero && x2().zero && y().zero) { "Fail: ORTest.state.5" }
+                assert(x1.zero && x2.zero && y.zero) { "Fail: ORTest.state.5" }
                 x1(X)
             }
             state {
-                assert(x1().x && x2().zero && y().x) { "Fail: ORTest.state.6" }
+                assert(x1.x && x2.zero && y.x) { "Fail: ORTest.state.6" }
                 x2(X)
             }
             state {
-                assert(x1().x && x2().x && y().x) { "Fail: ORTest.state.7" }
+                assert(x1.x && x2.x && y.x) { "Fail: ORTest.state.7" }
                 x2(ONE)
             }
             state {
-                assert(x1().x && x2().one && y().one) { "Fail: ORTest.state.8" }
+                assert(x1.x && x2.one && y.one) { "Fail: ORTest.state.8" }
                 x1(ZERO)
                 x2(X)
             }
             state {
-                assert(x1().zero && x2().x && y().x) { "Fail: ORTest.state.9" }
+                assert(x1.zero && x2.x && y.x) { "Fail: ORTest.state.9" }
             }
             stop(scheduler)
         }

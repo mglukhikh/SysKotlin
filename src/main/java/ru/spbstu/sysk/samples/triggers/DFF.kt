@@ -1,7 +1,6 @@
 package ru.spbstu.sysk.samples.triggers
 
 import ru.spbstu.sysk.core.SysModule
-import ru.spbstu.sysk.data.SysBit
 
 /**
  * Flip-flop D-trigger module
@@ -12,7 +11,7 @@ class DFF (name: String, parent: SysModule): SysModule(name, parent) {
     private val dval by bitPortReader(d)
     val clk = bitInput("clk")
 
-    val q = output<SysBit>("q")
+    val q = bitOutput("q")
     private var qval by portWriter(q)
 
     init {

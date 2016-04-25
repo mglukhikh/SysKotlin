@@ -3,7 +3,6 @@ package ru.spbstu.sysk.samples.triggers
 import org.junit.Test
 import ru.spbstu.sysk.core.*
 import ru.spbstu.sysk.core.TimeUnit.*
-import ru.spbstu.sysk.data.SysBit
 import ru.spbstu.sysk.data.SysBit.*
 import ru.spbstu.sysk.channels.bind
 import ru.spbstu.sysk.channels.bindArrays
@@ -13,7 +12,7 @@ class PRegTest {
 
     private class Testbench(name: String, digPerWord: Int, parent: SysModule): SysModule(name, parent) {
 
-        val d = Array(digPerWord, {i -> output<SysBit>("d" + i.toString())})
+        val d = Array(digPerWord, {i -> bitOutput("d" + i.toString())})
         val clk = bitInput("clk")
         val q   = Array(digPerWord, {i -> bitInput("q" + i.toString())})
 

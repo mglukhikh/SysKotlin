@@ -22,19 +22,19 @@ class NOTTest : SysTopModule() {
 
         stateFunction(clk) {
             state {
-                assert(x().x && y().x) {"Fail: NOTTest.state.1"}
+                assert(x.x && y.x) {"Fail: NOTTest.state.1"}
                 x(ONE)
             }
             state {
-                assert(x().one && y().zero) {"Fail: NOTTest.state.2"}
+                assert(x.one && y.zero) {"Fail: NOTTest.state.2"}
                 x(ZERO)
             }
             state {
-                assert(x().zero && y().one) {"Fail: NOTTest.state.3"}
+                assert(x.zero && y.one) {"Fail: NOTTest.state.3"}
                 x(X)
             }
             state {
-                assert(x().x && y().x) {"Fail: NOTTest.state.4"}
+                assert(x.x && y.x) {"Fail: NOTTest.state.4"}
             }
             stop(scheduler)
         }

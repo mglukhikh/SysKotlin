@@ -3,7 +3,6 @@ package ru.spbstu.sysk.samples.triggers
 import org.junit.Test
 import ru.spbstu.sysk.core.*
 import ru.spbstu.sysk.core.TimeUnit.*
-import ru.spbstu.sysk.data.SysBit
 import ru.spbstu.sysk.channels.bind
 import ru.spbstu.sysk.data.SysBit.*
 
@@ -11,8 +10,8 @@ class JKFFTest {
 
     private class Testbench(name: String, parent: SysModule): SysModule(name, parent) {
 
-        val j = output<SysBit>("j")
-        val k = output<SysBit>("k")
+        val j = bitOutput("j")
+        val k = bitOutput("k")
 
         val clk = bitInput("clk")
         val q   = bitInput("q")
