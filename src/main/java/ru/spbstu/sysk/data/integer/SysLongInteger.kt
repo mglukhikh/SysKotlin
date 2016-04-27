@@ -41,7 +41,10 @@ class SysLongInteger private constructor(
     /** Construct from given value and width*/
     constructor(width: Int, value: Long) : this(width, value, false,
             positiveMask = positiveValues[width],
-            negativeMask = negativeValues[width])
+            negativeMask = negativeValues[width]) {
+        if (value > positiveMask || value < negativeMask)
+            throw IllegalArgumentException("Width $width is short for value $value")
+    }
 
     private constructor(width: Int, value: Long, positiveMask: Long, negativeMask: Long) :
     this(width, value, false, positiveMask = positiveMask,
@@ -49,7 +52,10 @@ class SysLongInteger private constructor(
 
     constructor(width: Int, value: Int) : this(width, value.toLong(), false,
             positiveMask = positiveValues[width],
-            negativeMask = negativeValues[width])
+            negativeMask = negativeValues[width]) {
+        if (value > positiveMask || value < negativeMask)
+            throw IllegalArgumentException("Width $width is short for value $value")
+    }
 
     /**Construct from given SysBit Array*/
     constructor (arr: Array<SysBit>) : this(arr.size, valueBySWSArray(arr), arr.contains(SysBit.X),
@@ -79,12 +85,18 @@ class SysLongInteger private constructor(
     }
 
     private fun truncate(width: Int, value: Long, positiveMask: Long, negativeMask: Long): SysLongInteger {
-        //if (width == MAX_WIDTH)
-        //  return SysLongInteger(width, value, positiveMask, negativeMask)
+        if (width == MAX_WIDTH)
+            return SysLongInteger(width, value, positiveMask, negativeMask)
         if (value >= 0L)
-            return SysLongInteger(width, value and positiveMask, positiveMask, negativeMask)
+            if (value > positiveMask)
+                return SysLongInteger(width, value or negativeMask, positiveMask, negativeMask)
+            else
+                return SysLongInteger(width, value, positiveMask, negativeMask)
         else
-            return SysLongInteger(width, value or negativeMask, positiveMask, negativeMask)
+            if (value < negativeMask)
+                return SysLongInteger(width, positiveMask + (value + positiveMask), positiveMask, negativeMask)
+            else
+                return SysLongInteger(width, value, positiveMask, negativeMask)
     }
 
 

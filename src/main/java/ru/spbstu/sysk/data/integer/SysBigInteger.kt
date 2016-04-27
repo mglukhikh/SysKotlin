@@ -15,7 +15,10 @@ class SysBigInteger private constructor(
     override lateinit var bitsState: Array<SysBit>
 
     constructor(width: Int, value: BigInteger) : this(width, value, false,
-            positiveMask = getMaxValue(width), negativeMask = getMinValue(width))
+            positiveMask = getMaxValue(width), negativeMask = getMinValue(width)) {
+        if (value > positiveMask || value < negativeMask)
+            throw IllegalArgumentException("Width $width is short for value $value")
+    }
 
     //    private constructor(width: Int, value: BigInteger, bitsState: Array<Boolean>) :
     //    this(width, value, bitsState = maskByValue(value, width),
@@ -27,8 +30,7 @@ class SysBigInteger private constructor(
 
     constructor(width: Int, value: Int) : this(width, value.toLong())
 
-    constructor(width: Int, value: Long) : this(width, BigInteger.valueOf(value),
-            false, positiveMask = getMaxValue(width), negativeMask = getMinValue(width))
+    constructor(width: Int, value: Long) : this(width, BigInteger.valueOf(value))
 
     private constructor(value: BigInteger, width: Int = value.bitLength() + 1) : this(width, value,
             false, positiveMask = getMaxValue(width), negativeMask = getMinValue(width))
@@ -62,9 +64,15 @@ class SysBigInteger private constructor(
 
     private fun truncate(width: Int, value: BigInteger, positiveMask: BigInteger, negativeMask: BigInteger): SysBigInteger {
         if (value >= BigInteger.ZERO)
-            return SysBigInteger(width, value.and(positiveMask), positiveMask, negativeMask)
+            if (value > positiveMask)
+                return SysBigInteger(width, value.or(negativeMask), positiveMask, negativeMask)
+            else
+                return SysBigInteger(width, value, positiveMask, negativeMask)
         else
-            return SysBigInteger(width, value.or(negativeMask), positiveMask, negativeMask)
+            if (value < negativeMask)
+                return SysBigInteger(width, positiveMask + (value + positiveMask), positiveMask, negativeMask)
+            else
+                return SysBigInteger(width, value, positiveMask, negativeMask)
     }
 
 

@@ -2,6 +2,7 @@ package ru.spbstu.sysk.data.integer
 
 import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
+import org.junit.Ignore
 import org.junit.Test
 import ru.spbstu.sysk.data.SysBit.*
 import java.util.*
@@ -178,7 +179,7 @@ class SysIntegerTest {
 
     }
 
-
+    @Ignore("Integer bound test need rework")
     @Test
     fun boundTest() {
 

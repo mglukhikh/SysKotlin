@@ -15,7 +15,10 @@ private constructor(
     override lateinit var bitsState: Array<SysBit>
 
     private constructor(width: Int, value: Long) : this(width, value,
-            positiveMask = maxValue(width))
+            positiveMask = maxValue(width)) {
+        if (value > positiveMask)
+            throw IllegalArgumentException("Width $width is short for value $value")
+    }
 
     private constructor(width: Int, value: Long, positiveMask: Long) :
     this(width, value, false,
