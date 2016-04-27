@@ -3,6 +3,7 @@ package ru.spbstu.sysk.samples.processors.i8080
 import ru.spbstu.sysk.core.SysModule
 import ru.spbstu.sysk.data.integer.SysUnsigned
 import ru.spbstu.sysk.data.integer.unsigned
+import ru.spbstu.sysk.data.SysBit.*
 
 class Core(parent: SysModule) : SysModule("i8080", parent) {
 
@@ -21,7 +22,11 @@ class Core(parent: SysModule) : SysModule("i8080", parent) {
 
     private val dataBus = signal("dataBus", unsigned(CAPACITY.DATA, 0))
     private val addressBus = signal("addressBus", unsigned(CAPACITY.ADDRESS, 0))
-    private val clk = bitSignal("clk")
+    private val dataSignal = signal("dataSignal", unsigned(CAPACITY.DATA, 0))
+    private val addressSignal = signal("addressSignal", unsigned(CAPACITY.ADDRESS, 0))
+    private val clkSignal1 = bitSignal("clkSignal1")
+    private val clkSignal2 = bitSignal("clkSignal2")
+    private val dbinSignal = bitSignal("dbinSignal", ZERO)
 
     val data = bidirPort<SysUnsigned>("data")
     val address = bidirPort<SysUnsigned>("address")
@@ -30,33 +35,44 @@ class Core(parent: SysModule) : SysModule("i8080", parent) {
         connector("connector", unsigned(CAPACITY.DATA, 0), RF.out, ALU.A)
         connector("connector", unsigned(CAPACITY.DATA, 0), RF.B, ALU.B)
         connector("connector", unsigned(CAPACITY.DATA, 0), ALU.out, RF.inp)
-        RF.data bind dataBus
-        RF.address bind addressBus
         connector("connector", CU.registerRF, RF.register)
         connector("connector", CU.commandRF, RF.command)
-        RF.clk bind clk
-        bitConnector("connector", CU.enRF, RF.en)
-        connector("connector", CU.operationALU, ALU.operation)
-
-        OF.data bind dataBus
         connector("connector", CU.commandOF, OF.command)
         connector("connector", OF.operation, CU.operationOF)
-        OF.clk bind clk
-        bitConnector("connector", CU.enOF, OF.en)
+        connector("connector", CU.operationALU, ALU.operation)
+        bitConnector("connector", ZERO, CU.enRF, RF.en)
+        bitConnector("connector", ZERO, CU.enOF, OF.en)
+        bitConnector("connector", ZERO, CU.enDG, DG.en)
+        bitConnector("connector", ZERO, CU.enAG, AG.en)
+        bitConnector("connector", ONE, CU.allowOF, OF.allow)
+        bitConnector("connector", ONE, OF.empty, CU.emptyOF)
+        bitConnector("connector", ZERO, OF.inc, RF.inc)
+        bitConnector("connector", ZERO, OF.read, RF.read)
 
-        DG.back bind data
+        RF.data bind dataBus
+        RF.address bind addressBus
+        RF.clk bind clkSignal2
+        RF.pc bind addressSignal
+        OF.data bind dataSignal
+        OF.clk1 bind clkSignal1
+        OF.clk2 bind clkSignal2
+        OF.dbin bind dbinSignal
+        DG.back bind dataSignal
         DG.front bind dataBus
-        bitConnector("connector", CU.enDG, DG.en)
-
-        AG.back bind address
+        AG.back bind addressSignal
         AG.front bind addressBus
-        bitConnector("connector", CU.enAG, AG.en)
-
         CU.reset bind reset
-        CU.clk1 bind clk1
-        CU.clk2 bind clk2
-        CU.clk bind clk
-        CU.dbin bind dbin
+        CU.clk1 bind clkSignal1
+        CU.clk2 bind clkSignal2
+        CU.dbin bind dbinSignal
         CU.wr bind wr
+
+        function(data.defaultEvent) { dataSignal(data()) }
+        function(address.defaultEvent) { addressSignal(address()) }
+        function(dataSignal.defaultEvent) { data(dataSignal()) }
+        function(addressSignal.defaultEvent) { address(addressSignal()) }
+        function(clk1.defaultEvent) { clkSignal1(clk1()) }
+        function(clk2.defaultEvent) { clkSignal2(clk2()) }
+        function(dbinSignal.defaultEvent) { dbin(dbinSignal()) }
     }
 }

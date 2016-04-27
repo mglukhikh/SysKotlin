@@ -25,6 +25,10 @@ class RegisterFile constructor(
     val out = output<SysUnsigned>("out")
     val B = output<SysUnsigned>("B")
 
+    val inc = bitInput("inc")
+    val read = bitInput("read")
+    val pc = output<SysUnsigned>("pc")
+
     val data = bidirPort<SysUnsigned>("data")
     val address = bidirPort<SysUnsigned>("address")
     val register = input<REGISTER>("register")
@@ -34,6 +38,8 @@ class RegisterFile constructor(
     val clk = bitInput("clk")
 
     init {
+        function(inc.posEdgeEvent) { inc(REGISTER.PC) }
+        function(read.posEdgeEvent) { pc(read(REGISTER.PC)!!) }
         stateFunction(clk) {
             infinite.state {
                 if (command().width != capacityCommand) throw IllegalArgumentException()

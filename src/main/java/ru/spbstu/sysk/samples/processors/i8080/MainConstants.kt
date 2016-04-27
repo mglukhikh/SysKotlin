@@ -75,6 +75,7 @@ internal val opcodes = HashMap<Int, OPERATION>()
 
 enum class OPERATION private constructor(val id: Int) : SysData {
 
+    UNDEFINED(0xFD),
     ADD_A(0x87),
     ADD_B(0x80),
     ADD_C(0x81),
@@ -332,6 +333,6 @@ enum class OPERATION private constructor(val id: Int) : SysData {
         operator fun get(id: Int) = opcodes[id]
 
         override val undefined: OPERATION
-            get() = NOP
+            get() = UNDEFINED
     }
 }

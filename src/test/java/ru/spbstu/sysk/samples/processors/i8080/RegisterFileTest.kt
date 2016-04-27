@@ -32,6 +32,9 @@ class RegisterFileTest : SysTopModule() {
         RF.out bind out
         RF.B bind b
         RF.en bind en
+        RF.inc bind bitSignalStub("inc", ZERO)
+        RF.read bind bitSignalStub("read", ZERO)
+        RF.pc bind address
 
         stateFunction(clk, false) {
             state {
