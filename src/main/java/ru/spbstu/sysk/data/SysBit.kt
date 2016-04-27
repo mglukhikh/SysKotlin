@@ -14,6 +14,8 @@ enum class SysBit(
 
     companion object : SysDataCompanion<SysBit> {
 
+        operator fun invoke(value: Boolean) = if (value) ONE else ZERO
+
         override val undefined: SysBit
             get() = SysBit.X
     }
