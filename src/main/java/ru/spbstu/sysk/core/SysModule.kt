@@ -115,6 +115,14 @@ open class SysModule internal constructor(
             name: String, vararg readPorts: SysBitInput
     ) = Connector(bitSignal(name), null, *readPorts)
 
+    protected fun bitConnector(
+            name: String, defaultValue: SysBit, writePort: SysOutput<SysBit>, vararg readPorts: SysBitInput
+    ) = Connector(bitSignal(name, defaultValue), writePort, *readPorts)
+
+    protected fun bitConnector(
+            name: String, defaultValue: SysBit, vararg readPorts: SysBitInput
+    ) = Connector(bitSignal(name, defaultValue), null, *readPorts)
+
     protected inline fun <reified T : SysData> signalReader(
             name: String, writePort: SysOutput<T>, vararg readPorts: SysInput<T>
     ) = SignalReader(signal(name), writePort, *readPorts)
