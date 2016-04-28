@@ -8,6 +8,8 @@ interface SysInterface {
     fun register(port: SysPort<*>)
 
     val defaultEvent: SysWait.Event
+
+    val name: String
 }
 
 interface SysSignalRead<out T : SysData>: SysInterface {

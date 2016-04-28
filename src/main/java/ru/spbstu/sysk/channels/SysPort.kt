@@ -41,7 +41,7 @@ abstract class SysPort<IF : SysInterface> internal constructor(
 
     private fun bindCheck() {
         assert(scheduler.stopped) { "Impossible to bind the port while running the scheduler" }
-        assert(!isBound) { "Port $name is already bound to ${bound()}" }
+        assert(!isBound) { "Port $name is already bound to ${bound()?.name}" }
         assert(!sealed) { "Port $name is already sealed" }
     }
 
