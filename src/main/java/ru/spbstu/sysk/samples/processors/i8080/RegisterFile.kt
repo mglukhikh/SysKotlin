@@ -152,25 +152,3 @@ class RegisterFile constructor(
         else -> null
     }
 }
-
-// Slow?
-internal fun <T : SysInteger> T.set(i: Int, bit: Boolean): T {
-    if (i >= SysLongInteger.MAX_WIDTH) throw UnsupportedOperationException()
-    if (i < 0 || i >= width) throw IndexOutOfBoundsException()
-    if (this[i].one == bit) return this
-    val mask = SysInteger(width, 1L shl i)
-    @Suppress("UNCHECKED_CAST")
-    return (this xor mask) as T
-}
-
-internal fun <T : SysInteger> T.set(j: Int, i: Int, bits: T) = sets(j, i, bits.bits())
-
-internal fun <T : SysInteger> T.sets(j: Int, i: Int, bits: Array<SysBit>): T {
-    if (j >= SysLongInteger.MAX_WIDTH) throw UnsupportedOperationException()
-    if (j < i) throw IllegalArgumentException()
-    if (j >= width || i < 0) throw IndexOutOfBoundsException()
-    if ((j - i + 1) != bits.size) throw IllegalArgumentException()
-    var temp = this
-    for (it in i..j) temp = temp.set(it, bits[it - i].one)
-    return temp
-}

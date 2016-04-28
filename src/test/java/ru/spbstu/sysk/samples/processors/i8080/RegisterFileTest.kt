@@ -94,12 +94,12 @@ class RegisterFileTest : SysTopModule() {
         println("SysUnsigned")
         println(java.lang.Long.toBinaryString(unsigned(5, 21).toLong()))
         println(java.lang.Long.toBinaryString(unsigned(9, 268).toLong()))
-        println(java.lang.Long.toBinaryString(unsigned(9, 268).sets(5, 1, unsigned(5, 21).bits()).toLong()))
+        println(java.lang.Long.toBinaryString(unsigned(9, 268).set(5, 1, unsigned(5, 21).bits()).toLong()))
 
         println("SysLongInteger")
-        println(java.lang.Long.toBinaryString(integer(5, 21).toLong()))
-        println(java.lang.Long.toBinaryString(integer(9, 268).toLong()))
-        println(java.lang.Long.toBinaryString(integer (9, 268).sets(5, 1, unsigned(5, 21).bits()).toLong()))
+        println(java.lang.Long.toBinaryString(integer(6, 21).toLong()))
+        println(java.lang.Long.toBinaryString(integer(10, 268).toLong()))
+        println(java.lang.Long.toBinaryString(integer (10, 268).set(5, 1, unsigned(5, 21).bits()).toLong()))
     }
 
     @Test
