@@ -24,7 +24,6 @@ class Core(parent: SysModule) : SysModule("i8080", parent) {
     private val addressBus = signal("addressBus", unsigned(CAPACITY.ADDRESS, 0))
     private val dataSignal = signal("dataSignal", unsigned(CAPACITY.DATA, 0))
     private val addressSignal = signal("addressSignal", unsigned(CAPACITY.ADDRESS, 0))
-    private val dbinSignal = bitSignal("dbinSignal", ZERO)
 
     val data = bidirPort<SysUnsigned>("data")
     val address = bidirPort<SysUnsigned>("address")
@@ -54,7 +53,7 @@ class Core(parent: SysModule) : SysModule("i8080", parent) {
         OF.data bind dataSignal
         OF.clk1 bind clk1
         OF.clk2 bind clk2
-        OF.dbin bind dbinSignal
+        OF.dbin bind dbin
         DG.back bind dataSignal
         DG.front bind dataBus
         AG.back bind addressSignal
@@ -62,13 +61,12 @@ class Core(parent: SysModule) : SysModule("i8080", parent) {
         CU.reset bind reset
         CU.clk1 bind clk1
         CU.clk2 bind clk2
-        CU.dbin bind dbinSignal
+        CU.dbin bind dbin
         CU.wr bind wr
 
         function(data.defaultEvent) { dataSignal(data()) }
         function(address.defaultEvent) { addressSignal(address()) }
         function(dataSignal.defaultEvent) { data(dataSignal()) }
         function(addressSignal.defaultEvent) { address(addressSignal()) }
-        function(dbinSignal.defaultEvent) { dbin(dbinSignal()) }
     }
 }
