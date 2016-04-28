@@ -21,7 +21,6 @@ class CoreTest : SysTopModule() {
     private val wr = bitSignal("wr")
     private val dbin = bitSignal("dbin")
     private val enRAM = bitSignal("enRAM")
-    private val wrRAM = bitSignal("wrRAM")
 
     init {
         core.data bind data
@@ -36,7 +35,7 @@ class CoreTest : SysTopModule() {
         ram.addr bind address
         ram.clk bind clk1
         ram.en bind enRAM
-        ram.wr bind wrRAM
+        ram.wr bind wr
 
         ram.load {
             when (it) {
@@ -54,15 +53,9 @@ class CoreTest : SysTopModule() {
         }
 
         enRAM(ZERO)
-        wrRAM(ZERO)
+
         function(wr.defaultEvent or dbin.defaultEvent) {
-            if (wr.one && !dbin.one) {
-                enRAM(ONE)
-                wr(ONE)
-            } else if (!wr.one && dbin.one) {
-                enRAM(ONE)
-                wr(ZERO)
-            } else enRAM(ZERO)
+            enRAM(wr.value xor dbin.value)
         }
 
         stateFunction(clk1) {
