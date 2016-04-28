@@ -24,8 +24,6 @@ class Core(parent: SysModule) : SysModule("i8080", parent) {
     private val addressBus = signal("addressBus", unsigned(CAPACITY.ADDRESS, 0))
     private val dataSignal = signal("dataSignal", unsigned(CAPACITY.DATA, 0))
     private val addressSignal = signal("addressSignal", unsigned(CAPACITY.ADDRESS, 0))
-    private val clkSignal1 = bitSignal("clkSignal1")
-    private val clkSignal2 = bitSignal("clkSignal2")
     private val dbinSignal = bitSignal("dbinSignal", ZERO)
 
     val data = bidirPort<SysUnsigned>("data")
@@ -51,19 +49,19 @@ class Core(parent: SysModule) : SysModule("i8080", parent) {
 
         RF.data bind dataBus
         RF.address bind addressBus
-        RF.clk bind clkSignal2
+        RF.clk bind clk2
         RF.pc bind addressSignal
         OF.data bind dataSignal
-        OF.clk1 bind clkSignal1
-        OF.clk2 bind clkSignal2
+        OF.clk1 bind clk1
+        OF.clk2 bind clk2
         OF.dbin bind dbinSignal
         DG.back bind dataSignal
         DG.front bind dataBus
         AG.back bind addressSignal
         AG.front bind addressBus
         CU.reset bind reset
-        CU.clk1 bind clkSignal1
-        CU.clk2 bind clkSignal2
+        CU.clk1 bind clk1
+        CU.clk2 bind clk2
         CU.dbin bind dbinSignal
         CU.wr bind wr
 
@@ -71,8 +69,6 @@ class Core(parent: SysModule) : SysModule("i8080", parent) {
         function(address.defaultEvent) { addressSignal(address()) }
         function(dataSignal.defaultEvent) { data(dataSignal()) }
         function(addressSignal.defaultEvent) { address(addressSignal()) }
-        function(clk1.defaultEvent) { clkSignal1(clk1()) }
-        function(clk2.defaultEvent) { clkSignal2(clk2()) }
         function(dbinSignal.defaultEvent) { dbin(dbinSignal()) }
     }
 }
