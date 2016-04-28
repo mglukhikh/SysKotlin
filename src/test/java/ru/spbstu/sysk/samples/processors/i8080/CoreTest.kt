@@ -64,9 +64,13 @@ class CoreTest : SysTopModule() {
                 wr(ZERO)
             } else enRAM(ZERO)
         }
+
+        stateFunction(clk1) {
+            sleep(50)
+            stop(scheduler)
+        }
     }
 
-    @Ignore
     @Test
     fun show() = start()
 }
