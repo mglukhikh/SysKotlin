@@ -7,6 +7,8 @@ sealed class Label {
         override fun equals(other: Any?) = name == (other as? User)?.name
 
         override fun hashCode() = name.hashCode()
+
+        override fun toString() = name
     }
 
     class Internal internal constructor() : Label()
@@ -77,6 +79,7 @@ interface StateContainer {
     fun case(condition: () -> Boolean) = State.Block(this, { init -> case(condition, init) })
 
     fun case(condition: () -> Boolean, init: StateContainer.() -> Unit) {
+        states.add(State.CaseFunction("blank", { wait() }))
         val current = this.states.size
         this.init()
         val delta = this.states.size - current
@@ -88,13 +91,14 @@ interface StateContainer {
             if (++currentState < states.size) this.run(wait())
             wait()
         }
-        states.add(current, func)
+        states[current - 1] = func
     }
 
     val otherwise: State.Block
         get() = State.Block(this, { init -> otherwise(init) })
 
     fun otherwise(init: StateContainer.() -> Unit) {
+        states.add(State.CaseFunction("blank", { wait() }))
         val current = this.states.size
         this.init()
         val delta = this.states.size - current
@@ -105,7 +109,7 @@ interface StateContainer {
             if (++currentState < states.size) this.run(wait())
             wait()
         }
-        states.add(current, func)
+        states[current - 1] = func
     }
 
     fun continueLoop() {
