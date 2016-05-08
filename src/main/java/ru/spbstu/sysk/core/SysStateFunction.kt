@@ -78,15 +78,17 @@ interface StateContainer {
 
     fun case(condition: () -> Boolean) = State.Block(this, { init -> case(condition, init) })
 
-    fun case(condition: () -> Boolean, init: StateContainer.() -> Unit) {
+    private fun caseBuilder(condition: () -> Boolean, init: StateContainer.() -> Unit, isCase: Boolean) {
         states.add(State.CaseFunction("blank", { wait() }))
         val current = this.states.size
         this.init()
         val delta = this.states.size - current
         val func = State.CaseFunction("if") {
-            val cond = condition() && !((states[currentState] as? State.CaseFunction)?.args as? Boolean ?: false)
-            val otherwise = states.elementAtOrNull(currentState + delta + 1) as? State.CaseFunction
-            if (otherwise != null) otherwise.args = cond
+            val prevCond = (states[currentState] as? State.CaseFunction)?.args as? Boolean
+                    ?: if (isCase) false else throw AssertionError("Block 'case' expected before 'otherwise'")
+            val cond = condition() && !prevCond
+            val case = if (isCase) states.elementAtOrNull(currentState + delta + 1) as? State.CaseFunction else null
+            if (case != null) case.args = cond || prevCond
             if (!cond) currentState += delta
             if (++currentState < states.size) this.run(wait())
             wait()
@@ -94,23 +96,12 @@ interface StateContainer {
         states[current - 1] = func
     }
 
+    fun case(condition: () -> Boolean, init: StateContainer.() -> Unit) = caseBuilder(condition, init, true)
+
     val otherwise: State.Block
         get() = State.Block(this, { init -> otherwise(init) })
 
-    fun otherwise(init: StateContainer.() -> Unit) {
-        states.add(State.CaseFunction("blank", { wait() }))
-        val current = this.states.size
-        this.init()
-        val delta = this.states.size - current
-        val func = State.OtherwiseFunction {
-            val cond = (states[currentState] as? State.OtherwiseFunction)?.args as? Boolean
-                    ?: throw AssertionError("Block 'case' expected before 'otherwise'")
-            if (cond) currentState += delta
-            if (++currentState < states.size) this.run(wait())
-            wait()
-        }
-        states[current - 1] = func
-    }
+    fun otherwise(init: StateContainer.() -> Unit) = caseBuilder({ true }, init, false)
 
     fun continueLoop() {
         states.add(State.LoopJumpFunction("continue"))
@@ -212,8 +203,6 @@ sealed class State {
     )
 
     class JumpFunction(f: (SysWait) -> SysWait) : Function("jump", { false }, f)
-
-    class OtherwiseFunction(f: (SysWait) -> SysWait) : CaseFunction("otherwise", f)
 
     open class CaseFunction(name: String, f: (SysWait) -> SysWait) : Function(name, { false }, f)
 
