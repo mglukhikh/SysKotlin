@@ -1,7 +1,6 @@
 package ru.spbstu.sysk.samples.processors.i8080
 
 import ru.spbstu.sysk.core.SysModule
-import ru.spbstu.sysk.data.SysBit
 import ru.spbstu.sysk.data.integer.*
 
 class RegisterFile constructor(
@@ -38,8 +37,9 @@ class RegisterFile constructor(
     val clk = bitInput("clk")
 
     init {
+        if (capacityAddress != capacityData * 2) throw IllegalArgumentException()
         function(inc.posEdgeEvent) { inc(REGISTER.PC) }
-        function(read.posEdgeEvent) { pc(read(REGISTER.PC)!!) }
+        function(read.posEdgeEvent) { pc(read(REGISTER.PC)) }
         stateFunction(clk) {
             infinite.state {
                 if (command().width != capacityCommand) throw IllegalArgumentException()
@@ -47,12 +47,18 @@ class RegisterFile constructor(
                 if (data().width != capacityData) throw IllegalArgumentException()
                 if (address().width != capacityAddress) throw IllegalArgumentException()
                 if (en.one) when (command()) {
-                    COMMAND.WRITE_DATA -> write(data(), register())
-                    COMMAND.WRITE_ADDRESS -> write(address(), register())
-                    COMMAND.READ_DATA -> data(read(register()) ?: throw IllegalArgumentException("$register is not found"))
-                    COMMAND.READ_ADDRESS -> address(read(register()) ?: throw IllegalArgumentException("$register is not found"))
-                    COMMAND.SET_A -> out(read(register()) ?: throw IllegalArgumentException("$register is not found"))
-                    COMMAND.SET_B -> B(read(register()) ?: throw IllegalArgumentException("$register is not found"))
+                    COMMAND.WRITE_DATA -> {
+                        write(data(), register())
+                        changed(register())
+                    }
+                    COMMAND.WRITE_ADDRESS -> {
+                        write(address(), register())
+                        changed(register())
+                    }
+                    COMMAND.READ_DATA -> data(read(register()).truncate(capacityData) as SysUnsigned)
+                    COMMAND.READ_ADDRESS -> address(read(register()).truncate(capacityData * 2) as SysUnsigned)
+                    COMMAND.SET_A -> out(read(register()))
+                    COMMAND.SET_B -> B(read(register()))
                     COMMAND.SET_CURRENT -> current = register()
                     COMMAND.INC -> inc(register())
                     COMMAND.DEC -> dec(register())
@@ -116,7 +122,7 @@ class RegisterFile constructor(
         SP = unsigned(capacityData * 2, 0)
     }
 
-    private fun read(register: REGISTER): SysUnsigned? = when (register) {
+    private fun read(register: REGISTER): SysUnsigned = when (register) {
         REGISTER.A -> PSW[capacityData - 1, 0]
         REGISTER.Flag -> PSW[capacityData * 2 - 1, capacityData]
         REGISTER.B -> BC[capacityData - 1, 0]
@@ -131,7 +137,7 @@ class RegisterFile constructor(
         REGISTER.PSW -> PSW
         REGISTER.PC -> PC
         REGISTER.SP -> SP
-        else -> null
+        else -> throw IllegalArgumentException("$register is not found")
     }
 
     private fun write(value: SysUnsigned, register: REGISTER) = when (register) {
@@ -143,12 +149,14 @@ class RegisterFile constructor(
         REGISTER.E -> DE = DE.set(capacityData * 2 - 1, capacityData, value)
         REGISTER.H -> HL = HL.set(capacityData - 1, 0, value)
         REGISTER.L -> HL = HL.set(capacityData * 2 - 1, capacityData, value)
-        REGISTER.BC -> BC = value[capacityData * 2 - 1, 0]
-        REGISTER.DE -> DE = value[capacityData * 2 - 1, 0]
-        REGISTER.HL -> HL = value[capacityData * 2 - 1, 0]
-        REGISTER.PSW -> PSW = value[capacityData * 2 - 1, 0]
-        REGISTER.PC -> PC = value[capacityData * 2 - 1, 0]
-        REGISTER.SP -> SP = value[capacityData * 2 - 1, 0]
-        else -> null
+        REGISTER.BC -> BC = value.truncate(capacityData * 2) as SysUnsigned
+        REGISTER.DE -> DE = value.truncate(capacityData * 2) as SysUnsigned
+        REGISTER.HL -> HL = value.truncate(capacityData * 2) as SysUnsigned
+        REGISTER.PSW -> PSW = value.truncate(capacityData * 2) as SysUnsigned
+        REGISTER.PC -> PC = value.truncate(capacityData * 2) as SysUnsigned
+        REGISTER.SP -> SP = value.truncate(capacityData * 2) as SysUnsigned
+        else -> throw IllegalArgumentException("$register is not found")
     }
+
+    private fun changed(register: REGISTER) = println("$register -> ${read(register)}")
 }

@@ -1,6 +1,5 @@
 package ru.spbstu.sysk.samples.processors.i8080
 
-import org.junit.Ignore
 import org.junit.Test
 import ru.spbstu.sysk.core.SysTopModule
 import ru.spbstu.sysk.core.TimeUnit.*
@@ -39,16 +38,16 @@ class CoreTest : SysTopModule() {
 
         ram.load {
             when (it) {
-                0L -> OPERATION.ADD_C.toSysUnsigned()
-                1L -> OPERATION.ADD_D.toSysUnsigned()
-                2L -> OPERATION.ADC_B.toSysUnsigned()
-                3L -> OPERATION.INR_E.toSysUnsigned()
-                4L -> OPERATION.MOV_B_E.toSysUnsigned()
-                5L -> OPERATION.MOV_B_L.toSysUnsigned()
-                6L -> OPERATION.ADC_A.toSysUnsigned()
-                7L -> OPERATION.ADD_H.toSysUnsigned()
-                8L -> OPERATION.ORA_L.toSysUnsigned()
-                else -> OPERATION.NOP.toSysUnsigned()
+                0L -> OPERATION.ADD_C()
+                1L -> OPERATION.ADD_D()
+                2L -> OPERATION.ADC_B()
+                3L -> OPERATION.MVI_B_d8()
+                4L -> unsigned(CAPACITY.DATA, 123)
+                5L -> OPERATION.MOV_B_M()
+                6L -> OPERATION.ADC_A()
+                7L -> OPERATION.ADD_H()
+                8L -> OPERATION.ORA_L()
+                else -> OPERATION.NOP()
             }
         }
 

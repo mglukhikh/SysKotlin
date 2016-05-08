@@ -326,7 +326,7 @@ enum class OPERATION private constructor(val id: Int) : SysData {
         opcodes.put(id, this)
     }
 
-    fun toSysUnsigned() = unsigned(CAPACITY.DATA, id)
+    operator fun invoke() = unsigned(CAPACITY.DATA, id)
 
     companion object : SysDataCompanion<OPERATION> {
 

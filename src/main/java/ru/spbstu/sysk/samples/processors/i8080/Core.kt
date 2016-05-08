@@ -54,6 +54,7 @@ class Core(parent: SysModule) : SysModule("i8080", parent) {
         OF.clk1 bind clk1
         OF.clk2 bind clk2
         OF.dbin bind dbin
+        OF.args bind dataBus
         DG.back bind dataSignal
         DG.front bind dataBus
         AG.back bind addressSignal

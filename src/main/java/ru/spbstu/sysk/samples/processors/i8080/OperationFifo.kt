@@ -13,7 +13,7 @@ class OperationFifo(
         parent: SysModule
 ) : SysModule("OperationFifo", parent) {
 
-    private var operations: Queue<SysUnsigned> = LinkedList<SysUnsigned>()
+    private var store: Queue<SysUnsigned> = LinkedList<SysUnsigned>()
 
     val clk1 = bitInput("clk1")
     val clk2 = bitInput("clk2")
@@ -21,17 +21,20 @@ class OperationFifo(
     val allow = bitInput("allow")
 
     val data = input<SysUnsigned>("data")
+    val args = output<SysUnsigned>("args")
     val command = input<COMMAND>("command")
-    val operation = output<SysUnsigned>("operation")
+    val operation = output<OPERATION>("operation")
     val empty = bitOutput("empty")
     val dbin = bitOutput("dbin")
 
     val inc = bitOutput("inc")
     val read = bitOutput("read")
 
+    private fun SysUnsigned.toOperation() = OPERATION[this.toInt()] ?: OPERATION.UNDEFINED
+
     init {
         stateFunction(clk1) {
-            state.instance {
+            init {
                 read(ZERO)
                 inc(ZERO)
             }
@@ -46,10 +49,10 @@ class OperationFifo(
                         read(ZERO)
                         dbin(ZERO)
                         inc(ONE)
-                        operations.add(data())
+                        store.add(data())
                         empty(ZERO)
                     }
-                    state.instance {
+                    state {
                         inc(ZERO)
                     }
                 }
@@ -62,11 +65,13 @@ class OperationFifo(
                 if (data().width != capacityData) throw IllegalArgumentException()
                 if (command().width != capacityCommand) throw IllegalArgumentException()
                 if (en.one) when (command()) {
-                    COMMAND.READ -> operation(operations.poll() ?: unsigned(capacityData, OPERATION.UNDEFINED.id))
-                    COMMAND.RESET -> operations = LinkedList<SysUnsigned>()
-                    else -> { }
+                    COMMAND.READ -> operation(store.poll()?.toOperation() ?: OPERATION.UNDEFINED)
+                    COMMAND.READ_DATA -> args(store.poll() ?: unsigned(capacityData, 0))
+                    COMMAND.RESET -> store = LinkedList<SysUnsigned>()
+                    else -> {
+                    }
                 }
-                empty(SysBit(operations.isEmpty()))
+                empty(SysBit(store.isEmpty()))
             }
         }
     }
