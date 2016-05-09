@@ -46,6 +46,7 @@ class CoreTest : SysTopModule() {
                 4L -> MOV_E_A()
                 5L -> ADD_D()
                 6L -> MOV_A_E()
+                7L -> MOV_E_H()
                 else -> NOP()
             }
         }

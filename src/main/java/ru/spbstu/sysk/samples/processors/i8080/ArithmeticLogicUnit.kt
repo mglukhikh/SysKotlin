@@ -2,6 +2,7 @@ package ru.spbstu.sysk.samples.processors.i8080
 
 import ru.spbstu.sysk.core.SysModule
 import ru.spbstu.sysk.data.SysBit
+import ru.spbstu.sysk.data.SysBit.*
 import ru.spbstu.sysk.data.integer.SysUnsigned
 
 class ArithmeticLogicUnit(
@@ -31,8 +32,10 @@ class ArithmeticLogicUnit(
         val B = B()
         val C = A - B
         out(C.truncate(capacityData) as SysUnsigned)
-        flag(flag().set(0, SysBit.ZERO))
+        flag(flag().set(0, ZERO))
     }
+
+    private fun setFlag(vararg pairs: Pair<Int, SysBit>) = pairs.forEach { flag(flag().set(it.first, it.second)) }
 
     init {
         function(A.defaultEvent or B.defaultEvent or operation.defaultEvent) {
@@ -49,11 +52,24 @@ class ArithmeticLogicUnit(
                 COMMAND.REM -> out(A() % B())
                 COMMAND.SHL -> out(A() shl (B()).toInt())
                 COMMAND.SHR -> out(A() shr (B()).toInt())
-                COMMAND.XRA -> out(A() xor B())
-                COMMAND.ORA -> out(A() or B())
-                COMMAND.ANA -> out(A() and B())
-                COMMAND.CMP -> out(A() and B())
-                else -> {}
+                COMMAND.XRA -> {
+                    out(A() xor B())
+                    setFlag(0 to ZERO, 4 to ZERO)
+                }
+                COMMAND.ORA -> {
+                    out(A() or B())
+                    setFlag(0 to ZERO, 4 to ZERO)
+                }
+                COMMAND.ANA -> {
+                    out(A() and B())
+                    setFlag(0 to ZERO, 4 to ZERO)
+                }
+                COMMAND.CMP -> {
+                    val comp = A().compareTo(B())
+                    setFlag(0 to SysBit(comp == 0), 6 to SysBit(comp < 0))
+                }
+                else -> {
+                }
             }
         }
     }

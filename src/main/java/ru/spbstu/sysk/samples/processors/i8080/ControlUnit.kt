@@ -41,11 +41,40 @@ class ControlUnit(parent: SysModule) : SysModule("ControlUnit", parent) {
 
     private fun StateContainer.getArgs() = get(READ_DATA)
 
-    private fun StateContainer.add(initOperation: () -> OPERATION, transfer: Boolean) {
+    private fun StateContainer.add(initOperation: () -> OPERATION)
+            = arithmeticOperation(initOperation, ADD, ADD_A, ADD_B, ADD_C, ADD_D, ADD_E, ADD_H, ADD_L, ADD_M)
+
+    private fun StateContainer.adc(initOperation: () -> OPERATION)
+            = arithmeticOperation(initOperation, ADC, ADC_A, ADC_B, ADC_C, ADC_D, ADC_E, ADC_H, ADC_L, ADC_M)
+
+    private fun StateContainer.sub(initOperation: () -> OPERATION)
+            = arithmeticOperation(initOperation, SUB, SUB_A, SUB_B, SUB_C, SUB_D, SUB_E, SUB_H, SUB_L, SUB_M)
+
+    private fun StateContainer.sbb(initOperation: () -> OPERATION)
+            = arithmeticOperation(initOperation, SBB, SBB_A, SBB_B, SBB_C, SBB_D, SBB_E, SBB_H, SBB_L, SBB_M)
+
+    private fun StateContainer.xra(initOperation: () -> OPERATION)
+            = arithmeticOperation(initOperation, XRA, XRA_A, XRA_B, XRA_C, XRA_D, XRA_E, XRA_H, XRA_L, XRA_M)
+
+    private fun StateContainer.ora(initOperation: () -> OPERATION)
+            = arithmeticOperation(initOperation, ORA, ORA_A, ORA_B, ORA_C, ORA_D, ORA_E, ORA_H, ORA_L, ORA_M)
+
+    private fun StateContainer.ana(initOperation: () -> OPERATION)
+            = arithmeticOperation(initOperation, ANA, ANA_A, ANA_B, ANA_C, ANA_D, ANA_E, ANA_H, ANA_L, ANA_M)
+
+    private fun StateContainer.cmp(initOperation: () -> OPERATION)
+            = arithmeticOperation(initOperation, CMP, CMP_A, CMP_B, CMP_C, CMP_D, CMP_E, CMP_H, CMP_L, CMP_M)
+
+    private fun StateContainer.arithmeticOperation(initOperation: () -> OPERATION, command: COMMAND,
+                                                   A: OPERATION,
+                                                   B: OPERATION, C: OPERATION,
+                                                   D: OPERATION, E: OPERATION,
+                                                   H: OPERATION, L: OPERATION,
+                                                   M: OPERATION) {
         var operation = OPERATION.UNDEFINED
         state.instance {
             operation = initOperation()
-            println("ADD: ${initOperation()}")
+            println("$command: $operation")
         }
         state {
             enRF(ONE)
@@ -53,60 +82,18 @@ class ControlUnit(parent: SysModule) : SysModule("ControlUnit", parent) {
             registerRF(REGISTER.A)
         }
         state.instance { commandRF(SET_B) }
-        case { operation == ADD_A }.state { registerRF(REGISTER.A) }
-        case { operation == ADD_B }.state { registerRF(REGISTER.B) }
-        case { operation == ADD_C }.state { registerRF(REGISTER.C) }
-        case { operation == ADD_D }.state { registerRF(REGISTER.D) }
-        case { operation == ADD_E }.state { registerRF(REGISTER.E) }
-        case { operation == ADD_H }.state { registerRF(REGISTER.H) }
-        case { operation == ADD_L }.state { registerRF(REGISTER.L) }
-        case { operation == ADD_M }.state { registerRF(REGISTER.HL) }
+        case { operation == A }.state { registerRF(REGISTER.A) }
+        case { operation == B }.state { registerRF(REGISTER.B) }
+        case { operation == C }.state { registerRF(REGISTER.C) }
+        case { operation == D }.state { registerRF(REGISTER.D) }
+        case { operation == E }.state { registerRF(REGISTER.E) }
+        case { operation == H }.state { registerRF(REGISTER.H) }
+        case { operation == L }.state { registerRF(REGISTER.L) }
+        case { operation == M }.state { registerRF(REGISTER.HL) }
         state {
             enRF(ZERO)
-            operationALU(if (transfer) ADC else ADD)
+            operationALU(command)
         }
-    }
-
-    private fun StateContainer.sub(initOperation: () -> OPERATION, transfer: Boolean) {
-        var operation = OPERATION.UNDEFINED
-        state.instance {
-            operation = initOperation()
-            println("SUB: ${initOperation()}")
-        }
-        state {
-            enRF(ONE)
-            commandRF(SET_A)
-            registerRF(REGISTER.A)
-        }
-        state.instance { commandRF(SET_B) }
-        case { operation == SUB_A }.state { registerRF(REGISTER.A) }
-        case { operation == SUB_B }.state { registerRF(REGISTER.B) }
-        case { operation == SUB_C }.state { registerRF(REGISTER.C) }
-        case { operation == SUB_D }.state { registerRF(REGISTER.D) }
-        case { operation == SUB_E }.state { registerRF(REGISTER.E) }
-        case { operation == SUB_H }.state { registerRF(REGISTER.H) }
-        case { operation == SUB_L }.state { registerRF(REGISTER.L) }
-        case { operation == SUB_M }.state { registerRF(REGISTER.HL) }
-        state {
-            enRF(ZERO)
-            operationALU(if (transfer) SBB else SUB)
-        }
-    }
-
-    private fun StateContainer.xra(operation: () -> OPERATION) {
-        state.println { "XRA: ${operation()}" }
-    }
-
-    private fun StateContainer.ora(operation: () -> OPERATION) {
-        state.println { "ORA: ${operation()}" }
-    }
-
-    private fun StateContainer.ana(operation: () -> OPERATION) {
-        state.println { "ANA: ${operation()}" }
-    }
-
-    private fun StateContainer.cmp(operation: () -> OPERATION) {
-        state.println { "CMP: ${operation()}" }
     }
 
     private fun StateContainer.mov(initOperation: () -> OPERATION) {
@@ -174,10 +161,10 @@ class ControlUnit(parent: SysModule) : SysModule("ControlUnit", parent) {
                     state.instance { wait = true }
                     getOperation()
                     state.instance { operation = operationOF() }
-                    case ({ operation.id in ADD_B.id..ADD_A.id }) { add({ operation }, false) }
-                    case ({ operation.id in ADC_B.id..ADC_A.id }) { add({ operation }, true) }
-                    case ({ operation.id in SUB_B.id..SUB_A.id }) { sub({ operation }, false) }
-                    case ({ operation.id in SBB_B.id..SBB_A.id }) { sub({ operation }, true) }
+                    case ({ operation.id in ADD_B.id..ADD_A.id }) { add({ operation }) }
+                    case ({ operation.id in ADC_B.id..ADC_A.id }) { adc({ operation }) }
+                    case ({ operation.id in SUB_B.id..SUB_A.id }) { sub({ operation }) }
+                    case ({ operation.id in SBB_B.id..SBB_A.id }) { sbb({ operation }) }
                     case ({ operation.id in XRA_B.id..XRA_A.id }) { xra({ operation }) }
                     case ({ operation.id in ORA_B.id..ORA_A.id }) { ora({ operation }) }
                     case ({ operation.id in ANA_B.id..ANA_A.id }) { ana({ operation }) }
