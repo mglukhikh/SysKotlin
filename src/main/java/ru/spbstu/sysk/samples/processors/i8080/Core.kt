@@ -46,8 +46,11 @@ class Core(parent: SysModule) : SysModule("i8080", parent) {
         bitConnector("connector", ONE, OF.empty, CU.emptyOF)
         bitConnector("connector", ZERO, OF.inc, RF.inc)
         bitConnector("connector", ZERO, OF.read, RF.read)
+        bitConnector("connector", ZERO, CU.outsideALU, ALU.outside)
+        bitConnector("connector", ZERO, CU.enALU, ALU.en)
 
         ALU.flag bind flag
+        ALU.data bind dataBus
         RF.data bind dataBus
         RF.address bind addressBus
         RF.clk bind clk2

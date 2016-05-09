@@ -47,6 +47,9 @@ class CoreTest : SysTopModule() {
                 5L -> ADD_D()
                 6L -> MOV_A_E()
                 7L -> MOV_E_H()
+                8L -> SUI_d8()
+                9L -> unsigned(CAPACITY.DATA, 24)
+                10L -> MOV_A_L()
                 else -> NOP()
             }
         }

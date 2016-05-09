@@ -20,11 +20,13 @@ class ControlUnit(parent: SysModule) : SysModule("ControlUnit", parent) {
     val allowOF = bitOutput("allowOF")
     val emptyOF = bitInput("emptyOF")
     val operationALU = output<COMMAND>("operationALU")
+    val outsideALU = bitOutput("outsideALU")
     val operationOF = input<OPERATION>("operationOF")
     val enOF = bitOutput("enOF")
     val enDG = bitOutput("enDG")
     val enAG = bitOutput("enAG")
     val enRF = bitOutput("enRF")
+    val enALU = bitOutput("enALU")
 
 
     private fun StateContainer.get(command: COMMAND) {
@@ -39,33 +41,39 @@ class ControlUnit(parent: SysModule) : SysModule("ControlUnit", parent) {
 
     private fun StateContainer.getOperation() = get(READ)
 
-    private fun StateContainer.getArgs() = get(READ_DATA)
+    private var id = 0L
+    private fun StateContainer.getArgs() {
+        label("start$id")
+        sleep(1)
+        case ({ emptyOF.zero }) { get(READ_DATA) }
+        otherwise { jump("start${id++}") }
+    }
 
-    private fun StateContainer.add(initOperation: () -> OPERATION)
-            = arithmeticOperation(initOperation, ADD, ADD_A, ADD_B, ADD_C, ADD_D, ADD_E, ADD_H, ADD_L, ADD_M)
+    private fun StateContainer.add(initOperation: () -> OPERATION, outside: Boolean)
+            = arithmeticOperation(initOperation, ADD, outside, ADD_A, ADD_B, ADD_C, ADD_D, ADD_E, ADD_H, ADD_L, ADD_M)
 
-    private fun StateContainer.adc(initOperation: () -> OPERATION)
-            = arithmeticOperation(initOperation, ADC, ADC_A, ADC_B, ADC_C, ADC_D, ADC_E, ADC_H, ADC_L, ADC_M)
+    private fun StateContainer.adc(initOperation: () -> OPERATION, outside: Boolean)
+            = arithmeticOperation(initOperation, ADC, outside, ADC_A, ADC_B, ADC_C, ADC_D, ADC_E, ADC_H, ADC_L, ADC_M)
 
-    private fun StateContainer.sub(initOperation: () -> OPERATION)
-            = arithmeticOperation(initOperation, SUB, SUB_A, SUB_B, SUB_C, SUB_D, SUB_E, SUB_H, SUB_L, SUB_M)
+    private fun StateContainer.sub(initOperation: () -> OPERATION, outside: Boolean)
+            = arithmeticOperation(initOperation, SUB, outside, SUB_A, SUB_B, SUB_C, SUB_D, SUB_E, SUB_H, SUB_L, SUB_M)
 
-    private fun StateContainer.sbb(initOperation: () -> OPERATION)
-            = arithmeticOperation(initOperation, SBB, SBB_A, SBB_B, SBB_C, SBB_D, SBB_E, SBB_H, SBB_L, SBB_M)
+    private fun StateContainer.sbb(initOperation: () -> OPERATION, outside: Boolean)
+            = arithmeticOperation(initOperation, SBB, outside, SBB_A, SBB_B, SBB_C, SBB_D, SBB_E, SBB_H, SBB_L, SBB_M)
 
-    private fun StateContainer.xra(initOperation: () -> OPERATION)
-            = arithmeticOperation(initOperation, XRA, XRA_A, XRA_B, XRA_C, XRA_D, XRA_E, XRA_H, XRA_L, XRA_M)
+    private fun StateContainer.xra(initOperation: () -> OPERATION, outside: Boolean)
+            = arithmeticOperation(initOperation, XRA, outside, XRA_A, XRA_B, XRA_C, XRA_D, XRA_E, XRA_H, XRA_L, XRA_M)
 
-    private fun StateContainer.ora(initOperation: () -> OPERATION)
-            = arithmeticOperation(initOperation, ORA, ORA_A, ORA_B, ORA_C, ORA_D, ORA_E, ORA_H, ORA_L, ORA_M)
+    private fun StateContainer.ora(initOperation: () -> OPERATION, outside: Boolean)
+            = arithmeticOperation(initOperation, ORA, outside, ORA_A, ORA_B, ORA_C, ORA_D, ORA_E, ORA_H, ORA_L, ORA_M)
 
-    private fun StateContainer.ana(initOperation: () -> OPERATION)
-            = arithmeticOperation(initOperation, ANA, ANA_A, ANA_B, ANA_C, ANA_D, ANA_E, ANA_H, ANA_L, ANA_M)
+    private fun StateContainer.ana(initOperation: () -> OPERATION, outside: Boolean)
+            = arithmeticOperation(initOperation, ANA, outside, ANA_A, ANA_B, ANA_C, ANA_D, ANA_E, ANA_H, ANA_L, ANA_M)
 
-    private fun StateContainer.cmp(initOperation: () -> OPERATION)
-            = arithmeticOperation(initOperation, CMP, CMP_A, CMP_B, CMP_C, CMP_D, CMP_E, CMP_H, CMP_L, CMP_M)
+    private fun StateContainer.cmp(initOperation: () -> OPERATION, outside: Boolean)
+            = arithmeticOperation(initOperation, CMP, outside, CMP_A, CMP_B, CMP_C, CMP_D, CMP_E, CMP_H, CMP_L, CMP_M)
 
-    private fun StateContainer.arithmeticOperation(initOperation: () -> OPERATION, command: COMMAND,
+    private fun StateContainer.arithmeticOperation(initOperation: () -> OPERATION, command: COMMAND, outside: Boolean,
                                                    A: OPERATION,
                                                    B: OPERATION, C: OPERATION,
                                                    D: OPERATION, E: OPERATION,
@@ -76,6 +84,7 @@ class ControlUnit(parent: SysModule) : SysModule("ControlUnit", parent) {
             operation = initOperation()
             println("$command: $operation")
         }
+        if (outside) getArgs()
         state {
             enRF(ONE)
             commandRF(SET_A)
@@ -90,9 +99,15 @@ class ControlUnit(parent: SysModule) : SysModule("ControlUnit", parent) {
         case { operation == H }.state { registerRF(REGISTER.H) }
         case { operation == L }.state { registerRF(REGISTER.L) }
         case { operation == M }.state { registerRF(REGISTER.HL) }
+        if (outside) state.instance { outsideALU(ONE) }
         state {
+            enALU(ONE)
             enRF(ZERO)
             operationALU(command)
+        }
+        if (outside) state.instance { outsideALU(ZERO) }
+        state {
+            enALU(ZERO)
         }
     }
 
@@ -126,13 +141,9 @@ class ControlUnit(parent: SysModule) : SysModule("ControlUnit", parent) {
         state.instance { enRF(ZERO) }
     }
 
-    private var mviId = 0L
     private fun StateContainer.mvi(operation: () -> OPERATION, register: () -> REGISTER) {
         state.instance { println("MVI: ${operation()}") }
-        label("start mvi$mviId")
-        sleep(1)
-        case ({ emptyOF.zero }) { getArgs() }
-        otherwise { jump("start mvi${mviId++}") }
+        getArgs()
         state {
             enRF(ONE)
             commandRF(WRITE_DATA)
@@ -155,20 +166,29 @@ class ControlUnit(parent: SysModule) : SysModule("ControlUnit", parent) {
                 allowOF(ONE)
                 wr(ZERO)
                 dbin(ZERO)
+                outsideALU(ZERO)
             }
             infinite.block {
                 case ({ !wait && emptyOF.zero }) {
                     state.instance { wait = true }
                     getOperation()
                     state.instance { operation = operationOF() }
-                    case ({ operation.id in ADD_B.id..ADD_A.id }) { add({ operation }) }
-                    case ({ operation.id in ADC_B.id..ADC_A.id }) { adc({ operation }) }
-                    case ({ operation.id in SUB_B.id..SUB_A.id }) { sub({ operation }) }
-                    case ({ operation.id in SBB_B.id..SBB_A.id }) { sbb({ operation }) }
-                    case ({ operation.id in XRA_B.id..XRA_A.id }) { xra({ operation }) }
-                    case ({ operation.id in ORA_B.id..ORA_A.id }) { ora({ operation }) }
-                    case ({ operation.id in ANA_B.id..ANA_A.id }) { ana({ operation }) }
-                    case ({ operation.id in CMP_B.id..CMP_A.id }) { cmp({ operation }) }
+                    case ({ operation.id in ADD_B.id..ADD_A.id }) { add({ operation }, false) }
+                    case ({ operation == ADI_d8 }) { add({ ADD_A }, true) }
+                    case ({ operation.id in ADC_B.id..ADC_A.id }) { adc({ operation }, false) }
+                    case ({ operation == ACI_d8 }) { adc({ ADC_A }, true) }
+                    case ({ operation.id in SUB_B.id..SUB_A.id }) { sub({ operation }, false) }
+                    case ({ operation == SUI_d8 }) { sub({ SUB_A }, true) }
+                    case ({ operation.id in SBB_B.id..SBB_A.id }) { sbb({ operation }, false) }
+                    case ({ operation == SBI_d8 }) { sbb({ SBB_A }, true) }
+                    case ({ operation.id in XRA_B.id..XRA_A.id }) { xra({ operation }, false) }
+                    case ({ operation == XRI_d8 }) { xra({ XRA_A }, true) }
+                    case ({ operation.id in ORA_B.id..ORA_A.id }) { ora({ operation }, false) }
+                    case ({ operation == ORI_d8 }) { ora({ ORA_A }, true) }
+                    case ({ operation.id in ANA_B.id..ANA_A.id }) { ana({ operation }, false) }
+                    case ({ operation == ANI_d8 }) { ana({ ANA_A }, true) }
+                    case ({ operation.id in CMP_B.id..CMP_A.id }) { cmp({ operation }, false) }
+                    case ({ operation == CPI_d8 }) { cmp({ CMP_A }, true) }
                     case ({ operation.id in MOV_B_B.id..MOV_A_A.id }) { mov({ operation }) }
                     case ({ operation == MVI_A_d8 }) { mvi({ operation }, { REGISTER.A }) }
                     case ({ operation == MVI_B_d8 }) { mvi({ operation }, { REGISTER.B }) }

@@ -4,6 +4,7 @@ import org.junit.Test
 import ru.spbstu.sysk.core.SysTopModule
 import ru.spbstu.sysk.core.TimeUnit.*
 import ru.spbstu.sysk.core.invoke
+import ru.spbstu.sysk.data.SysBit
 import ru.spbstu.sysk.data.integer.unsigned
 
 class ALUTest : SysTopModule() {
@@ -21,6 +22,10 @@ class ALUTest : SysTopModule() {
         ALU.A bind a
         ALU.B bind b
         ALU.out bind out
+        ALU.flag bind signal("flag", unsigned(CAPACITY.DATA, 0))
+        ALU.outside bind bitSignalStub("outside", SysBit.ZERO)
+        ALU.data bind signalStub("data", unsigned(CAPACITY.DATA, 0))
+        ALU.en bind bitSignalStub("en", SysBit.ONE)
 
         stateFunction(clk, false) {
             state {
