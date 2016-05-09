@@ -52,7 +52,7 @@ class OperationFifo(
                         store.add(data())
                         empty(ZERO)
                     }
-                    state {
+                    state.instance {
                         inc(ZERO)
                     }
                 }

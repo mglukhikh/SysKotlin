@@ -12,11 +12,6 @@ object CAPACITY {
     const val REGISTER = 4
 }
 
-object VALUE {
-    const val MAX_DATA = 255
-    const val MAX_ADDRESS = 65535
-}
-
 enum class COMMAND : SysData {
 
     UNDEFINED,
@@ -31,15 +26,19 @@ enum class COMMAND : SysData {
     WRITE,
     RESET,
 
-    ADD,
-    SUB,
+    ADD, ADC,
+    SUB, SBB,
     MUL,
     DIV,
     INC,
     DEC,
     SHL,
     SHR,
-    REM;
+    REM,
+    XRA,
+    ORA,
+    ANA,
+    CMP;
 
     val width = CAPACITY.COMMAND
 

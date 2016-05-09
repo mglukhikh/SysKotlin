@@ -20,6 +20,7 @@ class Core(parent: SysModule) : SysModule("i8080", parent) {
     val wr = bitOutput("dbin")
     val dbin = bitOutput("dbin")
 
+    private val flag = signal("flag", unsigned(CAPACITY.DATA, 0))
     private val dataBus = signal("dataBus", unsigned(CAPACITY.DATA, 0))
     private val addressBus = signal("addressBus", unsigned(CAPACITY.ADDRESS, 0))
     private val dataSignal = signal("dataSignal", unsigned(CAPACITY.DATA, 0))
@@ -46,10 +47,12 @@ class Core(parent: SysModule) : SysModule("i8080", parent) {
         bitConnector("connector", ZERO, OF.inc, RF.inc)
         bitConnector("connector", ZERO, OF.read, RF.read)
 
+        ALU.flag bind flag
         RF.data bind dataBus
         RF.address bind addressBus
         RF.clk bind clk2
         RF.pc bind addressSignal
+        RF.flag bind flag
         OF.data bind dataSignal
         OF.clk1 bind clk1
         OF.clk2 bind clk2

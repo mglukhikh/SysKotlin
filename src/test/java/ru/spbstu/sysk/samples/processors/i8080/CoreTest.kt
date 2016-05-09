@@ -6,6 +6,7 @@ import ru.spbstu.sysk.core.TimeUnit.*
 import ru.spbstu.sysk.core.invoke
 import ru.spbstu.sysk.data.integer.unsigned
 import ru.spbstu.sysk.data.SysBit.*
+import ru.spbstu.sysk.samples.processors.i8080.OPERATION.*
 
 class CoreTest : SysTopModule() {
 
@@ -38,22 +39,20 @@ class CoreTest : SysTopModule() {
 
         ram.load {
             when (it) {
-                0L -> OPERATION.ADD_C()
-                1L -> OPERATION.ADD_D()
-                2L -> OPERATION.ADC_B()
-                3L -> OPERATION.MVI_B_d8()
-                4L -> unsigned(CAPACITY.DATA, 123)
-                5L -> OPERATION.MOV_B_M()
-                6L -> OPERATION.ADC_A()
-                7L -> OPERATION.ADD_H()
-                8L -> OPERATION.ORA_L()
-                else -> OPERATION.NOP()
+                0L -> MVI_D_d8()
+                1L -> unsigned(CAPACITY.DATA, 12)
+                2L -> MVI_E_d8()
+                3L -> unsigned(CAPACITY.DATA, 25)
+                4L -> MOV_E_A()
+                5L -> ADD_D()
+                6L -> MOV_A_E()
+                else -> NOP()
             }
         }
 
         enRAM(ZERO)
 
-        function(wr.defaultEvent or dbin.defaultEvent) {
+        function(wr.defaultEvent or dbin.defaultEvent, false) {
             enRAM(wr.value xor dbin.value)
         }
 

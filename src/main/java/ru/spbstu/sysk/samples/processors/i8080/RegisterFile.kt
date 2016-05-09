@@ -1,5 +1,6 @@
 package ru.spbstu.sysk.samples.processors.i8080
 
+import org.junit.Assert
 import ru.spbstu.sysk.core.SysModule
 import ru.spbstu.sysk.data.integer.*
 
@@ -23,6 +24,7 @@ class RegisterFile constructor(
     val inp = input<SysUnsigned>("inp")
     val out = output<SysUnsigned>("out")
     val B = output<SysUnsigned>("B")
+    val flag = bidirPort<SysUnsigned>("flag")
 
     val inc = bitInput("inc")
     val read = bitInput("read")
@@ -38,14 +40,22 @@ class RegisterFile constructor(
 
     init {
         if (capacityAddress != capacityData * 2) throw IllegalArgumentException()
-        function(inc.posEdgeEvent) { inc(REGISTER.PC) }
-        function(read.posEdgeEvent) { pc(read(REGISTER.PC)) }
+        function(inc.posEdgeEvent, false) { inc(REGISTER.PC) }
+        function(read.posEdgeEvent, false) { pc(read(REGISTER.PC)) }
+        function(inp.defaultEvent, false) {
+            write(inp(), current)
+            changed(current)
+        }
+        function(flag.defaultEvent, false) {
+            write(flag(), REGISTER.Flag)
+            changed(REGISTER.Flag)
+        }
         stateFunction(clk) {
             infinite.state {
-                if (command().width != capacityCommand) throw IllegalArgumentException()
-                if (register().width != capacityRegisterAddress) throw IllegalArgumentException()
-                if (data().width != capacityData) throw IllegalArgumentException()
-                if (address().width != capacityAddress) throw IllegalArgumentException()
+                Assert.assertEquals(capacityCommand, command().width)
+                Assert.assertEquals(capacityRegisterAddress, register().width)
+                Assert.assertEquals(capacityData, data().width)
+                Assert.assertEquals(capacityAddress, address().width)
                 if (en.one) when (command()) {
                     COMMAND.WRITE_DATA -> {
                         write(data(), register())
@@ -70,7 +80,6 @@ class RegisterFile constructor(
                 }
             }
         }
-        function(inp.defaultEvent) { write(inp(), current) }
     }
 
     private fun shl(register: REGISTER) = when (register) {
@@ -141,14 +150,17 @@ class RegisterFile constructor(
     }
 
     private fun write(value: SysUnsigned, register: REGISTER) = when (register) {
-        REGISTER.A -> PSW = PSW.set(capacityData - 1, 0, value)
-        REGISTER.Flag -> PSW = PSW.set(capacityData * 2 - 1, capacityData, value)
-        REGISTER.B -> BC = BC.set(capacityData - 1, 0, value)
-        REGISTER.C -> BC = BC.set(capacityData * 2 - 1, capacityData, value)
-        REGISTER.D -> DE = DE.set(capacityData - 1, 0, value)
-        REGISTER.E -> DE = DE.set(capacityData * 2 - 1, capacityData, value)
-        REGISTER.H -> HL = HL.set(capacityData - 1, 0, value)
-        REGISTER.L -> HL = HL.set(capacityData * 2 - 1, capacityData, value)
+        REGISTER.A -> PSW = PSW.set(capacityData - 1, 0, value.truncate(capacityData) as SysUnsigned)
+        REGISTER.Flag -> {
+            PSW = PSW.set(capacityData * 2 - 1, capacityData, value.truncate(capacityData) as SysUnsigned)
+            flag(read(REGISTER.Flag))
+        }
+        REGISTER.B -> BC = BC.set(capacityData - 1, 0, value.truncate(capacityData) as SysUnsigned)
+        REGISTER.C -> BC = BC.set(capacityData * 2 - 1, capacityData, value.truncate(capacityData) as SysUnsigned)
+        REGISTER.D -> DE = DE.set(capacityData - 1, 0, value.truncate(capacityData) as SysUnsigned)
+        REGISTER.E -> DE = DE.set(capacityData * 2 - 1, capacityData, value.truncate(capacityData) as SysUnsigned)
+        REGISTER.H -> HL = HL.set(capacityData - 1, 0, value.truncate(capacityData) as SysUnsigned)
+        REGISTER.L -> HL = HL.set(capacityData * 2 - 1, capacityData, value.truncate(capacityData) as SysUnsigned)
         REGISTER.BC -> BC = value.truncate(capacityData * 2) as SysUnsigned
         REGISTER.DE -> DE = value.truncate(capacityData * 2) as SysUnsigned
         REGISTER.HL -> HL = value.truncate(capacityData * 2) as SysUnsigned

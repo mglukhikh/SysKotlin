@@ -13,13 +13,13 @@ class Gateway constructor(
     val en = bitInput("en")
 
     init {
-        function(front.defaultEvent) {
+        function(front.defaultEvent, false) {
             if (front().width != capacity) throw IllegalArgumentException()
             if (back().width != capacity) throw IllegalArgumentException()
             if (en.one) back(front())
         }
 
-        function(back.defaultEvent) {
+        function(back.defaultEvent, false) {
             if (front().width != capacity) throw IllegalArgumentException()
             if (back().width != capacity) throw IllegalArgumentException()
             if (en.one) front(back())
