@@ -43,10 +43,10 @@ class ControlUnit(parent: SysModule) : SysModule("ControlUnit", parent) {
 
     private var id = 0L
     private fun StateContainer.getArgs() {
-        label("start$id")
-        sleep(1)
-        case ({ emptyOF.zero }) { get(READ_DATA) }
-        otherwise { jump("start${id++}") }
+        loop({ emptyOF.one }) {
+            sleep(1)
+        }
+        get(READ_DATA)
     }
 
     private fun StateContainer.add(initOperation: () -> OPERATION, outside: Boolean)

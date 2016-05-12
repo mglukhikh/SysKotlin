@@ -130,7 +130,7 @@ interface StateContainer {
 
     fun <T : Any> loop(iterator: ResetIterator<T>) = State.Block(this, { init -> loop(iterator, init) })
 
-    private fun loop(condition: () -> Boolean, init: StateContainer.() -> Unit) {
+    fun loop(condition: () -> Boolean, init: StateContainer.() -> Unit) {
         val begin = Label.Internal()
         val end = Label.Internal()
         labelInternal(begin)
