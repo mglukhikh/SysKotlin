@@ -76,11 +76,8 @@ class SysLongInteger private constructor(
     }
 
     /** Decrease width to the given with value truncation */
-    override fun truncate(width: Int): SysInteger {
-        if (width < 0) throw IllegalArgumentException()
-        if (width > MAX_WIDTH)
-            return SysInteger(width, value)
-        if (width >= this.width) return SysLongInteger(width, value)
+    override fun truncate(width: Int): SysLongInteger {
+        if (width < 0 || width >= this.width) throw IllegalArgumentException()
         return truncate(width, value, positiveValues[width], negativeValues[width])
     }
 

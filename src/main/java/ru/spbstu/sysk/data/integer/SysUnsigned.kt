@@ -41,9 +41,8 @@ private constructor(
         return SysUnsigned(width, value)
     }
 
-    override fun truncate(width: Int): SysInteger {
-        if (width > this.width) return extend(width)
-        if (width < 0) throw IllegalArgumentException()
+    override fun truncate(width: Int): SysUnsigned {
+        if (width < 0 || width >= this.width) throw IllegalArgumentException()
         return truncate(width, value, positiveValues[width])
     }
 
