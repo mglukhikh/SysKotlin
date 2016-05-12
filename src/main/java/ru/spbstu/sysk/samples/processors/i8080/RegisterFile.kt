@@ -65,8 +65,8 @@ class RegisterFile constructor(
                         write(address(), register())
                         changed(register())
                     }
-                    COMMAND.READ_DATA -> data(read(register()).truncate(capacityData) as SysUnsigned)
-                    COMMAND.READ_ADDRESS -> address(read(register()).truncate(capacityData * 2) as SysUnsigned)
+                    COMMAND.READ_DATA -> data(read(register()).extend(capacityData) as SysUnsigned)
+                    COMMAND.READ_ADDRESS -> address(read(register()).extend(capacityData * 2) as SysUnsigned)
                     COMMAND.SET_A -> out(read(register()))
                     COMMAND.SET_B -> B(read(register()))
                     COMMAND.SET_CURRENT -> current = register()
@@ -150,23 +150,23 @@ class RegisterFile constructor(
     }
 
     private fun write(value: SysUnsigned, register: REGISTER) = when (register) {
-        REGISTER.A -> PSW = PSW.set(capacityData - 1, 0, value.truncate(capacityData) as SysUnsigned)
+        REGISTER.A -> PSW = PSW.set(capacityData - 1, 0, value.extend(capacityData))
         REGISTER.Flag -> {
-            PSW = PSW.set(capacityData * 2 - 1, capacityData, value.truncate(capacityData) as SysUnsigned)
+            PSW = PSW.set(capacityData * 2 - 1, capacityData, value.extend(capacityData))
             flag(read(REGISTER.Flag))
         }
-        REGISTER.B -> BC = BC.set(capacityData - 1, 0, value.truncate(capacityData) as SysUnsigned)
-        REGISTER.C -> BC = BC.set(capacityData * 2 - 1, capacityData, value.truncate(capacityData) as SysUnsigned)
-        REGISTER.D -> DE = DE.set(capacityData - 1, 0, value.truncate(capacityData) as SysUnsigned)
-        REGISTER.E -> DE = DE.set(capacityData * 2 - 1, capacityData, value.truncate(capacityData) as SysUnsigned)
-        REGISTER.H -> HL = HL.set(capacityData - 1, 0, value.truncate(capacityData) as SysUnsigned)
-        REGISTER.L -> HL = HL.set(capacityData * 2 - 1, capacityData, value.truncate(capacityData) as SysUnsigned)
-        REGISTER.BC -> BC = value.truncate(capacityData * 2) as SysUnsigned
-        REGISTER.DE -> DE = value.truncate(capacityData * 2) as SysUnsigned
-        REGISTER.HL -> HL = value.truncate(capacityData * 2) as SysUnsigned
-        REGISTER.PSW -> PSW = value.truncate(capacityData * 2) as SysUnsigned
-        REGISTER.PC -> PC = value.truncate(capacityData * 2) as SysUnsigned
-        REGISTER.SP -> SP = value.truncate(capacityData * 2) as SysUnsigned
+        REGISTER.B -> BC = BC.set(capacityData - 1, 0, value.extend(capacityData))
+        REGISTER.C -> BC = BC.set(capacityData * 2 - 1, capacityData, value.extend(capacityData))
+        REGISTER.D -> DE = DE.set(capacityData - 1, 0, value.extend(capacityData))
+        REGISTER.E -> DE = DE.set(capacityData * 2 - 1, capacityData, value.extend(capacityData))
+        REGISTER.H -> HL = HL.set(capacityData - 1, 0, value.extend(capacityData))
+        REGISTER.L -> HL = HL.set(capacityData * 2 - 1, capacityData, value.extend(capacityData))
+        REGISTER.BC -> BC = value.extend(capacityData * 2) as SysUnsigned
+        REGISTER.DE -> DE = value.extend(capacityData * 2) as SysUnsigned
+        REGISTER.HL -> HL = value.extend(capacityData * 2) as SysUnsigned
+        REGISTER.PSW -> PSW = value.extend(capacityData * 2) as SysUnsigned
+        REGISTER.PC -> PC = value.extend(capacityData * 2) as SysUnsigned
+        REGISTER.SP -> SP = value.extend(capacityData * 2) as SysUnsigned
         else -> throw IllegalArgumentException("$register is not found")
     }
 

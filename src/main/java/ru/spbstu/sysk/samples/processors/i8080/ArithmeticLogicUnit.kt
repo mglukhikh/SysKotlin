@@ -25,10 +25,10 @@ class ArithmeticLogicUnit(
     private fun inp() = if (outside.one) data() else B()
 
     private fun add(transfer: Boolean, capacityData: Int) {
-        val A = A().truncate(capacityData + 1) as SysUnsigned
-        val B = inp().truncate(capacityData + 1) as SysUnsigned
+        val A = A().extend(capacityData + 1) as SysUnsigned
+        val B = inp().extend(capacityData + 1) as SysUnsigned
         val C = A + B + if (transfer) flag()[0].toInt() else 0
-        out(C.truncate(capacityData) as SysUnsigned)
+        out(C.extend(capacityData) as SysUnsigned)
         flag(flag().set(0, C[capacityData]))
     }
 
@@ -36,7 +36,7 @@ class ArithmeticLogicUnit(
         val A = A() + ((if (transfer) flag()[0].toInt() else 0) shl capacityData)
         val B = inp()
         val C = A - B
-        out(C.truncate(capacityData) as SysUnsigned)
+        out(C.extend(capacityData) as SysUnsigned)
         flag(flag().set(0, ZERO))
     }
 

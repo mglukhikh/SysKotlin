@@ -35,7 +35,7 @@ private constructor(
 
     override fun extend(width: Int): SysInteger {
         if (width < this.width)
-            throw IllegalArgumentException()
+            return truncate(width)
         if (width > MAX_WIDTH)
             return SysBigInteger(width, value)
         return SysUnsigned(width, value)
