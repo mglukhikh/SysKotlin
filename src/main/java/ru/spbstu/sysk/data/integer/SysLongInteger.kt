@@ -116,7 +116,7 @@ class SysLongInteger private constructor(
     /** Adds arg to this integer, with result width is maximum of argument's widths */
     override operator fun plus(arg: SysInteger): SysInteger {
         if (hasUndefined)
-            throw UnsupportedOperationException("Not implemented yet")
+            return SysInteger.uninitialized(Math.max(width, arg.width))
         if (arg.width > width)
             return arg + this
         return truncate(width, value + arg.value.toLong(), positiveMask, negativeMask)
@@ -125,14 +125,14 @@ class SysLongInteger private constructor(
     /**Unary minus*/
     override operator fun unaryMinus(): SysLongInteger {
         if (hasUndefined)
-            throw UnsupportedOperationException("Not implemented yet")
+            return SysLongInteger(Array(width, { i -> bitsState[i].not() }))
         return truncate(width, -value, positiveMask, negativeMask)
     }
 
     /** Subtract arg from this integer*/
     override operator fun minus(arg: SysInteger): SysInteger {
         if (hasUndefined)
-            throw UnsupportedOperationException("Not implemented yet")
+            return SysInteger.uninitialized(Math.max(width, arg.width))
         if (arg.width > width)
             return arg - this
         return truncate(width, value - arg.value.toLong(), positiveMask, negativeMask)
@@ -141,7 +141,7 @@ class SysLongInteger private constructor(
     /** Integer division by divisor*/
     override operator fun div(arg: SysInteger): SysInteger {
         if (hasUndefined)
-            throw UnsupportedOperationException("Not implemented yet")
+            return SysInteger.uninitialized(Math.max(width, arg.width))
         if (arg.width > MAX_WIDTH)
             return this.extend(arg.width) / arg
         if (arg.value == 0L) throw IllegalArgumentException("Division by zero")
@@ -155,7 +155,7 @@ class SysLongInteger private constructor(
     /** Remainder of integer division*/
     override operator fun mod(arg: SysInteger): SysInteger {
         if (hasUndefined)
-            throw UnsupportedOperationException("Not implemented yet")
+            return SysInteger.uninitialized(Math.max(width, arg.width))
         if (arg.width > MAX_WIDTH)
             return this.extend(arg.width) % arg
         if (arg.value == 0L) throw IllegalArgumentException("Division by zero")
@@ -169,7 +169,7 @@ class SysLongInteger private constructor(
     /** Multiplies arg to this integer, with result width is sum of argument's width */
     override operator fun times(arg: SysInteger): SysInteger {
         if (hasUndefined)
-            throw UnsupportedOperationException("Not implemented yet")
+            return SysInteger.uninitialized(Math.max(width, arg.width))
         if (arg.width > width)
             return arg * this
         return truncate(width, value * arg.value.toLong(), positiveMask, negativeMask)
