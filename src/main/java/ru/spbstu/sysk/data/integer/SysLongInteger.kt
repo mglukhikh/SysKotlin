@@ -254,7 +254,7 @@ class SysLongInteger private constructor(
     }
 
     /** Cyclic shift right*/
-    override infix fun cshr(shift: Int): SysLongInteger {
+    override infix fun cshr(shift: Int): SysInteger {
 
         if (shift < 0)
             return this cshl -shift
@@ -269,7 +269,7 @@ class SysLongInteger private constructor(
     }
 
     /** Cyclic shift left*/
-    override infix fun cshl(shift: Int): SysLongInteger {
+    override infix fun cshl(shift: Int): SysInteger {
 
         if (shift < 0)
             return this cshr -shift
@@ -282,9 +282,8 @@ class SysLongInteger private constructor(
     }
 
     /** Bitwise and*/
-    override infix fun and(arg: SysInteger): SysLongInteger {
-        if (arg.width > MAX_WIDTH)
-            throw UnsupportedOperationException("Not implemented")
+    override infix fun and(arg: SysInteger): SysInteger {
+        if (arg.width > MAX_WIDTH) return arg.and(this)
 
         if (hasUndefined || arg.hasUndefined) {
 
@@ -313,10 +312,8 @@ class SysLongInteger private constructor(
     }
 
     /** Bitwise or*/
-    override infix fun or(arg: SysInteger): SysLongInteger {
-
-        if (arg.width > MAX_WIDTH)
-            throw UnsupportedOperationException("Not implemented")
+    override infix fun or(arg: SysInteger): SysInteger {
+        if (arg.width > MAX_WIDTH) return arg.or(this)
 
         if (hasUndefined || arg.hasUndefined) {
 
@@ -347,11 +344,8 @@ class SysLongInteger private constructor(
     }
 
     /** Bitwise xor*/
-    override infix fun xor(arg: SysInteger): SysLongInteger {
-
-
-        if (arg.width > MAX_WIDTH)
-            throw UnsupportedOperationException("Not implemented")
+    override infix fun xor(arg: SysInteger): SysInteger {
+        if (arg.width > MAX_WIDTH) return arg.and(this)
 
         if (hasUndefined || arg.hasUndefined) {
 
