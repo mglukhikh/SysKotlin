@@ -53,9 +53,12 @@ private constructor(
             return SysUnsigned(width, value and positiveMask, positiveMask)
     }
 
+    private fun unknown(arg: SysUnsigned) = SysUnsigned(Array(Math.max(arg.width, width), { i -> SysBit.X }))
+    private fun unknown(arg: SysInteger) = SysInteger(Array(Math.max(arg.width, width), { i -> SysBit.X }))
+
     operator fun plus(arg: SysUnsigned): SysUnsigned {
-        if (hasUndefined)
-            throw UnsupportedOperationException("Not implemented yet")
+        if (hasUndefined || arg.hasUndefined)
+            return unknown(arg)
         if (arg.width > width)
             return truncate(arg.width, value + arg.value, arg.positiveMask)
         else
@@ -63,8 +66,8 @@ private constructor(
     }
 
     operator fun minus(arg: SysUnsigned): SysUnsigned {
-        if (hasUndefined)
-            throw UnsupportedOperationException("Not implemented yet")
+        if (hasUndefined || arg.hasUndefined)
+            return unknown(arg)
         if (arg.width > width)
             return truncate(arg.width, value - arg.value, arg.positiveMask)
         else
@@ -72,8 +75,8 @@ private constructor(
     }
 
     operator fun times(arg: SysUnsigned): SysUnsigned {
-        if (hasUndefined)
-            throw UnsupportedOperationException("Not implemented yet")
+        if (hasUndefined || arg.hasUndefined)
+            return unknown(arg)
         if (arg.width > width)
             return truncate(arg.width, value * arg.value, arg.positiveMask)
         else
@@ -81,8 +84,8 @@ private constructor(
     }
 
     operator fun div(arg: SysUnsigned): SysUnsigned {
-        if (hasUndefined)
-            throw UnsupportedOperationException("Not implemented yet")
+        if (hasUndefined || arg.hasUndefined)
+            return unknown(arg)
         if (arg.width > width)
             return truncate(arg.width, java.lang.Long.divideUnsigned(value, arg.value), arg.positiveMask)
         else
@@ -90,8 +93,8 @@ private constructor(
     }
 
     operator fun mod(arg: SysUnsigned): SysUnsigned {
-        if (hasUndefined)
-            throw UnsupportedOperationException("Not implemented yet")
+        if (hasUndefined || arg.hasUndefined)
+            return unknown(arg)
         if (arg.width > width)
             return truncate(arg.width, java.lang.Long.remainderUnsigned (value, arg.value), arg.positiveMask)
         else
@@ -99,40 +102,40 @@ private constructor(
     }
 
     override operator fun plus(arg: SysInteger): SysInteger {
-        if (hasUndefined)
-            throw UnsupportedOperationException("Not implemented yet")
+        if (hasUndefined || arg.hasUndefined)
+            return unknown(arg)
         if (arg.width > MAX_WIDTH)
             return toSysBigInteger() + arg
         return toSysLongInteger() + arg
     }
 
     override operator fun minus(arg: SysInteger): SysInteger {
-        if (hasUndefined)
-            throw UnsupportedOperationException("Not implemented yet")
+        if (hasUndefined || arg.hasUndefined)
+            return unknown(arg)
         if (arg.width > MAX_WIDTH)
             return toSysBigInteger() - arg
         return toSysLongInteger() - arg
     }
 
     override operator fun times(arg: SysInteger): SysInteger {
-        if (hasUndefined)
-            throw UnsupportedOperationException("Not implemented yet")
+        if (hasUndefined || arg.hasUndefined)
+            return unknown(arg)
         if (arg.width > MAX_WIDTH)
             return toSysBigInteger() * arg
         return toSysLongInteger() * arg
     }
 
     override operator fun div(arg: SysInteger): SysInteger {
-        if (hasUndefined)
-            throw UnsupportedOperationException("Not implemented yet")
+        if (hasUndefined || arg.hasUndefined)
+            return unknown(arg)
         if (arg.width > MAX_WIDTH)
             return toSysBigInteger() / arg
         return toSysLongInteger() / arg
     }
 
     override operator fun mod(arg: SysInteger): SysInteger {
-        if (hasUndefined)
-            throw UnsupportedOperationException("Not implemented yet")
+        if (hasUndefined || arg.hasUndefined)
+            return unknown(arg)
         if (arg.width > MAX_WIDTH)
             return toSysBigInteger() % arg
         return toSysLongInteger() % arg
@@ -145,7 +148,7 @@ private constructor(
         if (i < 0 || i >= width) throw IndexOutOfBoundsException()
         if (hasUndefined)
             return bitsState[i]
-        if ((value and (1L shl i )) != 0L)
+        if ((value and (1L shl i)) != 0L)
             return SysBit.ONE
         else
             return SysBit.ZERO
@@ -163,7 +166,7 @@ private constructor(
     override infix fun ushr(shift: Int): SysUnsigned {
         if (shift == 0)
             return this;
-        if (shift > width )
+        if (shift > width)
             throw IllegalArgumentException()
         var realShift = shift
         if (shift < 0)
@@ -188,7 +191,7 @@ private constructor(
     override infix fun shl(shift: Int): SysUnsigned {
         if (shift == 0)
             return this;
-        if (shift > width )
+        if (shift > width)
             throw IllegalArgumentException()
         var realShift = shift
         if (shift < 0)
@@ -478,7 +481,7 @@ private constructor(
         private fun valueBySWSArray(arr: Array<SysBit>): Long {
             val value = CharArray(64, { i -> '0' })
             var counter: Int = 0;
-            while (counter < arr.size && arr[counter] == SysBit.X )
+            while (counter < arr.size && arr[counter] == SysBit.X)
                 counter++;
             var shift = 0
             while (counter < arr.size && arr[counter] != SysBit.X) {
@@ -528,7 +531,7 @@ private constructor(
 
         private fun maxValue(width: Int): Long {
             if (width == 0) return 0
-            return (-1L ushr (MAX_WIDTH - width ))
+            return (-1L ushr (MAX_WIDTH - width))
         }
     }
 

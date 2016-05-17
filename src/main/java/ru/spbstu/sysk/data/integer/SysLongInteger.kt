@@ -112,7 +112,7 @@ class SysLongInteger private constructor(
 
     /** Adds arg to this integer, with result width is maximum of argument's widths */
     override operator fun plus(arg: SysInteger): SysInteger {
-        if (hasUndefined)
+        if (hasUndefined || arg.hasUndefined)
             return SysInteger.uninitialized(Math.max(width, arg.width))
         if (arg.width > width)
             return arg + this
@@ -128,7 +128,7 @@ class SysLongInteger private constructor(
 
     /** Subtract arg from this integer*/
     override operator fun minus(arg: SysInteger): SysInteger {
-        if (hasUndefined)
+        if (hasUndefined || arg.hasUndefined)
             return SysInteger.uninitialized(Math.max(width, arg.width))
         if (arg.width > width)
             return arg - this
@@ -137,7 +137,7 @@ class SysLongInteger private constructor(
 
     /** Integer division by divisor*/
     override operator fun div(arg: SysInteger): SysInteger {
-        if (hasUndefined)
+        if (hasUndefined || arg.hasUndefined)
             return SysInteger.uninitialized(Math.max(width, arg.width))
         if (arg.width > MAX_WIDTH)
             return this.extend(arg.width) / arg
@@ -151,7 +151,7 @@ class SysLongInteger private constructor(
 
     /** Remainder of integer division*/
     override operator fun mod(arg: SysInteger): SysInteger {
-        if (hasUndefined)
+        if (hasUndefined || arg.hasUndefined)
             return SysInteger.uninitialized(Math.max(width, arg.width))
         if (arg.width > MAX_WIDTH)
             return this.extend(arg.width) % arg
@@ -165,7 +165,7 @@ class SysLongInteger private constructor(
 
     /** Multiplies arg to this integer, with result width is sum of argument's width */
     override operator fun times(arg: SysInteger): SysInteger {
-        if (hasUndefined)
+        if (hasUndefined || arg.hasUndefined)
             return SysInteger.uninitialized(Math.max(width, arg.width))
         if (arg.width > width)
             return arg * this
@@ -284,7 +284,7 @@ class SysLongInteger private constructor(
 
         if (hasUndefined || arg.hasUndefined) {
 
-            val state = (if (hasUndefined) bitsState else Array(width, { i -> get(i) }))
+            val state = (if (hasUndefined || arg.hasUndefined) bitsState else Array(width, { i -> get(i) }))
             val argState = (if (arg.hasUndefined) arg.bitsState else Array(arg.width, { i -> arg[i] }))
             val resultState: Array<SysBit>
             if (state.size > argState.size) {
@@ -314,7 +314,7 @@ class SysLongInteger private constructor(
 
         if (hasUndefined || arg.hasUndefined) {
 
-            val state = (if (hasUndefined) bitsState else Array(width, { i -> get(i) }))
+            val state = (if (hasUndefined || arg.hasUndefined) bitsState else Array(width, { i -> get(i) }))
             val argState = (if (arg.hasUndefined) arg.bitsState else Array(arg.width, { i -> arg[i] }))
             val resultState: Array<SysBit>
             if (state.size > argState.size) {
@@ -346,7 +346,7 @@ class SysLongInteger private constructor(
 
         if (hasUndefined || arg.hasUndefined) {
 
-            val state = (if (hasUndefined) bitsState else Array(width, { i -> get(i) }))
+            val state = (if (hasUndefined || arg.hasUndefined) bitsState else Array(width, { i -> get(i) }))
             val argState = (if (arg.hasUndefined) arg.bitsState else Array(arg.width, { i -> arg[i] }))
             val resultState: Array<SysBit>
             if (state.size > argState.size) {

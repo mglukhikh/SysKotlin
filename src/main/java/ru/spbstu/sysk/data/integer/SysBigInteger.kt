@@ -95,8 +95,8 @@ class SysBigInteger private constructor(
 
     /** Adds arg to this integer, with result width is maximum of argument's widths */
     override operator fun plus(arg: SysInteger): SysBigInteger {
-        if (hasUndefined)
-            throw UnsupportedOperationException("Not implemented yet")
+        if (hasUndefined || arg.hasUndefined)
+            unknown(arg)
         val argv = arg.toSysBigInteger()
         if (argv.width > width)
             return truncate(argv.width, value + argv.value, argv.positiveMask, argv.negativeMask)
@@ -104,6 +104,7 @@ class SysBigInteger private constructor(
         return truncate(width, value + argv.value, positiveMask, negativeMask)
     }
 
+    private fun unknown(arg: SysInteger) = unknown(Math.max(width, arg.width))
     /**Unary minus*/
     override operator fun unaryMinus(): SysBigInteger {
         return SysBigInteger(width, value.negate())
@@ -111,8 +112,8 @@ class SysBigInteger private constructor(
 
     /** Subtract arg from this integer*/
     override operator fun minus(arg: SysInteger): SysBigInteger {
-        if (hasUndefined)
-            throw UnsupportedOperationException("Not implemented yet")
+        if (hasUndefined || arg.hasUndefined)
+            unknown(arg)
         val argv = arg.toSysBigInteger()
         if (argv.width > width)
             return truncate(argv.width, value - argv.value, argv.positiveMask, argv.negativeMask)
@@ -122,8 +123,8 @@ class SysBigInteger private constructor(
 
     /** Integer division by divisor*/
     override operator fun div(arg: SysInteger): SysBigInteger {
-        if (hasUndefined)
-            throw UnsupportedOperationException("Not implemented yet")
+        if (hasUndefined || arg.hasUndefined)
+            unknown(arg)
         val argv = arg.toSysBigInteger()
         if (arg.value == BigInteger.ZERO) throw IllegalArgumentException("Division by zero")
         if (argv.width > width)
@@ -134,8 +135,8 @@ class SysBigInteger private constructor(
 
     /** Remainder of integer division*/
     override operator fun mod(arg: SysInteger): SysBigInteger {
-        if (hasUndefined)
-            throw UnsupportedOperationException("Not implemented yet")
+        if (hasUndefined || arg.hasUndefined)
+            unknown(arg)
         val argv = arg.toSysBigInteger()
         if (arg.value == BigInteger.ZERO) throw IllegalArgumentException("Division by zero")
         if (argv.width > width)
@@ -146,8 +147,8 @@ class SysBigInteger private constructor(
 
     /** Multiplies arg to this integer, with result width is sum of argument's width */
     override operator fun times(arg: SysInteger): SysBigInteger {
-        if (hasUndefined)
-            throw UnsupportedOperationException("Not implemented yet")
+        if (hasUndefined || arg.hasUndefined)
+            unknown(arg)
         val argv = arg.toSysBigInteger()
         if (argv.width > width)
             return truncate(argv.width, value * argv.value, argv.positiveMask, argv.negativeMask)
@@ -338,7 +339,7 @@ class SysBigInteger private constructor(
     override infix fun ushr(shift: Int): SysBigInteger {
         if (shift == 0)
             return this;
-        if (shift > width )
+        if (shift > width)
             throw IllegalArgumentException()
         var realShift = shift
         if (shift < 0)
@@ -385,7 +386,7 @@ class SysBigInteger private constructor(
     override infix fun shl(shift: Int): SysBigInteger {
         if (shift == 0)
             return this;
-        if (shift > width )
+        if (shift > width)
             throw IllegalArgumentException()
         var realShift = shift
         if (shift < 0)
@@ -466,6 +467,8 @@ class SysBigInteger private constructor(
 
         fun valueOf(value: SysInteger) = value.toSysBigInteger()
 
+        fun unknown(width: Int) = SysBigInteger(width.toShort())
+
         //        private fun maskByValue(value: BigInteger, width: Int): Array<Boolean> {
         //
         //                        if (width == 0)
@@ -489,10 +492,10 @@ class SysBigInteger private constructor(
 
             var leftShift = 0;
             var rightShift = 0;
-            while (leftShift < arr.size && arr[leftShift] == SysBit.X )
+            while (leftShift < arr.size && arr[leftShift] == SysBit.X)
                 leftShift++;
 
-            while (arr.size - rightShift > leftShift && arr[arr.size - 1 - rightShift] == SysBit.X )
+            while (arr.size - rightShift > leftShift && arr[arr.size - 1 - rightShift] == SysBit.X)
                 rightShift++;
 
 
@@ -539,7 +542,7 @@ class SysBigInteger private constructor(
 
             var breaker = true;
             var i = 0;
-            while (breaker && i < result.size ) {
+            while (breaker && i < result.size) {
 
                 if (result[i] == SysBit.ZERO) {
                     result[i] = SysBit.ONE
