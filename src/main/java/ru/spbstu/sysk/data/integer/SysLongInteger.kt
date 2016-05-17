@@ -84,16 +84,11 @@ class SysLongInteger private constructor(
     private fun truncate(width: Int, value: Long, positiveMask: Long, negativeMask: Long): SysLongInteger {
         if (width == MAX_WIDTH)
             return SysLongInteger(width, value, positiveMask, negativeMask)
-        if (value >= 0L)
-            if (value > positiveMask)
-                return SysLongInteger(width, value or negativeMask, positiveMask, negativeMask)
-            else
-                return SysLongInteger(width, value, positiveMask, negativeMask)
-        else
-            if (value < negativeMask)
-                return SysLongInteger(width, positiveMask + (value + positiveMask), positiveMask, negativeMask)
-            else
-                return SysLongInteger(width, value, positiveMask, negativeMask)
+        if (value > positiveMask)
+            return SysLongInteger(width, value or negativeMask, positiveMask, negativeMask)
+        if (value < negativeMask)
+            return SysLongInteger(width, positiveMask + (value + positiveMask), positiveMask, negativeMask)
+        return SysLongInteger(width, value, positiveMask, negativeMask)
     }
 
 
@@ -175,14 +170,14 @@ class SysLongInteger private constructor(
     override fun power(exp: Int) = truncate(width, Math.pow(value.toDouble(), exp.toDouble()).toLong()
             , positiveMask, negativeMask)
 
-    override fun abs() = SysLongInteger(width, (if ( value >= 0L) value else -value),
+    override fun abs() = SysLongInteger(width, (if (value >= 0L) value else -value),
             positiveMask = positiveMask, negativeMask = negativeMask)
 
     /** Bitwise logical shift right*/
     override infix fun ushr(shift: Int): SysLongInteger {
         if (shift == 0)
             return this;
-        if (shift > width )
+        if (shift > width)
             throw IllegalArgumentException()
         var realShift = shift
         if (shift < 0)
@@ -232,7 +227,7 @@ class SysLongInteger private constructor(
     override infix fun shl(shift: Int): SysLongInteger {
         if (shift == 0)
             return this;
-        if (shift > width )
+        if (shift > width)
             throw IllegalArgumentException()
         var realShift = shift
         if (shift < 0)
@@ -493,12 +488,12 @@ class SysLongInteger private constructor(
         private fun valueBySWSArray(arr: Array<SysBit>): Long {
             var value: Long = 0L
             var counter: Int = 0;
-            while (counter < arr.size && arr[counter] == SysBit.X )
+            while (counter < arr.size && arr[counter] == SysBit.X)
                 counter++;
             var shift = 0
             while (counter < arr.size && arr[counter] != SysBit.X) {
                 if (arr[counter].one)
-                    value = value  or (1L shl shift );
+                    value = value  or (1L shl shift);
                 shift++;
                 counter++;
             }
@@ -508,7 +503,6 @@ class SysLongInteger private constructor(
                 }
             return value
         }
-
 
 
         //        private fun maskBySWSArray(arr: Array<SysBit>): Array<Boolean> {
