@@ -50,6 +50,14 @@ class CoreTest : SysTopModule() {
                 8L -> SUI_d8()
                 9L -> unsigned(CAPACITY.DATA, 24)
                 10L -> MOV_A_L()
+                11L -> STA_a16()
+                12L -> unsigned(CAPACITY.DATA, 40)
+                13L -> unsigned(CAPACITY.DATA, 40)
+                14L -> MVI_A_d8()
+                15L -> unsigned(CAPACITY.DATA, 123)
+                16L -> LDA_a16()
+                17L -> unsigned(CAPACITY.DATA, 40)
+                18L -> unsigned(CAPACITY.DATA, 40)
                 else -> NOP()
             }
         }
@@ -61,7 +69,7 @@ class CoreTest : SysTopModule() {
         }
 
         stateFunction(clk1) {
-            sleep(50)
+            sleep(100)
             stop(scheduler)
         }
     }

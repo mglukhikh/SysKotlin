@@ -18,6 +18,7 @@ class RegisterFile constructor(
     private var HL = unsigned(capacityData * 2, 0)
     private var PC = unsigned(capacityData * 2, 0)
     private var SP = unsigned(capacityData * 2, 0)
+    private var THL = unsigned(capacityData * 2, 0)
 
     private var current = REGISTER.A
 
@@ -44,11 +45,11 @@ class RegisterFile constructor(
         function(read.posEdgeEvent, false) { pc(read(REGISTER.PC)) }
         function(inp.defaultEvent, false) {
             write(inp(), current)
-            changed(current)
+            println("$current <- ${read(current)}")
         }
         function(flag.defaultEvent, false) {
             write(flag(), REGISTER.Flag)
-            changed(REGISTER.Flag)
+            println("$current <- ${read(current)}")
         }
         stateFunction(clk) {
             infinite.state {
@@ -59,14 +60,23 @@ class RegisterFile constructor(
                 if (en.one) when (command()) {
                     COMMAND.WRITE_DATA -> {
                         write(data(), register())
-                        changed(register())
+                        println("${register()} <- ${read(register())}")
                     }
                     COMMAND.WRITE_ADDRESS -> {
                         write(address(), register())
-                        changed(register())
+                        println("${register()} <- ${read(register())}")
                     }
-                    COMMAND.READ_DATA -> data(read(register()).extend(capacityData) as SysUnsigned)
-                    COMMAND.READ_ADDRESS -> address(read(register()).extend(capacityData * 2) as SysUnsigned)
+                    COMMAND.READ_DATA -> {
+                        val value = read(register()).extend(capacityData) as SysUnsigned
+                        data(value)
+                        println("${register()} -> $value")
+
+                    }
+                    COMMAND.READ_ADDRESS -> {
+                        val value = read(register()).extend(capacityData * 2) as SysUnsigned
+                        address(value)
+                        println("${register()} -> $value")
+                    }
                     COMMAND.SET_A -> out(read(register()))
                     COMMAND.SET_B -> B(read(register()))
                     COMMAND.SET_CURRENT -> current = register()
@@ -83,22 +93,24 @@ class RegisterFile constructor(
     }
 
     private fun shl(register: REGISTER) = when (register) {
-        REGISTER.PSW -> PSW shl 1
-        REGISTER.BC -> BC shl 1
-        REGISTER.DE -> DE shl 1
-        REGISTER.HL -> HL shl 1
-        REGISTER.PC -> PC shl 1
-        REGISTER.SP -> SP shl 1
+        REGISTER.PSW -> PSW = PSW shl 1
+        REGISTER.BC -> BC = BC shl 1
+        REGISTER.DE -> DE = DE shl 1
+        REGISTER.HL -> HL = HL shl 1
+        REGISTER.PC -> PC = PC shl 1
+        REGISTER.SP -> SP = SP shl 1
+        REGISTER.THL -> THL = THL shl 1
         else -> null
     }
 
     private fun shr(register: REGISTER) = when (register) {
-        REGISTER.PSW -> PSW shr 1
-        REGISTER.BC -> BC shr 1
-        REGISTER.DE -> DE shr 1
-        REGISTER.HL -> HL shr 1
-        REGISTER.PC -> PC shr 1
-        REGISTER.SP -> SP shr 1
+        REGISTER.PSW -> PSW = PSW shr 1
+        REGISTER.BC -> BC = BC shr 1
+        REGISTER.DE -> DE = DE shr 1
+        REGISTER.HL -> HL = HL shr 1
+        REGISTER.PC -> PC = PC shr 1
+        REGISTER.SP -> SP = SP shr 1
+        REGISTER.THL -> THL = THL shr 1
         else -> null
     }
 
@@ -109,6 +121,7 @@ class RegisterFile constructor(
         REGISTER.HL -> ++HL
         REGISTER.PC -> ++PC
         REGISTER.SP -> ++SP
+        REGISTER.THL -> ++THL
         else -> null
     }
 
@@ -119,6 +132,7 @@ class RegisterFile constructor(
         REGISTER.HL -> --HL
         REGISTER.PC -> --PC
         REGISTER.SP -> --SP
+        REGISTER.THL -> --THL
         else -> null
     }
 
@@ -129,6 +143,7 @@ class RegisterFile constructor(
         HL = unsigned(capacityData * 2, 0)
         PC = unsigned(capacityData * 2, 0)
         SP = unsigned(capacityData * 2, 0)
+        THL = unsigned(capacityData * 2, 0)
     }
 
     private fun read(register: REGISTER): SysUnsigned = when (register) {
@@ -140,12 +155,15 @@ class RegisterFile constructor(
         REGISTER.E -> DE[capacityData * 2 - 1, capacityData]
         REGISTER.H -> HL[capacityData - 1, 0]
         REGISTER.L -> HL[capacityData * 2 - 1, capacityData]
+        REGISTER.TH -> THL[capacityData - 1, 0]
+        REGISTER.TL -> THL[capacityData * 2 - 1, capacityData]
         REGISTER.BC -> BC
         REGISTER.DE -> DE
         REGISTER.HL -> HL
         REGISTER.PSW -> PSW
         REGISTER.PC -> PC
         REGISTER.SP -> SP
+        REGISTER.THL -> THL
         else -> throw IllegalArgumentException("$register is not found")
     }
 
@@ -161,14 +179,15 @@ class RegisterFile constructor(
         REGISTER.E -> DE = DE.set(capacityData * 2 - 1, capacityData, value.extend(capacityData))
         REGISTER.H -> HL = HL.set(capacityData - 1, 0, value.extend(capacityData))
         REGISTER.L -> HL = HL.set(capacityData * 2 - 1, capacityData, value.extend(capacityData))
+        REGISTER.TH -> THL = THL.set(capacityData - 1, 0, value.extend(capacityData))
+        REGISTER.TL -> THL = THL.set(capacityData * 2 - 1, capacityData, value.extend(capacityData))
         REGISTER.BC -> BC = value.extend(capacityData * 2) as SysUnsigned
         REGISTER.DE -> DE = value.extend(capacityData * 2) as SysUnsigned
         REGISTER.HL -> HL = value.extend(capacityData * 2) as SysUnsigned
         REGISTER.PSW -> PSW = value.extend(capacityData * 2) as SysUnsigned
         REGISTER.PC -> PC = value.extend(capacityData * 2) as SysUnsigned
         REGISTER.SP -> SP = value.extend(capacityData * 2) as SysUnsigned
+        REGISTER.THL -> THL = value.extend(capacityData * 2) as SysUnsigned
         else -> throw IllegalArgumentException("$register is not found")
     }
-
-    private fun changed(register: REGISTER) = println("$register -> ${read(register)}")
 }

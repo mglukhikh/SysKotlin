@@ -17,7 +17,7 @@ class Core(parent: SysModule) : SysModule("i8080", parent) {
     val reset = bitInput("reset")
     val clk1 = bitInput("clk1")
     val clk2 = bitInput("clk2")
-    val wr = bitOutput("dbin")
+    val wr = bitOutput("wr")
     val dbin = bitOutput("dbin")
 
     private val flag = signal("flag", unsigned(CAPACITY.DATA, 0))
@@ -43,6 +43,7 @@ class Core(parent: SysModule) : SysModule("i8080", parent) {
         bitConnector("connector", ZERO, CU.enDG, DG.en)
         bitConnector("connector", ZERO, CU.enAG, AG.en)
         bitConnector("connector", ONE, CU.allowOF, OF.allow)
+        bitConnector("connector", ZERO, OF.sleep, CU.sleepOF)
         bitConnector("connector", ONE, OF.empty, CU.emptyOF)
         bitConnector("connector", ZERO, OF.inc, RF.inc)
         bitConnector("connector", ZERO, OF.read, RF.read)
@@ -69,6 +70,7 @@ class Core(parent: SysModule) : SysModule("i8080", parent) {
         CU.clk1 bind clk1
         CU.clk2 bind clk2
         CU.dbin bind dbin
+        CU.flag bind flag
         CU.wr bind wr
 
         function(data.defaultEvent) { dataSignal(data()) }

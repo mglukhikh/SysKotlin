@@ -19,6 +19,7 @@ class OperationFifo(
     val clk2 = bitInput("clk2")
     val en = bitInput("en")
     val allow = bitInput("allow")
+    val sleep = bitOutput("sleep")
 
     val data = input<SysUnsigned>("data")
     val args = output<SysUnsigned>("args")
@@ -37,17 +38,20 @@ class OperationFifo(
             init {
                 read(ZERO)
                 inc(ZERO)
+                sleep(ZERO)
             }
             infinite.block {
                 case({ allow.one }) {
                     state {
+                        sleep(ZERO)
                         read(ONE)
                         dbin(ONE)
                     }
-                    sleep(1)
                     state {
                         read(ZERO)
                         dbin(ZERO)
+                    }
+                    state {
                         inc(ONE)
                         store.add(data())
                         empty(ZERO)
@@ -56,7 +60,10 @@ class OperationFifo(
                         inc(ZERO)
                     }
                 }
-                otherwise { sleep(1) }
+                otherwise {
+                    state.instance { sleep(ONE) }
+                    sleep(1)
+                }
             }
         }
 

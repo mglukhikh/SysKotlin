@@ -3,6 +3,7 @@ package ru.spbstu.sysk.samples.processors.i8080
 import ru.spbstu.sysk.core.StateContainer
 import ru.spbstu.sysk.core.SysModule
 import ru.spbstu.sysk.data.SysBit.*
+import ru.spbstu.sysk.data.integer.SysUnsigned
 import ru.spbstu.sysk.samples.processors.i8080.OPERATION.*
 import ru.spbstu.sysk.samples.processors.i8080.COMMAND.*
 
@@ -18,7 +19,9 @@ class ControlUnit(parent: SysModule) : SysModule("ControlUnit", parent) {
     val commandRF = output<COMMAND>("commandRF")
     val commandOF = output<COMMAND>("commandOF")
     val allowOF = bitOutput("allowOF")
+    val sleepOF = bitInput("sleepOF")
     val emptyOF = bitInput("emptyOF")
+    val flag = input<SysUnsigned>("flag")
     val operationALU = output<COMMAND>("operationALU")
     val outsideALU = bitOutput("outsideALU")
     val operationOF = input<OPERATION>("operationOF")
@@ -41,11 +44,8 @@ class ControlUnit(parent: SysModule) : SysModule("ControlUnit", parent) {
 
     private fun StateContainer.getOperation() = get(READ)
 
-    private var id = 0L
     private fun StateContainer.getArgs() {
-        loop({ emptyOF.one }) {
-            sleep(1)
-        }
+        loop({ emptyOF.one }) { sleep(1) }
         get(READ_DATA)
     }
 
@@ -82,7 +82,7 @@ class ControlUnit(parent: SysModule) : SysModule("ControlUnit", parent) {
         var operation = OPERATION.UNDEFINED
         state.instance {
             operation = initOperation()
-            println("$command: $operation")
+            println(operation)
         }
         if (outside) getArgs()
         state {
@@ -115,7 +115,7 @@ class ControlUnit(parent: SysModule) : SysModule("ControlUnit", parent) {
         var operation = OPERATION.UNDEFINED
         state.instance {
             operation = initOperation()
-            println("MOV: ${initOperation()}")
+            println(operation)
         }
         state.instance {
             enRF(ONE)
@@ -141,15 +141,136 @@ class ControlUnit(parent: SysModule) : SysModule("ControlUnit", parent) {
         state.instance { enRF(ZERO) }
     }
 
-    private fun StateContainer.mvi(operation: () -> OPERATION, register: () -> REGISTER) {
-        state.instance { println("MVI: ${operation()}") }
+    private fun StateContainer.mvi(register: REGISTER) {
+        state.instance { println("MVI_${register}_d8") }
         getArgs()
         state {
             enRF(ONE)
             commandRF(WRITE_DATA)
-            registerRF(register())
+            registerRF(register)
         }
         state.instance { enRF(ZERO) }
+    }
+
+    private fun StateContainer.wait(number: Int) {
+        loop(1..number) {
+            state { wait = true }
+            loop ({ wait }) { sleep(1) }
+        }
+    }
+
+    private fun StateContainer.sta(data: REGISTER, address: REGISTER? = null) {
+        state.instance { println("STA") }
+        state.instance {
+            enRF(ONE)
+            enDG(ONE)
+            enAG(ONE)
+        }
+        if (address != null) {
+            state {
+                commandRF(READ_ADDRESS)
+                registerRF(address)
+            }
+        } else {
+            state.instance { enRF(ZERO) }
+            mvi(REGISTER.TH)
+            mvi(REGISTER.TL)
+            state {
+                enRF(ONE)
+                commandRF(READ_ADDRESS)
+                registerRF(REGISTER.THL)
+            }
+        }
+        state {
+            commandRF(READ_DATA)
+            registerRF(data)
+        }
+        state {
+            enRF(ZERO)
+            allowOF(ZERO)
+        }
+        loop ({ sleepOF.zero }) { sleep(1) }
+        state {
+            enDG(ONE)
+            enAG(ONE)
+        }
+        state.instance { wr(ONE) }
+        wait(1)
+        state.instance { wr(ZERO) }
+        wait(1)
+        state {
+            enDG(ZERO)
+            enAG(ZERO)
+            wait = true
+            allowOF(ONE)
+        }
+    }
+
+    private fun StateContainer.lda(data: REGISTER, address: REGISTER? = null) {
+        state.instance { println("LDA") }
+        state.instance {
+            enRF(ONE)
+            enDG(ONE)
+            enAG(ONE)
+        }
+        if (address != null) {
+            state {
+                commandRF(READ_ADDRESS)
+                registerRF(address)
+            }
+        } else {
+            state.instance { enRF(ZERO) }
+            mvi(REGISTER.TH)
+            mvi(REGISTER.TL)
+            state {
+                enRF(ONE)
+                commandRF(READ_ADDRESS)
+                registerRF(REGISTER.THL)
+            }
+        }
+        state {
+            enRF(ZERO)
+            allowOF(ZERO)
+        }
+        loop ({ sleepOF.zero }) { sleep(1) }
+        state.instance { dbin(ONE) }
+        wait(1)
+        state.instance { dbin(ZERO) }
+        wait(1)
+        state {
+            enDG(ZERO)
+            enAG(ZERO)
+            enRF(ONE)
+            commandRF(WRITE_DATA)
+            registerRF(data)
+        }
+        state {
+            enRF(ZERO)
+            wait = true
+            allowOF(ONE)
+        }
+    }
+
+    private fun StateContainer.sphl() {
+        state.instance { println("SPHL") }
+        state {
+            enRF(ONE)
+            commandRF(READ_ADDRESS)
+            registerRF(REGISTER.HL)
+        }
+        state {
+            commandRF(WRITE_ADDRESS)
+            registerRF(REGISTER.SP)
+        }
+        state.instance { enRF(ZERO) }
+    }
+
+    private fun StateContainer.jmp(cond: () -> Boolean) {
+
+    }
+
+    private fun StateContainer.rtn(cond: () -> Boolean) {
+
     }
 
     private var wait = false
@@ -173,6 +294,7 @@ class ControlUnit(parent: SysModule) : SysModule("ControlUnit", parent) {
                     state.instance { wait = true }
                     getOperation()
                     state.instance { operation = operationOF() }
+                    case ({ operation == NOP }) { state.println { "NOP" } }
                     case ({ operation.id in ADD_B.id..ADD_A.id }) { add({ operation }, false) }
                     case ({ operation == ADI_d8 }) { add({ ADD_A }, true) }
                     case ({ operation.id in ADC_B.id..ADC_A.id }) { adc({ operation }, false) }
@@ -190,14 +312,45 @@ class ControlUnit(parent: SysModule) : SysModule("ControlUnit", parent) {
                     case ({ operation.id in CMP_B.id..CMP_A.id }) { cmp({ operation }, false) }
                     case ({ operation == CPI_d8 }) { cmp({ CMP_A }, true) }
                     case ({ operation.id in MOV_B_B.id..MOV_A_A.id }) { mov({ operation }) }
-                    case ({ operation == MVI_A_d8 }) { mvi({ operation }, { REGISTER.A }) }
-                    case ({ operation == MVI_B_d8 }) { mvi({ operation }, { REGISTER.B }) }
-                    case ({ operation == MVI_C_d8 }) { mvi({ operation }, { REGISTER.C }) }
-                    case ({ operation == MVI_D_d8 }) { mvi({ operation }, { REGISTER.D }) }
-                    case ({ operation == MVI_E_d8 }) { mvi({ operation }, { REGISTER.E }) }
-                    case ({ operation == MVI_H_d8 }) { mvi({ operation }, { REGISTER.H }) }
-                    case ({ operation == MVI_L_d8 }) { mvi({ operation }, { REGISTER.L }) }
-                    case ({ operation == MVI_M_d8 }) { mvi({ operation }, { REGISTER.HL }) }
+                    case ({ operation == MVI_A_d8 }) { mvi(REGISTER.A) }
+                    case ({ operation == MVI_B_d8 }) { mvi(REGISTER.B) }
+                    case ({ operation == MVI_C_d8 }) { mvi(REGISTER.C) }
+                    case ({ operation == MVI_D_d8 }) { mvi(REGISTER.D) }
+                    case ({ operation == MVI_E_d8 }) { mvi(REGISTER.E) }
+                    case ({ operation == MVI_H_d8 }) { mvi(REGISTER.H) }
+                    case ({ operation == MVI_L_d8 }) { mvi(REGISTER.L) }
+                    case ({ operation == MVI_M_d8 }) { mvi(REGISTER.HL) }
+                    case ({ operation == SPHL }) { sphl() }
+                    case ({ operation == STA_a16 }) { sta(REGISTER.A) }
+                    case ({ operation == STAX_B }) { sta(REGISTER.A, REGISTER.BC) }
+                    case ({ operation == STAX_D }) { sta(REGISTER.A, REGISTER.DE) }
+                    case ({ operation == SHLD_a16 }) { sta(REGISTER.HL) }
+                    case ({ operation == LDA_a16 }) { lda(REGISTER.A) }
+                    case ({ operation == LDAX_B }) { lda(REGISTER.A, REGISTER.BC) }
+                    case ({ operation == LDAX_D }) { lda(REGISTER.A, REGISTER.DE) }
+                    case ({ operation == LHLD_a16 }) { lda(REGISTER.HL) }
+                    case ({ operation == LXI_B_d16 }) {
+                        mvi(REGISTER.B)
+                        mvi(REGISTER.C)
+                    }
+                    case ({ operation == LXI_H_d16 }) {
+                        mvi(REGISTER.H)
+                        mvi(REGISTER.L)
+                    }
+                    case ({ operation == LXI_SP_d16 }) {
+                        mvi(REGISTER.TH)
+                        mvi(REGISTER.TL)
+                        state {
+                            enRF(ONE)
+                            commandRF(READ_ADDRESS)
+                            registerRF(REGISTER.THL)
+                        }
+                        state {
+                            commandRF(WRITE_ADDRESS)
+                            registerRF(REGISTER.SP)
+                        }
+                        state.instance { enRF(ZERO) }
+                    }
                     otherwise { state.println { "Skipped operation $operation" } }
                     sleep(1)
                 }
