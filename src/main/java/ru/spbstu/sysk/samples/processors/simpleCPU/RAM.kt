@@ -5,8 +5,9 @@ import ru.spbstu.sysk.core.SysWait
 import ru.spbstu.sysk.data.SysBit
 import ru.spbstu.sysk.data.integer.SysInteger
 import ru.spbstu.sysk.data.integer.SysLongInteger
-import ru.spbstu.sysk.samples.processors.simpleCPU.MainConstants.CAPACITY
-import ru.spbstu.sysk.samples.processors.simpleCPU.MainConstants.COMMAND
+import ru.spbstu.sysk.samples.processors.simpleCPU.Capacity
+import ru.spbstu.sysk.samples.processors.simpleCPU.Command
+import ru.spbstu.sysk.samples.processors.simpleCPU.Command.*
 
 /** This class not describes the operation of the real RAM. He only needed for the test. */
 internal class RAM constructor(
@@ -14,11 +15,11 @@ internal class RAM constructor(
 )
 : SysModule(name, parent) {
 
-    val dataPort = busPort<SysBit>(CAPACITY.DATA, "data")
-    val addressPort = busPort<SysBit>(CAPACITY.ADDRESS, "address")
-    val commandPort = busPort<SysBit>(CAPACITY.COMMAND, "command")
+    val dataPort = busPort<SysBit>(Capacity.DATA, "data")
+    val addressPort = busPort<SysBit>(Capacity.ADDRESS, "address")
+    val commandPort = busPort<SysBit>(Capacity.COMMAND, "command")
 
-    private val memory = Array(capacity, { SysInteger(CAPACITY.DATA, 0) })
+    private val memory = Array(capacity, { SysInteger(Capacity.DATA, 0) })
 
     companion object Static {
         val waitWrite = SysWait.Time(4)
@@ -36,15 +37,15 @@ internal class RAM constructor(
     private val startUpdate = event("update")
 
     private val disable: (SysWait) -> SysWait = {
-        for (i in 0..(CAPACITY.DATA - 1)) dataPort(SysBit.Z, i)
-        for (i in 0..(CAPACITY.ADDRESS - 1)) addressPort(SysBit.Z, i)
-        for (i in 0..(CAPACITY.COMMAND - 1)) commandPort(SysBit.Z, i)
+        for (i in 0..(Capacity.DATA - 1)) dataPort(SysBit.Z, i)
+        for (i in 0..(Capacity.ADDRESS - 1)) addressPort(SysBit.Z, i)
+        for (i in 0..(Capacity.COMMAND - 1)) commandPort(SysBit.Z, i)
         startDisable
     }
 
     private val write: (SysWait) -> SysWait = {
-        val data = SysInteger(Array(CAPACITY.DATA, { dataPort[it] }))
-        val address = SysLongInteger(Array(CAPACITY.ADDRESS, { addressPort[it] }))
+        val data = SysInteger(Array(Capacity.DATA, { dataPort[it] }))
+        val address = SysLongInteger(Array(Capacity.ADDRESS, { addressPort[it] }))
         if ((address.value > firstAddress) && (address.value < (firstAddress + capacity))) {
             memory[address.value.toInt() - firstAddress] = data
         }
@@ -52,16 +53,16 @@ internal class RAM constructor(
     }
 
     private val read: (SysWait) -> SysWait = {
-        val address = SysLongInteger(Array(CAPACITY.ADDRESS, { addressPort[it] }))
+        val address = SysLongInteger(Array(Capacity.ADDRESS, { addressPort[it] }))
         if ((address.value >= firstAddress) && (address.value < (firstAddress + capacity))) {
-            for (i in 0..(CAPACITY.DATA - 1))
+            for (i in 0..(Capacity.DATA - 1))
                 dataPort(memory[address.value.toInt() - firstAddress][i], i)
         }
         startRead
     }
 
     private val print: (SysWait) -> SysWait = {
-        val address = SysLongInteger(Array(CAPACITY.ADDRESS, { addressPort[it] }))
+        val address = SysLongInteger(Array(Capacity.ADDRESS, { addressPort[it] }))
         if (address.value.toInt() >= firstAddress && address.value.toInt() < firstAddress + capacity) {
             println("$this.value: ${memory[address.value.toInt() - firstAddress]}")
             println("$this.address: $address")
@@ -75,20 +76,20 @@ internal class RAM constructor(
     }
 
     private val update: (SysWait) -> SysWait = {
-        val command = SysInteger(Array(CAPACITY.COMMAND, { commandPort[it] }))
+        val command = SysInteger(Array(Capacity.COMMAND, { commandPort[it] }))
         when (command) {
-            COMMAND.PUSH -> {
+            PUSH.value -> {
                 startWrite.happens(waitWrite)
                 startEmitUpdate.happens(waitEmitUpdate + waitWrite)
                 startUpdate
             }
-            COMMAND.PULL -> {
+            PULL.value -> {
                 startRead.happens(waitRead)
                 startDisable.happens(waitRead + CPU.waitSave + waitDisable)
                 startEmitUpdate.happens(waitRead + CPU.waitSave + waitDisable + waitEmitUpdate)
                 startUpdate
             }
-            COMMAND.RESPONSE -> {
+            RESPONSE.value -> {
                 startPrint.happens(waitPrint)
                 startEmitUpdate.happens(waitEmitUpdate + waitPrint)
                 startUpdate

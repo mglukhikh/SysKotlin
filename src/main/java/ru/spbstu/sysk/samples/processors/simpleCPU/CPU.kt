@@ -4,25 +4,27 @@ import ru.spbstu.sysk.core.SysModule
 import ru.spbstu.sysk.core.SysWait
 import ru.spbstu.sysk.data.SysBit
 import ru.spbstu.sysk.data.integer.SysInteger
+import ru.spbstu.sysk.data.integer.integer
 import java.util.*
-import ru.spbstu.sysk.samples.processors.simpleCPU.MainConstants.CAPACITY
-import ru.spbstu.sysk.samples.processors.simpleCPU.MainConstants.COMMAND
+import ru.spbstu.sysk.samples.processors.simpleCPU.Command.*
 
-/** This class not describes the operation of the real CPU. He only needed for the test. */
-internal class CPU constructor(
-        commands: Queue<Command> = LinkedList<CPU.Command>(),
+/** This class not describes the operation of the real CPU. It is only needed for the test. */
+internal class CPU(
+        commands: Queue<CommandWithArgument> = LinkedList(),
         A: Long, B: Long, name: String, parent: SysModule
 ) : SysModule(name, parent) {
 
-    internal data class Command constructor(val name: SysInteger, val arg: SysInteger? = null)
+    internal data class CommandWithArgument(val cmd: Command, val arg: SysInteger? = null) {
+        constructor(cmd: Command, arg: Int): this(cmd, integer(Capacity.ADDRESS, arg))
+    }
 
-    val dataPort = busPort<SysBit>(CAPACITY.DATA, "data")
-    val addressPort = busPort<SysBit>(CAPACITY.ADDRESS, "address")
-    val commandPort = busPort<SysBit>(CAPACITY.COMMAND, "command")
+    val dataPort = busPort<SysBit>(Capacity.DATA, "data")
+    val addressPort = busPort<SysBit>(Capacity.ADDRESS, "address")
+    val commandPort = busPort<SysBit>(Capacity.COMMAND, "command")
 
-    private var register: Array<SysInteger> = arrayOf(SysInteger(CAPACITY.DATA, A), SysInteger(CAPACITY.DATA, B))
+    private var register = arrayOf(SysInteger(Capacity.DATA, A), SysInteger(Capacity.DATA, B))
     private var currentRegister = 0
-    private var command = Command(COMMAND.NULL)
+    private var command = CommandWithArgument(NULL)
 
     companion object Static {
         val waitStop = SysWait.Time(10)
@@ -57,9 +59,9 @@ internal class CPU constructor(
     private val startStop = event("stop")
 
     private val disable: (SysWait) -> SysWait = {
-        for (i in 0..(CAPACITY.DATA - 1)) dataPort(SysBit.Z, i)
-        for (i in 0..(CAPACITY.ADDRESS - 1)) addressPort(SysBit.Z, i)
-        for (i in 0..(CAPACITY.COMMAND - 1)) commandPort(SysBit.Z, i)
+        for (i in 0..(Capacity.DATA - 1)) dataPort(SysBit.Z, i)
+        for (i in 0..(Capacity.ADDRESS - 1)) addressPort(SysBit.Z, i)
+        for (i in 0..(Capacity.COMMAND - 1)) commandPort(SysBit.Z, i)
         startDisable
     }
 
@@ -74,7 +76,7 @@ internal class CPU constructor(
     }
 
     private val mul: (SysWait) -> SysWait = {
-        register[currentRegister] = (register[0] * register[1]).truncate(CAPACITY.DATA)
+        register[currentRegister] = (register[0] * register[1]).truncate(Capacity.DATA)
         startMul
     }
 
@@ -90,27 +92,27 @@ internal class CPU constructor(
 
     private val push: (SysWait) -> SysWait = {
         val address = command.arg!!
-        for (i in 0..(CAPACITY.DATA - 1)) dataPort(register[currentRegister][i], i)
-        for (i in 0..(CAPACITY.ADDRESS - 1)) addressPort(address[i], i)
-        for (i in 0..(CAPACITY.COMMAND - 1)) commandPort(COMMAND.PUSH[i], i)
+        for (i in 0..(Capacity.DATA - 1)) dataPort(register[currentRegister][i], i)
+        for (i in 0..(Capacity.ADDRESS - 1)) addressPort(address[i], i)
+        for (i in 0..(Capacity.COMMAND - 1)) commandPort(PUSH[i], i)
         startPush
     }
 
     private val pull: (SysWait) -> SysWait = {
         val address = command.arg!!
-        for (i in 0..(CAPACITY.ADDRESS - 1)) addressPort(address[i], i)
-        for (i in 0..(CAPACITY.COMMAND - 1)) commandPort(COMMAND.PULL[i], i)
+        for (i in 0..(Capacity.ADDRESS - 1)) addressPort(address[i], i)
+        for (i in 0..(Capacity.COMMAND - 1)) commandPort(PULL[i], i)
         startPull
     }
 
     private val save: (SysWait) -> SysWait = {
-        register[currentRegister] = SysInteger(Array(CAPACITY.DATA, { dataPort[it] }))
+        register[currentRegister] = SysInteger(Array(Capacity.DATA, { dataPort[it] }))
         startSave
     }
 
     private val next: (SysWait) -> SysWait = {
         ++currentRegister
-        currentRegister %= CAPACITY.REGISTER
+        currentRegister %= Capacity.REGISTER
         startNext
     }
 
@@ -122,8 +124,8 @@ internal class CPU constructor(
 
     private val response: (SysWait) -> SysWait = {
         val address = command.arg!!
-        for (i in 0..(CAPACITY.ADDRESS - 1)) addressPort(address[i], i)
-        for (i in 0..(CAPACITY.COMMAND - 1)) commandPort(COMMAND.RESPONSE[i], i)
+        for (i in 0..(Capacity.ADDRESS - 1)) addressPort(address[i], i)
+        for (i in 0..(Capacity.COMMAND - 1)) commandPort(RESPONSE[i], i)
         startResponse
     }
 
@@ -135,54 +137,56 @@ internal class CPU constructor(
     private val update: (SysWait) -> SysWait = {
         command = commands.element()
         commands.remove()
-        when (command.name) {
-            COMMAND.ADD -> {
+        when (command.cmd) {
+            ADD -> {
                 startAdd.happens(waitAdd)
                 startUpdate.happens(waitAdd + waitUpdate)
             }
-            COMMAND.SUB -> {
+            SUB -> {
                 startSub.happens(waitSub)
                 startUpdate.happens(waitSub + waitUpdate)
             }
-            COMMAND.MUL -> {
+            MUL -> {
                 startMul.happens(waitMul)
                 startUpdate.happens(waitMul + waitUpdate)
             }
-            COMMAND.DIV -> {
+            DIV -> {
                 startDiv.happens(waitDiv)
                 startUpdate.happens(waitDiv + waitUpdate)
             }
-            COMMAND.REM -> {
+            REM -> {
                 startRem.happens(waitRem)
                 startUpdate.happens(waitRem + waitUpdate)
             }
-            COMMAND.PUSH -> {
+            PUSH -> {
                 startPush.happens(waitPush)
                 startDisable.happens(waitPush + RAM.waitWrite + waitDisable)
                 startUpdate.happens(waitPush + RAM.waitWrite + waitDisable + waitUpdate)
             }
-            COMMAND.PULL -> {
+            PULL -> {
                 startPull.happens(waitPull)
                 startDisable.happens(waitPull + RAM.waitRead + waitDisable)
                 startSave.happens(waitPull + RAM.waitRead + waitSave)
-                startUpdate.happens(waitPull + RAM.waitRead + if (waitSave > waitDisable) waitSave else waitDisable + waitUpdate)
+                startUpdate.happens(waitPull + RAM.waitRead +
+                        if (waitSave > waitDisable) waitSave else waitDisable + waitUpdate)
             }
-            COMMAND.NEXT -> {
+            NEXT -> {
                 startNext.happens(waitNext)
                 startUpdate.happens(waitNext + waitUpdate)
             }
-            COMMAND.PRINT -> {
+            PRINT -> {
                 startPrint.happens(waitPrint)
                 startUpdate.happens(waitPrint + waitUpdate)
             }
-            COMMAND.RESPONSE -> {
+            RESPONSE -> {
                 startResponse.happens(waitResponse)
                 startDisable.happens(waitResponse + RAM.waitPrint + waitDisable)
                 startUpdate.happens(waitResponse + RAM.waitPrint + waitDisable + waitUpdate)
             }
-            COMMAND.STOP -> {
+            STOP -> {
                 startStop.happens(waitStop)
             }
+            NULL -> {}
         }
         startUpdate
     }
