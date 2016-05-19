@@ -21,8 +21,10 @@ class Machine(
     private var top = undefined
     private var second = undefined
     private var size = -2
-    private val address: SysUnsigned
+    private val writeAddress: SysUnsigned
         get() = unsigned(addrWidth, if (size >= 0) size else 0)
+    private val readAddress: SysUnsigned
+        get() = unsigned(addrWidth, if (size >= 1) size - 1 else 0)
     private val limit = stack.lastAddress()
 
     val din = input<SysInteger>("din")
@@ -44,26 +46,26 @@ class Machine(
                 dout(top)
                 stackEn = ONE
                 stackWr = ZERO
-                stackAddr = address
+                stackAddr = readAddress
             }
             infinite.block {
                 case { opcode() == NOP }.state {
                     stackWr = ZERO
-                    stackAddr = address
+                    stackAddr = readAddress
                 }
                 case { opcode() == UNDEFINED }.state {
                     stackWr = ZERO
-                    stackAddr = address
+                    stackAddr = readAddress
                     dout(undefined)
                     top = undefined
                     second = undefined
                 }
                 case { opcode() == PUSH }.state {
+                    stackIn = second
                     second = top
                     top = din()
-                    stackIn = second
                     stackWr = if (size >= 0) ONE else ZERO
-                    stackAddr = address
+                    stackAddr = writeAddress
                     dout(din())
                     if (size < limit) size++
                 }
@@ -78,7 +80,7 @@ class Machine(
                     }
                     top = result
                     dout(result)
-                    stackAddr = address
+                    stackAddr = readAddress
                     stackWr = ZERO
                     second = stackOut
                     if (size > -2) size--

@@ -38,6 +38,7 @@ open class SysMemory<T : SysData>(
                             "Inconsistent memory $name data: $din()"
                         }
                         storage[addr().toLong()] = din()
+                        dout(din())
                     }
                     else {
                         dout(storage[addr().toLong()] ?: defaultValue)

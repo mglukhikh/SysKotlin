@@ -11,8 +11,8 @@ import ru.spbstu.sysk.samples.stack.Opcode.*
 class MachineTest {
 
     private abstract class AbstractMachineTester(
-            protected val addrWidth: Int = 8,
-            protected val dataWidth: Int = 8
+            addrWidth: Int = 8,
+            dataWidth: Int = 8
     ) : SysTopModule("tester") {
 
         val m = Machine("machine", addrWidth, dataWidth, this)
@@ -89,5 +89,47 @@ class MachineTest {
     @Test
     fun tester2() {
         MachineTester2().start()
+    }
+
+    private class MachineTester3 : AbstractMachineTester() {
+        init {
+            stateFunction(clk) {
+                init {
+                    resetInput()
+                }
+                state {
+                    mInput = 10
+                    mOpcode = PUSH
+                }
+                state {
+                    mInput = 4
+                }
+                state {
+                    mInput = 3
+                }
+                state {
+                    // Necessary! WHY?
+                    mOpcode = NOP
+                }
+                state {
+                    mOpcode = PLUS
+                }
+                state {
+                    mOpcode = TIMES
+                }
+                state {
+                    mOpcode = POP
+                }
+                state {
+                    assertEquals(70L, mOutput)
+                    scheduler.stop()
+                }
+            }
+        }
+    }
+
+    @Test
+    fun tester3() {
+        MachineTester3().start()
     }
 }
