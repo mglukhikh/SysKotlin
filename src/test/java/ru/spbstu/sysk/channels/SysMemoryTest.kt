@@ -41,12 +41,11 @@ class SysMemoryTest {
                 }
                 val j = iterator(0..255)
                 loop(j) {
-                    state {
+                    state(2) {
                         en = SysBit.ONE
                         wr = SysBit.ZERO
                         addr = SysUnsigned.valueOf(8, j.it)
                     }
-                    state {}
                     state {
                         val expected = SysInteger(8, j.it - 128)
                         assert(q == expected) {

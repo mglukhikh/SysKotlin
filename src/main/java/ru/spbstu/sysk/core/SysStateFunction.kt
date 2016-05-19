@@ -35,12 +35,16 @@ interface StateContainer {
     val state: State.Extends
         get() = State.Extends(this)
 
-    fun state(f: () -> Unit) {
+    fun state(f: () -> Unit) = state(1, f)
+
+    fun state(clocks: Int, f: () -> Unit) {
+        if (clocks < 1) throw IllegalArgumentException("Attempt to stay in state for $clocks clocks")
         val result = State.Single {
             f()
             wait()
         }
         states.add(result)
+        for (i in 2..clocks) states.add(State.Single { wait() })
     }
 
     fun sleep(number: Int) {

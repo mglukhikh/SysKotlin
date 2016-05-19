@@ -107,14 +107,10 @@ class MachineTest {
                 state {
                     mInput = 3
                 }
-                state {
-                    // Necessary! WHY?
-                    mOpcode = NOP
-                }
-                state {
+                state(2) {
                     mOpcode = PLUS
                 }
-                state {
+                state(2) {
                     mOpcode = TIMES
                 }
                 state {
@@ -131,5 +127,61 @@ class MachineTest {
     @Test
     fun tester3() {
         MachineTester3().start()
+    }
+
+    private class MachineTester4 : AbstractMachineTester() {
+        init {
+            stateFunction(clk) {
+                init {
+                    resetInput()
+                }
+                state {
+                    mInput = 12
+                    mOpcode = PUSH
+                }
+                state {
+                    mInput = 34
+                }
+                state {
+                    mInput = 56
+                }
+                state {
+                    mInput = 78
+                }
+                state {
+                    mInput = 110
+                }
+                state {
+                    mInput = 127
+                }
+                state {
+                    mOpcode = POP
+                }
+                state(2) {
+                    assertEquals(127L, mOutput)
+                }
+                state(2) {
+                    assertEquals(110L, mOutput)
+                }
+                state(2) {
+                    assertEquals(78L, mOutput)
+                }
+                state(2) {
+                    assertEquals(56L, mOutput)
+                }
+                state(2) {
+                    assertEquals(34L, mOutput)
+                }
+                state {
+                    assertEquals(12L, mOutput)
+                    scheduler.stop()
+                }
+            }
+        }
+    }
+
+    @Test
+    fun tester4() {
+        MachineTester4().start()
     }
 }

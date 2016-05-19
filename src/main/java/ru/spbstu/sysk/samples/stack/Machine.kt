@@ -69,21 +69,25 @@ class Machine(
                     dout(din())
                     if (size < limit) size++
                 }
-                otherwise.state {
-                    val result = when (opcode()) {
-                        PLUS -> top + second
-                        MINUS -> second - top
-                        TIMES -> top * second
-                        DIV -> second / top
-                        POP -> second
-                        else -> undefined
+                otherwise {
+                    state {
+                        val result = when (opcode()) {
+                            PLUS -> top + second
+                            MINUS -> second - top
+                            TIMES -> top * second
+                            DIV -> second / top
+                            POP -> second
+                            else -> undefined
+                        }
+                        top = result
+                        dout(result)
+                        if (size > -2) size--
+                        stackAddr = readAddress
+                        stackWr = ZERO
                     }
-                    top = result
-                    dout(result)
-                    stackAddr = readAddress
-                    stackWr = ZERO
-                    second = stackOut
-                    if (size > -2) size--
+                    state {
+                        second = stackOut
+                    }
                 }
             }
         }
