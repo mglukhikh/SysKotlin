@@ -17,7 +17,7 @@ open class SysFifo<T : SysData> internal constructor(
 
     var input: T = startValue
         set(value) {
-            field = value;
+            field = value
         }
 
     var output: T = startValue
@@ -98,7 +98,7 @@ open class SysBitFifo internal constructor(
 }
 
 open class SysSynchronousFifo<T : SysData> internal constructor(
-        capacity: Int, name: String, startValue: T, positive: Boolean, private val scheduler: SysScheduler, parent: SysObject? = null
+        capacity: Int, name: String, startValue: T, positive: Boolean, scheduler: SysScheduler, parent: SysObject? = null
 ) : SysFifo<T>(capacity, name, startValue, scheduler, parent) {
 
     val clk = SysBitInput(name, scheduler, this)

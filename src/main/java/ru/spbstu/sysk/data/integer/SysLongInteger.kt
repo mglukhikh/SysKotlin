@@ -176,7 +176,7 @@ class SysLongInteger private constructor(
     /** Bitwise logical shift right*/
     override infix fun ushr(shift: Int): SysLongInteger {
         if (shift == 0)
-            return this;
+            return this
         if (shift > width)
             throw IllegalArgumentException()
         var realShift = shift
@@ -207,7 +207,7 @@ class SysLongInteger private constructor(
     /** Arithmetic shift right*/
     override infix fun shr(shift: Int): SysLongInteger {
         if (shift == 0)
-            return this;
+            return this
         if (shift > width || shift < 0)
             throw IllegalArgumentException()
         if (hasUndefined) {
@@ -226,7 +226,7 @@ class SysLongInteger private constructor(
     /** Arithmetic shift left*/
     override infix fun shl(shift: Int): SysLongInteger {
         if (shift == 0)
-            return this;
+            return this
         if (shift > width)
             throw IllegalArgumentException()
         var realShift = shift
@@ -254,7 +254,7 @@ class SysLongInteger private constructor(
         val realShift = shift % width
 
         if (realShift == 0)
-            return this;
+            return this
 
         return ((this ushr realShift)or(this shl -realShift))
 
@@ -268,7 +268,7 @@ class SysLongInteger private constructor(
         val realShift = shift % width
 
         if (realShift == 0)
-            return this;
+            return this
 
         return ((this shl realShift)or(this ushr -realShift))
     }
@@ -372,7 +372,7 @@ class SysLongInteger private constructor(
             return SysLongInteger(resultState)
         }
         return SysLongInteger(width, value.inv(),
-                positiveMask = positiveMask, negativeMask = negativeMask);
+                positiveMask = positiveMask, negativeMask = negativeMask)
     }
 
     /** Extracts a single bit, accessible as [i] */
@@ -487,15 +487,15 @@ class SysLongInteger private constructor(
 
         private fun valueBySWSArray(arr: Array<SysBit>): Long {
             var value: Long = 0L
-            var counter: Int = 0;
+            var counter: Int = 0
             while (counter < arr.size && arr[counter] == SysBit.X)
-                counter++;
+                counter++
             var shift = 0
             while (counter < arr.size && arr[counter] != SysBit.X) {
                 if (arr[counter].one)
-                    value = value  or (1L shl shift);
-                shift++;
-                counter++;
+                    value = value  or (1L shl shift)
+                shift++
+                counter++
             }
             if (arr[counter - 1].one)
                 for (i in 0..64 - shift) {
@@ -536,7 +536,7 @@ class SysLongInteger private constructor(
 
 
         private fun widthByValue(value: Long): Int {
-            var current = value;
+            var current = value
             if (current == 0L)
                 return 1
             if (current < 0)
@@ -547,7 +547,7 @@ class SysLongInteger private constructor(
 
         private fun minValue(width: Int): Long {
             if (width == 0) return 0
-            if (width == MAX_WIDTH) return Long.MIN_VALUE;
+            if (width == MAX_WIDTH) return Long.MIN_VALUE
             return ((-1L shl (width - 1)))
         }
 

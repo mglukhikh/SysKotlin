@@ -57,13 +57,13 @@ class SysUnsignedTest {
     @Test
     fun testGet() {
 
-        val x = SysUnsigned.valueOf(10, 128);
-        val y = SysUnsigned.valueOf(10, 127);
-        val z = SysUnsigned.valueOf(10, 1);
+        val x = SysUnsigned.valueOf(10, 128)
+        val y = SysUnsigned.valueOf(10, 127)
+        val z = SysUnsigned.valueOf(10, 1)
 
-        val arrx = arrayOf(ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ONE, ZERO, ZERO);
-        val arry = arrayOf(ONE, ONE, ONE, ONE, ONE, ONE, ONE, ZERO, ZERO, ZERO);
-        val arrz = arrayOf(ONE, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO);
+        val arrx = arrayOf(ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ONE, ZERO, ZERO)
+        val arry = arrayOf(ONE, ONE, ONE, ONE, ONE, ONE, ONE, ZERO, ZERO, ZERO)
+        val arrz = arrayOf(ONE, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO)
 
 
         for (i in 0..9) {
@@ -73,9 +73,9 @@ class SysUnsignedTest {
 
         }
 
-        val a = SysUnsigned.valueOf(arrx);
-        val b = SysUnsigned.valueOf(arry);
-        val c = SysUnsigned.valueOf(arrz);
+        val a = SysUnsigned.valueOf(arrx)
+        val b = SysUnsigned.valueOf(arry)
+        val c = SysUnsigned.valueOf(arrz)
 
         for (i in 0..9) {
             assert(arrx[i].equals(a[i])) { "a" + i + " " + a[i] }

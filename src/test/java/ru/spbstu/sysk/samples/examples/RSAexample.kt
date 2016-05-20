@@ -18,11 +18,11 @@ class RSAexample {
     // of nbits + 1. This function is used to generate random messages to
     // process.
     fun randBitStr(str: CharArray, nbits: Int) {
-        assert(nbits >= 4);
+        assert(nbits >= 4)
 
-        str[0] = '0';// Sign for positive numbers.
-        str[1] = '1';
-        str[2] = '0';
+        str[0] = '0'// Sign for positive numbers.
+        str[1] = '1'
+        str[2] = '0'
 
         for (i in  3..str.lastIndex) {
             if (flip(0.5)) {
@@ -37,8 +37,8 @@ class RSAexample {
     // Return a positive remainder.
     fun positiveRemainder(x: SysBigInteger, n: SysBigInteger): SysBigInteger {
         if ( x.value.signum() < 0 )
-            return x + n;
-        return x;
+            return x + n
+        return x
     }
 
 
@@ -81,11 +81,11 @@ class RSAexample {
         val x = SysBigInteger(NBITS, BigInteger.ZERO)
         val y = SysBigInteger(NBITS, BigInteger.ZERO)
         val result = euclid(EuclidData(a, n, d, x, y))
-        assert(result.d.value == BigInteger.ONE) { d };
+        assert(result.d.value == BigInteger.ONE) { d }
         //check this!
-        val temp = result.x % n;
+        val temp = result.x % n
 
-        return positiveRemainder(temp, n);
+        return positiveRemainder(temp, n)
     }
 
     // Find a small odd integer a that is relatively prime to n. I do not
@@ -94,17 +94,17 @@ class RSAexample {
     // prime to n if their only common divisor is 1, i.e., gcd( a, n ) ==
     // 1.
     fun findRelPrime(n: SysBigInteger): SysBigInteger {
-        var a = BigInteger.valueOf(3);
+        var a = BigInteger.valueOf(3)
         val two = BigInteger.valueOf(2)
         while ( true ) {
             if ( a.gcd(n.value) == BigInteger.ONE )
-                break;
+                break
             a += two
         }
         if (a > n.value)
             throw ArithmeticException("n is not prime")
 
-        return SysBigInteger(NBITS, a);
+        return SysBigInteger(NBITS, a)
     }
 
     // Return d = a^b % n, where ^ represents exponentiation.
@@ -112,33 +112,33 @@ class RSAexample {
             SysBigInteger(NBITS, a.value.modPow(b.value, n.value))
 
     fun cipher(msg: SysBigInteger, e: SysBigInteger, n: SysBigInteger) =
-            modularExp(msg, e, n);
+            modularExp(msg, e, n)
 
     // Dencode or decipher the message in msg using the RSA secret key S=( d, n ).
     fun decipher(msg: SysBigInteger, d: SysBigInteger, n: SysBigInteger) =
-            modularExp(msg, d, n);
+            modularExp(msg, d, n)
 
     fun rsa(seed: Long) {
 
         // val r = SysBigInteger(NBITS, BigInteger.probablePrime(HALF_NBITS, Random(seed)))
 
         // Find two large primes p and q.
-        val p = SysBigInteger(NBITS, BigInteger.probablePrime(HALF_NBITS, Random(seed)));
-        val q = SysBigInteger(NBITS, p.value.nextProbablePrime());
+        val p = SysBigInteger(NBITS, BigInteger.probablePrime(HALF_NBITS, Random(seed)))
+        val q = SysBigInteger(NBITS, p.value.nextProbablePrime())
 
         //println("p = $p \nq = $q")
 
         // Compute n and ( p - 1 ) * ( q - 1 ) = m.
-        val n = p * q;
-        val m = (p - 1) * ( q - 1 );
+        val n = p * q
+        val m = (p - 1) * ( q - 1 )
 
         //println("m = $m")
 
         // Find a small odd integer e that is relatively prime to m.
-        val e = findRelPrime(m);
+        val e = findRelPrime(m)
 
         // Find the multiplicative inverse d of e, modulo m.
-        val d = inverse(e, m);
+        val d = inverse(e, m)
 
         // Output public and secret keys.
         println("RSA public key P: P=( e, n )")
@@ -152,21 +152,21 @@ class RSAexample {
 
         // Cipher and decipher a randomly generated message msg.
         val msgStr = CharArray(HALF_STR_SIZE)
-        randBitStr(msgStr, HALF_STR_SIZE);
+        randBitStr(msgStr, HALF_STR_SIZE)
         var msg = SysBigInteger(NBITS, BigInteger(String(msgStr), 2))
 
-        msg %= n; // Make sure msg is smaller than n. If larger, this part
+        msg %= n // Make sure msg is smaller than n. If larger, this part
         // will be a block of the input message.
 
 
         println("Message to be ciphered = ")
         println(msg)
 
-        var msg2 = cipher(msg, e, n);
+        var msg2 = cipher(msg, e, n)
         println("\nCiphered message = ")
         println(msg2)
 
-        msg2 = decipher(msg2, d, n);
+        msg2 = decipher(msg2, d, n)
         println("\nDeciphered message = ")
         println(msg2)
 

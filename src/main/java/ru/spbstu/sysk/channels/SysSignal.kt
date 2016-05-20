@@ -102,7 +102,7 @@ open class SysBitSignal internal constructor(
 class SysClock internal constructor(
         name: String,
         val period: SysWait.Time,
-        private val scheduler: SysScheduler,
+        scheduler: SysScheduler,
         startValue: SysBit = SysBit.ZERO,
         parent: SysObject? = null
 ): SysBitSignal(name, scheduler, startValue, parent) {

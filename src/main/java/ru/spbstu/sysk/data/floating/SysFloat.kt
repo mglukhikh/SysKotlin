@@ -29,7 +29,7 @@ class SysFloat private constructor(
 
             val bits: Int = java.lang.Float.floatToIntBits(arg)
             val signBit = (bits and (1 shl 31)) != 0
-            val exponentBits = bits and 0x7ff00000;
+            val exponentBits = bits and 0x7ff00000
             val mantis = (bits and 0x007fffff)
             val exponent = (exponentBits shr 23)
             val sign: SysBit

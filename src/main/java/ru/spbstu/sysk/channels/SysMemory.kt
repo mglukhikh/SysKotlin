@@ -74,7 +74,7 @@ open class SysMemory<T : SysData>(
 
 class SysIntegerMemory(
         name: String,
-        private val addrWidth: Int,
+        addrWidth: Int,
         private val dataWidth: Int,
         parent: SysModule
 ) : SysMemory<SysInteger>(name, addrWidth, SysInteger.uninitialized(dataWidth), parent, {

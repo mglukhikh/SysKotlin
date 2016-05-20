@@ -165,7 +165,7 @@ private constructor(
     /** Bitwise logical shift right*/
     override infix fun ushr(shift: Int): SysUnsigned {
         if (shift == 0)
-            return this;
+            return this
         if (shift > width)
             throw IllegalArgumentException()
         var realShift = shift
@@ -190,7 +190,7 @@ private constructor(
     /** Arithmetic shift left*/
     override infix fun shl(shift: Int): SysUnsigned {
         if (shift == 0)
-            return this;
+            return this
         if (shift > width)
             throw IllegalArgumentException()
         var realShift = shift
@@ -218,7 +218,7 @@ private constructor(
         val realShift = shift % width
 
         if (realShift == 0)
-            return this;
+            return this
 
         return ((this ushr realShift)or(this shl -realShift))
 
@@ -232,7 +232,7 @@ private constructor(
         val realShift = shift % width
 
         if (realShift == 0)
-            return this;
+            return this
 
         return ((this shl realShift)or(this ushr -realShift))
     }
@@ -342,7 +342,7 @@ private constructor(
             return SysUnsigned(resultState)
         }
         return SysUnsigned(width, value.inv(),
-                positiveMask = positiveMask, negativeMask = negativeMask);
+                positiveMask = positiveMask, negativeMask = negativeMask)
     }
 
     override fun unaryMinus(): SysInteger {
@@ -480,15 +480,15 @@ private constructor(
 
         private fun valueBySWSArray(arr: Array<SysBit>): Long {
             val value = CharArray(64, { i -> '0' })
-            var counter: Int = 0;
+            var counter: Int = 0
             while (counter < arr.size && arr[counter] == SysBit.X)
-                counter++;
+                counter++
             var shift = 0
             while (counter < arr.size && arr[counter] != SysBit.X) {
                 if (arr[counter].one)
                     value[value.lastIndex - shift] = '1'
-                shift++;
-                counter++;
+                shift++
+                counter++
             }
             return java.lang.Long.parseUnsignedLong(String(value), 2)
         }

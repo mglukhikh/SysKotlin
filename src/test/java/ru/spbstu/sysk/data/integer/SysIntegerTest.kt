@@ -25,10 +25,10 @@ class SysIntegerTest {
         val v: @Width(12) SysInteger = y * z
         assert(v.width == 12)
         assert(v.equals(SysInteger(12, 126)), { v })
-        val m = SysLongInteger(0, 0);
+        val m = SysLongInteger(0, 0)
         val n = SysLongInteger(32, 0)
         //assert(n[10] == X);
-        assert((m + n).equals(SysLongInteger(32, 0)));
+        assert((m + n).equals(SysLongInteger(32, 0)))
         //assert((m + n)[10] == X)
         // println(x.toBitString())
     }
@@ -36,13 +36,13 @@ class SysIntegerTest {
     @Test
     fun testGet() {
 
-        val x = SysLongInteger(10, -128);
-        val y = SysLongInteger(10, 127);
-        val z = SysLongInteger(10, -1);
+        val x = SysLongInteger(10, -128)
+        val y = SysLongInteger(10, 127)
+        val z = SysLongInteger(10, -1)
 
-        val arrx = arrayOf(ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ONE, ONE, ONE);
-        val arry = arrayOf(ONE, ONE, ONE, ONE, ONE, ONE, ONE, ZERO, ZERO, ZERO);
-        val arrz = arrayOf(ONE, ONE, ONE, ONE, ONE, ONE, ONE, ONE, ONE, ONE);
+        val arrx = arrayOf(ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ONE, ONE, ONE)
+        val arry = arrayOf(ONE, ONE, ONE, ONE, ONE, ONE, ONE, ZERO, ZERO, ZERO)
+        val arrz = arrayOf(ONE, ONE, ONE, ONE, ONE, ONE, ONE, ONE, ONE, ONE)
 
 
         for (i in 0..9) {
@@ -53,9 +53,9 @@ class SysIntegerTest {
 
         }
 
-        val a = SysLongInteger(arrx);
-        val b = SysLongInteger(arry);
-        val c = SysLongInteger(arrz);
+        val a = SysLongInteger(arrx)
+        val b = SysLongInteger(arry)
+        val c = SysLongInteger(arrz)
 
         for (i in 0..9) {
             assert(arrx[i].equals(a[i])) { "a" + i + " " + a[i] }
@@ -71,19 +71,19 @@ class SysIntegerTest {
 
     @Test
     fun testMath() {
-        val x: SysLongInteger = SysLongInteger(64, 62000L);
-        val y: SysLongInteger = SysLongInteger(32, 128000);
-        assert((x + y).equals(SysLongInteger(64, 190000)), { x + y });
-        assert((x - y).equals(SysLongInteger(64, -66000)));
-        assert((x * y).equals(SysLongInteger(64, 7936000000)));
-        assert((x / y).equals(SysLongInteger(64, 0)));
+        val x: SysLongInteger = SysLongInteger(64, 62000L)
+        val y: SysLongInteger = SysLongInteger(32, 128000)
+        assert((x + y).equals(SysLongInteger(64, 190000)), { x + y })
+        assert((x - y).equals(SysLongInteger(64, -66000)))
+        assert((x * y).equals(SysLongInteger(64, 7936000000)))
+        assert((x / y).equals(SysLongInteger(64, 0)))
         //assert((y / x).equals(SysInteger(64, 2)));
         //assert((x % y).equals(x));
         assert((x - y).equals(x + (-y)))
         assert((x - y).equals((-y) + x))
-        val z = SysLongInteger(32, 62000L);
-        assert((y / z).equals(SysLongInteger(32, 2)));
-        assert((z % y).equals(z));
+        val z = SysLongInteger(32, 62000L)
+        assert((y / z).equals(SysLongInteger(32, 2)))
+        assert((z % y).equals(z))
         assert((-y).equals(SysLongInteger(32, -128000)))
     }
 
@@ -94,32 +94,32 @@ class SysIntegerTest {
         val y: SysLongInteger = SysLongInteger(8, 64)
 
 
-        var arr = arrayOf (ONE, ONE, ONE, ONE, ONE, ONE, ONE, ZERO, ZERO, ZERO);
-        var z = SysLongInteger(arr);
+        var arr = arrayOf (ONE, ONE, ONE, ONE, ONE, ONE, ONE, ZERO, ZERO, ZERO)
+        var z = SysLongInteger(arr)
 
         assertEquals(z, x or y)
 
-        arr = arrayOf(ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ONE, ZERO, ZERO, ZERO);
-        z = SysLongInteger(arr);
+        arr = arrayOf(ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ONE, ZERO, ZERO, ZERO)
+        z = SysLongInteger(arr)
 
         assertEquals(z, x and y)
 
         assertEquals(SysLongInteger(10, -128), x.inv())
 
-        arr = arrayOf(ONE, ONE, ONE, ONE, ONE, ONE, ZERO, ZERO, ZERO, ZERO);
-        z = SysLongInteger(arr);
+        arr = arrayOf(ONE, ONE, ONE, ONE, ONE, ONE, ZERO, ZERO, ZERO, ZERO)
+        z = SysLongInteger(arr)
 
-        assertEquals(z, x xor y);
+        assertEquals(z, x xor y)
     }
 
     @Test
     fun testShifts() {
-        val x = SysLongInteger(arrayOf(X, X, ONE, ONE, ZERO, ZERO, ONE, ZERO, ONE));
-        val cshrTest = SysLongInteger(arrayOf(ZERO, ONE, X, X, ONE, ONE, ZERO, ZERO, ONE));//OK
-        val cshlTest = SysLongInteger(arrayOf(ONE, ONE, ZERO, ZERO, ONE, ZERO, ONE, X, X));//OK
-        val shlTest = SysLongInteger(arrayOf(ONE, ZERO, ZERO, ONE, ZERO, ONE, ZERO, ZERO, ZERO));//OK
-        val shrTest = SysLongInteger(arrayOf(X, X, X, X, ONE, ONE, ZERO, ZERO, ONE));//OK
-        val ushrTest = SysLongInteger(arrayOf(ZERO, ZERO, X, X, ONE, ONE, ZERO, ZERO, ONE)); //OK
+        val x = SysLongInteger(arrayOf(X, X, ONE, ONE, ZERO, ZERO, ONE, ZERO, ONE))
+        val cshrTest = SysLongInteger(arrayOf(ZERO, ONE, X, X, ONE, ONE, ZERO, ZERO, ONE))//OK
+        val cshlTest = SysLongInteger(arrayOf(ONE, ONE, ZERO, ZERO, ONE, ZERO, ONE, X, X))//OK
+        val shlTest = SysLongInteger(arrayOf(ONE, ZERO, ZERO, ONE, ZERO, ONE, ZERO, ZERO, ZERO))//OK
+        val shrTest = SysLongInteger(arrayOf(X, X, X, X, ONE, ONE, ZERO, ZERO, ONE))//OK
+        val ushrTest = SysLongInteger(arrayOf(ZERO, ZERO, X, X, ONE, ONE, ZERO, ZERO, ONE)) //OK
 
         assertEquals(cshrTest, (x cshr 2))
         assertEquals(cshlTest, (x cshl 2))

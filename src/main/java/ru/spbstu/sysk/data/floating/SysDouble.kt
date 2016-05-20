@@ -27,10 +27,10 @@ class SysDouble private constructor(
 
         fun valueOf(arg: Double): SysDouble {
 
-            val bits: Long = java.lang.Double.doubleToLongBits(arg);
+            val bits: Long = java.lang.Double.doubleToLongBits(arg)
 
             val signBit = (bits and (1L shl 63)) != 0L
-            val exponentBits = bits and 0x7ff0000000000000L;
+            val exponentBits = bits and 0x7ff0000000000000L
             val mantis = (bits and 0x000fffffffffffffL)//or 0x0010000000000000L
             val exponent = (exponentBits shr 52).toInt()
             val sign: SysBit

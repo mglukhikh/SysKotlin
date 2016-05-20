@@ -1,4 +1,4 @@
-package ru.spbstu.sysk.samples.processors.simpleCPU;
+package ru.spbstu.sysk.samples.processors.simpleCPU
 
 import org.junit.Test
 import ru.spbstu.sysk.channels.bind

@@ -251,7 +251,7 @@ class SysBigInteger private constructor(
         if (hasUndefined) {
             return SysBigInteger(Array(bitsState.size, { i -> bitsState[i].not() }))
         }
-        return SysBigInteger(width, value.not(), positiveMask, negativeMask);
+        return SysBigInteger(width, value.not(), positiveMask, negativeMask)
     }
 
     /** Extracts a single bit, accessible as [i] */
@@ -338,7 +338,7 @@ class SysBigInteger private constructor(
     /** Bitwise logical shift right*/
     override infix fun ushr(shift: Int): SysBigInteger {
         if (shift == 0)
-            return this;
+            return this
         if (shift > width)
             throw IllegalArgumentException()
         var realShift = shift
@@ -366,7 +366,7 @@ class SysBigInteger private constructor(
     /** Arithmetic shift right*/
     override infix fun shr(shift: Int): SysBigInteger {
         if (shift == 0)
-            return this;
+            return this
         if (shift > width || shift < 0)
             throw IllegalArgumentException()
         if (hasUndefined) {
@@ -385,7 +385,7 @@ class SysBigInteger private constructor(
     /** Arithmetic shift left*/
     override infix fun shl(shift: Int): SysBigInteger {
         if (shift == 0)
-            return this;
+            return this
         if (shift > width)
             throw IllegalArgumentException()
         var realShift = shift
@@ -414,7 +414,7 @@ class SysBigInteger private constructor(
         val realShift = shift % width
 
         if (realShift == 0)
-            return this;
+            return this
 
         return ((this ushr realShift)or(this shl -realShift))
     }
@@ -427,7 +427,7 @@ class SysBigInteger private constructor(
         val realShift = shift % width
 
         if (realShift == 0)
-            return this;
+            return this
 
         return ((this shl realShift)or(this ushr -realShift))
     }
@@ -490,13 +490,13 @@ class SysBigInteger private constructor(
 
         private fun valueBySWSArray(arr: Array<SysBit>): BigInteger {
 
-            var leftShift = 0;
-            var rightShift = 0;
+            var leftShift = 0
+            var rightShift = 0
             while (leftShift < arr.size && arr[leftShift] == SysBit.X)
-                leftShift++;
+                leftShift++
 
             while (arr.size - rightShift > leftShift && arr[arr.size - 1 - rightShift] == SysBit.X)
-                rightShift++;
+                rightShift++
 
 
             if (leftShift + rightShift == arr.size)
@@ -531,7 +531,7 @@ class SysBigInteger private constructor(
 
         private fun inverseSWSArray(arr: Array<SysBit>): Array<SysBit> {
 
-            val result = arr;
+            val result = arr
             for (i in result.indices) {
                 if (result[i] == SysBit.ZERO) {
                     result[i] = SysBit.ONE
@@ -540,8 +540,8 @@ class SysBigInteger private constructor(
                 }
             }
 
-            var breaker = true;
-            var i = 0;
+            var breaker = true
+            var i = 0
             while (breaker && i < result.size) {
 
                 if (result[i] == SysBit.ZERO) {

@@ -66,7 +66,7 @@ open class SysBitBus internal constructor(
     private fun update(index: Int) {
         var value: SysBit = SysBit.Z
         ports.forEach { value = value.wiredAnd(it.value[index]) }
-        signals[index].value = value;
+        signals[index].value = value
         if (signals[index].changed) changed = true
     }
 
@@ -121,7 +121,7 @@ open class SysFifoBus<T : SysData> internal constructor(
     private val fifo: MutableList<Queue<T>> = ArrayList()
 
     override fun set(value: T, index: Int, port: SysPort<*>) {
-        fifo[index].add(value);
+        fifo[index].add(value)
     }
 
     override fun update() {
