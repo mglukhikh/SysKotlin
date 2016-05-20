@@ -92,15 +92,12 @@ class RegisterFileTest : SysTopModule() {
 
     @Test
     fun set() {
-        println("SysUnsigned")
-        println(java.lang.Long.toBinaryString(unsigned(5, 21).toLong()))
-        println(java.lang.Long.toBinaryString(unsigned(9, 268).toLong()))
-        println(java.lang.Long.toBinaryString(unsigned(9, 268).set(5, 1, unsigned(5, 21).bits()).toLong()))
+        val first = unsigned(5, 21)
+        val second = unsigned(9, 268)
+        assert(second.set(5, 1, first) == unsigned(9, 298))
 
-        println("SysLongInteger")
-        println(java.lang.Long.toBinaryString(integer(6, 21).toLong()))
-        println(java.lang.Long.toBinaryString(integer(10, 268).toLong()))
-        println(java.lang.Long.toBinaryString(integer (10, 268).set(5, 1, unsigned(5, 21).bits()).toLong()))
+        val secondInt = integer(10, 268)
+        assert(secondInt.set(5, 1, first) == integer(10, 298))
     }
 
     @Test
