@@ -47,17 +47,29 @@ interface StateContainer {
         for (i in 2..clocks) states.add(State.Single { wait() })
     }
 
-    fun sleep(number: Int) {
+    fun sleep(clock: Int) {
+        if (clock == 0) nopInternal("sleep")
+        else sleepInternal(clock)
+    }
+
+    private fun sleepInternal(number: Int) {
         if (number < 0) throw IllegalArgumentException("Impossible to sleep $number cycles.")
         var memory = number
         val result = State.Function("sleep", { true }) {
-            if (number == 0) {
-                if (++currentState < states.size) this.run(wait())
-                --currentState
-            }
             --memory
-            if (memory > 0) currentState--
+            if (memory > 0) --currentState
             else memory = number
+            wait()
+        }
+        states.add(result)
+    }
+
+    fun nop() = nopInternal("nop")
+
+    fun nopInternal(name: String) {
+        val result = State.Function(name, { true }) {
+            if (++currentState < states.size) this.run(wait())
+            --currentState
             wait()
         }
         states.add(result)
