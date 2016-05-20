@@ -5,8 +5,6 @@ import ru.spbstu.sysk.core.SysWait
 import ru.spbstu.sysk.data.SysBit
 import ru.spbstu.sysk.data.integer.SysInteger
 import ru.spbstu.sysk.data.integer.SysLongInteger
-import ru.spbstu.sysk.samples.processors.simpleCPU.Capacity
-import ru.spbstu.sysk.samples.processors.simpleCPU.Command
 import ru.spbstu.sysk.samples.processors.simpleCPU.Command.*
 
 /** This class not describes the operation of the real RAM. He only needed for the test. */

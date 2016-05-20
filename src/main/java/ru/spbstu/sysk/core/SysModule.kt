@@ -75,7 +75,7 @@ open class SysModule internal constructor(
             SysOutput(name, scheduler, this, signalWrite)
 
     protected fun bitOutput(name: String, signalWrite: SysSignalWrite<SysBit>? = null) =
-            output<SysBit>(name, signalWrite)
+            output(name, signalWrite)
 
     protected fun <T : SysData> portWriter(output: SysOutput<T>) = PortWriter(output)
 
