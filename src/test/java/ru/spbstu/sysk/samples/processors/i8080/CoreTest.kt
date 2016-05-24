@@ -11,7 +11,7 @@ import ru.spbstu.sysk.samples.processors.i8080.OPERATION.*
 class CoreTest : SysTopModule() {
 
     private val core = Core(this)
-    private val ram = memory("memory", CAPACITY.ADDRESS, unsigned(CAPACITY.DATA, 0))
+    private val ram = unsignedMemory("memory", CAPACITY.ADDRESS, CAPACITY.DATA)
 
     private val data = signal("data", unsigned(CAPACITY.DATA, 0))
     private val address = signal("address", unsigned(CAPACITY.ADDRESS, 0))
@@ -38,26 +38,63 @@ class CoreTest : SysTopModule() {
         ram.wr bind wr
 
         ram.load {
+            var i = -1L
             when (it) {
-                0L -> MVI_D_d8()
-                1L -> unsigned(CAPACITY.DATA, 12)
-                2L -> MVI_E_d8()
-                3L -> unsigned(CAPACITY.DATA, 25)
-                4L -> MOV_E_A()
-                5L -> ADD_D()
-                6L -> MOV_A_E()
-                7L -> MOV_E_H()
-                8L -> SUI_d8()
-                9L -> unsigned(CAPACITY.DATA, 24)
-                10L -> MOV_A_L()
-                11L -> STA_a16()
-                12L -> unsigned(CAPACITY.DATA, 40)
-                13L -> unsigned(CAPACITY.DATA, 40)
-                14L -> MVI_A_d8()
-                15L -> unsigned(CAPACITY.DATA, 123)
-                16L -> LDA_a16()
-                17L -> unsigned(CAPACITY.DATA, 40)
-                18L -> unsigned(CAPACITY.DATA, 40)
+                ++i -> MVI_D_d8()
+                ++i -> unsigned(CAPACITY.DATA, 12)
+                ++i -> MVI_E_d8()
+                ++i -> unsigned(CAPACITY.DATA, 25)
+                ++i -> MOV_E_A()
+                ++i -> ADD_D()
+                ++i -> MOV_A_E()
+                ++i -> MOV_E_H()
+                ++i -> SUI_d8()
+                ++i -> unsigned(CAPACITY.DATA, 24)
+
+                ++i -> STA_a16()
+                ++i -> unsigned(CAPACITY.DATA, 0)
+                ++i -> unsigned(CAPACITY.DATA, 255)
+
+                ++i -> STA_a16()
+                ++i -> unsigned(CAPACITY.DATA, 40)
+                ++i -> unsigned(CAPACITY.DATA, 40)
+                ++i -> MVI_A_d8()
+                ++i -> unsigned(CAPACITY.DATA, 123)
+                ++i -> LDA_a16()
+                ++i -> unsigned(CAPACITY.DATA, 40)
+                ++i -> unsigned(CAPACITY.DATA, 40)
+                ++i -> MVI_H_d8()
+                ++i -> unsigned(CAPACITY.DATA, 1)
+                ++i -> MVI_L_d8()
+                ++i -> unsigned(CAPACITY.DATA, 211)
+                ++i -> SPHL()
+                ++i -> MVI_H_d8()
+                ++i -> unsigned(CAPACITY.DATA, 8)
+                ++i -> MVI_L_d8()
+                ++i -> unsigned(CAPACITY.DATA, 138)
+                ++i -> DAD_SP()
+
+                ++i -> MOV_H_A()
+                ++i -> STA_a16()
+                ++i -> unsigned(CAPACITY.DATA, 1)
+                ++i -> unsigned(CAPACITY.DATA, 255)
+                ++i -> MOV_L_A()
+                ++i -> STA_a16()
+                ++i -> unsigned(CAPACITY.DATA, 2)
+                ++i -> unsigned(CAPACITY.DATA, 255)
+
+                ++i -> INX_H()
+                ++i -> INX_H()
+                ++i -> INX_H()
+                ++i -> DCR_H()
+                ++i -> MOV_H_A()
+                ++i -> STA_a16()
+                ++i -> unsigned(CAPACITY.DATA, 3)
+                ++i -> unsigned(CAPACITY.DATA, 255)
+                ++i -> MOV_L_A()
+                ++i -> STA_a16()
+                ++i -> unsigned(CAPACITY.DATA, 4)
+                ++i -> unsigned(CAPACITY.DATA, 255)
                 else -> NOP()
             }
         }
@@ -69,8 +106,14 @@ class CoreTest : SysTopModule() {
         }
 
         stateFunction(clk1) {
-            sleep(100)
-            stop(scheduler)
+            sleep(200)
+            state {
+                val mask = unsigned(CAPACITY.ADDRESS, 255) shl 8
+                assert(ram[mask + 0].toInt() == 13)
+                assert(ram[mask + 2].toInt() + (ram[mask + 1].toInt() shl 8) == 2653)
+                assert(ram[mask + 4].toInt() + (ram[mask + 3].toInt() shl 8) == 2400)
+                scheduler.stop()
+            }
         }
     }
 

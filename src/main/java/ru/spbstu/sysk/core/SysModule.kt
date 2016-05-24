@@ -162,6 +162,9 @@ open class SysModule internal constructor(
     protected fun integerMemory(name: String, addrWidth: Int, dataWidth: Int) =
             SysIntegerMemory(name, addrWidth, dataWidth, this)
 
+    protected fun unsignedMemory(name: String, addrWidth: Int, dataWidth: Int) =
+            SysUnsignedMemory(name, addrWidth, dataWidth, this)
+
     protected fun <T : SysData> fifoOutput(name: String, fifo: SysFifo<T>? = null) =
             SysFifoOutput(name, scheduler, this, fifo)
 

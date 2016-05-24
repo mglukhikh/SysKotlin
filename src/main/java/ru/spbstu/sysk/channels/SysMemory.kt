@@ -1,6 +1,7 @@
 package ru.spbstu.sysk.channels
 
 import ru.spbstu.sysk.core.SysModule
+import ru.spbstu.sysk.data.SysBit
 import ru.spbstu.sysk.data.SysData
 import ru.spbstu.sysk.data.integer.SysInteger
 import ru.spbstu.sysk.data.integer.SysUnsigned
@@ -8,7 +9,7 @@ import ru.spbstu.sysk.data.integer.SysUnsigned
 open class SysMemory<T : SysData>(
         name: String,
         private val addrWidth: Int,
-        defaultValue: T,
+        private val defaultValue: T,
         parent: SysModule,
         correct: (T) -> Boolean = { true }
 ) : SysModule(name, parent) {
@@ -70,6 +71,8 @@ open class SysMemory<T : SysData>(
         }
         return true
     }
+
+    operator fun get(index: SysUnsigned) = storage[index.toLong()] ?: defaultValue
 }
 
 class SysIntegerMemory(
@@ -78,5 +81,14 @@ class SysIntegerMemory(
         private val dataWidth: Int,
         parent: SysModule
 ) : SysMemory<SysInteger>(name, addrWidth, SysInteger.uninitialized(dataWidth), parent, {
+    din -> din.width == dataWidth
+})
+
+class SysUnsignedMemory(
+        name: String,
+        private val addrWidth: Int,
+        private val dataWidth: Int,
+        parent: SysModule
+) : SysMemory<SysUnsigned>(name, addrWidth, SysUnsigned.valueOf(Array(dataWidth, { SysBit.X })), parent, {
     din -> din.width == dataWidth
 })

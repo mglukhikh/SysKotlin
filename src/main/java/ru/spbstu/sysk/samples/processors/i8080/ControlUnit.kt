@@ -90,6 +90,10 @@ class ControlUnit(parent: SysModule) : SysModule("ControlUnit", parent) {
             commandRF(SET_A)
             registerRF(REGISTER.A)
         }
+        state {
+            commandRF(SET_CURRENT)
+            registerRF(REGISTER.A)
+        }
         state.instance { commandRF(SET_B) }
         case { operation == A }.state { registerRF(REGISTER.A) }
         case { operation == B }.state { registerRF(REGISTER.B) }
@@ -99,15 +103,65 @@ class ControlUnit(parent: SysModule) : SysModule("ControlUnit", parent) {
         case { operation == H }.state { registerRF(REGISTER.H) }
         case { operation == L }.state { registerRF(REGISTER.L) }
         case { operation == M }.state { registerRF(REGISTER.HL) }
-        if (outside) state.instance { outsideALU(ONE) }
         state {
+            if (outside) outsideALU(ONE)
             enALU(ONE)
             enRF(ZERO)
             operationALU(command)
         }
-        if (outside) state.instance { outsideALU(ZERO) }
+        state.instance {
+            if (outside) outsideALU(ZERO)
+            enALU(ZERO)
+        }
+    }
+
+    private fun StateContainer.dad(register: REGISTER) {
+        state.instance { println("DAD_$register") }
+        state {
+            enRF(ONE)
+            commandRF(READ_ADDRESS)
+            registerRF(register)
+        }
+        state {
+            commandRF(WRITE_ADDRESS)
+            registerRF(REGISTER.THL)
+        }
+        state {
+            commandRF(SET_A)
+            registerRF(REGISTER.L)
+        }
+        state {
+            commandRF(SET_CURRENT)
+            registerRF(REGISTER.L)
+        }
+        state {
+            commandRF(SET_B)
+            registerRF(REGISTER.TL)
+        }
+        state {
+            enALU(ONE)
+            operationALU(ADD)
+        }
         state {
             enALU(ZERO)
+            commandRF(SET_A)
+            registerRF(REGISTER.H)
+        }
+        state {
+            commandRF(SET_CURRENT)
+            registerRF(REGISTER.H)
+        }
+        state {
+            commandRF(SET_B)
+            registerRF(REGISTER.TH)
+        }
+        state {
+            enALU(ONE)
+            operationALU(ADC)
+        }
+        state.instance {
+            enALU(ZERO)
+            enRF(ZERO)
         }
     }
 
@@ -161,25 +215,16 @@ class ControlUnit(parent: SysModule) : SysModule("ControlUnit", parent) {
 
     private fun StateContainer.sta(data: REGISTER, address: REGISTER? = null) {
         state.instance { println("STA") }
-        state.instance {
+        if (address == null) {
+            mvi(REGISTER.TL)
+            mvi(REGISTER.TH)
+        }
+        state {
             enRF(ONE)
             enDG(ONE)
             enAG(ONE)
-        }
-        if (address != null) {
-            state {
-                commandRF(READ_ADDRESS)
-                registerRF(address)
-            }
-        } else {
-            state.instance { enRF(ZERO) }
-            mvi(REGISTER.TH)
-            mvi(REGISTER.TL)
-            state {
-                enRF(ONE)
-                commandRF(READ_ADDRESS)
-                registerRF(REGISTER.THL)
-            }
+            commandRF(READ_ADDRESS)
+            registerRF(address ?: REGISTER.THL)
         }
         state {
             commandRF(READ_DATA)
@@ -220,8 +265,8 @@ class ControlUnit(parent: SysModule) : SysModule("ControlUnit", parent) {
             }
         } else {
             state.instance { enRF(ZERO) }
-            mvi(REGISTER.TH)
             mvi(REGISTER.TL)
+            mvi(REGISTER.TH)
             state {
                 enRF(ONE)
                 commandRF(READ_ADDRESS)
@@ -265,12 +310,24 @@ class ControlUnit(parent: SysModule) : SysModule("ControlUnit", parent) {
         state.instance { enRF(ZERO) }
     }
 
-    private fun StateContainer.jmp(cond: () -> Boolean) {
-
+    private fun StateContainer.inc(register: REGISTER) {
+        state.instance { println("INC_$register") }
+        state {
+            enRF(ONE)
+            commandRF(INC)
+            registerRF(register)
+        }
+        state.instance { enRF(ZERO) }
     }
 
-    private fun StateContainer.rtn(cond: () -> Boolean) {
-
+    private fun StateContainer.dcr(register: REGISTER) {
+        state.instance { println("DCR_$register") }
+        state {
+            enRF(ONE)
+            commandRF(DEC)
+            registerRF(register)
+        }
+        state.instance { enRF(ZERO) }
     }
 
     private var wait = false
@@ -311,6 +368,10 @@ class ControlUnit(parent: SysModule) : SysModule("ControlUnit", parent) {
                     case ({ operation == ANI_d8 }) { ana({ ANA_A }, true) }
                     case ({ operation.id in CMP_B.id..CMP_A.id }) { cmp({ operation }, false) }
                     case ({ operation == CPI_d8 }) { cmp({ CMP_A }, true) }
+                    case ({ operation == DAD_B }) { dad(REGISTER.BC) }
+                    case ({ operation == DAD_D }) { dad(REGISTER.DE) }
+                    case ({ operation == DAD_H }) { dad(REGISTER.HL) }
+                    case ({ operation == DAD_SP }) { dad(REGISTER.SP) }
                     case ({ operation.id in MOV_B_B.id..MOV_A_A.id }) { mov({ operation }) }
                     case ({ operation == MVI_A_d8 }) { mvi(REGISTER.A) }
                     case ({ operation == MVI_B_d8 }) { mvi(REGISTER.B) }
@@ -330,16 +391,16 @@ class ControlUnit(parent: SysModule) : SysModule("ControlUnit", parent) {
                     case ({ operation == LDAX_D }) { lda(REGISTER.A, REGISTER.DE) }
                     case ({ operation == LHLD_a16 }) { lda(REGISTER.HL) }
                     case ({ operation == LXI_B_d16 }) {
-                        mvi(REGISTER.B)
                         mvi(REGISTER.C)
+                        mvi(REGISTER.B)
                     }
                     case ({ operation == LXI_H_d16 }) {
-                        mvi(REGISTER.H)
                         mvi(REGISTER.L)
+                        mvi(REGISTER.H)
                     }
                     case ({ operation == LXI_SP_d16 }) {
-                        mvi(REGISTER.TH)
                         mvi(REGISTER.TL)
+                        mvi(REGISTER.TH)
                         state {
                             enRF(ONE)
                             commandRF(READ_ADDRESS)
@@ -351,6 +412,28 @@ class ControlUnit(parent: SysModule) : SysModule("ControlUnit", parent) {
                         }
                         state.instance { enRF(ZERO) }
                     }
+                    case ({operation == INR_A}) { inc(REGISTER.A) }
+                    case ({operation == INR_B}) { inc(REGISTER.B) }
+                    case ({operation == INR_C}) { inc(REGISTER.C) }
+                    case ({operation == INR_D}) { inc(REGISTER.D) }
+                    case ({operation == INR_E}) { inc(REGISTER.E) }
+                    case ({operation == INR_H}) { inc(REGISTER.H) }
+                    case ({operation == INR_L}) { inc(REGISTER.L) }
+                    case ({operation == INX_B}) { inc(REGISTER.BC) }
+                    case ({operation == INX_D}) { inc(REGISTER.DE) }
+                    case ({operation == INX_H}) { inc(REGISTER.HL) }
+                    case ({operation == INX_SP}) { inc(REGISTER.SP) }
+                    case ({operation == DCR_A}) { dcr(REGISTER.A) }
+                    case ({operation == DCR_B}) { dcr(REGISTER.B) }
+                    case ({operation == DCR_C}) { dcr(REGISTER.C) }
+                    case ({operation == DCR_D}) { dcr(REGISTER.D) }
+                    case ({operation == DCR_E}) { dcr(REGISTER.E) }
+                    case ({operation == DCR_H}) { dcr(REGISTER.H) }
+                    case ({operation == DCR_L}) { dcr(REGISTER.L) }
+                    case ({operation == DCX_B}) { dcr(REGISTER.BC) }
+                    case ({operation == DCX_D}) { dcr(REGISTER.DE) }
+                    case ({operation == DCX_H}) { dcr(REGISTER.HL) }
+                    case ({operation == DCX_SP}) { dcr(REGISTER.SP) }
                     otherwise { state.println { "Skipped operation $operation" } }
                     sleep(1)
                 }
