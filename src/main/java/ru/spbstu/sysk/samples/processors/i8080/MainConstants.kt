@@ -125,10 +125,10 @@ enum class OPERATION private constructor(val id: Int) : SysData {
     CMP_M(0xBE), //--
     CPI_d8(0xFE), //--
     DAA(0x27),
-    DAD_B(0x09),
-    DAD_D(0x19),
-    DAD_H(0x29),
-    DAD_SP(0x39),
+    DAD_B(0x09), //--
+    DAD_D(0x19), //--
+    DAD_H(0x29), //--
+    DAD_SP(0x39), //--
     DCR_A(0x3D),
     DCR_B(0x05),
     DCR_C(0x0D),

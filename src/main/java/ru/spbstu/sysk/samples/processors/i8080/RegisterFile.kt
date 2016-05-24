@@ -43,14 +43,8 @@ class RegisterFile constructor(
         if (capacityAddress != capacityData * 2) throw IllegalArgumentException()
         function(inc.posEdgeEvent, false) { inc(REGISTER.PC) }
         function(read.posEdgeEvent, false) { pc(read(REGISTER.PC)) }
-        function(inp.defaultEvent, false) {
-            write(inp(), current)
-            println("$current <- ${read(current)}")
-        }
-        function(flag.defaultEvent, false) {
-            write(flag(), REGISTER.Flag)
-            println("$current <- ${read(current)}")
-        }
+        function(inp.defaultEvent, false) { write(inp(), current) }
+        function(flag.defaultEvent, false) { write(flag(), REGISTER.Flag) }
         stateFunction(clk) {
             infinite.state {
                 Assert.assertEquals(capacityCommand, command().width)
@@ -60,24 +54,23 @@ class RegisterFile constructor(
                 if (en.one) when (command()) {
                     COMMAND.WRITE_DATA -> {
                         write(data(), register())
-                        println("${register()} <- ${read(register())}")
                     }
                     COMMAND.WRITE_ADDRESS -> {
                         write(address(), register())
-                        println("${register()} <- ${read(register())}")
                     }
                     COMMAND.READ_DATA -> {
                         val value = read(register()).extend(capacityData) as SysUnsigned
                         data(value)
                         println("${register()} -> $value")
-
                     }
                     COMMAND.READ_ADDRESS -> {
                         val value = read(register()).extend(capacityData * 2) as SysUnsigned
                         address(value)
                         println("${register()} -> $value")
                     }
-                    COMMAND.SET_A -> out(read(register()))
+                    COMMAND.SET_A -> {
+                        out(read(register()))
+                    }
                     COMMAND.SET_B -> B(read(register()))
                     COMMAND.SET_CURRENT -> current = register()
                     COMMAND.INC -> inc(register())
@@ -114,26 +107,55 @@ class RegisterFile constructor(
         else -> null
     }
 
-    private fun inc(register: REGISTER) = when (register) {
-        REGISTER.PSW -> ++PSW
-        REGISTER.BC -> ++BC
-        REGISTER.DE -> ++DE
-        REGISTER.HL -> ++HL
-        REGISTER.PC -> ++PC
-        REGISTER.SP -> ++SP
-        REGISTER.THL -> ++THL
-        else -> null
+    private fun inc(register: REGISTER) {
+        val inc: (REGISTER) -> Unit = { write(read(it) + 1, it)}
+        when (register) {
+            REGISTER.A -> inc(register)
+            REGISTER.Flag -> inc(register)
+            REGISTER.B -> inc(register)
+            REGISTER.C -> inc(register)
+            REGISTER.D -> inc(register)
+            REGISTER.E -> inc(register)
+            REGISTER.H -> inc(register)
+            REGISTER.L -> inc(register)
+            REGISTER.TH -> inc(register)
+            REGISTER.TL -> inc(register)
+            REGISTER.PSW -> ++PSW
+            REGISTER.BC -> ++BC
+            REGISTER.DE -> ++DE
+            REGISTER.HL -> ++HL
+            REGISTER.PC -> ++PC
+            REGISTER.SP -> ++SP
+            REGISTER.THL -> ++THL
+            else -> {
+            }
+        }
     }
 
-    private fun dec(register: REGISTER) = when (register) {
-        REGISTER.PSW -> --PSW
-        REGISTER.BC -> --BC
-        REGISTER.DE -> --DE
-        REGISTER.HL -> --HL
-        REGISTER.PC -> --PC
-        REGISTER.SP -> --SP
-        REGISTER.THL -> --THL
-        else -> null
+    private fun dec(register: REGISTER) {
+        val dec: (REGISTER) -> Unit = { write(read(it) - 1, it) }
+        when (register) {
+            REGISTER.A -> dec(register)
+            REGISTER.Flag -> dec(register)
+            REGISTER.B -> dec(register)
+            REGISTER.C -> dec(register)
+            REGISTER.D -> dec(register)
+            REGISTER.E -> dec(register)
+            REGISTER.H -> dec(register)
+            REGISTER.L -> dec(register)
+            REGISTER.TH -> dec(register)
+            REGISTER.TL -> dec(register)
+            REGISTER.PSW -> --PSW
+            REGISTER.BC -> --BC
+            REGISTER.DE -> --DE
+            REGISTER.HL -> --HL
+            REGISTER.PC -> --PC
+            REGISTER.SP -> --SP
+            REGISTER.THL -> --THL
+            else -> {
+
+            }
+        }
     }
 
     private fun reset() {
@@ -147,16 +169,16 @@ class RegisterFile constructor(
     }
 
     private fun read(register: REGISTER): SysUnsigned = when (register) {
-        REGISTER.A -> PSW[capacityData - 1, 0]
-        REGISTER.Flag -> PSW[capacityData * 2 - 1, capacityData]
-        REGISTER.B -> BC[capacityData - 1, 0]
-        REGISTER.C -> BC[capacityData * 2 - 1, capacityData]
-        REGISTER.D -> DE[capacityData - 1, 0]
-        REGISTER.E -> DE[capacityData * 2 - 1, capacityData]
-        REGISTER.H -> HL[capacityData - 1, 0]
-        REGISTER.L -> HL[capacityData * 2 - 1, capacityData]
-        REGISTER.TH -> THL[capacityData - 1, 0]
-        REGISTER.TL -> THL[capacityData * 2 - 1, capacityData]
+        REGISTER.A -> PSW[capacityData * 2 - 1, capacityData]
+        REGISTER.Flag -> PSW[capacityData - 1, 0]
+        REGISTER.B -> BC[capacityData * 2 - 1, capacityData]
+        REGISTER.C -> BC[capacityData - 1, 0]
+        REGISTER.D -> DE[capacityData * 2 - 1, capacityData]
+        REGISTER.E -> DE[capacityData - 1, 0]
+        REGISTER.H -> HL[capacityData * 2 - 1, capacityData]
+        REGISTER.L -> HL[capacityData - 1, 0]
+        REGISTER.TH -> THL[capacityData * 2 - 1, capacityData]
+        REGISTER.TL -> THL[capacityData - 1, 0]
         REGISTER.BC -> BC
         REGISTER.DE -> DE
         REGISTER.HL -> HL
@@ -167,27 +189,30 @@ class RegisterFile constructor(
         else -> throw IllegalArgumentException("$register is not found")
     }
 
-    private fun write(value: SysUnsigned, register: REGISTER) = when (register) {
-        REGISTER.A -> PSW = PSW.set(capacityData - 1, 0, value.extend(capacityData))
-        REGISTER.Flag -> {
-            PSW = PSW.set(capacityData * 2 - 1, capacityData, value.extend(capacityData))
-            flag(read(REGISTER.Flag))
+    private fun write(value: SysUnsigned, register: REGISTER) {
+        when (register) {
+            REGISTER.A -> PSW = PSW.set(capacityData * 2 - 1, capacityData, value.extend(capacityData))
+            REGISTER.Flag -> {
+                PSW = PSW.set(capacityData - 1, 0, value.extend(capacityData))
+                flag(read(REGISTER.Flag))
+            }
+            REGISTER.B -> BC = BC.set(capacityData * 2 - 1, capacityData, value.extend(capacityData))
+            REGISTER.C -> BC = BC.set(capacityData - 1, 0, value.extend(capacityData))
+            REGISTER.D -> DE = DE.set(capacityData * 2 - 1, capacityData, value.extend(capacityData))
+            REGISTER.E -> DE = DE.set(capacityData - 1, 0, value.extend(capacityData))
+            REGISTER.H -> HL = HL.set(capacityData * 2 - 1, capacityData, value.extend(capacityData))
+            REGISTER.L -> HL = HL.set(capacityData - 1, 0, value.extend(capacityData))
+            REGISTER.TH -> THL = THL.set(capacityData * 2 - 1, capacityData, value.extend(capacityData))
+            REGISTER.TL -> THL = THL.set(capacityData - 1, 0, value.extend(capacityData))
+            REGISTER.BC -> BC = value.extend(capacityData * 2) as SysUnsigned
+            REGISTER.DE -> DE = value.extend(capacityData * 2) as SysUnsigned
+            REGISTER.HL -> HL = value.extend(capacityData * 2) as SysUnsigned
+            REGISTER.PSW -> PSW = value.extend(capacityData * 2) as SysUnsigned
+            REGISTER.PC -> PC = value.extend(capacityData * 2) as SysUnsigned
+            REGISTER.SP -> SP = value.extend(capacityData * 2) as SysUnsigned
+            REGISTER.THL -> THL = value.extend(capacityData * 2) as SysUnsigned
+            else -> throw IllegalArgumentException("$register is not found")
         }
-        REGISTER.B -> BC = BC.set(capacityData - 1, 0, value.extend(capacityData))
-        REGISTER.C -> BC = BC.set(capacityData * 2 - 1, capacityData, value.extend(capacityData))
-        REGISTER.D -> DE = DE.set(capacityData - 1, 0, value.extend(capacityData))
-        REGISTER.E -> DE = DE.set(capacityData * 2 - 1, capacityData, value.extend(capacityData))
-        REGISTER.H -> HL = HL.set(capacityData - 1, 0, value.extend(capacityData))
-        REGISTER.L -> HL = HL.set(capacityData * 2 - 1, capacityData, value.extend(capacityData))
-        REGISTER.TH -> THL = THL.set(capacityData - 1, 0, value.extend(capacityData))
-        REGISTER.TL -> THL = THL.set(capacityData * 2 - 1, capacityData, value.extend(capacityData))
-        REGISTER.BC -> BC = value.extend(capacityData * 2) as SysUnsigned
-        REGISTER.DE -> DE = value.extend(capacityData * 2) as SysUnsigned
-        REGISTER.HL -> HL = value.extend(capacityData * 2) as SysUnsigned
-        REGISTER.PSW -> PSW = value.extend(capacityData * 2) as SysUnsigned
-        REGISTER.PC -> PC = value.extend(capacityData * 2) as SysUnsigned
-        REGISTER.SP -> SP = value.extend(capacityData * 2) as SysUnsigned
-        REGISTER.THL -> THL = value.extend(capacityData * 2) as SysUnsigned
-        else -> throw IllegalArgumentException("$register is not found")
+        println("$register <- ${read(register)}")
     }
 }
