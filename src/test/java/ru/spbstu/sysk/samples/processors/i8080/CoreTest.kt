@@ -95,6 +95,16 @@ class CoreTest : SysTopModule() {
                 ++i -> STA_a16()
                 ++i -> unsigned(CAPACITY.DATA, 4)
                 ++i -> unsigned(CAPACITY.DATA, 255)
+
+                ++i -> MVI_A_d8()
+                ++i -> unsigned(CAPACITY.DATA, 147)
+                ++i -> MVI_B_d8()
+                ++i -> unsigned(CAPACITY.DATA, 121)
+                ++i -> ADD_B()
+                ++i -> RAL()
+                ++i -> STA_a16()
+                ++i -> unsigned(CAPACITY.DATA, 5)
+                ++i -> unsigned(CAPACITY.DATA, 255)
                 else -> NOP()
             }
         }
@@ -106,12 +116,13 @@ class CoreTest : SysTopModule() {
         }
 
         stateFunction(clk1) {
-            sleep(200)
+            sleep(250)
             state {
                 val mask = unsigned(CAPACITY.ADDRESS, 255) shl 8
                 assert(ram[mask + 0].toInt() == 13)
                 assert(ram[mask + 2].toInt() + (ram[mask + 1].toInt() shl 8) == 2653)
                 assert(ram[mask + 4].toInt() + (ram[mask + 3].toInt() shl 8) == 2400)
+                assert(ram[mask + 5].toInt() == 25)
                 scheduler.stop()
             }
         }
