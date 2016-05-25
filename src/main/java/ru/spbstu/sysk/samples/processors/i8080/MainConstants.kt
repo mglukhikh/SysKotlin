@@ -32,8 +32,8 @@ enum class COMMAND : SysData {
     DIV,
     INC,
     DEC,
-    SHL,
-    SHR,
+    SHL, USL_A, SHL_A,
+    SHR, USR_A, SHR_A,
     REM,
     XRA,
     ORA,
@@ -129,34 +129,34 @@ enum class OPERATION private constructor(val id: Int) : SysData {
     DAD_D(0x19), //--
     DAD_H(0x29), //--
     DAD_SP(0x39), //--
-    DCR_A(0x3D),
-    DCR_B(0x05),
-    DCR_C(0x0D),
-    DCR_D(0x15),
-    DCR_E(0x1D),
-    DCR_H(0x25),
-    DCR_L(0x2D),
-    DCR_M(0x35),
-    DCX_B(0x0B),
-    DCX_D(0x1B),
-    DCX_H(0x2B),
-    DCX_SP(0x3B),
+    DCR_A(0x3D), //--
+    DCR_B(0x05), //--
+    DCR_C(0x0D), //--
+    DCR_D(0x15), //--
+    DCR_E(0x1D), //--
+    DCR_H(0x25), //--
+    DCR_L(0x2D), //--
+    DCR_M(0x35), //--
+    DCX_B(0x0B), //--
+    DCX_D(0x1B), //--
+    DCX_H(0x2B), //--
+    DCX_SP(0x3B), //--
     DI(0xF3),
     EI(0xFB),
     HLT(0x76),
     IN_pp(0xDB),
-    INR_A(0x3C),
-    INR_B(0x04),
-    INR_C(0x0C),
-    INR_D(0x14),
-    INR_E(0x1C),
-    INR_H(0x24),
-    INR_L(0x2C),
-    INR_M(0x34),
-    INX_B(0x03),
-    INX_D(0x13),
-    INX_H(0x23),
-    INX_SP(0x33),
+    INR_A(0x3C), //--
+    INR_B(0x04), //--
+    INR_C(0x0C), //--
+    INR_D(0x14), //--
+    INR_E(0x1C), //--
+    INR_H(0x24), //--
+    INR_L(0x2C), //--
+    INR_M(0x34), //--
+    INX_B(0x03), //--
+    INX_D(0x13), //--
+    INX_H(0x23), //--
+    INX_SP(0x33), //--
     JMP_a16(0xC3),
     JZ_a16(0xCA),
     JNZ_a16(0xC2),
@@ -264,10 +264,10 @@ enum class OPERATION private constructor(val id: Int) : SysData {
     PUSH_D(0xD5),
     PUSH_H(0xE5),
     PUSH_PSW(0xF5),
-    RAL(0x17),
-    RAR(0x1F),
-    RLC(0x07),
-    RRC(0x0F),
+    RAL(0x17), //--
+    RAR(0x1F), //--
+    RLC(0x07), //--
+    RRC(0x0F), //--
     RIM(0x20),
     RET(0xC9),
     RZ(0xC8),
@@ -311,7 +311,7 @@ enum class OPERATION private constructor(val id: Int) : SysData {
     SBB_L(0x9D), //--
     SBB_M(0x9E), //--
     SBI_d8(0xDE), //--
-    XCHG(0xEB),
+    XCHG(0xEB), //--
     XTHL(0xE3),
     XRA_A(0xAF), //--
     XRA_B(0xA8), //--

@@ -80,10 +80,7 @@ class ControlUnit(parent: SysModule) : SysModule("ControlUnit", parent) {
                                                    H: OPERATION, L: OPERATION,
                                                    M: OPERATION) {
         var operation = OPERATION.UNDEFINED
-        state.instance {
-            operation = initOperation()
-            println(operation)
-        }
+        state.instance { operation = initOperation() }
         if (outside) getArgs()
         state {
             enRF(ONE)
@@ -116,17 +113,9 @@ class ControlUnit(parent: SysModule) : SysModule("ControlUnit", parent) {
     }
 
     private fun StateContainer.dad(register: REGISTER) {
-        state.instance { println("DAD_$register") }
+        mov(register, REGISTER.THL)
         state {
             enRF(ONE)
-            commandRF(READ_ADDRESS)
-            registerRF(register)
-        }
-        state {
-            commandRF(WRITE_ADDRESS)
-            registerRF(REGISTER.THL)
-        }
-        state {
             commandRF(SET_A)
             registerRF(REGISTER.L)
         }
@@ -169,9 +158,6 @@ class ControlUnit(parent: SysModule) : SysModule("ControlUnit", parent) {
         var operation = OPERATION.UNDEFINED
         state.instance {
             operation = initOperation()
-            println(operation)
-        }
-        state.instance {
             enRF(ONE)
             commandRF(READ_ADDRESS)
         }
@@ -196,7 +182,6 @@ class ControlUnit(parent: SysModule) : SysModule("ControlUnit", parent) {
     }
 
     private fun StateContainer.mvi(register: REGISTER) {
-        state.instance { println("MVI_${register}_d8") }
         getArgs()
         state {
             enRF(ONE)
@@ -214,7 +199,6 @@ class ControlUnit(parent: SysModule) : SysModule("ControlUnit", parent) {
     }
 
     private fun StateContainer.sta(data: REGISTER, address: REGISTER? = null) {
-        state.instance { println("STA") }
         if (address == null) {
             mvi(REGISTER.TL)
             mvi(REGISTER.TH)
@@ -252,7 +236,6 @@ class ControlUnit(parent: SysModule) : SysModule("ControlUnit", parent) {
     }
 
     private fun StateContainer.lda(data: REGISTER, address: REGISTER? = null) {
-        state.instance { println("LDA") }
         state.instance {
             enRF(ONE)
             enDG(ONE)
@@ -296,22 +279,7 @@ class ControlUnit(parent: SysModule) : SysModule("ControlUnit", parent) {
         }
     }
 
-    private fun StateContainer.sphl() {
-        state.instance { println("SPHL") }
-        state {
-            enRF(ONE)
-            commandRF(READ_ADDRESS)
-            registerRF(REGISTER.HL)
-        }
-        state {
-            commandRF(WRITE_ADDRESS)
-            registerRF(REGISTER.SP)
-        }
-        state.instance { enRF(ZERO) }
-    }
-
     private fun StateContainer.inc(register: REGISTER) {
-        state.instance { println("INC_$register") }
         state {
             enRF(ONE)
             commandRF(INC)
@@ -321,13 +289,44 @@ class ControlUnit(parent: SysModule) : SysModule("ControlUnit", parent) {
     }
 
     private fun StateContainer.dcr(register: REGISTER) {
-        state.instance { println("DCR_$register") }
         state {
             enRF(ONE)
             commandRF(DEC)
             registerRF(register)
         }
         state.instance { enRF(ZERO) }
+    }
+
+    private fun StateContainer.shift(right: Boolean, cycle: Boolean) {
+        state {
+            enRF(ONE)
+            when {
+                right && cycle -> commandRF(USR_A)
+                right && !cycle -> commandRF(SHR_A)
+                !right && cycle -> commandRF(USL_A)
+                !right && !cycle -> commandRF(SHL_A)
+            }
+        }
+        state.instance { enRF(ZERO) }
+    }
+
+    private fun StateContainer.mov(inp: REGISTER, out: REGISTER) {
+        state {
+            enRF(ONE)
+            commandRF(READ_ADDRESS)
+            registerRF(inp)
+        }
+        state {
+            commandRF(WRITE_ADDRESS)
+            registerRF(out)
+        }
+        state.instance { enRF(ZERO) }
+    }
+
+    private fun StateContainer.swap(a: REGISTER, b: REGISTER) {
+        mov(a, REGISTER.THL)
+        mov(b, a)
+        mov(REGISTER.THL, b)
     }
 
     private var wait = false
@@ -381,7 +380,7 @@ class ControlUnit(parent: SysModule) : SysModule("ControlUnit", parent) {
                     case ({ operation == MVI_H_d8 }) { mvi(REGISTER.H) }
                     case ({ operation == MVI_L_d8 }) { mvi(REGISTER.L) }
                     case ({ operation == MVI_M_d8 }) { mvi(REGISTER.HL) }
-                    case ({ operation == SPHL }) { sphl() }
+                    case ({ operation == SPHL }) { mov(REGISTER.HL, REGISTER.SP) }
                     case ({ operation == STA_a16 }) { sta(REGISTER.A) }
                     case ({ operation == STAX_B }) { sta(REGISTER.A, REGISTER.BC) }
                     case ({ operation == STAX_D }) { sta(REGISTER.A, REGISTER.DE) }
@@ -401,39 +400,35 @@ class ControlUnit(parent: SysModule) : SysModule("ControlUnit", parent) {
                     case ({ operation == LXI_SP_d16 }) {
                         mvi(REGISTER.TL)
                         mvi(REGISTER.TH)
-                        state {
-                            enRF(ONE)
-                            commandRF(READ_ADDRESS)
-                            registerRF(REGISTER.THL)
-                        }
-                        state {
-                            commandRF(WRITE_ADDRESS)
-                            registerRF(REGISTER.SP)
-                        }
-                        state.instance { enRF(ZERO) }
+                        mov(REGISTER.THL, REGISTER.SP)
                     }
-                    case ({operation == INR_A}) { inc(REGISTER.A) }
-                    case ({operation == INR_B}) { inc(REGISTER.B) }
-                    case ({operation == INR_C}) { inc(REGISTER.C) }
-                    case ({operation == INR_D}) { inc(REGISTER.D) }
-                    case ({operation == INR_E}) { inc(REGISTER.E) }
-                    case ({operation == INR_H}) { inc(REGISTER.H) }
-                    case ({operation == INR_L}) { inc(REGISTER.L) }
-                    case ({operation == INX_B}) { inc(REGISTER.BC) }
-                    case ({operation == INX_D}) { inc(REGISTER.DE) }
-                    case ({operation == INX_H}) { inc(REGISTER.HL) }
-                    case ({operation == INX_SP}) { inc(REGISTER.SP) }
-                    case ({operation == DCR_A}) { dcr(REGISTER.A) }
-                    case ({operation == DCR_B}) { dcr(REGISTER.B) }
-                    case ({operation == DCR_C}) { dcr(REGISTER.C) }
-                    case ({operation == DCR_D}) { dcr(REGISTER.D) }
-                    case ({operation == DCR_E}) { dcr(REGISTER.E) }
-                    case ({operation == DCR_H}) { dcr(REGISTER.H) }
-                    case ({operation == DCR_L}) { dcr(REGISTER.L) }
-                    case ({operation == DCX_B}) { dcr(REGISTER.BC) }
-                    case ({operation == DCX_D}) { dcr(REGISTER.DE) }
-                    case ({operation == DCX_H}) { dcr(REGISTER.HL) }
-                    case ({operation == DCX_SP}) { dcr(REGISTER.SP) }
+                    case ({ operation == INR_A }) { inc(REGISTER.A) }
+                    case ({ operation == INR_B }) { inc(REGISTER.B) }
+                    case ({ operation == INR_C }) { inc(REGISTER.C) }
+                    case ({ operation == INR_D }) { inc(REGISTER.D) }
+                    case ({ operation == INR_E }) { inc(REGISTER.E) }
+                    case ({ operation == INR_H }) { inc(REGISTER.H) }
+                    case ({ operation == INR_L }) { inc(REGISTER.L) }
+                    case ({ operation == INX_B }) { inc(REGISTER.BC) }
+                    case ({ operation == INX_D }) { inc(REGISTER.DE) }
+                    case ({ operation == INX_H }) { inc(REGISTER.HL) }
+                    case ({ operation == INX_SP }) { inc(REGISTER.SP) }
+                    case ({ operation == DCR_A }) { dcr(REGISTER.A) }
+                    case ({ operation == DCR_B }) { dcr(REGISTER.B) }
+                    case ({ operation == DCR_C }) { dcr(REGISTER.C) }
+                    case ({ operation == DCR_D }) { dcr(REGISTER.D) }
+                    case ({ operation == DCR_E }) { dcr(REGISTER.E) }
+                    case ({ operation == DCR_H }) { dcr(REGISTER.H) }
+                    case ({ operation == DCR_L }) { dcr(REGISTER.L) }
+                    case ({ operation == DCX_B }) { dcr(REGISTER.BC) }
+                    case ({ operation == DCX_D }) { dcr(REGISTER.DE) }
+                    case ({ operation == DCX_H }) { dcr(REGISTER.HL) }
+                    case ({ operation == DCX_SP }) { dcr(REGISTER.SP) }
+                    case ({ operation == RAL }) { shift(false, true) }
+                    case ({ operation == RAR }) { shift(true, false) }
+                    case ({ operation == RLC }) { shift(false, false) }
+                    case ({ operation == RRC }) { shift(true, false) }
+                    case ({ operation == XCHG }) { swap(REGISTER.DE, REGISTER.HL) }
                     otherwise { state.println { "Skipped operation $operation" } }
                     sleep(1)
                 }
