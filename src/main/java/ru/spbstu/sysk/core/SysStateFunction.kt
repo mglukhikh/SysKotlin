@@ -247,7 +247,7 @@ sealed class State {
             container.states.add(result)
         }
 
-        fun instance(f: () -> Unit) {
+        fun instant(f: () -> Unit) {
             val result = State.Single {
                 f()
                 if (++container.currentState < container.states.size) container.run(container.wait())

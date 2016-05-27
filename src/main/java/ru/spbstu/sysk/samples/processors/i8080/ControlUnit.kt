@@ -80,7 +80,7 @@ class ControlUnit(parent: SysModule) : SysModule("ControlUnit", parent) {
                                                    H: OPERATION, L: OPERATION,
                                                    M: OPERATION) {
         var operation = OPERATION.UNDEFINED
-        state.instance { operation = initOperation() }
+        state.instant { operation = initOperation() }
         if (outside) getArgs()
         state {
             enRF(ONE)
@@ -91,7 +91,7 @@ class ControlUnit(parent: SysModule) : SysModule("ControlUnit", parent) {
             commandRF(SET_CURRENT)
             registerRF(REGISTER.A)
         }
-        state.instance { commandRF(SET_B) }
+        state.instant { commandRF(SET_B) }
         case { operation == A }.state { registerRF(REGISTER.A) }
         case { operation == B }.state { registerRF(REGISTER.B) }
         case { operation == C }.state { registerRF(REGISTER.C) }
@@ -106,7 +106,7 @@ class ControlUnit(parent: SysModule) : SysModule("ControlUnit", parent) {
             enRF(ZERO)
             operationALU(command)
         }
-        state.instance {
+        state.instant {
             if (outside) outsideALU(ZERO)
             enALU(ZERO)
         }
@@ -148,7 +148,7 @@ class ControlUnit(parent: SysModule) : SysModule("ControlUnit", parent) {
             enALU(ONE)
             operationALU(ADC)
         }
-        state.instance {
+        state.instant {
             enALU(ZERO)
             enRF(ZERO)
         }
@@ -156,7 +156,7 @@ class ControlUnit(parent: SysModule) : SysModule("ControlUnit", parent) {
 
     private fun StateContainer.mov(initOperation: () -> OPERATION) {
         var operation = OPERATION.UNDEFINED
-        state.instance {
+        state.instant {
             operation = initOperation()
             enRF(ONE)
             commandRF(READ_ADDRESS)
@@ -169,7 +169,7 @@ class ControlUnit(parent: SysModule) : SysModule("ControlUnit", parent) {
         case { operation.id in MOV_H_B.id..MOV_H_A.id }.state { registerRF(REGISTER.H) }
         case { operation.id in MOV_L_B.id..MOV_L_A.id }.state { registerRF(REGISTER.L) }
         case { operation.id in MOV_M_B.id..MOV_M_A.id }.state { registerRF(REGISTER.HL) }
-        state.instance { commandRF(WRITE_ADDRESS) }
+        state.instant { commandRF(WRITE_ADDRESS) }
         case { operation()[2, 0] == MOV_A_A()[2, 0] }.state { registerRF(REGISTER.A) }
         case { operation()[2, 0] == MOV_A_B()[2, 0] }.state { registerRF(REGISTER.B) }
         case { operation()[2, 0] == MOV_A_C()[2, 0] }.state { registerRF(REGISTER.C) }
@@ -178,7 +178,7 @@ class ControlUnit(parent: SysModule) : SysModule("ControlUnit", parent) {
         case { operation()[2, 0] == MOV_A_H()[2, 0] }.state { registerRF(REGISTER.H) }
         case { operation()[2, 0] == MOV_A_L()[2, 0] }.state { registerRF(REGISTER.L) }
         case { operation()[2, 0] == MOV_A_M()[2, 0] }.state { registerRF(REGISTER.HL) }
-        state.instance { enRF(ZERO) }
+        state.instant { enRF(ZERO) }
     }
 
     private fun StateContainer.mvi(register: REGISTER) {
@@ -188,7 +188,7 @@ class ControlUnit(parent: SysModule) : SysModule("ControlUnit", parent) {
             commandRF(WRITE_DATA)
             registerRF(register)
         }
-        state.instance { enRF(ZERO) }
+        state.instant { enRF(ZERO) }
     }
 
     private fun StateContainer.wait(number: Int) {
@@ -199,14 +199,16 @@ class ControlUnit(parent: SysModule) : SysModule("ControlUnit", parent) {
     }
 
     private fun StateContainer.sta(data: REGISTER, address: REGISTER? = null) {
+        state.instant {
+            enDG(ONE)
+            enAG(ONE)
+        }
         if (address == null) {
             mvi(REGISTER.TL)
             mvi(REGISTER.TH)
         }
         state {
             enRF(ONE)
-            enDG(ONE)
-            enAG(ONE)
             commandRF(READ_ADDRESS)
             registerRF(address ?: REGISTER.THL)
         }
@@ -219,13 +221,9 @@ class ControlUnit(parent: SysModule) : SysModule("ControlUnit", parent) {
             allowOF(ZERO)
         }
         loop ({ sleepOF.zero }) { sleep(1) }
-        state {
-            enDG(ONE)
-            enAG(ONE)
-        }
-        state.instance { wr(ONE) }
+        state.instant { wr(ONE) }
         wait(1)
-        state.instance { wr(ZERO) }
+        state.instant { wr(ZERO) }
         wait(1)
         state {
             enDG(ZERO)
@@ -236,34 +234,27 @@ class ControlUnit(parent: SysModule) : SysModule("ControlUnit", parent) {
     }
 
     private fun StateContainer.lda(data: REGISTER, address: REGISTER? = null) {
-        state.instance {
-            enRF(ONE)
+        state.instant {
             enDG(ONE)
             enAG(ONE)
         }
-        if (address != null) {
-            state {
-                commandRF(READ_ADDRESS)
-                registerRF(address)
-            }
-        } else {
-            state.instance { enRF(ZERO) }
+        if (address == null) {
             mvi(REGISTER.TL)
             mvi(REGISTER.TH)
-            state {
-                enRF(ONE)
-                commandRF(READ_ADDRESS)
-                registerRF(REGISTER.THL)
-            }
+        }
+        state {
+            enRF(ONE)
+            commandRF(READ_ADDRESS)
+            registerRF(address ?: REGISTER.THL)
         }
         state {
             enRF(ZERO)
             allowOF(ZERO)
         }
         loop ({ sleepOF.zero }) { sleep(1) }
-        state.instance { dbin(ONE) }
+        state.instant { dbin(ONE) }
         wait(1)
-        state.instance { dbin(ZERO) }
+        state.instant { dbin(ZERO) }
         wait(1)
         state {
             enDG(ZERO)
@@ -285,7 +276,7 @@ class ControlUnit(parent: SysModule) : SysModule("ControlUnit", parent) {
             commandRF(INC)
             registerRF(register)
         }
-        state.instance { enRF(ZERO) }
+        state.instant { enRF(ZERO) }
     }
 
     private fun StateContainer.dcr(register: REGISTER) {
@@ -294,7 +285,7 @@ class ControlUnit(parent: SysModule) : SysModule("ControlUnit", parent) {
             commandRF(DEC)
             registerRF(register)
         }
-        state.instance { enRF(ZERO) }
+        state.instant { enRF(ZERO) }
     }
 
     private fun StateContainer.shift(right: Boolean, cycle: Boolean) {
@@ -307,7 +298,7 @@ class ControlUnit(parent: SysModule) : SysModule("ControlUnit", parent) {
                 !right && !cycle -> commandRF(SHL_A)
             }
         }
-        state.instance { enRF(ZERO) }
+        state.instant { enRF(ZERO) }
     }
 
     private fun StateContainer.mov(inp: REGISTER, out: REGISTER) {
@@ -320,7 +311,7 @@ class ControlUnit(parent: SysModule) : SysModule("ControlUnit", parent) {
             commandRF(WRITE_ADDRESS)
             registerRF(out)
         }
-        state.instance { enRF(ZERO) }
+        state.instant { enRF(ZERO) }
     }
 
     private fun StateContainer.swap(a: REGISTER, b: REGISTER) {
@@ -329,27 +320,62 @@ class ControlUnit(parent: SysModule) : SysModule("ControlUnit", parent) {
         mov(REGISTER.THL, b)
     }
 
+    private fun StateContainer.resetOF() {
+        state {
+            allowOF(ZERO)
+        }
+        loop ({ sleepOF.zero }) { sleep(1) }
+        state {
+            enOF(ONE)
+            commandOF(RESET)
+        }
+        state.instant { enOF(ZERO) }
+    }
+
+    private fun StateContainer.resetRF() {
+        state {
+            enRF(ONE)
+            commandRF(RESET)
+        }
+        state.instant { enRF(ZERO) }
+    }
+
+    private fun StateContainer.reset() {
+        resetOF()
+        resetRF()
+        state(init)
+    }
+
+    private val init: () -> Unit = {
+        println("init")
+        enOF(ZERO)
+        enDG(ZERO)
+        enAG(ZERO)
+        enRF(ZERO)
+        allowOF(ONE)
+        wr(ZERO)
+        dbin(ZERO)
+        outsideALU(ZERO)
+        prepareReset = false
+        wait = false
+    }
+
     private var wait = false
+
+    private var prepareReset = false
 
     init {
         function(clk1.posEdgeEvent) { wait = false }
+        function(reset.posEdgeEvent) { prepareReset = true }
         var operation = OPERATION.UNDEFINED
         stateFunction(clk2) {
-            init {
-                enOF(ZERO)
-                enDG(ZERO)
-                enAG(ZERO)
-                enRF(ZERO)
-                allowOF(ONE)
-                wr(ZERO)
-                dbin(ZERO)
-                outsideALU(ZERO)
-            }
+            init(init)
             infinite.block {
+                case ({ prepareReset }) { reset() }
                 case ({ !wait && emptyOF.zero }) {
-                    state.instance { wait = true }
+                    state.instant { wait = true }
                     getOperation()
-                    state.instance { operation = operationOF() }
+                    state.instant { operation = operationOF() }
                     case ({ operation == NOP }) { state.println { "NOP" } }
                     case ({ operation.id in ADD_B.id..ADD_A.id }) { add({ operation }, false) }
                     case ({ operation == ADI_d8 }) { add({ ADD_A }, true) }

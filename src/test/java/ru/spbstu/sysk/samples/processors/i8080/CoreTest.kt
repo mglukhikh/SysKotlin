@@ -20,7 +20,7 @@ class CoreTest : SysTopModule() {
     private val reset = bitSignal("reset")
     private val wr = bitSignal("wr")
     private val dbin = bitSignal("dbin")
-    private val enRAM = bitSignal("enRAM")
+    private val enRAM = bitSignal("enRAM", ZERO)
 
     init {
         core.data bind data
@@ -37,6 +37,7 @@ class CoreTest : SysTopModule() {
         ram.en bind enRAM
         ram.wr bind wr
 
+        var checkValue = 10
         ram.load {
             var i = -1L
             when (it) {
@@ -53,8 +54,9 @@ class CoreTest : SysTopModule() {
 
                 ++i -> STA_a16()
                 ++i -> unsigned(CAPACITY.DATA, 0)
-                ++i -> unsigned(CAPACITY.DATA, 255)
-
+                ++i -> {
+                    unsigned(CAPACITY.DATA, 255)
+                }
                 ++i -> STA_a16()
                 ++i -> unsigned(CAPACITY.DATA, 40)
                 ++i -> unsigned(CAPACITY.DATA, 40)
@@ -105,25 +107,38 @@ class CoreTest : SysTopModule() {
                 ++i -> STA_a16()
                 ++i -> unsigned(CAPACITY.DATA, 5)
                 ++i -> unsigned(CAPACITY.DATA, 255)
+
+                ++i -> LDA_a16()
+                ++i -> unsigned(CAPACITY.DATA, 6)
+                ++i -> unsigned(CAPACITY.DATA, 255)
+                ++i -> INR_A()
+                ++i -> STA_a16()
+                ++i -> unsigned(CAPACITY.DATA, 6)
+                ++i -> unsigned(CAPACITY.DATA, 255)
+
+                (255L shl 8) + 6L -> unsigned(CAPACITY.DATA, checkValue)
                 else -> NOP()
             }
         }
 
-        enRAM(ZERO)
-
-        function(wr.defaultEvent or dbin.defaultEvent, false) {
-            enRAM(wr.value xor dbin.value)
-        }
+        function(wr.defaultEvent or dbin.defaultEvent, false) { enRAM(wr.value xor dbin.value) }
 
         stateFunction(clk1) {
-            sleep(250)
-            state {
-                val mask = unsigned(CAPACITY.ADDRESS, 255) shl 8
-                assert(ram[mask + 0].toInt() == 13)
-                assert(ram[mask + 2].toInt() + (ram[mask + 1].toInt() shl 8) == 2653)
-                assert(ram[mask + 4].toInt() + (ram[mask + 3].toInt() shl 8) == 2400)
-                assert(ram[mask + 5].toInt() == 25)
-                scheduler.stop()
+            val last = 1
+            val i = iterator(0..last)
+            loop(i) {
+                state.instant { reset(ZERO) }
+                sleep(250)
+                state {
+                    val mask = unsigned(CAPACITY.ADDRESS, 255) shl 8
+                    assert(ram[mask + 0].toInt() == 13)
+                    assert(ram[mask + 2].toInt() + (ram[mask + 1].toInt() shl 8) == 2653)
+                    assert(ram[mask + 4].toInt() + (ram[mask + 3].toInt() shl 8) == 2400)
+                    assert(ram[mask + 5].toInt() == 25)
+                    assert(ram[mask + 6].toInt() == ++checkValue)
+                    reset(ONE)
+                    if (i.it == last) scheduler.stop()
+                }
             }
         }
     }

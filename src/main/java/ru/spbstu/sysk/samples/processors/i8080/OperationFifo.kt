@@ -56,12 +56,12 @@ class OperationFifo(
                         store.add(data())
                         empty(ZERO)
                     }
-                    state.instance {
+                    state.instant {
                         inc(ZERO)
                     }
                 }
                 otherwise {
-                    state.instance { sleep(ONE) }
+                    state.instant { sleep(ONE) }
                     sleep(1)
                 }
             }
