@@ -37,7 +37,9 @@ class CoreTest : SysTopModule() {
         ram.en bind enRAM
         ram.wr bind wr
 
-        var checkValue = 10
+        var masterValue = 10
+        var slaveValue = 10
+        val skipValue = 12
         ram.load {
             var i = -1L
             when (it) {
@@ -116,7 +118,25 @@ class CoreTest : SysTopModule() {
                 ++i -> unsigned(CAPACITY.DATA, 6)
                 ++i -> unsigned(CAPACITY.DATA, 255)
 
-                (255L shl 8) + 6L -> unsigned(CAPACITY.DATA, checkValue)
+                ++i -> STA_a16()
+                ++i -> unsigned(CAPACITY.DATA, 6)
+                ++i -> unsigned(CAPACITY.DATA, 255)
+                ++i -> CPI_d8()
+                ++i -> unsigned(CAPACITY.DATA, skipValue)
+                ++i -> JZ_a16()
+                ++i -> unsigned(CAPACITY.DATA, i + 9)
+                ++i -> unsigned(CAPACITY.DATA, 0)
+
+                ++i -> LDA_a16()
+                ++i -> unsigned(CAPACITY.DATA, 7)
+                ++i -> unsigned(CAPACITY.DATA, 255)
+                ++i -> INR_A()
+                ++i -> STA_a16()
+                ++i -> unsigned(CAPACITY.DATA, 7)
+                ++i -> unsigned(CAPACITY.DATA, 255)
+
+                (255L shl 8) + 6L -> unsigned(CAPACITY.DATA, masterValue)
+                (255L shl 8) + 7L -> unsigned(CAPACITY.DATA, slaveValue)
                 else -> NOP()
             }
         }
@@ -124,18 +144,20 @@ class CoreTest : SysTopModule() {
         function(wr.defaultEvent or dbin.defaultEvent, false) { enRAM(wr.value xor dbin.value) }
 
         stateFunction(clk1) {
-            val last = 1
+            val last = 3
             val i = iterator(0..last)
             loop(i) {
                 state.instant { reset(ZERO) }
-                sleep(250)
+                sleep(300)
                 state {
                     val mask = unsigned(CAPACITY.ADDRESS, 255) shl 8
                     assert(ram[mask + 0].toInt() == 13)
                     assert(ram[mask + 2].toInt() + (ram[mask + 1].toInt() shl 8) == 2653)
                     assert(ram[mask + 4].toInt() + (ram[mask + 3].toInt() shl 8) == 2400)
                     assert(ram[mask + 5].toInt() == 25)
-                    assert(ram[mask + 6].toInt() == ++checkValue)
+                    assert(ram[mask + 6].toInt() == ++masterValue)
+                    if (masterValue != skipValue) ++slaveValue
+                    assert(ram[mask + 7].toInt() == slaveValue)
                     reset(ONE)
                     if (i.it == last) scheduler.stop()
                 }
