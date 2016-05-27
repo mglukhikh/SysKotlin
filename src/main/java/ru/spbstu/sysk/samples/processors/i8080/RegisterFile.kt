@@ -200,7 +200,7 @@ class RegisterFile constructor(
         REGISTER.A -> PSW = PSW.set(capacityData * 2 - 1, capacityData, value.extend(capacityData))
         REGISTER.Flag -> {
             PSW = PSW.set(capacityData - 1, 0, value.extend(capacityData))
-            flag(read(REGISTER.Flag))
+            flag(PSW[capacityData - 1, 0])
         }
         REGISTER.B -> BC = BC.set(capacityData * 2 - 1, capacityData, value.extend(capacityData))
         REGISTER.C -> BC = BC.set(capacityData - 1, 0, value.extend(capacityData))

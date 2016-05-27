@@ -40,7 +40,11 @@ class ArithmeticLogicUnit(
         flag(flag().set(0, ZERO))
     }
 
-    private fun setFlag(vararg pairs: Pair<Int, SysBit>) = pairs.forEach { flag(flag().set(it.first, it.second)) }
+    private fun setFlag(vararg pairs: Pair<Int, SysBit>) {
+        var flag = flag()
+        pairs.forEach { flag = flag.set(it.first, it.second) }
+        flag(flag)
+    }
 
     init {
         function(A.defaultEvent or B.defaultEvent or operation.defaultEvent) {
@@ -71,7 +75,7 @@ class ArithmeticLogicUnit(
                 }
                 COMMAND.CMP -> {
                     val comp = A().compareTo(inp())
-                    setFlag(0 to SysBit(comp == 0), 6 to SysBit(comp < 0))
+                    setFlag(6 to SysBit(comp == 0), 0 to SysBit(comp < 0))
                 }
                 else -> {
                 }

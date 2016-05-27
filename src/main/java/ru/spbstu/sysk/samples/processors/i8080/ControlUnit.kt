@@ -31,7 +31,6 @@ class ControlUnit(parent: SysModule) : SysModule("ControlUnit", parent) {
     val enRF = bitOutput("enRF")
     val enALU = bitOutput("enALU")
 
-
     private fun StateContainer.get(command: COMMAND) {
         state {
             enOF(ONE)
@@ -320,6 +319,22 @@ class ControlUnit(parent: SysModule) : SysModule("ControlUnit", parent) {
         mov(REGISTER.THL, b)
     }
 
+    private fun StateContainer.jump() {
+        mvi(REGISTER.TL)
+        mvi(REGISTER.TH)
+        state {
+            enRF(ONE)
+            commandRF(READ_ADDRESS)
+            registerRF(REGISTER.THL)
+        }
+        state.instant { enRF(ZERO) }
+        resetOF()
+        mov(REGISTER.THL, REGISTER.PC)
+        state {
+            allowOF(ONE)
+        }
+    }
+
     private fun StateContainer.resetOF() {
         state {
             allowOF(ZERO)
@@ -455,6 +470,40 @@ class ControlUnit(parent: SysModule) : SysModule("ControlUnit", parent) {
                     case ({ operation == RLC }) { shift(false, false) }
                     case ({ operation == RRC }) { shift(true, false) }
                     case ({ operation == XCHG }) { swap(REGISTER.DE, REGISTER.HL) }
+                    case ({ operation == JMP_a16 }) { jump() }
+                    //  BUG: IN case function. Upgrade to caseOf.of...of.otherwise fixed this bug
+                    case ({ operation == JZ_a16 }) {
+                        case({ flag()[6] == ONE }) { jump() }
+                        nop()
+                    }
+                    case ({ operation == JNZ_a16 }) {
+                        case({ flag()[6] == ZERO }) { jump() }
+                        nop()
+                    }
+                    case ({ operation == JP_a16 }) {
+                        case({ flag()[7] == ONE }) { jump() }
+                        nop()
+                    }
+                    case ({ operation == JM_a16 }) {
+                        case({ flag()[7] == ZERO }) { jump() }
+                        nop()
+                    }
+                    case ({ operation == JC_a16 }) {
+                        case({ flag()[0] == ONE }) { jump() }
+                        nop()
+                    }
+                    case ({ operation == JNC_a16 }) {
+                        case({ flag()[0] == ZERO }) { jump() }
+                        nop()
+                    }
+                    case ({ operation == JPE_a16 }) {
+                        case({ flag()[2] == ONE }) { jump() }
+                        nop()
+                    }
+                    case ({ operation == JPO_a16 }) {
+                        case({ flag()[2] == ZERO }) { jump() }
+                        nop()
+                    }
                     otherwise { state.println { "Skipped operation $operation" } }
                     sleep(1)
                 }
