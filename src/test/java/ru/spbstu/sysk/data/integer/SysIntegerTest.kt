@@ -179,7 +179,7 @@ class SysIntegerTest {
 
     }
 
-    @Ignore("Integer bound test need rework")
+    @Ignore("Integer bound test need rework\n")
     @Test
     fun boundTest() {
 
