@@ -103,13 +103,15 @@ interface StateContainer {
         states.add(result)
     }
 
-    /** ToDo: unique family name */
-    fun <T : Any> caseOf(obj: () -> T) = State.Switch(this, obj, "caseFamily", { container, condition, init, isCase, familyName ->
+    var id: Long
+    private fun uniqueName() = "caseFamily${++id}"
+
+    fun <T : Any> caseOf(obj: () -> T) = State.Switch(this, obj, uniqueName(), { container, condition, init, isCase, familyName ->
         container.caseBuilder(condition, init, isCase, familyName)
     })
 
     val case: State.Case
-        get() = State.Case(this, "caseFamily") { container, condition, init, isCase, familyName ->
+        get() = State.Case(this, uniqueName()) { container, condition, init, isCase, familyName ->
             container.caseBuilder(condition, init, isCase, familyName)
         }
 
@@ -123,7 +125,7 @@ interface StateContainer {
                     ?: if (isCase) false else throw AssertionError("Block 'case' expected before 'otherwise'")
             val cond = condition() && !prevCond
             val case = if (isCase) states.elementAtOrNull(currentState + delta + 1) as? State.CaseFunction else null
-            if (case != null) case.args = cond || prevCond
+            if (case != null && case.name == familyName) case.args = cond || prevCond
             if (!cond) currentState += delta
             nextState()
             wait()
@@ -415,6 +417,8 @@ class SysStateFunction private constructor(
     override var currentState = 0
 
     override var next = false
+
+    override var id = 0L
 
     override fun run(event: SysWait): SysWait {
         if (event == SysWait.Initialize) {
