@@ -1,5 +1,6 @@
 package ru.spbstu.sysk.core
 
+import ru.spbstu.sysk.samples.processors.i8080.OPERATION
 import java.util.*
 
 sealed class Label {
@@ -20,7 +21,9 @@ interface StateContainer {
 
     var next: Boolean
 
-    fun next() { next = true }
+    fun next() {
+        next = true
+    }
 
     fun nextState() {
         ++currentState
@@ -101,14 +104,22 @@ interface StateContainer {
         states.add(result)
     }
 
-    fun case(condition: () -> Boolean) = State.Block(this, { init -> case(condition, init) })
+    /** ToDo: unique family name */
+    fun <T : Any> caseOf(obj: () -> T) = State.Switch(this, obj, "caseFamily", { container, condition, init, isCase, familyName ->
+        container.caseBuilder(condition, init, isCase, familyName)
+    })
 
-    private fun caseBuilder(condition: () -> Boolean, init: StateContainer.() -> Unit, isCase: Boolean) {
+    val case: State.Case
+        get() = State.Case(this, "caseFamily") { container, condition, init, isCase, familyName ->
+            container.caseBuilder(condition, init, isCase, familyName)
+        }
+
+    private fun caseBuilder(condition: () -> Boolean, init: StateContainer.() -> Unit, isCase: Boolean, familyName: String) {
         states.add(State.CaseFunction("blank", { wait() }))
         val current = this.states.size
         this.init()
         val delta = this.states.size - current
-        val func = State.CaseFunction("if") {
+        val func = State.CaseFunction(familyName) {
             val prevCond = (states[currentState] as? State.CaseFunction)?.args as? Boolean
                     ?: if (isCase) false else throw AssertionError("Block 'case' expected before 'otherwise'")
             val cond = condition() && !prevCond
@@ -121,12 +132,14 @@ interface StateContainer {
         states[current - 1] = func
     }
 
-    fun case(condition: () -> Boolean, init: StateContainer.() -> Unit) = caseBuilder(condition, init, true)
+    fun case(condition: () -> Boolean) = State.Block(this, { init -> case(condition, init) })
+
+    fun case(condition: () -> Boolean, init: StateContainer.() -> Unit) = caseBuilder(condition, init, true, "case")
 
     val otherwise: State.Block
         get() = State.Block(this, { init -> otherwise(init) })
 
-    fun otherwise(init: StateContainer.() -> Unit) = caseBuilder({ true }, init, false)
+    fun otherwise(init: StateContainer.() -> Unit) = caseBuilder({ true }, init, false, "case")
 
     fun continueLoop() {
         states.add(State.LoopJumpFunction("continue"))
@@ -236,7 +249,98 @@ sealed class State {
 
     open class CaseFunction(name: String, f: (SysWait) -> SysWait) : Function(name, { false }, f)
 
-    class Block(private val container: StateContainer, private val function: StateContainer.(StateContainer.() -> Unit) -> Unit) {
+    class Case(
+            private val container: StateContainer,
+            private val familyName: String,
+            private val case: (StateContainer, () -> Boolean, StateContainer.() -> Unit, Boolean, String) -> Unit
+    ) {
+
+        fun of(condition: () -> Boolean)
+                = CaseBlock(container, { init -> case(container, condition, init, true, familyName) }, this)
+
+        fun of(condition: () -> Boolean, init: StateContainer.() -> Unit): Case {
+            case(container, condition, init, true, familyName)
+            return this
+        }
+
+        val otherwise: Block
+            get() = Block(container, { init -> case(container, { true }, init, false, familyName) })
+
+        fun otherwise(init: StateContainer.() -> Unit) {
+            case(container, { true }, init, false, familyName)
+        }
+    }
+
+    class Switch<T : Any>(
+            private val container: StateContainer,
+            private val obj: () -> T,
+            private val familyName: String,
+            private val case: (StateContainer, () -> Boolean, StateContainer.() -> Unit, Boolean, String) -> Unit
+    ) {
+
+        fun of(obj: T)
+                = SwitchBlock(container, { init -> case(container, { obj().equals(obj) }, init, true, familyName) }, this)
+
+        fun of(obj: T, init: StateContainer.() -> Unit): Switch<T> {
+            case(container, { obj().equals(obj) }, init, true, familyName)
+            return this
+        }
+
+        fun <R : Comparable<T>> ofIn(range: Iterable<R>)
+                = SwitchBlock(container, { init -> case(container, { inRange(obj(), range) }, init, true, familyName) }, this)
+
+        fun <R : Comparable<T>> ofIn(range: Iterable<R>, init: StateContainer.() -> Unit): Switch<T> {
+            case(container, { inRange(obj(), range) }, init, true, familyName)
+            return this
+        }
+
+        private fun <Type : Any, R : Comparable<Type>> inRange(obj: Type, range: Iterable<R>)
+                = (range.first().compareTo(obj) <= 0) && (range.last().compareTo(obj) >= 0)
+
+        val otherwise: Block
+            get() = Block(container, { init -> case(container, { true }, init, false, familyName) })
+
+        fun otherwise(init: StateContainer.() -> Unit) {
+            case(container, { true }, init, false, familyName)
+        }
+    }
+
+    class CaseBlock(
+            private val container: StateContainer,
+            private val function: StateContainer.(StateContainer.() -> Unit) -> Unit,
+            private val parent: Case
+    ) {
+        fun block(init: StateContainer.() -> Unit): Case {
+            Block(container, function).block(init)
+            return parent
+        }
+
+        fun state(f: () -> Unit): Case {
+            Block(container, function).state(f)
+            return parent
+        }
+    }
+
+    class SwitchBlock<T : Any>(
+            private val container: StateContainer,
+            private val function: StateContainer.(StateContainer.() -> Unit) -> Unit,
+            private val parent: Switch<T>
+    ) {
+
+        fun block(init: StateContainer.() -> Unit): Switch<T> {
+            Block(container, function).block(init)
+            return parent
+        }
+
+        fun state(f: () -> Unit): Switch<T> {
+            Block(container, function).state(f)
+            return parent
+        }
+    }
+
+    class Block(
+            private val container: StateContainer,
+            private val function: StateContainer.(StateContainer.() -> Unit) -> Unit) {
 
         fun block(init: StateContainer.() -> Unit) = container.function(init)
 
