@@ -91,14 +91,23 @@ class ControlUnit(parent: SysModule) : SysModule("ControlUnit", parent) {
             registerRF(REGISTER.A)
         }
         state.instant { commandRF(SET_B) }
-        case { operation == A }.state { registerRF(REGISTER.A) }
-        case { operation == B }.state { registerRF(REGISTER.B) }
-        case { operation == C }.state { registerRF(REGISTER.C) }
-        case { operation == D }.state { registerRF(REGISTER.D) }
-        case { operation == E }.state { registerRF(REGISTER.E) }
-        case { operation == H }.state { registerRF(REGISTER.H) }
-        case { operation == L }.state { registerRF(REGISTER.L) }
-        case { operation == M }.state { registerRF(REGISTER.HL) }
+        case.of { operation == A }.state {
+            registerRF(REGISTER.A)
+        }.of { operation == B }.state {
+            registerRF(REGISTER.B)
+        }.of { operation == C }.state {
+            registerRF(REGISTER.C)
+        }.of { operation == D }.state {
+            registerRF(REGISTER.D)
+        }.of { operation == E }.state {
+            registerRF(REGISTER.E)
+        }.of { operation == H }.state {
+            registerRF(REGISTER.H)
+        }.of { operation == L }.state {
+            registerRF(REGISTER.L)
+        }.of { operation == M }.state {
+            registerRF(REGISTER.HL)
+        }
         state {
             if (outside) outsideALU(ONE)
             enALU(ONE)
@@ -160,23 +169,41 @@ class ControlUnit(parent: SysModule) : SysModule("ControlUnit", parent) {
             enRF(ONE)
             commandRF(READ_ADDRESS)
         }
-        case { operation.id in MOV_A_B.id..MOV_A_A.id }.state { registerRF(REGISTER.A) }
-        case { operation.id in MOV_B_B.id..MOV_B_A.id }.state { registerRF(REGISTER.B) }
-        case { operation.id in MOV_C_B.id..MOV_C_A.id }.state { registerRF(REGISTER.C) }
-        case { operation.id in MOV_D_B.id..MOV_D_A.id }.state { registerRF(REGISTER.D) }
-        case { operation.id in MOV_E_B.id..MOV_E_A.id }.state { registerRF(REGISTER.E) }
-        case { operation.id in MOV_H_B.id..MOV_H_A.id }.state { registerRF(REGISTER.H) }
-        case { operation.id in MOV_L_B.id..MOV_L_A.id }.state { registerRF(REGISTER.L) }
-        case { operation.id in MOV_M_B.id..MOV_M_A.id }.state { registerRF(REGISTER.HL) }
+        caseOf { operation.id }.ofIn(MOV_A_B.id..MOV_A_A.id).state {
+            registerRF(REGISTER.A)
+        }.ofIn(MOV_B_B.id..MOV_B_A.id).state {
+            registerRF(REGISTER.B)
+        }.ofIn(MOV_C_B.id..MOV_C_A.id).state {
+            registerRF(REGISTER.C)
+        }.ofIn(MOV_D_B.id..MOV_D_A.id).state {
+            registerRF(REGISTER.D)
+        }.ofIn(MOV_E_B.id..MOV_E_A.id).state {
+            registerRF(REGISTER.E)
+        }.ofIn(MOV_H_B.id..MOV_H_A.id).state {
+            registerRF(REGISTER.H)
+        }.ofIn(MOV_L_B.id..MOV_L_A.id).state {
+            registerRF(REGISTER.L)
+        }.ofIn(MOV_M_B.id..MOV_M_A.id).state {
+            registerRF(REGISTER.HL)
+        }
         state.instant { commandRF(WRITE_ADDRESS) }
-        case { operation()[2, 0] == MOV_A_A()[2, 0] }.state { registerRF(REGISTER.A) }
-        case { operation()[2, 0] == MOV_A_B()[2, 0] }.state { registerRF(REGISTER.B) }
-        case { operation()[2, 0] == MOV_A_C()[2, 0] }.state { registerRF(REGISTER.C) }
-        case { operation()[2, 0] == MOV_A_D()[2, 0] }.state { registerRF(REGISTER.D) }
-        case { operation()[2, 0] == MOV_A_E()[2, 0] }.state { registerRF(REGISTER.E) }
-        case { operation()[2, 0] == MOV_A_H()[2, 0] }.state { registerRF(REGISTER.H) }
-        case { operation()[2, 0] == MOV_A_L()[2, 0] }.state { registerRF(REGISTER.L) }
-        case { operation()[2, 0] == MOV_A_M()[2, 0] }.state { registerRF(REGISTER.HL) }
+        case.of { operation()[2, 0] == MOV_A_A()[2, 0] }.state {
+            registerRF(REGISTER.A)
+        }.of { operation()[2, 0] == MOV_A_B()[2, 0] }.state {
+            registerRF(REGISTER.B)
+        }.of { operation()[2, 0] == MOV_A_C()[2, 0] }.state {
+            registerRF(REGISTER.C)
+        }.of { operation()[2, 0] == MOV_A_D()[2, 0] }.state {
+            registerRF(REGISTER.D)
+        }.of { operation()[2, 0] == MOV_A_E()[2, 0] }.state {
+            registerRF(REGISTER.E)
+        }.of { operation()[2, 0] == MOV_A_H()[2, 0] }.state {
+            registerRF(REGISTER.H)
+        }.of { operation()[2, 0] == MOV_A_L()[2, 0] }.state {
+            registerRF(REGISTER.L)
+        }.of { operation()[2, 0] == MOV_A_M()[2, 0] }.state {
+            registerRF(REGISTER.HL)
+        }
         state.instant { enRF(ZERO) }
     }
 
@@ -386,128 +413,188 @@ class ControlUnit(parent: SysModule) : SysModule("ControlUnit", parent) {
         stateFunction(clk2) {
             init(init)
             infinite.block {
-                case ({ prepareReset }) { reset() }
-                case ({ !wait && emptyOF.zero }) {
+                case.of ({ prepareReset }) {
+                    reset()
+                }.of ({ !wait && emptyOF.zero }) {
                     state.instant { wait = true }
                     getOperation()
                     state.instant { operation = operationOF() }
-                    case ({ operation == NOP }) { state.println { "NOP" } }
-                    case ({ operation.id in ADD_B.id..ADD_A.id }) { add({ operation }, false) }
-                    case ({ operation == ADI_d8 }) { add({ ADD_A }, true) }
-                    case ({ operation.id in ADC_B.id..ADC_A.id }) { adc({ operation }, false) }
-                    case ({ operation == ACI_d8 }) { adc({ ADC_A }, true) }
-                    case ({ operation.id in SUB_B.id..SUB_A.id }) { sub({ operation }, false) }
-                    case ({ operation == SUI_d8 }) { sub({ SUB_A }, true) }
-                    case ({ operation.id in SBB_B.id..SBB_A.id }) { sbb({ operation }, false) }
-                    case ({ operation == SBI_d8 }) { sbb({ SBB_A }, true) }
-                    case ({ operation.id in XRA_B.id..XRA_A.id }) { xra({ operation }, false) }
-                    case ({ operation == XRI_d8 }) { xra({ XRA_A }, true) }
-                    case ({ operation.id in ORA_B.id..ORA_A.id }) { ora({ operation }, false) }
-                    case ({ operation == ORI_d8 }) { ora({ ORA_A }, true) }
-                    case ({ operation.id in ANA_B.id..ANA_A.id }) { ana({ operation }, false) }
-                    case ({ operation == ANI_d8 }) { ana({ ANA_A }, true) }
-                    case ({ operation.id in CMP_B.id..CMP_A.id }) { cmp({ operation }, false) }
-                    case ({ operation == CPI_d8 }) { cmp({ CMP_A }, true) }
-                    case ({ operation == DAD_B }) { dad(REGISTER.BC) }
-                    case ({ operation == DAD_D }) { dad(REGISTER.DE) }
-                    case ({ operation == DAD_H }) { dad(REGISTER.HL) }
-                    case ({ operation == DAD_SP }) { dad(REGISTER.SP) }
-                    case ({ operation.id in MOV_B_B.id..MOV_A_A.id }) { mov({ operation }) }
-                    case ({ operation == MVI_A_d8 }) { mvi(REGISTER.A) }
-                    case ({ operation == MVI_B_d8 }) { mvi(REGISTER.B) }
-                    case ({ operation == MVI_C_d8 }) { mvi(REGISTER.C) }
-                    case ({ operation == MVI_D_d8 }) { mvi(REGISTER.D) }
-                    case ({ operation == MVI_E_d8 }) { mvi(REGISTER.E) }
-                    case ({ operation == MVI_H_d8 }) { mvi(REGISTER.H) }
-                    case ({ operation == MVI_L_d8 }) { mvi(REGISTER.L) }
-                    case ({ operation == MVI_M_d8 }) { mvi(REGISTER.HL) }
-                    case ({ operation == SPHL }) { mov(REGISTER.HL, REGISTER.SP) }
-                    case ({ operation == STA_a16 }) { sta(REGISTER.A) }
-                    case ({ operation == STAX_B }) { sta(REGISTER.A, REGISTER.BC) }
-                    case ({ operation == STAX_D }) { sta(REGISTER.A, REGISTER.DE) }
-                    case ({ operation == SHLD_a16 }) { sta(REGISTER.HL) }
-                    case ({ operation == LDA_a16 }) { lda(REGISTER.A) }
-                    case ({ operation == LDAX_B }) { lda(REGISTER.A, REGISTER.BC) }
-                    case ({ operation == LDAX_D }) { lda(REGISTER.A, REGISTER.DE) }
-                    case ({ operation == LHLD_a16 }) { lda(REGISTER.HL) }
-                    case ({ operation == LXI_B_d16 }) {
+                    caseOf { operation.id }.of(NOP.id) {
+                        state.println { "NOP" }
+                    }.ofIn(ADD_B.id..ADD_A.id) {
+                        add({ operation }, false)
+                    }.of(ADI_d8.id) {
+                        add({ ADD_A }, true)
+                    }.ofIn (ADC_B.id..ADC_A.id) {
+                        adc({ operation }, false)
+                    }.of(ACI_d8.id) {
+                        adc({ ADC_A }, true)
+                    }.ofIn (SUB_B.id..SUB_A.id) {
+                        sub({ operation }, false)
+                    }.of(SUI_d8.id) {
+                        sub({ SUB_A }, true)
+                    }.ofIn (SBB_B.id..SBB_A.id) {
+                        sbb({ operation }, false)
+                    }.of(SBI_d8.id) {
+                        sbb({ SBB_A }, true)
+                    }.ofIn (XRA_B.id..XRA_A.id) {
+                        xra({ operation }, false)
+                    }.of(XRI_d8.id) {
+                        xra({ XRA_A }, true)
+                    }.ofIn (ORA_B.id..ORA_A.id) {
+                        ora({ operation }, false)
+                    }.of(ORI_d8.id) {
+                        ora({ ORA_A }, true)
+                    }.ofIn (ANA_B.id..ANA_A.id) {
+                        ana({ operation }, false)
+                    }.of(ANI_d8.id) {
+                        ana({ ANA_A }, true)
+                    }.ofIn (CMP_B.id..CMP_A.id) {
+                        cmp({ operation }, false)
+                    }.of(CPI_d8.id) {
+                        cmp({ CMP_A }, true)
+                    }.of(DAD_B.id) {
+                        dad(REGISTER.BC)
+                    }.of(DAD_D.id) {
+                        dad(REGISTER.DE)
+                    }.of(DAD_H.id) {
+                        dad(REGISTER.HL)
+                    }.of(DAD_SP.id) {
+                        dad(REGISTER.SP)
+                    }.ofIn (MOV_B_B.id..MOV_A_A.id) {
+                        mov({ operation })
+                    }.of(MVI_A_d8.id) {
+                        mvi(REGISTER.A)
+                    }.of(MVI_B_d8.id) {
+                        mvi(REGISTER.B)
+                    }.of(MVI_C_d8.id) {
+                        mvi(REGISTER.C)
+                    }.of(MVI_D_d8.id) {
+                        mvi(REGISTER.D)
+                    }.of(MVI_E_d8.id) {
+                        mvi(REGISTER.E)
+                    }.of(MVI_H_d8.id) {
+                        mvi(REGISTER.H)
+                    }.of(MVI_L_d8.id) {
+                        mvi(REGISTER.L)
+                    }.of(MVI_M_d8.id) {
+                        mvi(REGISTER.HL)
+                    }.of(SPHL.id) {
+                        mov(REGISTER.HL, REGISTER.SP)
+                    }.of(STA_a16.id) {
+                        sta(REGISTER.A)
+                    }.of(STAX_B.id) {
+                        sta(REGISTER.A, REGISTER.BC)
+                    }.of(STAX_D.id) {
+                        sta(REGISTER.A, REGISTER.DE)
+                    }.of(SHLD_a16.id) {
+                        sta(REGISTER.HL)
+                    }.of(LDA_a16.id) {
+                        lda(REGISTER.A)
+                    }.of(LDAX_B.id) {
+                        lda(REGISTER.A, REGISTER.BC)
+                    }.of(LDAX_D.id) {
+                        lda(REGISTER.A, REGISTER.DE)
+                    }.of(LHLD_a16.id) {
+                        lda(REGISTER.HL)
+                    }.of(LXI_B_d16.id) {
                         mvi(REGISTER.C)
                         mvi(REGISTER.B)
-                    }
-                    case ({ operation == LXI_H_d16 }) {
+                    }.of(LXI_H_d16.id) {
                         mvi(REGISTER.L)
                         mvi(REGISTER.H)
-                    }
-                    case ({ operation == LXI_SP_d16 }) {
+                    }.of(LXI_SP_d16.id) {
                         mvi(REGISTER.TL)
                         mvi(REGISTER.TH)
                         mov(REGISTER.THL, REGISTER.SP)
-                    }
-                    case ({ operation == INR_A }) { inc(REGISTER.A) }
-                    case ({ operation == INR_B }) { inc(REGISTER.B) }
-                    case ({ operation == INR_C }) { inc(REGISTER.C) }
-                    case ({ operation == INR_D }) { inc(REGISTER.D) }
-                    case ({ operation == INR_E }) { inc(REGISTER.E) }
-                    case ({ operation == INR_H }) { inc(REGISTER.H) }
-                    case ({ operation == INR_L }) { inc(REGISTER.L) }
-                    case ({ operation == INX_B }) { inc(REGISTER.BC) }
-                    case ({ operation == INX_D }) { inc(REGISTER.DE) }
-                    case ({ operation == INX_H }) { inc(REGISTER.HL) }
-                    case ({ operation == INX_SP }) { inc(REGISTER.SP) }
-                    case ({ operation == DCR_A }) { dcr(REGISTER.A) }
-                    case ({ operation == DCR_B }) { dcr(REGISTER.B) }
-                    case ({ operation == DCR_C }) { dcr(REGISTER.C) }
-                    case ({ operation == DCR_D }) { dcr(REGISTER.D) }
-                    case ({ operation == DCR_E }) { dcr(REGISTER.E) }
-                    case ({ operation == DCR_H }) { dcr(REGISTER.H) }
-                    case ({ operation == DCR_L }) { dcr(REGISTER.L) }
-                    case ({ operation == DCX_B }) { dcr(REGISTER.BC) }
-                    case ({ operation == DCX_D }) { dcr(REGISTER.DE) }
-                    case ({ operation == DCX_H }) { dcr(REGISTER.HL) }
-                    case ({ operation == DCX_SP }) { dcr(REGISTER.SP) }
-                    case ({ operation == RAL }) { shift(false, true) }
-                    case ({ operation == RAR }) { shift(true, false) }
-                    case ({ operation == RLC }) { shift(false, false) }
-                    case ({ operation == RRC }) { shift(true, false) }
-                    case ({ operation == XCHG }) { swap(REGISTER.DE, REGISTER.HL) }
-                    case ({ operation == JMP_a16 }) { jump() }
-                    //  BUG: IN case function. Upgrade to caseOf.of...of.otherwise fixed this bug
-                    case ({ operation == JZ_a16 }) {
-                        case({ flag()[6] == ONE }) { jump() }
+                    }.of(INR_A.id) {
+                        inc(REGISTER.A)
+                    }.of(INR_B.id) {
+                        inc(REGISTER.B)
+                    }.of(INR_C.id) {
+                        inc(REGISTER.C)
+                    }.of(INR_D.id) {
+                        inc(REGISTER.D)
+                    }.of(INR_E.id) {
+                        inc(REGISTER.E)
+                    }.of(INR_H.id) {
+                        inc(REGISTER.H)
+                    }.of(INR_L.id) {
+                        inc(REGISTER.L)
+                    }.of(INX_B.id) {
+                        inc(REGISTER.BC)
+                    }.of(INX_D.id) {
+                        inc(REGISTER.DE)
+                    }.of(INX_H.id) {
+                        inc(REGISTER.HL)
+                    }.of(INX_SP.id) {
+                        inc(REGISTER.SP)
+                    }.of(DCR_A.id) {
+                        dcr(REGISTER.A)
+                    }.of(DCR_B.id) {
+                        dcr(REGISTER.B)
+                    }.of(DCR_C.id) {
+                        dcr(REGISTER.C)
+                    }.of(DCR_D.id) {
+                        dcr(REGISTER.D)
+                    }.of(DCR_E.id) {
+                        dcr(REGISTER.E)
+                    }.of(DCR_H.id) {
+                        dcr(REGISTER.H)
+                    }.of(DCR_L.id) {
+                        dcr(REGISTER.L)
+                    }.of(DCX_B.id) {
+                        dcr(REGISTER.BC)
+                    }.of(DCX_D.id) {
+                        dcr(REGISTER.DE)
+                    }.of(DCX_H.id) {
+                        dcr(REGISTER.HL)
+                    }.of(DCX_SP.id) {
+                        dcr(REGISTER.SP)
+                    }.of(RAL.id) {
+                        shift(false, true)
+                    }.of(RAR.id) {
+                        shift(true, false)
+                    }.of(RLC.id) {
+                        shift(false, false)
+                    }.of(RRC.id) {
+                        shift(true, false)
+                    }.of(XCHG.id) {
+                        swap(REGISTER.DE, REGISTER.HL)
+                    }.of(JMP_a16.id) {
+                        jump()
+                    }.of(JZ_a16.id) {
+                        //  BUG: IN case function. Upgrade to caseOf.of...of.otherwise fixed this bug
+                        case.of({ flag()[6] == ONE }) { jump() }
                         nop()
-                    }
-                    case ({ operation == JNZ_a16 }) {
-                        case({ flag()[6] == ZERO }) { jump() }
+                    }.of(JNZ_a16.id) {
+                        case.of({ flag()[6] == ZERO }) { jump() }
                         nop()
-                    }
-                    case ({ operation == JP_a16 }) {
-                        case({ flag()[7] == ONE }) { jump() }
+                    }.of(JP_a16.id) {
+                        case.of({ flag()[7] == ONE }) { jump() }
                         nop()
-                    }
-                    case ({ operation == JM_a16 }) {
-                        case({ flag()[7] == ZERO }) { jump() }
+                    }.of(JM_a16.id) {
+                        case.of({ flag()[7] == ZERO }) { jump() }
                         nop()
-                    }
-                    case ({ operation == JC_a16 }) {
-                        case({ flag()[0] == ONE }) { jump() }
+                    }.of(JC_a16.id) {
+                        case.of({ flag()[0] == ONE }) { jump() }
                         nop()
-                    }
-                    case ({ operation == JNC_a16 }) {
-                        case({ flag()[0] == ZERO }) { jump() }
+                    }.of(JNC_a16.id) {
+                        case.of({ flag()[0] == ZERO }) { jump() }
                         nop()
-                    }
-                    case ({ operation == JPE_a16 }) {
-                        case({ flag()[2] == ONE }) { jump() }
+                    }.of(JPE_a16.id) {
+                        case.of({ flag()[2] == ONE }) { jump() }
                         nop()
-                    }
-                    case ({ operation == JPO_a16 }) {
-                        case({ flag()[2] == ZERO }) { jump() }
+                    }.of(JPO_a16.id) {
+                        case.of({ flag()[2] == ZERO }) { jump() }
                         nop()
+                    }.otherwise {
+                        state.println { "Skipped operation $operation" }
                     }
-                    otherwise { state.println { "Skipped operation $operation" } }
+                    sleep(1)
+                }.otherwise {
                     sleep(1)
                 }
-                otherwise { sleep(1) }
             }
         }
     }
