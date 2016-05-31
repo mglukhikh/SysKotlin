@@ -41,7 +41,7 @@ class OperationFifo(
                 sleep(ZERO)
             }
             infinite.block {
-                case({ allow.one }) {
+                case.of({ allow.one }) {
                     state {
                         sleep(ZERO)
                         read(ONE)
@@ -59,8 +59,7 @@ class OperationFifo(
                     state.instant {
                         inc(ZERO)
                     }
-                }
-                otherwise {
+                }.otherwise {
                     state.instant { sleep(ONE) }
                     sleep(1)
                 }

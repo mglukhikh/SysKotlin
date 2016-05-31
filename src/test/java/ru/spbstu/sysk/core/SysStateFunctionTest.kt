@@ -26,7 +26,7 @@ class SysStateFunctionTest {
                     // Kotlin BUG: try to pass 'null' as a DEFAULT argument to defaultIterator and then to reference
                     val j = iterator(0..3)
                     loop(j) {
-                        case ({ i.it == 3 }) { jump("end") }
+                        case.of ({ i.it == 3 }) { jump("end") }
                         state {
                             switch = !switch
                             println("i: ${i.it} j: ${j.it}")
@@ -37,7 +37,7 @@ class SysStateFunctionTest {
                             println("1: before IF-Else")
                             put(integer(2))
                         }
-                        case { switch }.block {
+                        case.of { switch }.block {
                             state {
                                 println("1: If-1")
                                 put(integer(3))
@@ -51,7 +51,7 @@ class SysStateFunctionTest {
                                 put(integer(5))
                             }
                         }
-                        case ({ !switch }) {
+                        case.of ({ !switch }) {
                             sleep(5)
                             continueLoop()
                             state { throw AssertionError() }
@@ -98,7 +98,7 @@ class SysStateFunctionTest {
                         println("2: before IF-Else")
                         put(integer(2))
                     }
-                    case { switch }.block {
+                    case.of { switch }.block {
                         state {
                             println("2: If-1")
                             put(integer(3))
@@ -112,10 +112,9 @@ class SysStateFunctionTest {
                             put(integer(5))
                         }
                     }
-                    case { !switch }.block {
+                    case.of { !switch }.block {
                         sleep(3)
-                    }
-                    otherwise {
+                    }.otherwise {
                         sleep(2)
                         continueLoop()
                         state { throw AssertionError() }
@@ -155,7 +154,7 @@ class SysStateFunctionTest {
             stateFunction(clk, false) {
                 var i = 0
                 infinite.block {
-                    case({ i++ > 11 }) { breakLoop() }
+                    case.of({ i++ > 11 }) { breakLoop() }
                     var switch = false
                     state {
                         println("start loop\n")
@@ -166,7 +165,7 @@ class SysStateFunctionTest {
                         println("before IF-Else\n")
                         check(integer(2))
                     }
-                    case { switch }.block {
+                    case.of { switch }.block {
                         state {
                             println("If-1\n")
                             check(integer(3))
@@ -179,8 +178,7 @@ class SysStateFunctionTest {
                             println("If-3\n")
                             check(integer(5))
                         }
-                    }
-                    otherwise {
+                    }.otherwise {
                         state {
                             println("Else-1\n")
                             check(integer(6))
