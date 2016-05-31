@@ -1,6 +1,5 @@
 package ru.spbstu.sysk.core
 
-import ru.spbstu.sysk.samples.processors.i8080.OPERATION
 import java.util.*
 
 sealed class Label {
@@ -132,13 +131,17 @@ interface StateContainer {
         states[current - 1] = func
     }
 
+    @Deprecated("")
     fun case(condition: () -> Boolean) = State.Block(this, { init -> case(condition, init) })
 
+    @Deprecated("")
     fun case(condition: () -> Boolean, init: StateContainer.() -> Unit) = caseBuilder(condition, init, true, "case")
 
+    @Deprecated("")
     val otherwise: State.Block
         get() = State.Block(this, { init -> otherwise(init) })
 
+    @Deprecated("")
     fun otherwise(init: StateContainer.() -> Unit) = caseBuilder({ true }, init, false, "case")
 
     fun continueLoop() {
@@ -172,7 +175,7 @@ interface StateContainer {
         val begin = Label.Internal()
         val end = Label.Internal()
         labelInternal(begin)
-        case({ !condition() }) { jumpInternal(end) }
+        case.of({ !condition() }) { jumpInternal(end) }
         val current = this.states.size
         this.init()
         toJump("break", end, this, current, this.states.size)
@@ -195,7 +198,7 @@ interface StateContainer {
         }
         states.add(reset)
         labelInternal(begin)
-        case({
+        case.of({
             val cond = iterator.hasNext()
             if (cond) iterator.next()
             !cond

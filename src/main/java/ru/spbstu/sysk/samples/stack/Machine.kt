@@ -49,18 +49,16 @@ class Machine(
                 stackAddr = readAddress
             }
             infinite.block {
-                case { opcode() == NOP }.state {
+                caseOf { opcode() }.of (NOP).state {
                     stackWr = ZERO
                     stackAddr = readAddress
-                }
-                case { opcode() == UNDEFINED }.state {
+                }.of (UNDEFINED).state {
                     stackWr = ZERO
                     stackAddr = readAddress
                     dout(undefined)
                     top = undefined
                     second = undefined
-                }
-                case { opcode() == PUSH }.state {
+                }.of (PUSH).state {
                     stackIn = second
                     second = top
                     top = din()
@@ -68,8 +66,7 @@ class Machine(
                     stackAddr = writeAddress
                     dout(din())
                     if (size < limit) size++
-                }
-                otherwise {
+                }.otherwise {
                     state {
                         val result = when (opcode()) {
                             PLUS -> top + second
