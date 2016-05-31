@@ -564,30 +564,21 @@ class ControlUnit(parent: SysModule) : SysModule("ControlUnit", parent) {
                     }.of(JMP_a16.id) {
                         jump()
                     }.of(JZ_a16.id) {
-                        //  BUG: IN case function. Upgrade to caseOf.of...of.otherwise fixed this bug
                         case.of({ flag()[6] == ONE }) { jump() }
-                        nop()
                     }.of(JNZ_a16.id) {
                         case.of({ flag()[6] == ZERO }) { jump() }
-                        nop()
                     }.of(JP_a16.id) {
                         case.of({ flag()[7] == ONE }) { jump() }
-                        nop()
                     }.of(JM_a16.id) {
                         case.of({ flag()[7] == ZERO }) { jump() }
-                        nop()
                     }.of(JC_a16.id) {
                         case.of({ flag()[0] == ONE }) { jump() }
-                        nop()
                     }.of(JNC_a16.id) {
                         case.of({ flag()[0] == ZERO }) { jump() }
-                        nop()
                     }.of(JPE_a16.id) {
                         case.of({ flag()[2] == ONE }) { jump() }
-                        nop()
                     }.of(JPO_a16.id) {
                         case.of({ flag()[2] == ZERO }) { jump() }
-                        nop()
                     }.otherwise {
                         state.println { "Skipped operation $operation" }
                     }
