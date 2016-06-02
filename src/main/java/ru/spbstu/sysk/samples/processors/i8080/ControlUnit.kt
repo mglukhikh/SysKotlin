@@ -169,21 +169,21 @@ class ControlUnit(parent: SysModule) : SysModule("ControlUnit", parent) {
             enRF(ONE)
             commandRF(READ_ADDRESS)
         }
-        caseOf { operation.id }.ofIn(MOV_A_B.id..MOV_A_A.id).state {
+        case { operation.id }.inside(MOV_A_B.id..MOV_A_A.id).state {
             registerRF(REGISTER.A)
-        }.ofIn(MOV_B_B.id..MOV_B_A.id).state {
+        }.inside(MOV_B_B.id..MOV_B_A.id).state {
             registerRF(REGISTER.B)
-        }.ofIn(MOV_C_B.id..MOV_C_A.id).state {
+        }.inside(MOV_C_B.id..MOV_C_A.id).state {
             registerRF(REGISTER.C)
-        }.ofIn(MOV_D_B.id..MOV_D_A.id).state {
+        }.inside(MOV_D_B.id..MOV_D_A.id).state {
             registerRF(REGISTER.D)
-        }.ofIn(MOV_E_B.id..MOV_E_A.id).state {
+        }.inside(MOV_E_B.id..MOV_E_A.id).state {
             registerRF(REGISTER.E)
-        }.ofIn(MOV_H_B.id..MOV_H_A.id).state {
+        }.inside(MOV_H_B.id..MOV_H_A.id).state {
             registerRF(REGISTER.H)
-        }.ofIn(MOV_L_B.id..MOV_L_A.id).state {
+        }.inside(MOV_L_B.id..MOV_L_A.id).state {
             registerRF(REGISTER.L)
-        }.ofIn(MOV_M_B.id..MOV_M_A.id).state {
+        }.inside(MOV_M_B.id..MOV_M_A.id).state {
             registerRF(REGISTER.HL)
         }
         state.instant { commandRF(WRITE_ADDRESS) }
@@ -419,37 +419,37 @@ class ControlUnit(parent: SysModule) : SysModule("ControlUnit", parent) {
                     state.instant { wait = true }
                     getOperation()
                     state.instant { operation = operationOF() }
-                    caseOf { operation.id }.of(NOP.id) {
+                    case { operation.id }.of(NOP.id) {
                         state.println { "NOP" }
-                    }.ofIn(ADD_B.id..ADD_A.id) {
+                    }.inside(ADD_B.id..ADD_A.id) {
                         add({ operation }, false)
                     }.of(ADI_d8.id) {
                         add({ ADD_A }, true)
-                    }.ofIn (ADC_B.id..ADC_A.id) {
+                    }.inside (ADC_B.id..ADC_A.id) {
                         adc({ operation }, false)
                     }.of(ACI_d8.id) {
                         adc({ ADC_A }, true)
-                    }.ofIn (SUB_B.id..SUB_A.id) {
+                    }.inside (SUB_B.id..SUB_A.id) {
                         sub({ operation }, false)
                     }.of(SUI_d8.id) {
                         sub({ SUB_A }, true)
-                    }.ofIn (SBB_B.id..SBB_A.id) {
+                    }.inside (SBB_B.id..SBB_A.id) {
                         sbb({ operation }, false)
                     }.of(SBI_d8.id) {
                         sbb({ SBB_A }, true)
-                    }.ofIn (XRA_B.id..XRA_A.id) {
+                    }.inside (XRA_B.id..XRA_A.id) {
                         xra({ operation }, false)
                     }.of(XRI_d8.id) {
                         xra({ XRA_A }, true)
-                    }.ofIn (ORA_B.id..ORA_A.id) {
+                    }.inside (ORA_B.id..ORA_A.id) {
                         ora({ operation }, false)
                     }.of(ORI_d8.id) {
                         ora({ ORA_A }, true)
-                    }.ofIn (ANA_B.id..ANA_A.id) {
+                    }.inside (ANA_B.id..ANA_A.id) {
                         ana({ operation }, false)
                     }.of(ANI_d8.id) {
                         ana({ ANA_A }, true)
-                    }.ofIn (CMP_B.id..CMP_A.id) {
+                    }.inside (CMP_B.id..CMP_A.id) {
                         cmp({ operation }, false)
                     }.of(CPI_d8.id) {
                         cmp({ CMP_A }, true)
@@ -461,7 +461,7 @@ class ControlUnit(parent: SysModule) : SysModule("ControlUnit", parent) {
                         dad(REGISTER.HL)
                     }.of(DAD_SP.id) {
                         dad(REGISTER.SP)
-                    }.ofIn (MOV_B_B.id..MOV_A_A.id) {
+                    }.inside (MOV_B_B.id..MOV_A_A.id) {
                         mov({ operation })
                     }.of(MVI_A_d8.id) {
                         mvi(REGISTER.A)

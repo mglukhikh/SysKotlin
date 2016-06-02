@@ -76,8 +76,6 @@ interface StateContainer {
         states.add(result)
     }
 
-    fun nop() = nopInternal("nop")
-
     fun nopInternal(name: String) {
         val result = State.Function(name, { false }) {
             nextState()
@@ -106,9 +104,10 @@ interface StateContainer {
     var id: Long
     private fun uniqueName() = "caseFamily${++id}"
 
-    fun <T : Any> caseOf(obj: () -> T) = State.Switch(this, obj, uniqueName(), { container, condition, init, isCase, familyName ->
+    fun <T : Any> case(obj: () -> T) = State.Switch(this, obj, uniqueName()) {
+        container, condition, init, isCase, familyName ->
         container.caseBuilder(condition, init, isCase, familyName)
-    })
+    }
 
     val case: State.Case
         get() = State.Case(this, uniqueName()) { container, condition, init, isCase, familyName ->
@@ -132,19 +131,6 @@ interface StateContainer {
         }
         states[current - 1] = func
     }
-
-    @Deprecated("")
-    fun case(condition: () -> Boolean) = State.Block(this, { init -> case(condition, init) })
-
-    @Deprecated("")
-    fun case(condition: () -> Boolean, init: StateContainer.() -> Unit) = caseBuilder(condition, init, true, "case")
-
-    @Deprecated("")
-    val otherwise: State.Block
-        get() = State.Block(this, { init -> otherwise(init) })
-
-    @Deprecated("")
-    fun otherwise(init: StateContainer.() -> Unit) = caseBuilder({ true }, init, false, "case")
 
     fun continueLoop() {
         states.add(State.LoopJumpFunction("continue"))
@@ -291,10 +277,10 @@ sealed class State {
             return this
         }
 
-        fun <R : Comparable<T>> ofIn(range: Iterable<R>)
+        fun <R : Comparable<T>> inside(range: Iterable<R>)
                 = SwitchBlock(container, { init -> case(container, { inRange(obj(), range) }, init, true, familyName) }, this)
 
-        fun <R : Comparable<T>> ofIn(range: Iterable<R>, init: StateContainer.() -> Unit): Switch<T> {
+        fun <R : Comparable<T>> inside(range: Iterable<R>, init: StateContainer.() -> Unit): Switch<T> {
             case(container, { inRange(obj(), range) }, init, true, familyName)
             return this
         }
