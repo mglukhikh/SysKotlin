@@ -1,6 +1,7 @@
 package ru.spbstu.sysk.data.integer
 
 import org.junit.Assert
+import org.junit.Assert.assertEquals
 import org.junit.Test
 import ru.spbstu.sysk.data.SysBit.ONE
 import ru.spbstu.sysk.data.SysBit.ZERO
@@ -8,10 +9,11 @@ import ru.spbstu.sysk.data.SysBit.ZERO
 class SysUnsignedTest {
     @Test
     fun constructionTest() {
-        SysUnsigned.valueOf(7, 127)
-        //println(a.toString())
-        //println(java.lang.Long.toBinaryString(a.value))
-        SysUnsigned.valueOf(7, 127L)
+
+
+        val a = unsigned(16, 255 shl 8 + 0)
+        val b = unsigned(16, 255) shl 8 + 0
+        assertEquals(a, b)
     }
 
     @Test
@@ -53,6 +55,7 @@ class SysUnsignedTest {
         Assert.assertArrayEquals(manySetThree, d.bits())
 
     }
+
 
     @Test
     fun testGet() {

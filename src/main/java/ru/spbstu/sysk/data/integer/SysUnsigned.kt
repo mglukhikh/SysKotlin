@@ -470,7 +470,6 @@ private constructor(
             return SysUnsigned(arr)
         }
 
-        //maybe some bugs
         fun valueOf(width: Int, value: Long): SysUnsigned {
             val realWidth = widthByValue(value)
             if (realWidth > width)
