@@ -2,6 +2,7 @@ package ru.spbstu.sysk.data.floating
 
 import ru.spbstu.sysk.data.SysBit
 import ru.spbstu.sysk.data.SysDataCompanion
+import ru.spbstu.sysk.data.integer.GInt
 import ru.spbstu.sysk.data.integer.SysUnsigned
 
 class SysDouble private constructor(
@@ -12,7 +13,7 @@ class SysDouble private constructor(
 ) : SysBaseFP(sign, exponent, mantissa, value) {
 
     constructor(sign: SysBit, exponent: SysUnsigned, mantissa: SysUnsigned) :
-            this(sign, exponent, mantissa, valueByBits(sign, exponent, mantissa))
+    this(sign, exponent, mantissa, valueByBits(sign, exponent, mantissa))
 
     override operator fun plus(arg: SysBaseFP) = valueOf(value + arg.value.toDouble())
     override operator fun minus(arg: SysBaseFP) = valueOf(value - arg.value.toDouble())
@@ -44,11 +45,11 @@ class SysDouble private constructor(
         private fun valueByBits(sign: SysBit, exponent: SysUnsigned, mantissa: SysUnsigned): Double {
             val mantis = mantissa.value
 
-            var result = mantis or ((exponent.value)shl 52)
+            var result = mantis or ((exponent.value) shl 52)
             if (sign == SysBit.ONE)
-                result = result or (1L shl 63)
+                result = result or GInt.UInt(1L shl 63)
 
-            return java.lang.Double.longBitsToDouble(result)
+            return java.lang.Double.longBitsToDouble(result.value)
         }
     }
 }
