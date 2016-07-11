@@ -53,6 +53,9 @@ class SysLongInteger private constructor(
         private val positiveValues = LongArray(MAX_WIDTH + 1, { i -> maxValue(i) })
         private val negativeValues = LongArray(MAX_WIDTH + 1, { i -> minValue(i) })
 
+        fun valueOf(width: Int, value: Long) = SysLongInteger(GInt.LInt(value), width)
+        fun valueOf(value: Long) = SysLongInteger(GInt.LInt(value))
+
         private fun minValue(width: Int): Long {
             if (width == 0) return 0
             if (width == MAX_WIDTH) return Long.MIN_VALUE

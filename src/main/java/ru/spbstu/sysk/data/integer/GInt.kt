@@ -3,7 +3,7 @@ package ru.spbstu.sysk.data.integer
 import ru.spbstu.sysk.data.SysBit
 import java.math.BigInteger
 
-sealed class GInt : Comparable<GInt> {
+sealed class GInt : Comparable<GInt>, Number() {
     abstract val value: Number
     abstract operator fun plus(arg: GInt): GInt
     abstract operator fun minus(arg: GInt): GInt
@@ -46,6 +46,14 @@ sealed class GInt : Comparable<GInt> {
 
     abstract fun toLInt(): LInt
     abstract fun toBInt(): BInt
+
+    override fun toLong() = toLInt().value
+    override fun toInt() = toLong().toInt()
+    override fun toShort() = toLong().toShort()
+    override fun toByte() = toLong().toByte()
+    override fun toChar() = toLong().toChar()
+    override fun toDouble() = toLong().toDouble()
+    override fun toFloat() = toLong().toFloat()
 
     protected fun Long.toBInt() = BigInteger.valueOf(this)
     protected fun Int.toBInt() = BigInteger.valueOf(this.toLong())

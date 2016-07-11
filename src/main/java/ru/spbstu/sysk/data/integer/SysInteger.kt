@@ -2,6 +2,8 @@ package ru.spbstu.sysk.data.integer
 
 import ru.spbstu.sysk.data.SysBit
 import ru.spbstu.sysk.data.SysData
+import ru.spbstu.sysk.data.SysDataCompanion
+import java.math.BigInteger
 
 abstract class SysInteger(
         val width: Int,
@@ -50,6 +52,9 @@ abstract class SysInteger(
     open operator fun div(arg: Long) = calc(value / arg)
     open operator fun mod(arg: Long) = calc(value % arg)
 
+    open operator fun inc() = calc(value.inc())
+    open operator fun dec() = calc(value.dec())
+
     operator fun get(i: Int): SysBit {
         if (i < 0 || i >= width) throw IndexOutOfBoundsException()
         if (hasUndefined) return bitsState[i]
@@ -60,7 +65,7 @@ abstract class SysInteger(
             SysBit.ZERO
     }
 
-    operator fun get(j: Int, i: Int): SysInteger {
+    open operator fun get(j: Int, i: Int): SysInteger {
         if (j < i) throw IllegalArgumentException()
         if (j >= width || i < 0) throw IndexOutOfBoundsException()
         val result = value shr i
@@ -69,7 +74,7 @@ abstract class SysInteger(
                 getPositiveValue(resWidth), getNegativeValue(resWidth))
     }
 
-    operator fun set(i: Int, bit: SysBit): SysInteger {
+    open operator fun set(i: Int, bit: SysBit): SysInteger {
         if (i < 0 || i >= width) throw IndexOutOfBoundsException()
         if (hasUndefined) {
             val newState = bitsState.copyOf()
@@ -86,7 +91,7 @@ abstract class SysInteger(
                 positiveMask, negativeMask)
     }
 
-    operator fun set(j: Int, i: Int, bits: Array<SysBit>): SysInteger {
+    open operator fun set(j: Int, i: Int, bits: Array<SysBit>): SysInteger {
         if (j < i) throw IllegalArgumentException()
         if (j >= width || i < 0) throw IndexOutOfBoundsException()
         if ((j - i + 1) != bits.size) throw IllegalArgumentException()
@@ -111,7 +116,7 @@ abstract class SysInteger(
                 positiveMask, negativeMask)
     }
 
-    operator fun set(j: Int, i: Int, arg: SysInteger): SysInteger {
+    open operator fun set(j: Int, i: Int, arg: SysInteger): SysInteger {
         if (j < i) throw IllegalArgumentException()
         if (j >= width || i < 0) throw IndexOutOfBoundsException()
         if ((j - i + 1) != arg.width) throw IllegalArgumentException()
@@ -119,7 +124,7 @@ abstract class SysInteger(
     }
 
 
-    fun inv(): SysInteger {
+    open fun inv(): SysInteger {
         if (hasUndefined) {
             val resultState = Array(bitsState.size, { i -> bitsState[i].not() })
             return valueOf(resultState)
@@ -128,17 +133,17 @@ abstract class SysInteger(
                 positiveMask, negativeMask)
     }
 
-    infix fun and(arg: SysInteger): SysInteger {
+    open infix fun and(arg: SysInteger): SysInteger {
         if (arg.width > width) return arg and this
         return bitwiseOperation(arg, SysBit::and, GInt::and)
     }
 
-    infix fun or(arg: SysInteger): SysInteger {
+    open infix fun or(arg: SysInteger): SysInteger {
         if (arg.width > width) return arg or this
         return bitwiseOperation(arg, SysBit::or, GInt::or)
     }
 
-    infix fun xor(arg: SysInteger): SysInteger {
+    open infix fun xor(arg: SysInteger): SysInteger {
         if (arg.width > width) return arg xor this
         return bitwiseOperation(arg, SysBit::xor, GInt::xor)
     }
@@ -162,7 +167,7 @@ abstract class SysInteger(
                 positiveMask, negativeMask)
     }
 
-    infix fun shl(shift: Int): SysInteger {
+    open infix fun shl(shift: Int): SysInteger {
         if (shift == 0) return this
         if (shift > width) throw IllegalArgumentException()
 
@@ -182,7 +187,7 @@ abstract class SysInteger(
                 positiveMask, negativeMask)
     }
 
-    infix fun shr(shift: Int): SysInteger {
+    open infix fun shr(shift: Int): SysInteger {
         if (shift == 0) return this
         if (shift > width || shift < 0) throw IllegalArgumentException()
 
@@ -200,7 +205,7 @@ abstract class SysInteger(
                 positiveMask, negativeMask)
     }
 
-    infix fun ushr(shift: Int): SysInteger {
+    open infix fun ushr(shift: Int): SysInteger {
         if (shift == 0) return this
         if (shift > width) throw IllegalArgumentException()
 
@@ -226,14 +231,14 @@ abstract class SysInteger(
         }
     }
 
-    infix fun cshl(shift: Int): SysInteger {
+    open infix fun cshl(shift: Int): SysInteger {
         if (shift < 0) return (this cshr -shift)
         val realShift = shift % width
         if (realShift == 0) return this
         return ((this shl realShift) or (this ushr -realShift))
     }
 
-    infix fun cshr(shift: Int): SysInteger {
+    open infix fun cshr(shift: Int): SysInteger {
         if (shift < 0) return (this cshl -shift)
         val realShift = shift % width
         if (realShift == 0) return this
@@ -254,6 +259,9 @@ abstract class SysInteger(
         return builder.toString()
     }
 
+    fun toLong() = value.toLong()
+    fun toInt() = value.toInt()
+
     override fun compareTo(other: SysInteger): Int {
         if (width != other.width) throw IllegalArgumentException("Non comparable. Width not equal.")
         return value.compareTo(other.value)
@@ -262,7 +270,7 @@ abstract class SysInteger(
     protected abstract fun getPositiveValue(width: Int): GInt
     protected abstract fun getNegativeValue(width: Int): GInt
 
-    companion object {
+    companion object : SysDataCompanion<SysInteger> {
 
         fun uninitialized(width: Int) = valueOf(Array(width, { i -> SysBit.X }))
 
@@ -286,6 +294,34 @@ abstract class SysInteger(
             return SysBigInteger(arr)
         }
 
+        fun valueOf(width: Int, value: Number): SysInteger {
+            if (width <= SysLongInteger.MAX_WIDTH)
+                return SysLongInteger.valueOf(width, value.toLong())
+            if (value is BigInteger)
+                return SysBigInteger.valueOf(width, value)
+            return SysBigInteger.valueOf(width, value.toLong())
+        }
+
+        operator fun invoke(arr: Array<SysBit>) = valueOf(arr)
+        operator fun invoke(width: Int, value: Long): SysInteger = SysLongInteger.valueOf(width, value)
+        override val undefined: SysInteger
+            get() = uninitialized(1)
+
     }
 }
 
+fun unsigned(width: Int, value: Int) = SysUnsigned.valueOf(width, value)
+
+fun unsigned(width: Int, value: Long) = SysUnsigned.valueOf(width, value)
+
+fun integer(value: Int) = SysLongInteger.valueOf(value.toLong())
+
+fun integer(value: Long) = SysLongInteger.valueOf(value)
+
+fun integer(width: Int, value: Int) = SysLongInteger.valueOf(width, value.toLong())
+
+fun integer(width: Int, value: Long) = SysLongInteger.valueOf(width, value)
+
+fun integer(width: Int, value: Number) = SysInteger.valueOf(width, value.toLong())
+
+fun integer(bits: Array<SysBit>) = SysInteger.valueOf(bits)
