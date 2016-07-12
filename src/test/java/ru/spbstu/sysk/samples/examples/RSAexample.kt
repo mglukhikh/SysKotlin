@@ -2,7 +2,8 @@ package ru.spbstu.sysk.samples.examples
 
 import org.junit.Ignore
 import org.junit.Test
-import ru.spbstu.sysk.data.integer.SysBigInteger
+import ru.spbstu.sysk.data.integer.SysInteger
+import ru.spbstu.sysk.data.integer.integer
 import java.math.BigInteger
 import java.util.*
 
@@ -24,7 +25,7 @@ class RSAexample {
         str[1] = '1'
         str[2] = '0'
 
-        for (i in  3..str.lastIndex) {
+        for (i in 3..str.lastIndex) {
             if (flip(0.5)) {
                 str[i] = '1'
             } else {
@@ -35,8 +36,8 @@ class RSAexample {
 
 
     // Return a positive remainder.
-    fun positiveRemainder(x: SysBigInteger, n: SysBigInteger): SysBigInteger {
-        if ( x.value.signum() < 0 )
+    fun positiveRemainder(x: SysInteger, n: SysInteger): SysInteger {
+        if (x.value < 0)
             return x + n
         return x
     }
@@ -48,17 +49,17 @@ class RSAexample {
     // and y is guaranteed by Euclid's algorithm.
 
     //TODO fix this
-    data class EuclidData(var a: SysBigInteger,
-                          var b: SysBigInteger,
-                          var d: SysBigInteger,
-                          var x: SysBigInteger,
-                          var y: SysBigInteger)
+    data class EuclidData(var a: SysInteger,
+                          var b: SysInteger,
+                          var d: SysInteger,
+                          var x: SysInteger,
+                          var y: SysInteger)
 
     fun euclid(arg: EuclidData): EuclidData {
         // println("arg $arg"
-        if ( arg.b.value != BigInteger.ZERO ) {
-            val aa: SysBigInteger = arg.b
-            val bb: SysBigInteger = arg.a % arg.b
+        if (arg.b.value != BigInteger.ZERO) {
+            val aa: SysInteger = arg.b
+            val bb: SysInteger = arg.a % arg.b
             val tempResult = euclid(EuclidData(aa, bb, arg.d, arg.x, arg.y))
             // println("temp $tempResult")
             //var tmp = x;
@@ -67,19 +68,19 @@ class RSAexample {
             return EuclidData(arg.a, arg.b, tempResult.d, tempResult.y, tempResult.x - (arg.a / arg.b) * tempResult.y)
         } else {
             // d = a;
-            //x = SysBigInteger.valueOf(1);
-            //y = SysBigInteger.valueOf(0);
-            return EuclidData(arg.a, arg.b, arg.a, SysBigInteger.Companion.valueOf(1), SysBigInteger.Companion.valueOf(0))
+            //x = SysInteger.valueOf(1);
+            //y = SysInteger.valueOf(0);
+            return EuclidData(arg.a, arg.b, arg.a, integer(1), integer(0))
         }
     }
 
     // Return the multiplicative inverse of a, modulo n, when a and n are
     // relatively prime. Recall that x is a multiplicative inverse of a,
     // modulo n, if a * x = 1 ( mod n ).
-    fun inverse(a: SysBigInteger, n: SysBigInteger): SysBigInteger {
-        val d = SysBigInteger(NBITS, BigInteger.ZERO)
-        val x = SysBigInteger(NBITS, BigInteger.ZERO)
-        val y = SysBigInteger(NBITS, BigInteger.ZERO)
+    fun inverse(a: SysInteger, n: SysInteger): SysInteger {
+        val d = SysInteger.valueOf(NBITS, BigInteger.ZERO)
+        val x = SysInteger.valueOf(NBITS, BigInteger.ZERO)
+        val y = SysInteger.valueOf(NBITS, BigInteger.ZERO)
         val result = euclid(EuclidData(a, n, d, x, y))
         assert(result.d.value == BigInteger.ONE) { d }
         //check this!
@@ -93,44 +94,47 @@ class RSAexample {
     // work; it usually iterates a few times. Recall that a is relatively
     // prime to n if their only common divisor is 1, i.e., gcd( a, n ) ==
     // 1.
-    fun findRelPrime(n: SysBigInteger): SysBigInteger {
+    fun findRelPrime(n: SysInteger): SysInteger {
         var a = BigInteger.valueOf(3)
         val two = BigInteger.valueOf(2)
-        while ( true ) {
-            if ( a.gcd(n.value) == BigInteger.ONE )
+        while (true) {
+            if (a.gcd(n.value.toBInt().value) == BigInteger.ONE)
                 break
             a += two
         }
-        if (a > n.value)
+        if (a > n.value.toBInt().value)
             throw ArithmeticException("n is not prime")
 
-        return SysBigInteger(NBITS, a)
+        return SysInteger.valueOf(NBITS, a)
     }
 
     // Return d = a^b % n, where ^ represents exponentiation.
-    fun modularExp(a: SysBigInteger, b: SysBigInteger, n: SysBigInteger) =
-            SysBigInteger(NBITS, a.value.modPow(b.value, n.value))
+    fun modularExp(a: SysInteger, b: SysInteger, n: SysInteger) =
+            SysInteger.valueOf(NBITS, a.value.toBInt().value.modPow(
+                    b.value.toBInt().value,
+                    n.value.toBInt().value))
 
-    fun cipher(msg: SysBigInteger, e: SysBigInteger, n: SysBigInteger) =
+    fun cipher(msg: SysInteger, e: SysInteger, n: SysInteger) =
             modularExp(msg, e, n)
 
     // Dencode or decipher the message in msg using the RSA secret key S=( d, n ).
-    fun decipher(msg: SysBigInteger, d: SysBigInteger, n: SysBigInteger) =
+    fun decipher(msg: SysInteger, d: SysInteger, n: SysInteger) =
             modularExp(msg, d, n)
 
     fun rsa(seed: Long) {
 
-        // val r = SysBigInteger(NBITS, BigInteger.probablePrime(HALF_NBITS, Random(seed)))
+        // val r = SysInteger(NBITS, BigInteger.probablePrime(HALF_NBITS, Random(seed)))
 
         // Find two large primes p and q.
-        val p = SysBigInteger(NBITS, BigInteger.probablePrime(HALF_NBITS, Random(seed)))
-        val q = SysBigInteger(NBITS, p.value.nextProbablePrime())
+        val prime = BigInteger.probablePrime(HALF_NBITS, Random(seed))
+        val p = SysInteger.valueOf(NBITS, prime)
+        val q = SysInteger.valueOf(NBITS, prime.nextProbablePrime())
 
         //println("p = $p \nq = $q")
 
         // Compute n and ( p - 1 ) * ( q - 1 ) = m.
         val n = p * q
-        val m = (p - 1) * ( q - 1 )
+        val m = (p - 1) * (q - 1)
 
         //println("m = $m")
 
@@ -153,7 +157,7 @@ class RSAexample {
         // Cipher and decipher a randomly generated message msg.
         val msgStr = CharArray(HALF_STR_SIZE)
         randBitStr(msgStr, HALF_STR_SIZE)
-        var msg = SysBigInteger(NBITS, BigInteger(String(msgStr), 2))
+        var msg = SysInteger.valueOf(NBITS, BigInteger(String(msgStr), 2))
 
         msg %= n // Make sure msg is smaller than n. If larger, this part
         // will be a block of the input message.
@@ -171,7 +175,7 @@ class RSAexample {
         println(msg2)
 
         // Make sure that the original message is recovered.
-        if ( msg == msg2 ) {
+        if (msg == msg2) {
             println("\nNote that the original message == the deciphered message, ")
             println("showing that this algorithm and implementation work correctly.\n")
         } else {

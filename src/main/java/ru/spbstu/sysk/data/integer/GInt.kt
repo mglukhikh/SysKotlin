@@ -3,7 +3,7 @@ package ru.spbstu.sysk.data.integer
 import ru.spbstu.sysk.data.SysBit
 import java.math.BigInteger
 
-sealed class GInt : Comparable<GInt>, Number() {
+sealed class GInt : Comparable<Int>, Number() {
     abstract val value: Number
     abstract operator fun plus(arg: GInt): GInt
     abstract operator fun minus(arg: GInt): GInt
@@ -41,8 +41,11 @@ sealed class GInt : Comparable<GInt>, Number() {
     abstract fun testBit(pos: Int): Boolean
     abstract fun setBit(bit: SysBit, i: Int): GInt
 
-    abstract infix fun eq(arg: Long): Boolean
-    abstract infix fun greater(arg: Long): Boolean
+    abstract infix fun eq(arg: GInt): Boolean
+    abstract infix fun greater(arg: GInt): Boolean
+    abstract infix fun less(arg: GInt): Boolean
+    abstract fun compareTo(arg: GInt): Int
+
 
     abstract fun toLInt(): LInt
     abstract fun toBInt(): BInt
@@ -66,6 +69,18 @@ sealed class GInt : Comparable<GInt>, Number() {
             mask = mask.setBit(i)
         return this.shiftRight(shift).and(mask)
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is GInt) return false
+        return compareTo(other) == 0
+    }
+
+    override fun hashCode(): Int {
+        return 17 * value.hashCode()
+    }
+
+    override fun toString() = "${value.toString()}"
 
     class BInt(override val value: BigInteger) : GInt() {
         override fun plus(arg: GInt) = when (arg) {
@@ -146,17 +161,15 @@ sealed class GInt : Comparable<GInt>, Number() {
         override fun setBit(bit: SysBit, i: Int)
                 = BInt(if (bit == SysBit.ONE) value.setBit(i) else value.clearBit(i))
 
-        override fun compareTo(other: GInt) = when (other) {
-            is BInt -> value.compareTo(other.value)
-            is LInt -> value.compareTo(other.value.toBInt())
-            is UInt -> value.compareTo(other.value.toBInt())
-        }
+        override fun compareTo(other: Int) = value.compareTo(other.toBInt())
+        override fun compareTo(arg: GInt) = value.compareTo(arg.toBInt().value)
 
         override fun toLInt() = LInt(value.longValueExact())
         override fun toBInt() = this
 
-        override fun eq(arg: Long) = value == arg.toBInt()
-        override fun greater(arg: Long) = value > arg.toBInt()
+        override fun eq(arg: GInt) = value == arg.toBInt().value
+        override fun greater(arg: GInt) = value > arg.toBInt().value
+        override fun less(arg: GInt) = value < arg.toBInt().value
     }
 
     class LInt(override val value: Long) : GInt() {
@@ -244,13 +257,25 @@ sealed class GInt : Comparable<GInt>, Number() {
         override fun toLInt() = this
         override fun toBInt() = BInt(value.toBInt())
 
-        override fun eq(arg: Long) = value == arg
-        override fun greater(arg: Long) = value > arg
+        override fun eq(arg: GInt) = when (arg) {
+            is BInt -> value.toBInt() == arg.value
+            else -> value == arg.toLInt().value
+        }
 
-        override fun compareTo(other: GInt) = when (other) {
-            is BInt -> value.toBInt().compareTo(other.value)
-            is LInt -> value.compareTo(other.value)
-            is UInt -> value.compareTo(other.value)
+        override fun greater(arg: GInt) = when (arg) {
+            is BInt -> value.toBInt() > arg.value
+            else -> value > arg.toLInt().value
+        }
+
+        override fun less(arg: GInt) = when (arg) {
+            is BInt -> value.toBInt() < arg.value
+            else -> value < arg.toLInt().value
+        }
+
+        override fun compareTo(other: Int) = value.compareTo(other)
+        override fun compareTo(arg: GInt) = when (arg) {
+            is BInt -> value.toBInt().compareTo(arg.value)
+            else -> value.compareTo(arg.toLInt().value)
         }
 
     }
@@ -349,15 +374,26 @@ sealed class GInt : Comparable<GInt>, Number() {
         override fun toLInt() = LInt(value)
         override fun toBInt() = BInt(value.toBInt())
 
-        override fun eq(arg: Long) = value == arg
-        override fun greater(arg: Long) = value > arg
-
-        override fun compareTo(other: GInt) = when (other) {
-            is BInt -> value.toBInt().compareTo(other.value)
-            is LInt -> value.compareTo(other.value)
-            is UInt -> value.compareTo(other.value)
+        override fun eq(arg: GInt) = when (arg) {
+            is BInt -> value.toBInt() == arg.value
+            else -> value == arg.toLInt().value
         }
 
+        override fun greater(arg: GInt) = when (arg) {
+            is BInt -> value.toBInt() > arg.value
+            else -> value > arg.toLInt().value
+        }
+
+        override fun less(arg: GInt) = when (arg) {
+            is BInt -> value.toBInt() < arg.value
+            else -> value < arg.toLInt().value
+        }
+
+        override fun compareTo(other: Int) = java.lang.Long.compareUnsigned(value, other.toLong())
+        override fun compareTo(arg: GInt) = when (arg) {
+            is BInt -> value.toBInt().compareTo(arg.value)
+            else -> value.compareTo(arg.toLInt().value)
+        }
 
     }
 

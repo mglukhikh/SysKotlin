@@ -30,7 +30,7 @@ class SysUnsigned private constructor(
             negativeMask = negativeMask)
 
     override fun extend(width: Int): SysInteger {
-        if (width < this.width) throw IllegalArgumentException("extended width smaller then current width")
+        if (width < this.width) throw IllegalArgumentException("extended width $width smaller then current width ${this.width}")
         if (width > MAX_WIDTH)
             return construct(width, value)
         return SysUnsigned(value, width)

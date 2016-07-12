@@ -116,7 +116,8 @@ class SysBigInteger private constructor(
 
         fun valueOf(width: Int, value: BigInteger) = SysBigInteger(GInt.BInt(value), width)
         fun valueOf(width: Int, value: Long) = SysBigInteger(GInt.BInt(BigInteger.valueOf(value)), width)
-
+        fun valueOf(arr: Array<SysBit>) = SysBigInteger(arr)
+        fun valueOf(arg: SysLongInteger) = valueOf(arg.width, arg.value)
 
     }
 }

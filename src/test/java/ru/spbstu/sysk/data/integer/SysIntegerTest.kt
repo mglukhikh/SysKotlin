@@ -15,20 +15,20 @@ class SysIntegerTest {
         val yy: @Width(6) SysLongInteger = SysLongInteger.valueOf(9)
         var y = yy.extend(6)
         assert(y.width == 6, { y })
-        var z: @Width(6) SysInteger = (x + y).toSysLongInteger()
+        var z = @Width(6) (x + y)
         assert(z.width == 6)
-        assert(z.equals(SysLongInteger(6, 14)), { z })
+        assert(z.equals(SysLongInteger.valueOf(6, 14)), { z })
         assert(z[2] == ONE, { z[2] })
-        assertEquals(SysLongInteger(4, 7), z[4, 1])
+        assertEquals(SysLongInteger.valueOf(4, 7), z[4, 1])
         y = y.extend(12)
         z = z.extend(12)
         val v: @Width(12) SysInteger = y * z
         assert(v.width == 12)
         assert(v.equals(SysInteger(12, 126)), { v })
-        val m = SysLongInteger(0, 0)
-        val n = SysLongInteger(32, 0)
+        val m = SysLongInteger.valueOf(0, 0)
+        val n = SysLongInteger.valueOf(32, 0)
         //assert(n[10] == X);
-        assert((m + n).equals(SysLongInteger(32, 0)))
+        assert((m + n).equals(SysLongInteger.valueOf(32, 0)))
         //assert((m + n)[10] == X)
         // println(x.toBitString())
     }
@@ -36,9 +36,9 @@ class SysIntegerTest {
     @Test
     fun testGet() {
 
-        val x = SysLongInteger(10, -128)
-        val y = SysLongInteger(10, 127)
-        val z = SysLongInteger(10, -1)
+        val x = SysLongInteger.valueOf(10, -128)
+        val y = SysLongInteger.valueOf(10, 127)
+        val z = SysLongInteger.valueOf(10, -1)
 
         val arrx = arrayOf(ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ONE, ONE, ONE)
         val arry = arrayOf(ONE, ONE, ONE, ONE, ONE, ONE, ONE, ZERO, ZERO, ZERO)
@@ -71,30 +71,30 @@ class SysIntegerTest {
 
     @Test
     fun testMath() {
-        val x: SysLongInteger = SysLongInteger(64, 62000L)
-        val y: SysLongInteger = SysLongInteger(32, 128000)
-        assert((x + y).equals(SysLongInteger(64, 190000)), { x + y })
-        assert((x - y).equals(SysLongInteger(64, -66000)))
-        assert((x * y).equals(SysLongInteger(64, 7936000000)))
-        assert((x / y).equals(SysLongInteger(64, 0)))
+        val x = SysLongInteger.valueOf(64, 62000L)
+        val y = SysLongInteger.valueOf(32, 128000)
+        assert((x + y).equals(SysLongInteger.valueOf(64, 190000)), { x + y })
+        assert((x - y).equals(SysLongInteger.valueOf(64, -66000)))
+        assert((x * y).equals(SysLongInteger.valueOf(64, 7936000000)))
+        assert((x / y).equals(SysLongInteger.valueOf(64, 0)))
         //assert((y / x).equals(SysInteger(64, 2)));
         //assert((x % y).equals(x));
         assert((x - y).equals(x + (-y)))
         assert((x - y).equals((-y) + x))
-        val z = SysLongInteger(32, 62000L)
-        assert((y / z).equals(SysLongInteger(32, 2)))
+        val z = SysLongInteger.valueOf(32, 62000L)
+        assert((y / z).equals(SysLongInteger.valueOf(32, 2)))
         assert((z % y).equals(z))
-        assert((-y).equals(SysLongInteger(32, -128000)))
+        assert((-y).equals(SysLongInteger.valueOf(32, -128000)))
     }
 
     @Test
     fun testLogic() {
 
-        val x: SysLongInteger = SysLongInteger(10, 127)
-        val y: SysLongInteger = SysLongInteger(8, 64)
+        val x = SysLongInteger.valueOf(10, 127)
+        val y = SysLongInteger.valueOf(8, 64)
 
 
-        var arr = arrayOf (ONE, ONE, ONE, ONE, ONE, ONE, ONE, ZERO, ZERO, ZERO)
+        var arr = arrayOf(ONE, ONE, ONE, ONE, ONE, ONE, ONE, ZERO, ZERO, ZERO)
         var z = SysLongInteger(arr)
 
         assertEquals(z, x or y)
@@ -104,7 +104,7 @@ class SysIntegerTest {
 
         assertEquals(z, x and y)
 
-        assertEquals(SysLongInteger(10, -128), x.inv())
+        assertEquals(SysLongInteger.valueOf(10, -128), x.inv())
 
         arr = arrayOf(ONE, ONE, ONE, ONE, ONE, ONE, ZERO, ZERO, ZERO, ZERO)
         z = SysLongInteger(arr)
@@ -131,13 +131,13 @@ class SysIntegerTest {
 
     @Test
     fun testMinMaxValues() {
-        val rcv = SysLongInteger(8, 0)
+        val rcv = SysLongInteger.valueOf(8, 0)
 
         val minValue = rcv.negativeMask
-        assertEquals(-128L, minValue)
+        assertEquals(-128L, minValue.toLong())
 
         val maxValue = rcv.positiveMask
-        assertEquals(127L, maxValue)
+        assertEquals(127L, maxValue.toLong())
 
     }
 
@@ -193,8 +193,8 @@ class SysIntegerTest {
         val width = 52
         var a = 1L shl width - 2
         var b = 1L shl width - 2
-        x = SysLongInteger(width, a)
-        y = SysLongInteger(width, b)
+        x = SysLongInteger.valueOf(width, a)
+        y = SysLongInteger.valueOf(width, b)
 
         val mask = -1L ushr ((64 - width) + 1)
         //        println(
@@ -205,26 +205,26 @@ class SysIntegerTest {
         //                        "${java.lang.Long.toBinaryString((y).value)}\n" +
         //                        "${java.lang.Long.toBinaryString((x + y).value)}\n"
         //        )
-        assert(allBitsEquals(a + b, (x + y).toSysLongInteger(), width - 1)) {
+        assert(allBitsEquals(a + b, (x + y), width - 1)) {
             "\n${java.lang.Long.toBinaryString(a + b)}\n" +
                     "${java.lang.Long.toBinaryString((x + y).value.toLong())}"
         }
 
         for (i in 0..99) {
 
-            a = Random().nextLong()and mask
-            b = Random().nextLong()and mask
+            a = Random().nextLong() and mask
+            b = Random().nextLong() and mask
 
-            x = SysLongInteger(SysLongInteger.Companion.MAX_WIDTH, a)
-            y = SysLongInteger(SysLongInteger.Companion.MAX_WIDTH, b)
+            x = SysLongInteger.valueOf(SysLongInteger.Companion.MAX_WIDTH, a)
+            y = SysLongInteger.valueOf(SysLongInteger.Companion.MAX_WIDTH, b)
             //println("iteration $i test 1")
             assert(allBitsEquals(a * b, x * y, SysLongInteger.MAX_WIDTH)) {
                 "\n${java.lang.Long.toBinaryString(a * b)}\n" +
                         "${java.lang.Long.toBinaryString((x * y).value.toLong())}"
             }
             //println("iteration $i test 2")
-            x = SysLongInteger(width, a)
-            y = SysLongInteger(width, b)
+            x = SysLongInteger.valueOf(width, a)
+            y = SysLongInteger.valueOf(width, b)
             assert(allBitsEquals(a * b, x * y, width - 1)) {
                 "\n${java.lang.Long.toBinaryString(a * b)}\n" +
                         "${java.lang.Long.toBinaryString((x * y).value.toLong())}"

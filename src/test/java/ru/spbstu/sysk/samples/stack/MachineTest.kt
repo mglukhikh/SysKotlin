@@ -1,6 +1,6 @@
 package ru.spbstu.sysk.samples.stack
 
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
 import org.junit.Test
 import ru.spbstu.sysk.channels.bind
 import ru.spbstu.sysk.core.SysTopModule

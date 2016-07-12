@@ -157,7 +157,7 @@ open class SignalReader<T : SysData>(
 open class NumberSignalReader(
         s: SysSignal<SysInteger>, writePort: SysOutput<SysInteger>?, vararg readPorts: SysInput<SysInteger>
 ) : Connector<SysInteger>(s, writePort, *readPorts), ReadOnlyProperty<SysModule, Number> {
-    override fun getValue(thisRef: SysModule, property: KProperty<*>) = s.value.value
+    override fun getValue(thisRef: SysModule, property: KProperty<*>) = s.value.toLong()
 }
 
 class SignalWriter<T : SysData>(

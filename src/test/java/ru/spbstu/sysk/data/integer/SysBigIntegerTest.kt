@@ -10,9 +10,9 @@ class SysBigIntegerTest {
     fun testGet() {
 
 
-        val x = SysBigInteger.valueOf(SysLongInteger(10, -128))
-        val y = SysBigInteger.valueOf(SysLongInteger(10, 127))
-        val z = SysBigInteger.valueOf(SysLongInteger(10, -1))
+        val x = SysBigInteger.valueOf(SysLongInteger.valueOf(10, -128))
+        val y = SysBigInteger.valueOf(SysLongInteger.valueOf(10, 127))
+        val z = SysBigInteger.valueOf(SysLongInteger.valueOf(10, -1))
 
         val arrx = arrayOf(ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ONE, ONE, ONE)
         val arry = arrayOf(ONE, ONE, ONE, ONE, ONE, ONE, ONE, ZERO, ZERO, ZERO)
@@ -26,9 +26,9 @@ class SysBigIntegerTest {
 
         }
 
-        val xx = SysBigInteger.valueOf(SysLongInteger(8, -128))
-        val yy = SysBigInteger.valueOf(SysLongInteger(8, 127))
-        val zz = SysBigInteger.valueOf(SysLongInteger(1, -1))
+        val xx = SysBigInteger.valueOf(SysLongInteger.valueOf(8, -128))
+        val yy = SysBigInteger.valueOf(SysLongInteger.valueOf(8, 127))
+        val zz = SysBigInteger.valueOf(SysLongInteger.valueOf(1, -1))
 
         val arrxx = arrayOf(ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ZERO, ONE)
         val arryy = arrayOf(ONE, ONE, ONE, ONE, ONE, ONE, ONE, ZERO)
@@ -63,40 +63,40 @@ class SysBigIntegerTest {
 
         }
 
-        assertEquals(x, (SysBigInteger(10, -128)))
-        assertEquals(y, (SysBigInteger(10, 127)))
-        assertEquals(z, (SysBigInteger(10, -1)))
+        assertEquals(x, (SysBigInteger.valueOf(10, -128)))
+        assertEquals(y, (SysBigInteger.valueOf(10, 127)))
+        assertEquals(z, (SysBigInteger.valueOf(10, -1)))
 
 
     }
 
     @Test
     fun testMath() {
-        val x: SysBigInteger = SysBigInteger(64, 62000L)
-        val y: SysBigInteger = SysBigInteger(32, 128000)
-        assert((x + y).equals(SysBigInteger(64, 190000))) { x + y }
-        assert((x - y).equals(SysBigInteger(64, -66000))) { x - y }
-        assert((x * y).equals(SysBigInteger(64, 7936000000)), { "x * y = ${x * y}" })
-        assert((x / y).equals(SysBigInteger(64, 0))) { x / y }
+        val x = SysBigInteger.valueOf(64, 62000L)
+        val y = SysBigInteger.valueOf(32, 128000)
+        assert((x + y).equals(SysBigInteger.valueOf(64, 190000))) { x + y }
+        assert((x - y).equals(SysBigInteger.valueOf(64, -66000))) { x - y }
+        assert((x * y).equals(SysBigInteger.valueOf(64, 7936000000)), { "x * y = ${x * y}" })
+        assert((x / y).equals(SysBigInteger.valueOf(64, 0))) { x / y }
         //assert((y / x).equals(SysInteger(64, 2)));
         //assert((x % y).equals(x));
         assert((x - y).equals(x + (-y)))
         assert((x - y).equals((-y) + x))
-        val z = SysBigInteger(32, 62000L)
-        assert((y / z).equals(SysBigInteger(32, 2)))
+        val z = SysBigInteger.valueOf(32, 62000L)
+        assert((y / z).equals(SysBigInteger.valueOf(32, 2)))
         assert((z % y).equals(z)) { 4 }
-        assert((-y).equals(SysBigInteger(32, -128000))) { -y }
+        assert((-y).equals(SysBigInteger.valueOf(32, -128000))) { -y }
     }
 
 
     @Test
     fun testLogic() {
 
-        val x: SysBigInteger = SysBigInteger(10, 127)
-        val y: SysBigInteger = SysBigInteger(8, 64)
+        val x = SysBigInteger.valueOf(10, 127)
+        val y = SysBigInteger.valueOf(8, 64)
 
 
-        var arr = arrayOf (ONE, ONE, ONE, ONE, ONE, ONE, ONE, ZERO, ZERO, ZERO)
+        var arr = arrayOf(ONE, ONE, ONE, ONE, ONE, ONE, ONE, ZERO, ZERO, ZERO)
         var z = SysBigInteger(arr)
 
         assertEquals((x or y), (z))
@@ -105,7 +105,7 @@ class SysBigIntegerTest {
         z = SysBigInteger(arr)
 
         assertEquals((x and y), (z))
-        assertEquals((x.inv()), (SysBigInteger(10, -128)))
+        assertEquals((x.inv()), (SysBigInteger.valueOf(10, -128)))
 
         arr = arrayOf(ONE, ONE, ONE, ONE, ONE, ONE, ZERO, ZERO, ZERO, ZERO)
         z = SysBigInteger(arr)

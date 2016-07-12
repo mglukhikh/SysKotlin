@@ -44,7 +44,7 @@ class StubTest : SysTopModule() {
         private var A: SysInteger = SysInteger(32, 0)
 
         private val init: () -> Unit = {
-            if (qCycles.toLong() == A.value) scheduler.stop()
+            if (A eq qCycles) scheduler.stop()
             A++
             exp(A)
         }

@@ -4,6 +4,11 @@ import ru.spbstu.sysk.data.SysBit
 import ru.spbstu.sysk.data.SysData
 import ru.spbstu.sysk.data.SysDataCompanion
 import java.math.BigInteger
+import java.util.*
+
+@Target(AnnotationTarget.EXPRESSION, AnnotationTarget.TYPE)
+@Retention(AnnotationRetention.SOURCE)
+annotation class Width(val value: Int)
 
 abstract class SysInteger(
         val width: Int,
@@ -17,9 +22,9 @@ abstract class SysInteger(
     abstract fun truncate(width: Int): SysInteger
 
     protected fun truncate(width: Int, value: GInt, positiveMask: GInt, negativeMask: GInt): SysInteger {
-        if (value > positiveMask)
+        if (value greater positiveMask)
             return construct(width, value or negativeMask, positiveMask, negativeMask)
-        if (value < negativeMask)
+        if (value less negativeMask)
             return construct(width, positiveMask + (value + positiveMask), positiveMask, negativeMask)
         return construct(width, value, positiveMask, negativeMask)
     }
@@ -54,6 +59,9 @@ abstract class SysInteger(
 
     open operator fun inc() = calc(value.inc())
     open operator fun dec() = calc(value.dec())
+    open operator fun unaryMinus() = calc(value.unaryMinus())
+
+    infix fun eq(arg: Int) = value.compareTo(arg) == 0
 
     operator fun get(i: Int): SysBit {
         if (i < 0 || i >= width) throw IndexOutOfBoundsException()
@@ -221,7 +229,7 @@ abstract class SysInteger(
 
             return valueOf(newBitsState)
         }
-        if (value greater 0L || value eq 0L)
+        if (value >= 0)
             return construct(width, value shr realShift,
                     positiveMask, negativeMask)
         else {
@@ -262,6 +270,7 @@ abstract class SysInteger(
     fun toLong() = value.toLong()
     fun toInt() = value.toInt()
 
+
     override fun compareTo(other: SysInteger): Int {
         if (width != other.width) throw IllegalArgumentException("Non comparable. Width not equal.")
         return value.compareTo(other.value)
@@ -269,6 +278,25 @@ abstract class SysInteger(
 
     protected abstract fun getPositiveValue(width: Int): GInt
     protected abstract fun getNegativeValue(width: Int): GInt
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is SysInteger) return false
+
+        if (width != other.width) return false
+        if (hasUndefined != other.hasUndefined) return false
+        return if (!hasUndefined) value == other.value
+        else Arrays.equals(bits(), other.bits())
+    }
+
+    override fun hashCode(): Int {
+        var result = width
+        result = 31 * result + value.hashCode()
+        result = 31 * result + hasUndefined.hashCode()
+        return result
+    }
+
+    override fun toString() = "${if (!hasUndefined) value.toString() else toBitString()}[$width]"
 
     companion object : SysDataCompanion<SysInteger> {
 
@@ -304,6 +332,7 @@ abstract class SysInteger(
 
         operator fun invoke(arr: Array<SysBit>) = valueOf(arr)
         operator fun invoke(width: Int, value: Long): SysInteger = SysLongInteger.valueOf(width, value)
+        operator fun invoke(width: Int, value: Int) = invoke(width, value.toLong())
         override val undefined: SysInteger
             get() = uninitialized(1)
 
