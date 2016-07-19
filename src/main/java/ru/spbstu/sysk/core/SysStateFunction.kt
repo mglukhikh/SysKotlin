@@ -104,15 +104,10 @@ interface StateContainer {
     var id: Long
     private fun uniqueName() = "caseFamily${++id}"
 
-    fun <T : Any> case(obj: () -> T) = State.Switch(this, obj, uniqueName()) {
-        container, condition, init, isCase, familyName ->
-        container.caseBuilder(condition, init, isCase, familyName)
-    }
+    fun <T : Any> case(obj: () -> T) = State.Switch(this, obj, uniqueName(), StateContainer::caseBuilder)
 
     val case: State.Case
-        get() = State.Case(this, uniqueName()) { container, condition, init, isCase, familyName ->
-            container.caseBuilder(condition, init, isCase, familyName)
-        }
+        get() = State.Case(this, uniqueName(), StateContainer::caseBuilder)
 
     private fun caseBuilder(condition: () -> Boolean, init: StateContainer.() -> Unit, isCase: Boolean, familyName: String) {
         states.add(State.CaseFunction("blank", { wait() }))
