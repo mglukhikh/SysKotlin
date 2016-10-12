@@ -1,10 +1,10 @@
 package ru.spbstu.sysk.data
 
 enum class SysBit(
-        open val one: Boolean = false,
-        open val zero: Boolean = false,
-        open val x: Boolean = false,
-        open val z: Boolean = false
+        val one: Boolean = false,
+        val zero: Boolean = false,
+        val x: Boolean = false,
+        val z: Boolean = false
 ) : SysData {
 
     ONE(one = true),
