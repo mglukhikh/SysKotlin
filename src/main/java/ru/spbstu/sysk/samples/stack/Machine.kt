@@ -49,7 +49,9 @@ class Machine(
                 stackAddr = readAddress
             }
             infinite.block {
-                case { opcode() }.of (NOP).state {
+                case {
+                    opcode()
+                }.of (NOP).state {
                     stackWr = ZERO
                     stackAddr = readAddress
                 }.of (UNDEFINED).state {
