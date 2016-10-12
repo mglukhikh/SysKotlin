@@ -86,7 +86,7 @@ class SysIntegerMemory(
 
 class SysUnsignedMemory(
         name: String,
-        private val addrWidth: Int,
+        addrWidth: Int,
         private val dataWidth: Int,
         parent: SysModule
 ) : SysMemory<SysUnsigned>(name, addrWidth, SysUnsigned.valueOf(Array(dataWidth, { SysBit.X })), parent, {
