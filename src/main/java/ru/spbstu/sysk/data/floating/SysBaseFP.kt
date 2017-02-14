@@ -24,7 +24,7 @@ abstract class SysBaseFP protected constructor(
     abstract operator fun minus(arg: SysBaseFP): SysBaseFP
     abstract operator fun times(arg: SysBaseFP): SysBaseFP
     abstract operator fun div(arg: SysBaseFP): SysBaseFP
-    abstract operator fun mod(arg: SysBaseFP): SysBaseFP
+    abstract operator fun rem(arg: SysBaseFP): SysBaseFP
 
     abstract fun power(arg: SysBaseFP): SysBaseFP
 

@@ -80,12 +80,12 @@ class SysBigInteger private constructor(
     override operator fun minus(arg: Long) = this - valueOf(arg)
     override operator fun times(arg: Long) = this * valueOf(arg)
     override operator fun div(arg: Long) = this / valueOf(arg)
-    override operator fun mod(arg: Long) = this % valueOf(arg)
+    override operator fun rem(arg: Long) = this % valueOf(arg)
     override operator fun plus(arg: Int) = this + valueOf(arg)
     override operator fun minus(arg: Int) = this - valueOf(arg)
     override operator fun times(arg: Int) = this * valueOf(arg)
     override operator fun div(arg: Int) = this / valueOf(arg)
-    override operator fun mod(arg: Int) = this % valueOf(arg)
+    override operator fun rem(arg: Int) = this % valueOf(arg)
 
     override operator fun inc() = truncate(width, value + BigInteger.ONE, positiveMask, negativeMask)
     override operator fun dec() = truncate(width, value - BigInteger.ONE, positiveMask, negativeMask)
@@ -134,7 +134,7 @@ class SysBigInteger private constructor(
     }
 
     /** Remainder of integer division*/
-    override operator fun mod(arg: SysInteger): SysBigInteger {
+    override operator fun rem(arg: SysInteger): SysBigInteger {
         if (hasUndefined || arg.hasUndefined)
             unknown(arg)
         val argv = arg.toSysBigInteger()

@@ -100,8 +100,8 @@ class SysLongInteger private constructor(
     override operator fun times(arg: Long) = truncate(this.width, this.value * arg, positiveMask, negativeMask)
     override operator fun div(arg: Int) = truncate(this.width, this.value / arg, positiveMask, negativeMask)
     override operator fun div(arg: Long) = truncate(this.width, this.value / arg, positiveMask, negativeMask)
-    override operator fun mod(arg: Int) = truncate(this.width, this.value / arg, positiveMask, negativeMask)
-    override operator fun mod(arg: Long) = truncate(this.width, this.value / arg, positiveMask, negativeMask)
+    override operator fun rem(arg: Int) = truncate(this.width, this.value / arg, positiveMask, negativeMask)
+    override operator fun rem(arg: Long) = truncate(this.width, this.value / arg, positiveMask, negativeMask)
     override operator fun inc() = truncate(this.width, this.value + 1, positiveMask, negativeMask)
     override operator fun dec() = truncate(this.width, this.value - 1, positiveMask, negativeMask)
 
@@ -145,7 +145,7 @@ class SysLongInteger private constructor(
     }
 
     /** Remainder of integer division*/
-    override operator fun mod(arg: SysInteger): SysInteger {
+    override operator fun rem(arg: SysInteger): SysInteger {
         if (hasUndefined || arg.hasUndefined)
             return SysInteger.uninitialized(Math.max(width, arg.width))
         if (arg.width > MAX_WIDTH)

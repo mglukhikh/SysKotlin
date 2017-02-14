@@ -18,7 +18,7 @@ class SysDouble private constructor(
     override operator fun minus(arg: SysBaseFP) = valueOf(value - arg.value.toDouble())
     override operator fun times(arg: SysBaseFP) = valueOf(value * arg.value.toDouble())
     override operator fun div(arg: SysBaseFP) = valueOf(value / arg.value.toDouble())
-    override operator fun mod(arg: SysBaseFP) = valueOf(value % arg.value.toDouble())
+    override operator fun rem(arg: SysBaseFP) = valueOf(value % arg.value.toDouble())
     override fun power(arg: SysBaseFP) = valueOf(Math.pow(value, arg.value.toDouble()))
 
     companion object : SysDataCompanion<SysDouble> {

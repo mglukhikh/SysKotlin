@@ -47,7 +47,7 @@ open class SysUnaryBitMoore<State, Output : SysData>(
 }
 
 class LatchTriggerMoore(name: String, parent: SysModule): SysUnaryBitMoore<SysBit, SysBit>(
-        { prev: SysBit, data: SysBit -> data },
+        { _: SysBit, data: SysBit -> data },
         { it },
         X,
         name,

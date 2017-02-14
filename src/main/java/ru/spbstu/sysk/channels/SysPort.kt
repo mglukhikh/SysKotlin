@@ -163,7 +163,7 @@ class SysBitInput internal constructor(
         get() = value.x
 
     override fun bound() = super.bound()?.let {
-        (it as? SysBitRead) ?: throw AssertionError("Port $name is bound to $it : ${it.javaClass} which is not a bit read interface")
+        (it as? SysBitRead) ?: throw AssertionError("Port $name is bound to $it : ${it::class.java} which is not a bit read interface")
     }
 }
 

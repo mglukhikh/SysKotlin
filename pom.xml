@@ -8,8 +8,24 @@
     <artifactId>sysk</artifactId>
     <version>0.0.1</version>
 
+    <repositories>
+        <repository>
+            <id>bintray</id>
+            <name>bintray</name>
+            <url>http://dl.bintray.com/kotlin/kotlin-dev</url>
+        </repository>
+    </repositories>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>bintray</id>
+            <name>bintray</name>
+            <url>http://dl.bintray.com/kotlin/kotlin-dev</url>
+        </pluginRepository>
+    </pluginRepositories>
+
     <properties>
-        <kotlin.version>1.0.4</kotlin.version>
+        <kotlin.version>1.1.0-rc-69</kotlin.version>
     </properties>
 
     <dependencies>

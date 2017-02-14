@@ -53,8 +53,8 @@ private constructor(
             return SysUnsigned(width, value and positiveMask, positiveMask)
     }
 
-    private fun unknown(arg: SysUnsigned) = SysUnsigned(Array(Math.max(arg.width, width), { i -> SysBit.X }))
-    private fun unknown(arg: SysInteger) = SysInteger(Array(Math.max(arg.width, width), { i -> SysBit.X }))
+    private fun unknown(arg: SysUnsigned) = SysUnsigned(Array(Math.max(arg.width, width), { _ -> SysBit.X }))
+    private fun unknown(arg: SysInteger) = SysInteger(Array(Math.max(arg.width, width), { _ -> SysBit.X }))
 
     operator fun plus(arg: SysUnsigned): SysUnsigned {
         if (hasUndefined || arg.hasUndefined)
@@ -92,7 +92,7 @@ private constructor(
             return truncate(width, java.lang.Long.divideUnsigned(value, arg.value), positiveMask)
     }
 
-    operator fun mod(arg: SysUnsigned): SysUnsigned {
+    operator fun rem(arg: SysUnsigned): SysUnsigned {
         if (hasUndefined || arg.hasUndefined)
             return unknown(arg)
         if (arg.width > width)
@@ -133,7 +133,7 @@ private constructor(
         return toSysLongInteger() / arg
     }
 
-    override operator fun mod(arg: SysInteger): SysInteger {
+    override operator fun rem(arg: SysInteger): SysInteger {
         if (hasUndefined || arg.hasUndefined)
             return unknown(arg)
         if (arg.width > MAX_WIDTH)
@@ -365,9 +365,9 @@ private constructor(
 
     override fun div(arg: Long) = this / valueOf(64, arg)
 
-    override fun mod(arg: Int) = this % valueOf(32, arg)
+    override fun rem(arg: Int) = this % valueOf(32, arg)
 
-    override fun mod(arg: Long) = this % valueOf(64, arg)
+    override fun rem(arg: Long) = this % valueOf(64, arg)
 
     override fun power(exp: Int) = truncate(width, Math.pow(this.value.toDouble(), exp.toDouble()).toLong(), positiveMask)
 
@@ -479,7 +479,7 @@ private constructor(
         }
 
         private fun valueBySWSArray(arr: Array<SysBit>): Long {
-            val value = CharArray(64, { i -> '0' })
+            val value = CharArray(64, { _ -> '0' })
             var counter: Int = 0
             while (counter < arr.size && arr[counter] == SysBit.X)
                 counter++

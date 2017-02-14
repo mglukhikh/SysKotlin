@@ -18,7 +18,7 @@ class SysFloat private constructor(
     override operator fun minus(arg: SysBaseFP) = valueOf(value - arg.value.toFloat())
     override operator fun times(arg: SysBaseFP) = valueOf(value * arg.value.toFloat())
     override operator fun div(arg: SysBaseFP) = valueOf(value / arg.value.toFloat())
-    override operator fun mod(arg: SysBaseFP) = valueOf(value % arg.value.toFloat())
+    override operator fun rem(arg: SysBaseFP) = valueOf(value % arg.value.toFloat())
     override fun power(arg: SysBaseFP) = valueOf(Math.pow(value.toDouble(), arg.value.toDouble()).toFloat())
 
     companion object : SysDataCompanion<SysFloat> {
@@ -43,7 +43,7 @@ class SysFloat private constructor(
         private fun valueByBits(sign: SysBit, exponent: SysUnsigned, mantissa: SysUnsigned): Float {
             val mantis = mantissa.value.toInt()
 
-            var result = mantis.toInt() or ((exponent.value.toInt())shl 23)
+            var result = mantis or ((exponent.value.toInt())shl 23)
             if (sign == SysBit.ONE)
                 result = result or (1 shl 31)
 

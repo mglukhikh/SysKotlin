@@ -23,7 +23,7 @@ abstract class SysInteger protected constructor(
     abstract operator fun minus(arg: SysInteger): SysInteger
     abstract operator fun times(arg: SysInteger): SysInteger
     abstract operator fun div(arg: SysInteger): SysInteger
-    abstract operator fun mod(arg: SysInteger): SysInteger
+    abstract operator fun rem(arg: SysInteger): SysInteger
     abstract operator fun unaryMinus(): SysInteger
 
     abstract operator fun plus(arg: Int): SysInteger
@@ -34,8 +34,8 @@ abstract class SysInteger protected constructor(
     abstract operator fun times(arg: Long): SysInteger
     abstract operator fun div(arg: Int): SysInteger
     abstract operator fun div(arg: Long): SysInteger
-    abstract operator fun mod(arg: Int): SysInteger
-    abstract operator fun mod(arg: Long): SysInteger
+    abstract operator fun rem(arg: Int): SysInteger
+    abstract operator fun rem(arg: Long): SysInteger
     abstract operator fun inc(): SysInteger
     abstract operator fun dec(): SysInteger
 

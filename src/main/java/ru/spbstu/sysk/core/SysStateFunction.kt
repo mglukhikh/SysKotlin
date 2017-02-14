@@ -265,10 +265,10 @@ sealed class State {
     ) {
 
         fun of(obj: T)
-                = SwitchBlock(container, { init -> case(container, { obj().equals(obj) }, init, true, familyName) }, this)
+                = SwitchBlock(container, { init -> case(container, { obj() == obj }, init, true, familyName) }, this)
 
         fun of(obj: T, init: StateContainer.() -> Unit): Switch<T> {
-            case(container, { obj().equals(obj) }, init, true, familyName)
+            case(container, { obj() == obj }, init, true, familyName)
             return this
         }
 
@@ -281,7 +281,7 @@ sealed class State {
         }
 
         private fun <Type : Any, R : Comparable<Type>> inRange(obj: Type, range: Iterable<R>)
-                = (range.first().compareTo(obj) <= 0) && (range.last().compareTo(obj) >= 0)
+                = (range.first() <= obj) && (range.last() >= obj)
 
         val otherwise: Block
             get() = Block(container, { init -> case(container, { true }, init, false, familyName) })
